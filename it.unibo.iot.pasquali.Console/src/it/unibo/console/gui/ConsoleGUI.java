@@ -1,6 +1,7 @@
 package it.unibo.console.gui;
 
 import java.awt.EventQueue;
+import java.awt.FileDialog;
 
 import javax.swing.JFrame;
 import java.awt.Component;
@@ -17,6 +18,8 @@ import javax.swing.JFileChooser;
 import javax.swing.JPanel;
 import javax.swing.border.TitledBorder;
 
+import it.unibo.domain.model.interfaces.IConsole;
+import it.unibo.domain.model.interfaces.IMap;
 import it.unibo.is.interfaces.IActivity;
 import it.unibo.is.interfaces.IActivityBase;
 import it.unibo.is.interfaces.IBasicEnvAwt;
@@ -31,8 +34,10 @@ import javax.swing.JLabel;
 import java.awt.Font;
 import java.awt.Frame;
 import javax.swing.JTextArea;
+import javax.swing.JRadioButton;
+import java.awt.Choice;
 
-public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt{
+public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt, IConsole{
 
 	/**
 	 * 
@@ -47,11 +52,20 @@ public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt{
 	private JTextField txtGoalY;
 	private JTextArea txtDefaultOutput;
 	
+	private JButton btnLoad;
+	private JButton btnStore;
+	private JButton btnExplore;
+	private JButton btnNavigate;
+	private JButton btnAbort;
+	
+	
+	private Choice envTypeChoice;
+	
 	protected String curVal = "";
 
 	private IActivityBase controller;
 	
-	private JFileChooser fileLoader, fileSaver;
+	//private JFileChooser fileLoader, fileSaver;
 
 
 	/**
@@ -112,7 +126,7 @@ public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt{
 		gbc_boxMapManager.gridy = 1;
 		frame.getContentPane().add(boxMapManager, gbc_boxMapManager);
 		
-		JButton btnLoad = new JButton("Load Map");
+		btnLoad = new JButton("Load Map");
 		btnLoad.addActionListener(new DefaultInputHandler());
 		btnLoad.setFont(new Font("Tahoma", Font.PLAIN, 15));
 		boxMapManager.add(btnLoad);
@@ -120,18 +134,13 @@ public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt{
 		Component horizontalStrut = Box.createHorizontalStrut(10);
 		boxMapManager.add(horizontalStrut);
 		
-		JButton btnStore = new JButton("Store Map");
+		btnStore = new JButton("Store Map");
 		btnStore.addActionListener(new DefaultInputHandler());
 		btnStore.setFont(new Font("Tahoma", Font.PLAIN, 15));
 		boxMapManager.add(btnStore);
 		
 		Component horizontalStrut_1 = Box.createHorizontalStrut(10);
 		boxMapManager.add(horizontalStrut_1);
-		
-		JTextField txtPath = new JTextField();
-		txtPath.setText("path");
-		txtPath.setColumns(100);
-		boxMapManager.add(txtPath);
 		
 		Component verticalStrut_1 = Box.createVerticalStrut(20);
 		GridBagConstraints gbc_verticalStrut_1 = new GridBagConstraints();
@@ -176,7 +185,7 @@ public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt{
 		GridBagConstraints gbc_lblMaximumExplorationTime = new GridBagConstraints();
 		gbc_lblMaximumExplorationTime.gridwidth = 3;
 		gbc_lblMaximumExplorationTime.anchor = GridBagConstraints.WEST;
-		gbc_lblMaximumExplorationTime.insets = new Insets(0, 0, 5, 5);
+		gbc_lblMaximumExplorationTime.insets = new Insets(0, 0, 5, 0);
 		gbc_lblMaximumExplorationTime.gridx = 0;
 		gbc_lblMaximumExplorationTime.gridy = 1;
 		explorePanel.add(lblMaximumExplorationTime, gbc_lblMaximumExplorationTime);
@@ -185,13 +194,13 @@ public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt{
 		GridBagConstraints gbc_txtExploreTime = new GridBagConstraints();
 		gbc_txtExploreTime.fill = GridBagConstraints.HORIZONTAL;
 		gbc_txtExploreTime.gridwidth = 3;
-		gbc_txtExploreTime.insets = new Insets(0, 0, 5, 5);
+		gbc_txtExploreTime.insets = new Insets(0, 0, 5, 0);
 		gbc_txtExploreTime.gridx = 0;
 		gbc_txtExploreTime.gridy = 2;
 		explorePanel.add(txtExploreTime, gbc_txtExploreTime);
 		txtExploreTime.setColumns(10);
 		
-		JButton btnExplore = new JButton("Explore");
+		btnExplore = new JButton("Explore");
 		btnExplore.addActionListener(new DefaultInputHandler());
 		btnExplore.setFont(new Font("Tahoma", Font.PLAIN, 15));
 		GridBagConstraints gbc_btnExplore = new GridBagConstraints();
@@ -200,6 +209,23 @@ public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt{
 		gbc_btnExplore.gridx = 0;
 		gbc_btnExplore.gridy = 3;
 		explorePanel.add(btnExplore, gbc_btnExplore);
+		
+		envTypeChoice = new Choice();
+		envTypeChoice.setFont(new Font("Dialog", Font.PLAIN, 15));
+		envTypeChoice.add("open");
+		envTypeChoice.add("close");
+		
+		JLabel lblEnvType = new JLabel("Env Type");
+		lblEnvType.setFont(new Font("Tahoma", Font.PLAIN, 15));
+		GridBagConstraints gbc_lblEnvType = new GridBagConstraints();
+		gbc_lblEnvType.insets = new Insets(0, 0, 0, 5);
+		gbc_lblEnvType.gridx = 1;
+		gbc_lblEnvType.gridy = 3;
+		explorePanel.add(lblEnvType, gbc_lblEnvType);
+		GridBagConstraints gbc_envTypeChoice = new GridBagConstraints();
+		gbc_envTypeChoice.gridx = 2;
+		gbc_envTypeChoice.gridy = 3;
+		explorePanel.add(envTypeChoice, gbc_envTypeChoice);
 		
 		JPanel navigatePanel = new JPanel();
 		navigatePanel.setBorder(new TitledBorder(null, "Navigation", TitledBorder.LEADING, TitledBorder.TOP, new Font("Tahoma", Font.PLAIN, 13), null));
@@ -290,7 +316,7 @@ public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt{
 		navigatePanel.add(txtGoalY, gbc_txtGoalY);
 		txtGoalY.setColumns(10);
 		
-		JButton btnNavigate = new JButton("Navigate");
+		btnNavigate = new JButton("Navigate");
 		btnNavigate.addActionListener(new DefaultInputHandler());
 		btnNavigate.setFont(new Font("Tahoma", Font.PLAIN, 15));
 		GridBagConstraints gbc_btnNavigate = new GridBagConstraints();
@@ -300,7 +326,8 @@ public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt{
 		gbc_btnNavigate.gridy = 6;
 		navigatePanel.add(btnNavigate, gbc_btnNavigate);
 		
-		JButton btnAbort = new JButton("Abort");
+		btnAbort = new JButton("Abort");
+		btnAbort.setEnabled(false);
 		btnAbort.addActionListener(new DefaultInputHandler());
 		btnAbort.setFont(new Font("Tahoma", Font.PLAIN, 15));
 		GridBagConstraints gbc_btnAbort = new GridBagConstraints();
@@ -314,12 +341,13 @@ public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt{
 		txtDefaultOutput.setRows(20);
 		bodyPanel.setRightComponent(txtDefaultOutput);
 		
+		/*
 		fileLoader = new JFileChooser();
-		fileLoader .setFileSelectionMode(JFileChooser.FILES_ONLY);
+		fileLoader.setFileSelectionMode(JFileChooser.FILES_ONLY);
 		
 		fileSaver = new JFileChooser();
 		fileSaver.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-		
+		*/
 	}
 
 
@@ -329,32 +357,128 @@ public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt{
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			
-			int dialogRetVal;
-			
 			switch(e.getActionCommand())
 			{
-			case "Load Map":
+			case "Load Map":				
+				FileDialog loadDialog = new FileDialog(frame, "Choose the Map", FileDialog.LOAD);
+				loadDialog.setDirectory("C:\\");
+				loadDialog.setFile("*.json");
+				loadDialog.setVisible(true);
+				String filename = loadDialog.getDirectory()+loadDialog.getFile();				
 				
-				dialogRetVal = fileLoader.showDialog(frame, "Load");
-				
-				if(dialogRetVal == JFileChooser.APPROVE_OPTION)
-				{
-					
-				}
-				
-				
+				controller.execAction("LOAD "+filename);			
 				break;
-			case "Store Map":
-				controller.execAction("STORE");
+				
+			case "Store Map":				
+				FileDialog storeDialog = new FileDialog(frame, "Create a File", FileDialog.SAVE);
+				storeDialog.setDirectory("C:\\");
+				storeDialog.setFile("*.json");
+				storeDialog.setVisible(true);
+				filename = storeDialog.getDirectory()+storeDialog.getFile();
+				
+				controller.execAction("STORE "+filename);
 				break;
+				
 			case "Navigate":
-				controller.execAction("NAVIGATE");
+				
+				String sx = txtStartX.getText();
+				String sy = txtStartY.getText();
+				String gx = txtGoalX.getText();
+				String gy = txtGoalY.getText();
+				
+				if(!gx.equals("") && !gy.equals(""))
+				{
+					if(!sx.equals("") && !sy.equals(""))
+					{
+						try
+						{
+							controller.execAction("NAVIGATE "
+								+Integer.parseInt(sx)+","						
+								+Integer.parseInt(sy)+","
+								+Integer.parseInt(gx)+","
+								+Integer.parseInt(gy)+","
+								);
+							
+							btnAbort.setEnabled(true);
+							
+							btnExplore.setEnabled(false);
+							btnLoad.setEnabled(false);
+							btnStore.setEnabled(false);
+						}
+						catch(NumberFormatException e1)
+						{
+							println(e1.getMessage());
+						}
+					}
+					else
+					{
+						try
+						{
+							controller.execAction("NAVIGATE "
+								+Integer.parseInt(gx)+","
+								+Integer.parseInt(gy)+","
+								);
+							
+							btnAbort.setEnabled(true);
+							
+							btnExplore.setEnabled(false);
+							btnNavigate.setEnabled(false);
+							btnLoad.setEnabled(false);
+							btnStore.setEnabled(false);
+						}
+						catch(NumberFormatException e1)
+						{
+							println(e1.getMessage());
+						}
+					}
+				}
+				else
+					println("ERROR: invalid GOAL position");
 				break;
-			case "Explore":
-				controller.execAction("EXPLORE");
+				
+			case "Explore":				
+
+				String mils = txtExploreTime.getText();
+				
+				if(mils.equals(""))
+				{
+					println("please insert max explore time");
+				}
+				else
+				{
+					String envType = envTypeChoice.getSelectedItem();
+					
+					try
+					{
+						controller.execAction("EXPLORE "
+							+envType+","
+							+Long.parseLong(mils)
+							);
+						
+						btnAbort.setEnabled(true);
+						
+						btnNavigate.setEnabled(false);
+						btnExplore.setEnabled(false);
+						btnLoad.setEnabled(false);
+						btnStore.setEnabled(false);						
+					}
+					catch(NumberFormatException e1)
+					{
+						println(e1.getMessage());
+					}
+				}				
 				break;
+				
 			case "Abort":
-				controller.execAction("ABORT");
+				controller.execAction("ABORT ");
+				
+				btnAbort.setEnabled(false);
+				
+				btnNavigate.setEnabled(true);
+				btnExplore.setEnabled(true);
+				btnLoad.setEnabled(true);
+				btnStore.setEnabled(true);
+				
 				break;
 			default:
 				addOutput("Invalid command");
@@ -373,6 +497,7 @@ public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt{
 		txtDefaultOutput.setText("");
 		txtDefaultOutput.validate();
 	}//clear
+	
 
 	
 	
@@ -497,6 +622,68 @@ public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt{
 	@Override
 	public void setEnvVisible(boolean b) {
 		setVisible(b);	
+	}
+
+	
+	
+	/*
+	 *=============================================================
+	 * EREDITATE DA IConsole
+	 *=============================================================
+	 */
+	
+	
+	@Override
+	public IMap explore(String EnvType, long maxMilsTime) {
+		return null;
+	}
+
+	@Override
+	public void navigate(double goalX, double goalY) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void navigate(double startX, double startY, double goalX, double goalY) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void adbort() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void storeMap(IMap map, String filepath) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public IMap loadMap(String filepath) {
+		return null;
+	}
+
+	@Override
+	public IMap getMap() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String getName() {
+		return curVal;
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public String getDefaultRep() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 

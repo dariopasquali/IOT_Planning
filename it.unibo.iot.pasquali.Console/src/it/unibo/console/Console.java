@@ -7,10 +7,7 @@ import it.unibo.console.gui.ConsoleGUI;
 import it.unibo.is.interfaces.IOutputEnvView;
 import it.unibo.qactors.ActorContext;
 
-public class Console extends AbstractConsole { 
-	
-	
-	
+public class Console extends AbstractConsole { 	
 	
 	public Console(String actorId, ActorContext myCtx, IOutputEnvView outEnvView )  throws Exception{
 		super(actorId, myCtx, outEnvView);
@@ -20,26 +17,48 @@ public class Console extends AbstractConsole {
 	@Override
 	public void execAction(String cmd) {
 		
-		switch (cmd){
+		String[] command = cmd.split(" ");
+		
+		
+		
+		switch (command[0]){
 		case "LOAD":
-			platform.raiseEvent("input", "local_gui_command", "command(load)");
+			String[] params = command[1].split(",");
+			platform.raiseEvent("input", "local_gui_command", "command(load("+params[0]+")");
 			break;
+			
 		case "STORE":
-			platform.raiseEvent("input", "local_gui_command", "command(store)");
+			params = command[1].split(",");
+			platform.raiseEvent("input", "local_gui_command", "command(store("+params[0]+")");
 			break;
+			
 		case "NAVIGATE":
-			platform.raiseEvent("input", "local_gui_command", "command(navigate)");
+			params = command[1].split(",");
+			if(params.length == 4)
+				platform.raiseEvent("input", "local_gui_command", "command(navigate("
+						+ "position(" + params[0] + "," + params[1]+")"
+								+ ","
+						+ "position(" + params[2] + "," + params[3]+")"
+								+ "))");
+			else
+				platform.raiseEvent("input", "local_gui_command", "command(navigate("
+						+ "position(" + params[0] + "," + params[1]+")"
+								+ "))");
+			
 			break;
+			
+			
 		case "EXPLORE":
-			platform.raiseEvent("input", "local_gui_command", "command(explore(close, 600000))");
+			params = command[1].split(",");
+			platform.raiseEvent("input", "local_gui_command", "command(explore(" + params[0] + ","+ params[1] +"))");
 			break;
+			
+			
 		case "ABORT":
 			platform.raiseEvent("input", "local_gui_command", "command(abort)");
 			break;
 		default:
 			println("Invalid command");
 		}
-	}
-	
-	
+	}	
 }

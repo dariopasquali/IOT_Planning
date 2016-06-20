@@ -20,28 +20,28 @@ public abstract class AbstractConsole extends QActorPlanned implements IActivity
 	protected boolean actionResult = true;
 	protected alice.tuprolog.SolveInfo sol;
 	
-			protected static IOutputEnvView setTheEnv(IOutputEnvView outEnvView ){
-				//EnvFrame env = new EnvFrame( "Env_console", java.awt.Color.cyan  , java.awt.Color.black );
-				//env.init();
-				//env.setSize(800,400);
-				
-				ConsoleGUI env = new ConsoleGUI();
-				env.setEnvVisible(true);
-				
-				//IOutputEnvView newOutEnvView = ((EnvFrame) env).getOutputEnvView();
-				
-				IOutputEnvView newOutEnvView = env;
-				return newOutEnvView;
-			}
-	
-	
-		public AbstractConsole(String actorId, ActorContext myCtx, IOutputEnvView outEnvView )  throws Exception{
-			super(actorId, myCtx, "./srcMore/it/unibo/console/plans.txt", 
-			"./srcMore/it/unibo/console/WorldTheory.pl",
-			setTheEnv( outEnvView )  , "init");
-			//addInputPanel(80);
-			//addCmdPanels();	
-	 	}
+	protected static IOutputEnvView setTheEnv(IOutputEnvView outEnvView ){
+		//EnvFrame env = new EnvFrame( "Env_console", java.awt.Color.cyan  , java.awt.Color.black );
+		//env.init();
+		//env.setSize(800,400);
+		
+		ConsoleGUI env = new ConsoleGUI();
+		env.setEnvVisible(true);
+		
+		//IOutputEnvView newOutEnvView = ((EnvFrame) env).getOutputEnvView();
+		
+		IOutputEnvView newOutEnvView = env;
+		return newOutEnvView;
+	}
+
+
+public AbstractConsole(String actorId, ActorContext myCtx, IOutputEnvView outEnvView )  throws Exception{
+	super(actorId, myCtx, "./srcMore/it/unibo/console/plans.txt", 
+	"./srcMore/it/unibo/console/WorldTheory.pl",
+	setTheEnv( outEnvView )  , "init");
+	//addInputPanel(80);
+	//addCmdPanels();	
+	}
 	protected void addInputPanel(int size){
 		((EnvFrame) env).addInputPanel(size);			
 	}
@@ -103,7 +103,7 @@ public abstract class AbstractConsole extends QActorPlanned implements IActivity
 	    		//onEvent
 	    		if( currentEvent.getEventId().equals("local_gui_command") ){
 	    		 		String parg = "";
-	    		 		parg = updateVars(null, Term.createTerm("command(C)"), Term.createTerm("command(explore(MILS))"), 
+	    		 		parg = updateVars(null, Term.createTerm("command(C)"), Term.createTerm("command(explore(TYPE,MILS))"), 
 	    		 			    		  					Term.createTerm(currentEvent.getMsg()), parg);
 	    		 			if( parg != null ){
 	    		 				 if( ! switchToPlan("exploration").getGoon() ) break; 
@@ -117,7 +117,7 @@ public abstract class AbstractConsole extends QActorPlanned implements IActivity
 	    		 			    		  					Term.createTerm(currentEvent.getMsg()), parg);
 	    		 			if( parg != null ){
 	    		 				 if( ! switchToPlan("navigation").getGoon() ) break; 
-	    		 			}//else println("guard it.unibo.xtext.qactor.impl.GuardImpl@6b7617c3 (name: [, not: false) fails");  //parg is null when there is no guard (onEvent)
+	    		 			}//else println("guard it.unibo.xtext.qactor.impl.GuardImpl@5f1dc7eb (name: [, not: false) fails");  //parg is null when there is no guard (onEvent)
 	    		 }
 	    		}
 	    		if( (guardVars = evalTheGuard( " !?have_map" )) != null ){
@@ -128,7 +128,7 @@ public abstract class AbstractConsole extends QActorPlanned implements IActivity
 	    		 			    		  					Term.createTerm(currentEvent.getMsg()), parg);
 	    		 			if( parg != null ){
 	    		 				 if( ! switchToPlan("navigation").getGoon() ) break; 
-	    		 			}//else println("guard it.unibo.xtext.qactor.impl.GuardImpl@33821cb1 (name: [, not: false) fails");  //parg is null when there is no guard (onEvent)
+	    		 			}//else println("guard it.unibo.xtext.qactor.impl.GuardImpl@5f51255e (name: [, not: false) fails");  //parg is null when there is no guard (onEvent)
 	    		 }
 	    		}
 	    		//onEvent
@@ -157,8 +157,8 @@ public abstract class AbstractConsole extends QActorPlanned implements IActivity
 	    nPlanIter++;
 	    		temporaryStr = " \"EXPLORE\" ";
 	    		println( temporaryStr );  
-	    		if( (guardVars = evalTheGuard( " ??msg(local_gui_command, \"event\" ,SENDER,none,command(explore(MILS)),MSGNUM)" )) != null ){
-	    		temporaryStr = unifyMsgContent("explore(MILS)","explore(600000)", guardVars ).toString();
+	    		if( (guardVars = evalTheGuard( " ??msg(local_gui_command, \"event\" ,SENDER,none,command(explore(TYPE,MILS)),MSGNUM)" )) != null ){
+	    		temporaryStr = unifyMsgContent("explore(TYPE,MILS)","explore(TYPE,MILS)", guardVars ).toString();
 	    		emit( "explore", temporaryStr );
 	    		}
 	    		//senseEvent
@@ -245,7 +245,7 @@ public abstract class AbstractConsole extends QActorPlanned implements IActivity
 	    		//onEvent
 	    		if( currentEvent.getEventId().equals("local_gui_command") ){
 	    		 		String parg = "";
-	    		 		parg = updateVars(null, Term.createTerm("command(C)"), Term.createTerm("command(explore(MILS))"), 
+	    		 		parg = updateVars(null, Term.createTerm("command(C)"), Term.createTerm("command(explore(TYPE,MILS))"), 
 	    		 			    		  					Term.createTerm(currentEvent.getMsg()), parg);
 	    		 			if( parg != null ){
 	    		 				 if( ! switchToPlan("exploration").getGoon() ) break; 

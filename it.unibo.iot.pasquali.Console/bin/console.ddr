@@ -7,7 +7,7 @@ RobotSystem exploreAndGo
  * ----------------------------------------------------
  */
  
-Event explore : explore(MILS) // C to R, MILS is the maximum millisecond time
+Event explore : explore(TYPE, MILS) // C to R, MILS is the maximum millisecond time
 Event navigate : navigate(START, GOAL) // C to R
 Event navigate : navigate(GOAL) // C to R
 Event abort : abort //C to R, abort exploration or navigation
@@ -57,7 +57,7 @@ Context ctxConsole ip [ host="localhost" port=8010]
  		memoCurrentEvent;
  		printCurrentEvent;
  		
- 		onEvent local_gui_command : command(explore(MILS)) ->	switchToPlan exploration;
+ 		onEvent local_gui_command : command(explore(TYPE, MILS)) ->	switchToPlan exploration;
  		[ !? have_map ] onEvent local_gui_command : command(navigate(START, GOAL)) -> switchToPlan navigation;
  		[ !? have_map ] onEvent local_gui_command : command(navigate(GOAL)) -> switchToPlan navigation;
  		onEvent local_gui_command : command(load(PATH)) -> switchToPlan loadMap;
@@ -73,7 +73,7 @@ Context ctxConsole ip [ host="localhost" port=8010]
  		
  		// discard all old map data
  		
- 		[?? msg(local_gui_command, "event", SENDER, none, command(explore(MILS)), MSGNUM)] emit explore : explore(600000);
+ 		[?? msg(local_gui_command, "event", SENDER, none, command(explore(TYPE, MILS)), MSGNUM)] emit explore : explore(TYPE, MILS);
  		
  		sense time(999999999) update, local_gui_command, end -> continue, continue, continue;
  		[ ?? tout(X,Y) ] switchToPlan handleTimeout;
@@ -95,7 +95,7 @@ Context ctxConsole ip [ host="localhost" port=8010]
  		printCurrentEvent; 	
  		
  		onEvent local_gui_command : command(store(PATH)) -> switchToPlan storeMap;
- 		onEvent local_gui_command : command(explore(MILS)) ->	switchToPlan exploration
+ 		onEvent local_gui_command : command(explore(TYPE, MILS)) ->	switchToPlan exploration
  		
  	
  	Plan updateMap resumeLastPlan
