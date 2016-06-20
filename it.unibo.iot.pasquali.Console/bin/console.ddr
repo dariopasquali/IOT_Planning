@@ -1,0 +1,158 @@
+RobotSystem exploreAndGo
+
+
+/*
+ * ----------------------------------------------------
+ * EVENTS emitted by the system components
+ * ----------------------------------------------------
+ */
+ 
+Event explore : explore(MILS) // C to R, MILS is the maximum millisecond time
+Event navigate : navigate(START, GOAL) // C to R
+Event navigate : navigate(GOAL) // C to R
+Event abort : abort //C to R, abort exploration or navigation
+ 
+Event end : end //R to C, termination of exploration or navigation
+Event update : update(ELEMENT)//R to C, update the Map
+ 
+ /*
+  * EVENTS FROM THE GUI
+  */
+  Event local_gui_command : command(C)
+ 
+ 
+/*
+ * ----------------------------------------------------
+ * CONTEXT for the Robot as independent device (standdalone)
+ * ----------------------------------------------------
+ */
+Context ctxRobot ip [ host="localhost" port=8020] -standalone 
+  
+/*
+ * ----------------------------------------------------
+ * CONTEXT for the Console
+ * ----------------------------------------------------
+ */ 
+Context ctxConsole ip [ host="localhost" port=8010]
+
+
+/*
+ * ----------------------------------------------------
+ * CONSOLE with custom GUI
+ * ----------------------------------------------------
+ */
+ 
+ QActor console context ctxConsole -g cyan{
+ 	
+ 	Plan init normal
+ 		println(console(start));
+ 		switchToPlan waitCommand
+ 		
+ 	Plan waitCommand
+ 	
+ 		println("Wait for user command");
+ 		
+ 		sense time(999999999) local_gui_command -> continue;
+ 		[ ?? tout(X,Y) ] switchToPlan handleTimeout;
+ 		memoCurrentEvent;
+ 		printCurrentEvent;
+ 		
+ 		onEvent local_gui_command : command(explore(MILS)) ->	switchToPlan exploration;
+ 		[ !? have_map ] onEvent local_gui_command : command(navigate(START, GOAL)) -> switchToPlan navigation;
+ 		[ !? have_map ] onEvent local_gui_command : command(navigate(GOAL)) -> switchToPlan navigation;
+ 		onEvent local_gui_command : command(load(PATH)) -> switchToPlan loadMap;
+ 		
+ 		repeatPlan 0
+ 		
+ 	
+ 	
+ 	
+ 	Plan exploration
+ 	
+ 		println("EXPLORE");
+ 		
+ 		// discard all old map data
+ 		
+ 		[?? msg(local_gui_command, "event", SENDER, none, command(explore(MILS)), MSGNUM)] emit explore : explore(600000);
+ 		
+ 		sense time(999999999) update, local_gui_command, end -> continue, continue, continue;
+ 		[ ?? tout(X,Y) ] switchToPlan handleTimeout;
+ 		memoCurrentEvent;
+ 		printCurrentEvent;
+ 		
+ 		onEvent update : update(ELEMENT) -> switchToPlan updateMap;
+ 		onEvent local_gui_command : command(abort) -> switchToPlan abortLastCommand;
+ 		onEvent end : end -> switchToPlan endOfExploration;
+ 		
+ 		repeatPlan 0
+ 	
+ 	Plan endOfExploration
+ 		println("do you want to save the map or explore again??");
+ 		
+ 		sense time(999999999) local_gui_command -> continue;
+ 		[ ?? tout(X,Y) ] switchToPlan handleTimeout;
+ 		memoCurrentEvent;
+ 		printCurrentEvent; 	
+ 		
+ 		onEvent local_gui_command : command(store(PATH)) -> switchToPlan storeMap;
+ 		onEvent local_gui_command : command(explore(MILS)) ->	switchToPlan exploration
+ 		
+ 	
+ 	Plan updateMap resumeLastPlan
+ 		[?? msg(update, "event", SENDER, none, update(ELEMENT), MSGNUM)] println(update(ELEMENT))
+ 		
+ 	
+ 	
+ 	Plan navigation resumeLastPlan
+ 		println("NAVIGATE");
+ 		
+ 		[?? msg(local_gui_command, "event", SENDER, none, command(navigate(START, GOAL)), MSGNUM)]emit navigate : navigate(START, GOAL);
+ 		[?? msg(local_gui_command, "event", SENDER, none, command(navigate(GOAL)), MSGNUM)]emit navigate : navigate(GOAL);
+ 		
+ 		sense time(999999999) local_gui_command, end -> continue, continue;
+ 		[ ?? tout(X,Y) ] switchToPlan handleTimeout;
+ 		memoCurrentEvent;
+ 		printCurrentEvent;
+ 		
+ 		onEvent local_gui_command : command(abort) -> switchToPlan abortLastCommand;
+ 		onEvent end : end -> switchToPlan endOfNavigation
+ 		
+ 	
+ 	Plan endOfNavigation
+ 		println("Robot reached the GOAL position");
+ 		switchToPlan waitCommand 	
+ 	
+ 	 	
+ 	Plan loadMap resumeLastPlan
+ 		println("Map loaded");
+ 		[?? msg(local_gui_command, "event", SENDER, none, command(load(PATH)), MSGNUM)] addRule have_map
+ 		// <-- waitCommand
+ 	
+ 	
+ 	Plan storeMap 
+ 		println("Map saved");
+ 		[?? msg(local_gui_command, "event", SENDER, none, command(store(PATH)), MSGNUM)] addRule have_map;
+ 		switchToPlan waitCommand
+ 		
+ 	
+ 	
+ 	Plan abortLastCommand
+ 		println("Abort");
+ 		emit abort : abort;
+ 		switchToPlan waitCommand
+ 	
+ 	
+ 	
+ 	Plan handleTimeout
+ 		println("timeout!! GOODBYE")
+ 	
+ }
+ 
+ 
+ Robot scout QActor robot context ctxRobot{
+ 	Plan init normal
+		println( "NEVER HERE. I'm just a place holder" ) 
+ }
+ 
+ 
+ 

@@ -1,0 +1,44 @@
+/* 
+ * ===================================
+ * mock
+ * ===================================
+ */ 
+RobotBase mock               
+ //BASIC                
+motorleft  = Motor  [ simulated 0  ]  position: LEFT
+motorright = Motor  [ simulated 0  ]  position: RIGHT
+l1Mock     = Line   [ simulated 0  ]  position: BOTTOM 
+distFrontMock= Distance [ simulated 0  ] position: FRONT
+mgn1 = Magnetometer  [ simulated 0 ] private position: FRONT
+//COMPOSED   
+rot    = Rotation [ mgn1  ] private position: FRONT
+motors = Actuators [ motorleft , motorright  ] private position: BOTTOM
+Mainrobot mock  [ motors,rot ]      
+; 
+  
+RobotBase mymock               
+ //BASIC                  
+motorleft  = Motor  [ simulated 0  ]  position: LEFT
+motorright = Motor  [ simulated 0  ]  position: RIGHT
+//distFrontMock= Distance [ simulated 0  ] position: FRONT
+//COMPOSED   
+motors = Actuators [ motorleft , motorright  ] private position: BOTTOM
+Mainrobot mymock  [ motors  ]      
+; 
+ /*  
+ * ===================================
+ * nano1
+ * ===================================
+ */
+RobotBase   scout   
+//BASIC                          
+motorleft  = Motor  [ gpiomotor pincw 8 pinccw 9  ]  position: LEFT
+motorright = Motor  [ gpiomotor pincw 12 pinccw 13  ]  position: RIGHT
+distanceRadar = Distance  [ sonarhcsr04 pintrig 0 pinecho 2]  position: FRONT
+
+//COMPOSED
+motors = Actuators [ motorleft , motorright  ] private position: BOTTOM
+Mainrobot scout  [ motors ]    
+;
+
+ 
