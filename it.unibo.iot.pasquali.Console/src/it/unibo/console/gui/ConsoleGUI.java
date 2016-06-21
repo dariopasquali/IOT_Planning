@@ -37,7 +37,7 @@ import javax.swing.JTextArea;
 import javax.swing.JRadioButton;
 import java.awt.Choice;
 
-public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt, IConsole{
+public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt{
 
 	/**
 	 * 
@@ -626,65 +626,7 @@ public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt, I
 
 	
 	
-	/*
-	 *=============================================================
-	 * EREDITATE DA IConsole
-	 *=============================================================
-	 */
 	
-	
-	@Override
-	public IMap explore(String EnvType, long maxMilsTime) {
-		return null;
-	}
-
-	@Override
-	public void navigate(double goalX, double goalY) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void navigate(double startX, double startY, double goalX, double goalY) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void adbort() {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void storeMap(IMap map, String filepath) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public IMap loadMap(String filepath) {
-		return null;
-	}
-
-	@Override
-	public IMap getMap() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public String getName() {
-		return curVal;
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public String getDefaultRep() {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
 
 

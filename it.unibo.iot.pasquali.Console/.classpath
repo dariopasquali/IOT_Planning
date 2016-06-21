@@ -17,5 +17,6 @@
 	<classpathentry kind="lib" path="/it.unibo.iss.libs/libs/http/nanoHTTPD.jar"/>
 	<classpathentry kind="lib" path="/it.unibo.iss.libs/libs/rxtx/RXTXcomm-2.2pre2.jar"/>
 	<classpathentry kind="lib" path="/it.unibo.iss.libs/libs/rxtx/RXTXcomm.jar"/>
+	<classpathentry kind="lib" path="libs/gson-2.3.1.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
