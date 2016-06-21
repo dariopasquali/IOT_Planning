@@ -7,7 +7,7 @@ public interface IConsole {
 	public void navigate(double startX, double startY, double goalX, double goalY); //modifier , primitive
 	public void abort(); 															//modifier , primitive
 	
-	public void storeMap(String filepath); 								//modifier , primitive
+	public void storeMap(String filepath) throws Exception; 								//modifier , primitive
 	public IMap loadMap(String filepath); 											//modifier , primitive
 	public void updateMap(IMapElement newElement);
 	

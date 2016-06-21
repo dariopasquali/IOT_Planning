@@ -45,9 +45,7 @@ public class ConsolePOJO extends Observable implements IConsole{
 	@Override
 	public IMap explore(String EnvType, long maxMilsTime) {
 		
-		/*
-		 * Init new empty map
-		 */
+		map = new Map();
 		this.exploring = true;
 		
 		Thread t = new Thread(new Runnable(){
@@ -66,6 +64,7 @@ public class ConsolePOJO extends Observable implements IConsole{
 				}				
 			}			
 		});
+		t.start();
 		
 		
 		return map;
@@ -88,7 +87,10 @@ public class ConsolePOJO extends Observable implements IConsole{
 	}
 
 	@Override
-	public void storeMap(String filepath) {
+	public void storeMap(String filepath) throws Exception {
+		
+		if(map == null)
+			throw new Exception("Map is Null");
 		
 		try
 		{
@@ -121,7 +123,6 @@ public class ConsolePOJO extends Observable implements IConsole{
 	
 	@Override
 	public void updateMap(IMapElement newElement) {
-
 		map.addElement(newElement);
 		setChanged();
 		notifyObservers();		
@@ -141,7 +142,7 @@ public class ConsolePOJO extends Observable implements IConsole{
 
 	@Override
 	public String getDefaultRep() {		
-		return name+"\n----\n"+map.toString();
+		return name+"\n----\n"+map.getDefaultRep();
 	}
 
 	@Override

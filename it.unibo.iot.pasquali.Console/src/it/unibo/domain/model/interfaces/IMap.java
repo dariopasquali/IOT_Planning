@@ -8,5 +8,6 @@ public interface IMap {
 	public List<IMapElement> getElements();
 	
 	public String getDefaultRep();
+	public String getJSONRep();
 
 }

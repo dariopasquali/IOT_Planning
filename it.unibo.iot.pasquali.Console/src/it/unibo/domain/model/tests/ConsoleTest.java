@@ -25,14 +25,11 @@ public class ConsoleTest {
 		console.explore("aperto", 6000);
 		assertTrue(console.isExploring());
 		
-		Thread.sleep(6000);
+		Thread.sleep(7000);
 		
 		assertTrue(!console.isExploring());		
 	}
 	
-	
-	//public void navigate(double goalX, double goalY); 								//modifier , primitive
-	//public void navigate(double startX, double startY, double goalX, double goalY); //modifier , primitive
 	
 	@Test
 	public void abortTest()
@@ -46,24 +43,24 @@ public class ConsoleTest {
 	}
 	
 	@Test
-	public void storeMapTest() throws InterruptedException
+	public void storeMapTest() throws Exception
 	{
 		console.explore("aperto", 6000);
 		Thread.sleep(6000);
 		
-		console.storeMap("\\mapTest.json");
-		IMap map = console.loadMap("\\mapTest.json");
+		console.storeMap("D:\\Desktop\\PLANNING\\GIT\\mapTest.json");
+		IMap map = console.loadMap("D:\\Desktop\\PLANNING\\GIT\\mapTest.json");
 		assertTrue(map!=null);
 	}
 	
 	@Test
-	public void loadMapTest() throws InterruptedException
+	public void loadMapTest() throws Exception
 	{
 		console.explore("aperto", 6000);
 		Thread.sleep(6000);
 		
-		console.storeMap("\\mapTest.json");
-		IMap map = console.loadMap("\\mapTest.json");
+		console.storeMap("D:\\Desktop\\PLANNING\\GIT\\mapTest.json");
+		IMap map = console.loadMap("D:\\Desktop\\PLANNING\\GIT\\mapTest.json");
 		assertTrue(map!=null);
 	}
 	
@@ -73,12 +70,10 @@ public class ConsoleTest {
 		
 	}
 	
-	public IMap getMap(); 															//property , primitive
-	public String getName(); 															//property , primitive
-	
-	public boolean isExploring();
-	public boolean isNavigating();
-		
-	public String getDefaultRep(); 													// mapping , non-primitive
+	@Test
+	public void getNameTest()
+	{
+		assertTrue(console.getName().equals("console"));
+	}	
 
 }
