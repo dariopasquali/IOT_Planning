@@ -10,7 +10,6 @@ import it.unibo.qactors.action.AsynchActionResult;
 import it.unibo.qactors.action.IActorAction;
 import it.unibo.qactors.action.IActorAction.ActionExecMode;
 import it.unibo.baseEnv.basicFrame.EnvFrame;
-import it.unibo.console.gui.ConsoleGUI;
 import alice.tuprolog.SolveInfo;
 import it.unibo.is.interfaces.IActivity;
 import it.unibo.is.interfaces.IIntent;
@@ -20,28 +19,22 @@ public abstract class AbstractConsole extends QActorPlanned implements IActivity
 	protected boolean actionResult = true;
 	protected alice.tuprolog.SolveInfo sol;
 	
-	protected static IOutputEnvView setTheEnv(IOutputEnvView outEnvView ){
-		//EnvFrame env = new EnvFrame( "Env_console", java.awt.Color.cyan  , java.awt.Color.black );
-		//env.init();
-		//env.setSize(800,400);
-		
-		ConsoleGUI env = new ConsoleGUI();
-		env.setEnvVisible(true);
-		
-		//IOutputEnvView newOutEnvView = ((EnvFrame) env).getOutputEnvView();
-		
-		IOutputEnvView newOutEnvView = env;
-		return newOutEnvView;
-	}
-
-
-public AbstractConsole(String actorId, ActorContext myCtx, IOutputEnvView outEnvView )  throws Exception{
-	super(actorId, myCtx, "./srcMore/it/unibo/console/plans.txt", 
-	"./srcMore/it/unibo/console/WorldTheory.pl",
-	setTheEnv( outEnvView )  , "init");
-	//addInputPanel(80);
-	//addCmdPanels();	
-	}
+			protected static IOutputEnvView setTheEnv(IOutputEnvView outEnvView ){
+				EnvFrame env = new EnvFrame( "Env_console", java.awt.Color.cyan  , java.awt.Color.black );
+				env.init();
+				env.setSize(800,400);
+				IOutputEnvView newOutEnvView = ((EnvFrame) env).getOutputEnvView();
+				return newOutEnvView;
+			}
+	
+	
+		public AbstractConsole(String actorId, ActorContext myCtx, IOutputEnvView outEnvView )  throws Exception{
+			super(actorId, myCtx, "./srcMore/it/unibo/console/plans.txt", 
+			"./srcMore/it/unibo/console/WorldTheory.pl",
+			setTheEnv( outEnvView )  , "init");		
+			addInputPanel(80);
+			addCmdPanels();	
+	 	}
 	protected void addInputPanel(int size){
 		((EnvFrame) env).addInputPanel(size);			
 	}
@@ -67,7 +60,7 @@ public AbstractConsole(String actorId, ActorContext myCtx, IOutputEnvView outEnv
 	    	boolean returnValue = suspendWork;
 	    while(true){
 	    nPlanIter++;
-	    		temporaryStr = "console(start)";
+	    		temporaryStr = " \"++++++++++++++++++ console(starts) ++++++++++++++++++\" ";
 	    		println( temporaryStr );  
 	    		if( ! switchToPlan("waitCommand").getGoon() ) break;
 	    break;
@@ -84,7 +77,7 @@ public AbstractConsole(String actorId, ActorContext myCtx, IOutputEnvView outEnv
 	    	boolean returnValue = suspendWork;
 	    while(true){
 	    nPlanIter++;
-	    		temporaryStr = " \"Wait for user command\" ";
+	    		temporaryStr = " \"++++++++++++++++++ WAIT COMMAND ++++++++++++++++++\" ";
 	    		println( temporaryStr );  
 	    		//senseEvent
 	    		timeoutval = 999999999;
@@ -98,17 +91,7 @@ public AbstractConsole(String actorId, ActorContext myCtx, IOutputEnvView outEnv
 	    		if( (guardVars = evalTheGuard( " ??tout(X,Y)" )) != null ){
 	    		if( ! switchToPlan("handleTimeout").getGoon() ) break;
 	    		}
-	    		memoCurrentEvent( false );
 	    		printCurrentEvent(false);
-	    		//onEvent
-	    		if( currentEvent.getEventId().equals("local_gui_command") ){
-	    		 		String parg = "";
-	    		 		parg = updateVars(null, Term.createTerm("command(C)"), Term.createTerm("command(explore(TYPE,MILS))"), 
-	    		 			    		  					Term.createTerm(currentEvent.getMsg()), parg);
-	    		 			if( parg != null ){
-	    		 				 if( ! switchToPlan("exploration").getGoon() ) break; 
-	    		 			}//else println("guard  fails");  //parg is null when there is no guard (onEvent)
-	    		 }
 	    		if( (guardVars = evalTheGuard( " !?have_map" )) != null ){
 	    		//onEvent
 	    		if( currentEvent.getEventId().equals("local_gui_command") ){
@@ -117,7 +100,7 @@ public AbstractConsole(String actorId, ActorContext myCtx, IOutputEnvView outEnv
 	    		 			    		  					Term.createTerm(currentEvent.getMsg()), parg);
 	    		 			if( parg != null ){
 	    		 				 if( ! switchToPlan("navigation").getGoon() ) break; 
-	    		 			}//else println("guard it.unibo.xtext.qactor.impl.GuardImpl@3474f8e4 (name: [, not: false) fails");  //parg is null when there is no guard (onEvent)
+	    		 			}//else println("guard it.unibo.xtext.qactor.impl.GuardImpl@7414683b (name: [, not: false) fails");  //parg is null when there is no guard (onEvent)
 	    		 }
 	    		}
 	    		if( (guardVars = evalTheGuard( " !?have_map" )) != null ){
@@ -128,7 +111,7 @@ public AbstractConsole(String actorId, ActorContext myCtx, IOutputEnvView outEnv
 	    		 			    		  					Term.createTerm(currentEvent.getMsg()), parg);
 	    		 			if( parg != null ){
 	    		 				 if( ! switchToPlan("navigation").getGoon() ) break; 
-	    		 			}//else println("guard it.unibo.xtext.qactor.impl.GuardImpl@b2c6f6e (name: [, not: false) fails");  //parg is null when there is no guard (onEvent)
+	    		 			}//else println("guard it.unibo.xtext.qactor.impl.GuardImpl@7ac64f2b (name: [, not: false) fails");  //parg is null when there is no guard (onEvent)
 	    		 }
 	    		}
 	    		//onEvent
@@ -155,7 +138,7 @@ public AbstractConsole(String actorId, ActorContext myCtx, IOutputEnvView outEnv
 	    	boolean returnValue = suspendWork;
 	    while(true){
 	    nPlanIter++;
-	    		temporaryStr = " \"EXPLORE\" ";
+	    		temporaryStr = " \"++++++++++++++++++ EXPLORE ++++++++++++++++++\" ";
 	    		println( temporaryStr );  
 	    		if( (guardVars = evalTheGuard( " ??msg(local_gui_command, \"event\" ,SENDER,none,command(explore(TYPE,MILS)),MSGNUM)" )) != null ){
 	    		temporaryStr = unifyMsgContent("explore(TYPE,MILS)","explore(TYPE,MILS)", guardVars ).toString();
@@ -285,7 +268,7 @@ public AbstractConsole(String actorId, ActorContext myCtx, IOutputEnvView outEnv
 	    	boolean returnValue = suspendWork;
 	    while(true){
 	    nPlanIter++;
-	    		temporaryStr = " \"NAVIGATE\" ";
+	    		temporaryStr = " \"++++++++++++++++++ NAVIGATE ++++++++++++++++++\" ";
 	    		println( temporaryStr );  
 	    		if( (guardVars = evalTheGuard( " ??msg(local_gui_command, \"event\" ,SENDER,none,command(navigate(START,GOAL)),MSGNUM)" )) != null ){
 	    		temporaryStr = unifyMsgContent("navigate(START,GOAL)","navigate(START,GOAL)", guardVars ).toString();

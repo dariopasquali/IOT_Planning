@@ -1,0 +1,87 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<link rel="stylesheet" type="text/css" href="QActorWebUI.css">
+<script type="text/javascript" src="QActorWebUI.js"></script>
+</head>
+<body>
+<h3 id="h3">Robot Web UI Term-based </h3>
+
+<div> 
+<input size=60% type="textArea" id="input" value="play( './audio/tada2.wav', 1500 , local_endplay)" />
+<input style="height: 30px; width: 90px;" type="button"
+ id="ExternalForward" value="INPUT" 
+ onmousedown="document.getElementById('inputArea').value= document.getElementById('input').value;
+ send('i-'+document.getElementById('input').value); "
+<br/>
+<textarea id="inputArea" rows="4" cols="80">
+</textarea>
+</div>
+
+<div id="bottom">
+<center>
+<button onclick="setSpeed('high');">speedHigh</button>
+<button onclick="setSpeed('medium');">speedMedium</button>
+<button onclick="setSpeed('low');">speedLow</button>
+</center>
+   
+</div>
+ 	<table id="robots">
+		<tr>
+			<td>
+				<table>
+					<tr>
+					<tr>
+						<td>Speed</td>
+ 						<td><input size=80% type="text" id="speed" value="low" /></td>
+					</tr>
+						<td>Connection</td>
+						<td><input size=80% type="text" id="connection" value="CONNECTING ..." /></td>
+	 					</tr>
+					<tr>
+						<td>Sending</td>
+ 						<td><input size=80% type="text" id="sending" value=" ... " /></td>
+					</tr>
+					<tr>
+						<td>State</td>
+ 						<td><input size=80% type="text" id="state" value=" ... " /></td>
+					</tr>
+				</table>
+			</td>
+		</tr>
+		<tr>
+			<td>
+                <center>
+				<table style="background-color: #d9f7f3">
+					<tr>
+						<td>&nbsp;</td>
+						<td align="center"><input
+							style="height: 90px; width: 90px;" type="button"
+							id="ExternalForward" value="FORWARD" onmousedown="send('w('+curSpeed+')');" /></td>
+						<td>&nbsp;</td>
+					</tr>
+					<tr>
+						<td align="center"><input
+							style="height: 90px; width: 90px;" type="button"
+							id="ExternalLeft" value="LEFT" onmousedown="send('a('+curSpeed+')');"  /></td>
+						<td align="center"><input
+							style="height: 90px; width: 90px;" type="button"
+							id="ExternalStop" value="STOP" onmousedown="send('h('+curSpeed+')');"  /></td>
+						<td align="center"><input
+							style="height: 90px; width: 90px;" type="button"
+							id="ExternalRight" value="RIGHT" onmousedown="send('d('+curSpeed+')');" /></td>
+					</tr>
+					<tr>
+						<td>&nbsp;</td>
+						<td align="center"><input
+							style="height: 90px; width: 90px;" type="button"
+							id="ExternalBackward" value="BACKWARD" onmousedown="send('s('+curSpeed+')');"/></td>
+						<td>&nbsp;</td>
+					</tr>
+				</table>
+                </center>
+			</td>
+		</tr>
+	</table>
+ </body>
+</html>

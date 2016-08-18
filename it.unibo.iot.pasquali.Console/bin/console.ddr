@@ -23,7 +23,7 @@ Event update : update(ELEMENT)//R to C, update the Map
  
 /*
  * ----------------------------------------------------
- * CONTEXT for the Robot as independent device (standdalone)
+ * CONTEXT for the Robot as independent device (standalone)
  * ----------------------------------------------------
  */
 Context ctxRobot ip [ host="localhost" port=8020] -standalone 
@@ -45,31 +45,29 @@ Context ctxConsole ip [ host="localhost" port=8010]
  QActor console context ctxConsole -g cyan{
  	
  	Plan init normal
- 		println(console(start));
+ 		println("++++++++++++++++++ console(starts) ++++++++++++++++++");
  		switchToPlan waitCommand
  		
  	Plan waitCommand
  	
- 		println("Wait for user command");
+ 		println("++++++++++++++++++ WAIT COMMAND ++++++++++++++++++");
  		
  		sense time(999999999) local_gui_command -> continue;
  		[ ?? tout(X,Y) ] switchToPlan handleTimeout;
- 		memoCurrentEvent;
  		printCurrentEvent;
  		
- 		onEvent local_gui_command : command(explore(TYPE, MILS)) ->	switchToPlan exploration;
+ 		//onEvent local_gui_command : command(explore(TYPE, MILS)) ->	switchToPlan exploration;
  		[ !? have_map ] onEvent local_gui_command : command(navigate(START, GOAL)) -> switchToPlan navigation;
  		[ !? have_map ] onEvent local_gui_command : command(navigate(GOAL)) -> switchToPlan navigation;
  		onEvent local_gui_command : command(load(PATH)) -> switchToPlan loadMap;
  		
- 		repeatPlan 0
- 		
+ 		repeatPlan 0		
  	
  	
  	
- 	Plan exploration
+ 	Plan exploration //TODO not yet implemented
  	
- 		println("EXPLORE");
+ 		println("++++++++++++++++++ EXPLORE ++++++++++++++++++");
  		
  		// discard all old map data
  		
@@ -104,7 +102,7 @@ Context ctxConsole ip [ host="localhost" port=8010]
  	
  	
  	Plan navigation resumeLastPlan
- 		println("NAVIGATE");
+ 		println("++++++++++++++++++ NAVIGATE ++++++++++++++++++");
  		
  		[?? msg(local_gui_command, "event", SENDER, none, command(navigate(START, GOAL)), MSGNUM)]emit navigate : navigate(START, GOAL);
  		[?? msg(local_gui_command, "event", SENDER, none, command(navigate(GOAL)), MSGNUM)]emit navigate : navigate(GOAL);

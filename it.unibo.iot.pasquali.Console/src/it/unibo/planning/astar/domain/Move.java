@@ -15,28 +15,39 @@ public class Move {
 	    case 'R': return "right";
 	    default: return "";
 	    }
-	    }
-		
+	    }		
+	}
+	
+	public enum MoveType {
+		STEP,
+		SPIN		
 	}
 	
 	
-	private int toX;
-	private int toY;
+	private int duration;	
 	private SpinDirection spin;
+	
+	private int speed;
+	
+	private MoveType type;
+
 	
 	private String prologRep;
 	
-	public Move(int toX, int toY)
+	public Move(int speed, int duration)
 	{
-		this.toX = toX;
-		this.toY = toY;		
-		prologRep = "move(robotmove, forward, 60, 500, 0)";
+		this.duration = duration;
+		this.speed = speed;
+		this.type = MoveType.STEP;
+		prologRep = "move(robotmove,forward,"+speed+","+duration+",0)";
 	}
 	
-	public Move(SpinDirection spinDir)
+	public Move(SpinDirection spinDir, int speed)
 	{
-		this.spin = spinDir;		
-		prologRep = "move(robotmove,"+spinDir+", 60, 0, 90)";
+		this.spin = spinDir;
+		this.speed = speed;
+		this.type = MoveType.SPIN;
+		prologRep = "move(robotspin,"+spinDir+","+speed+",0,90)";
 	}
 	
 	@Override
@@ -44,5 +55,28 @@ public class Move {
 	{
 		return prologRep;
 	}
+
+	public MoveType getType() {
+		// TODO Auto-generated method stub
+		return type;
+	}
+
+	public int getDuration() {
+		return duration;
+	}
+
+	public SpinDirection getSpin() {
+		return spin;
+	}
+
+	public int getSpeed() {
+		return speed;
+	}
+
+	public String getPrologRep() {
+		return prologRep;
+	}
+	
+	
 
 }

@@ -1,18 +1,19 @@
 package it.unibo.planning.astar.domain;
 
-public class State {
+public class State implements Comparable<State>{
 	
 	public enum Direction {
-		NORD ('N'),
-		EAST ('E'),
-		WEST ('W'),
-		SOUTH ('S');
+		NORTH ('N', 0),
+		EAST ('E', 1),
+		WEST ('W', 2),
+		SOUTH ('S', 3),
+		NONE ('0', -1);
 		
-		private final char direction;       
-	    private Direction(char s) { direction = s; }
-	    public boolean equalsDirection(char otherDir){ return otherDir == direction; }
+		private final char direction;
+		private final int value;
+	    private Direction(char s, int val) { direction = s; value = val;}
 	    public String toString(){ return ""+direction; }
-		
+	    public int getValue() {return value; }		
 	}
 
 	private Direction direction;
@@ -21,10 +22,20 @@ public class State {
 	
 	private Move genMove;
 	private int cost;
-	private int heuristic;
+	private double heuristic;
 	
+	public State()
+	{
+		this.x = -1;
+		this.y = -1;
+		this.direction = null;
+		
+		this.genMove = null;
+		this.cost = -1;
+		this.heuristic = -1;
+	}
 	
-	public State(int x, int y, Direction direction, Move genMove, int cost, int heuristic)
+	public State(int x, int y, Direction direction, Move genMove, int cost)
 	{
 		this.x = x;
 		this.y = y;
@@ -32,7 +43,6 @@ public class State {
 		
 		this.genMove = genMove;
 		this.cost = cost;
-		this.heuristic = heuristic;
 	}
 	
 	@Override
@@ -81,18 +91,47 @@ public class State {
 		this.cost = cost;
 	}
 
-	public int getHeuristic() {
+	public double getHeuristic() {
 		return heuristic;
 	}
 
-	public void setHeuristic(int heuristic) {
+	public void setHeuristic(double heuristic) {
 		this.heuristic = heuristic;
 	}
 	
-	public int getF()
+	public double getF()
 	{
 		return this.heuristic + this.cost;
 	}
 	
+	@Override
+	public int hashCode()
+	{
+		int prime = 37;
+		return prime * (x + y + direction.getValue());
+	}
+	
+	@Override
+	public boolean equals(Object o)
+	{
+		if(!(o instanceof State))
+			return false;
+		
+		if(this.hashCode() == ((State) o).hashCode())
+			return true;
+		else
+			return false;
+	}
+
+	@Override
+	public int compareTo(State s1) {
+		if(getF() == s1.getF())
+			return 0;
+		
+		else if(getF() > s1.getF())
+			return 1;
+		
+		else return -1;
+	}
 	
 }

@@ -2,8 +2,15 @@
 package it.unibo.robot;
 import it.unibo.is.interfaces.IOutputEnvView;
 import it.unibo.qactors.ActorContext;
+import it.unibo.qactors.action.AsynchActionResult;
 public class Robot extends AbstractRobot { 
 	public Robot(String actorId, ActorContext myCtx, IOutputEnvView outEnvView ,it.unibo.iot.executors.baseRobot.IBaseRobot baserobot) throws Exception{
 		super(actorId,myCtx,outEnvView ,baserobot );
 	}
+	
+	public AsynchActionResult solveGoal( String goal, int duration, String answerEv, String events, String plans) throws Exception
+	{
+		return super.solveGoal(goal, duration, answerEv, events, plans);
+	}
+	
 }

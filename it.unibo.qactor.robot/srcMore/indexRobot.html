@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+<link rel="stylesheet" type="text/css" href="robotWebUI.css">
+<script type="text/javascript" src="robotWebUI.js"></script>
+    <title></title>
+</head>
+<body>
+       hello i am Running......
+</body>
+<script type="text/javascript">
+    console.log("My server IP: "+document.location.host);
+    var exampleSocket = new WebSocket("ws://"+document.location.host, "protocolOne");
+
+    // When the connection is open, send some data to the server
+    exampleSocket.onopen = function (event) {
+        exampleSocket.send("Here's some text that the server is urgently awaiting!");
+        console.log("i am connected to server.....");
+    };
+
+    exampleSocket.onmessage = function (event) {
+        console.log("Server : "+event.data);
+    }
+
+    // Log errors
+    exampleSocket.onerror = function (error) {
+        console.log('WebSocket Error %0',  error);
+    };
+
+
+</script>
+</html>

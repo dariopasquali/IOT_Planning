@@ -1,0 +1,17 @@
+/*
+PLANS DEFINED BY THE APPLICATION DESIGNER
+any line that does not starts with 'pa' is a comment
+blank lines are skipped
+*/
+
+*** INIT plan
+
+pa(init,guard(permanent,true),type(basic),time(0),cmd(print),args('qahello hello world'),events([]),plans([]) )
+pa(init,guard(permanent,true),type(basic),time(3000),cmd(sound),args('./audio/any_commander3.wav'),events([]),plans([]) )
+pa(init,guard(permanent,true),type(move),time(8000),cmd(forward),args(100),events([usercmd]),plans([dummyPlan]))
+pa(init,guard(permanent,true),type(move),time(2000),cmd(stop),args(50),events([usercmd]),plans([reactToUserCmd]))  
+pa(init,guard(volatile,domove(M,S)),type(move),time(3000),cmd(M),args(S),events([usercmd,alarm]),plans([reactToUserCmd,reactToAlarm]))
+
+*** REACTION plan
+pa(reactToUserCmd,guard(permanent,true),type(sound),time(2000),cmd(play),args('./audio/tada2.wav'),events([]),plans([]))
+

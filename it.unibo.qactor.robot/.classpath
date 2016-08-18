@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8"/>
+	<classpathentry kind="lib" path="/it.unibo.iss.libs/libs/unibo/uniboInterfaces.jar"/>
+	<classpathentry kind="lib" path="/it.unibo.iss.libs/libs/unibo/unibonoawtsupports.jar"/>
+	<classpathentry kind="lib" path="/it.unibo.iss.libs/libs/json/android-json.jar"/>
+	<classpathentry kind="lib" path="/it.unibo.iss.libs/libs/http/nanoHTTPD.jar"/>
+	<classpathentry kind="lib" path="/it.unibo.iss.libs/libs/unibo/2p301.jar"/>
+	<classpathentry kind="src" path="srcWeb"/>
+	<classpathentry kind="lib" path="/it.unibo.iss.libs/libs/rxJava/rxjava-core-0.18.4.jar"/>
+	<classpathentry kind="lib" path="/it.unibo.iss.libs/libs/unibo/qevstreams.jar"/>
+	<classpathentry kind="lib" path="/it.unibo.iss.libs/libs/unibo/labbaseRobotSam.jar"/>
+	<classpathentry kind="lib" path="/it.unibo.iss.libs/libs/unibo/qactors18.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
