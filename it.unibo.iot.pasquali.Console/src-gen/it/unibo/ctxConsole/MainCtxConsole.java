@@ -2,18 +2,10 @@
 package it.unibo.ctxConsole;
 import it.unibo.qactors.ActorContext;
 import java.io.InputStream;
-import alice.tuprolog.SolveInfo;
-import alice.tuprolog.Term;
-import alice.tuprolog.Var;
-import it.unibo.is.interfaces.IActivity;
-import it.unibo.is.interfaces.IBasicEnvAwt;
-import it.unibo.is.interfaces.IIntent;
 import it.unibo.is.interfaces.IOutputEnvView;
 import it.unibo.system.SituatedSysKb;
-
-public class MainCtxConsole extends ActorContext implements IActivity{
-private IBasicEnvAwt env; 
-private it.unibo.qactor.robot.RobotActor robot; 
+public class MainCtxConsole extends ActorContext{
+//private IBasicEnvAwt env; 
  
 	public MainCtxConsole(String name, IOutputEnvView outEnvView,
 			InputStream sysKbStream, InputStream sysRulesStream) throws Exception {
@@ -24,50 +16,26 @@ private it.unibo.qactor.robot.RobotActor robot;
 	@Override
 	public void configure() {
 		try {
-				IBasicEnvAwt env = outEnvView.getEnv();
-				if( env != null){
- 					env.addInputPanel(60);
-					env.addCmdPanel("input", new String[]{"INPUT"}, this);					
-				}
-		println("Starting the handlers .... ");
-		println("Starting the actors .... ");
+		SituatedSysKb.init();	//Init the schedulers
+		println("Starting the actors .... ");	
 new it.unibo.console.Console("console", this, outEnvView);
 		
  		} catch (Exception e) {
  		  e.printStackTrace();
 		} 		
 	}
-	@Override
-	public void execAction(String cmd) {
-		String input = env.readln();
-		//println("input=" + input);
-		try {
-			Term.createTerm(input);
-			String goal = "executeInput(" + input +").";
-			SolveInfo sol = robot.getPrologEngine().solve( goal );
-			println("> " + sol);
-		} catch (Exception e) {
- 			println("Input error " + e.getMessage());
-		}
- 	}
-	@Override
-	public void execAction() {}
-	@Override
-	public void execAction(IIntent input) {}
-	@Override
-	public String execActionWithAnswer(String cmd) {return null;}
- 
-	
+ 	
 /*
 * ----------------------------------------------
 * MAIN
 * ----------------------------------------------
 */
-	public static void main(String[] args) throws Exception{
-		IOutputEnvView outEnvView = SituatedSysKb.standardOutEnvView;
+ 	
+public static void main(String[] args) throws Exception{
+	IOutputEnvView outEnvView = SituatedSysKb.standardOutEnvView;
  		InputStream sysKbStream    = //MainCtxConsole.class.getResourceAsStream("exploreandgo.pl");
  			new java.io.FileInputStream("./srcMore/it/unibo/ctxConsole/exploreandgo.pl");
-		InputStream sysRulesStream = MainCtxConsole.class.getResourceAsStream("sysRules.pl");
-		new MainCtxConsole("ctxConsole", outEnvView, sysKbStream, sysRulesStream ).configure();
- 	}
+	InputStream sysRulesStream = MainCtxConsole.class.getResourceAsStream("sysRules.pl");
+	new MainCtxConsole("ctxConsole", outEnvView, sysKbStream, sysRulesStream ).configure();
+ 	} 	
 }

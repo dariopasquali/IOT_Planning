@@ -168,9 +168,9 @@ public class Engine {
 		s.setY(y);
 		
 		if(isValidState(s))
-			possible.add(new Move(DEFAULT_SPEED, DEFAULT_DURATION));		
-		possible.add(new Move(SpinDirection.RIGHT, DEFAULT_SPEED));
-		possible.add(new Move(SpinDirection.LEFT, DEFAULT_SPEED));
+			possible.add(new Move());		
+		possible.add(new Move(SpinDirection.RIGHT));
+		possible.add(new Move(SpinDirection.LEFT));
 		
 		return possible;
 	}

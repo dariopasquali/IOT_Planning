@@ -1,0 +1,154 @@
+System exploreAndGo
+
+/*
+ * ----------------------------------------------------
+ * MESSAGES sent by the system components
+ * ----------------------------------------------------
+ */
+
+Dispatch navdata : navdata (DATA)
+
+/*
+ * DATA: 
+ * 
+ * mapdata ( map ( Xmax , Ymax ) )
+ * mapdata ( element ( X , Y ) )
+ * plan ( robotmove )
+ * plan ( robotspin ( DIR ) )
+ * position ( X , Y ) 
+ */
+
+
+/*
+ * ----------------------------------------------------
+ * EVENTS emitted by the system components
+ * ----------------------------------------------------
+ */
+ 
+// Raised by Console to abort the current command
+Event abort : abort
+
+// Raised by Robot when it ends the current command
+Event end : end
+
+// Raised by Robot when find an unexpected
+// obstacle during th navigation
+Event update : update(ELEMENT)
+ 
+/*
+ * ----------------------------------------------------
+ * EVENTS FROM THE GUI
+ * ----------------------------------------------------
+ */
+  Event local_gui_command : local_gui_command(COMMAND)
+ 
+ /*
+  * Button --> COMMAND
+  * 
+  * Load Map --> loadmap(PATH);
+  * Find Path –-> findpath(START,GOAL);
+  * Start Navigation --> navigate;
+  * Abort --> abort;
+ */
+ 
+/*
+ * ----------------------------------------------------
+ * CONTEXT for the Robot as independent device (standalone)
+ * ----------------------------------------------------
+ */
+Context ctxRobot ip [ host="localhost" port=8020] -standalone 
+  
+/*
+ * ----------------------------------------------------
+ * CONTEXT for the Console
+ * ----------------------------------------------------
+ */ 
+Context ctxConsole ip [ host="localhost" port=8010]
+
+QActor console context ctxConsole -g cyan{
+	
+	Plan init normal
+		solve consult("talkTheory.pl") time(0) onFailSwitchTo  prologFailure ;
+		solve consult("ConsoleTheory.pl") time(0) onFailSwitchTo  prologFailure ;
+		
+ 		println("++++++++++++++++++ console(starts) ++++++++++++++++++");
+ 		switchToPlan waitCommand
+	
+	
+	Plan waitCommand
+		println("++++++++++++++++++ WAIT COMMAND ++++++++++++++++++");
+ 		
+ 		sense time(999999999) local_gui_command -> continue;
+ 		[ ?? tout(X,Y) ] switchToPlan handleTimeout;
+ 		
+ 		printCurrentEvent;
+ 		memoCurrentEvent;
+ 		
+ 		onEvent local_gui_command : local_gui_command (loadmap(PATH)) -> switchToPlan loadMap;
+ 		onEvent local_gui_command : local_gui_command (findpath(START,GOAL)) -> switchToPlan findPath;
+ 		onEvent local_gui_command : local_gui_command (navigate) -> switchToPlan navigation;
+ 		
+ 		repeatPlan 0
+	
+	
+	Plan loadMap resumeLastPlan
+		[?? msg(local_gui_command, "event", SENDER, none, local_gui_command (loadmap(PATH)), MSGNUM)]
+				 solve loadMapFromFile(PATH) time(10000) onFailSwitchTo prologFailure;
+				
+		println("++++++++++++++++++ MAP LOADED ++++++++++++++++++")
+		
+	
+	Plan findPath resumeLastPlan
+		[?? msg(local_gui_command, "event", SENDER, none, local_gui_command (findpath(START,GOAL)), MSGNUM)]
+			solve searchBestPath(START,GOAL) time(600000) onFailSwitchTo  prologFailure;
+		
+		println("++++++++++++++++++ PATH FOUND ++++++++++++++++++")
+	
+	Plan navigation resumeLastPlan
+		println("++++++++++++++++++ NAVIGATION ++++++++++++++++++");
+		
+		solve sendMap time(60000) onFailSwitchTo  prologFailure;
+		solve sendPlan time(60000) onFailSwitchTo  prologFailure;
+		solve sendPositions time(60000) onFailSwitchTo  prologFailure;
+		
+		switchToPlan waitEndOfNavigation
+		
+	Plan waitEndOfNavigation
+		sense time(999999999) local_gui_command, update, end -> continue, continue, continue;
+ 		[ ?? tout(X,Y) ] switchToPlan handleTimeout;
+ 		
+ 		printCurrentEvent;
+ 		memoCurrentEvent;
+ 		
+ 		onEvent local_gui_command : local_gui_command(abort) -> emit abort : abort; 				
+		onEvent update : update (ELEMENT) -> solve updateMap(ELEMENT) time(600000) onFailSwitchTo  prologFailure;		
+		onEvent end : end -> switchToPlan endOfNavigation;
+		
+		repeatPlan 0
+		
+	Plan endOfNavigation
+	
+		println("++++++++++++++++++ NAVIGATION ENDED :D ++++++++++++++++++");
+	
+		solve enableManipulation time(600000) onFailSwitchTo  prologFailure;
+		switchToPlan waitCommand	
+	
+	
+	
+	
+	Plan handleTimeout
+ 		println("timeout!! GOODBYE")
+ 		
+ 	Plan prologFailure resumeLastPlan            
+		println("Prolog goal FAILURE" ) 
+	
+	
+}
+
+
+
+
+QActor robot context ctxRobot{
+ 	Plan init normal
+		println( "NEVER HERE. I'm just a placeholder" ) 
+ }

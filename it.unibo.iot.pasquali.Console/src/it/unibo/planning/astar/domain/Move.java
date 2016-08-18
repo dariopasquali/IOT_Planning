@@ -1,5 +1,7 @@
 package it.unibo.planning.astar.domain;
 
+import it.unibo.planning.astar.domain.Move.SpinDirection;
+
 public class Move {
 	
 	public enum SpinDirection {
@@ -24,30 +26,22 @@ public class Move {
 	}
 	
 	
-	private int duration;	
-	private SpinDirection spin;
-	
-	private int speed;
-	
-	private MoveType type;
 
-	
+	private SpinDirection spin;
+	private MoveType type;	
 	private String prologRep;
 	
-	public Move(int speed, int duration)
+	public Move()
 	{
-		this.duration = duration;
-		this.speed = speed;
 		this.type = MoveType.STEP;
-		prologRep = "move(robotmove,forward,"+speed+","+duration+",0)";
+		prologRep = "robotmove";
 	}
 	
-	public Move(SpinDirection spinDir, int speed)
+	public Move(SpinDirection spinDir)
 	{
 		this.spin = spinDir;
-		this.speed = speed;
 		this.type = MoveType.SPIN;
-		prologRep = "move(robotspin,"+spinDir+","+speed+",0,90)";
+		prologRep = "robotspin("+spinDir+")";
 	}
 	
 	@Override
@@ -61,22 +55,9 @@ public class Move {
 		return type;
 	}
 
-	public int getDuration() {
-		return duration;
-	}
-
 	public SpinDirection getSpin() {
 		return spin;
-	}
+	}	
 
-	public int getSpeed() {
-		return speed;
-	}
-
-	public String getPrologRep() {
-		return prologRep;
-	}
-	
-	
 
 }

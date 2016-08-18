@@ -17,7 +17,9 @@ consoleTheory.pl
 
 loadMapFromFile(FileName) :-
 	actorobj(Actor),
-	Actor <-  consultFromFile(  FName  ).
+	Actor <- consultFromFile(  FName  ),
+	assert(havemap),
+	Actor <- showMapOnGui.
 	
 checkValidState( X , Y) :-
 	X > 0,
@@ -30,12 +32,32 @@ checkValidState( X , Y) :-
 %% START -> position(X,Y)
 
 searchBestPath(position(Sx,Sy) , position(Gx,Gy)) :-
+	havemap,
 	actorobj(Actor),
-	Actor <-  searchBestPath(Sx,Sy,Gx,Gy).
+	Actor <- searchBestPath(Sx,Sy,Gx,Gy),
+	Actor <- showPathOnGui.
+
+sendMap :-
+	havemap,
+	actorobj(Actor),
+	Actor <-  sendMap.
 	
 sendPlan :-
 	actorobj(Actor),
 	Actor <-  sendPlan.
+	
+sendPositions :-
+	actorobj(Actor),
+	Actor <-  sendPositions.
+	
+enableManipulation :-
+	actorobj(Actor),
+	Actor <-  enableManipulation.
+	
+updateMap (element(X,Y)) :-
+	actorobj(Actor),
+	Actor <- updateMap(element(X,Y)),
+	assert(element(X,Y)).
 
 /*
 ------------------------------------------------------------
@@ -48,7 +70,7 @@ initConsole  :-
 	%% actorPrintln( actorobj(Actor) ),
 	( Actor <- isSimpleActor returns R, R=true, !,
 	  actorPrintln(" *** consoleTheory loaded FOR ACTORS ONLY  ***  ");
-	  actorPrintln(" *** consoleRobotTheory loaded FOR ROBOTS  *** ")
+	  actorPrintln(" *** consoleTheory loaded FOR ROBOTS  *** ")
 	).
  
 :- initialization(initConsole).

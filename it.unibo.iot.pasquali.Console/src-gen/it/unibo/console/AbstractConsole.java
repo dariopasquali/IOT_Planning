@@ -10,6 +10,7 @@ import it.unibo.qactors.action.AsynchActionResult;
 import it.unibo.qactors.action.IActorAction;
 import it.unibo.qactors.action.IActorAction.ActionExecMode;
 import it.unibo.baseEnv.basicFrame.EnvFrame;
+import it.unibo.console.gui.ConsoleGUI;
 import alice.tuprolog.SolveInfo;
 import it.unibo.is.interfaces.IActivity;
 import it.unibo.is.interfaces.IIntent;
@@ -19,22 +20,28 @@ public abstract class AbstractConsole extends QActorPlanned implements IActivity
 	protected boolean actionResult = true;
 	protected alice.tuprolog.SolveInfo sol;
 	
-			protected static IOutputEnvView setTheEnv(IOutputEnvView outEnvView ){
-				EnvFrame env = new EnvFrame( "Env_console", java.awt.Color.cyan  , java.awt.Color.black );
-				env.init();
-				env.setSize(800,400);
-				IOutputEnvView newOutEnvView = ((EnvFrame) env).getOutputEnvView();
-				return newOutEnvView;
-			}
-	
-	
-		public AbstractConsole(String actorId, ActorContext myCtx, IOutputEnvView outEnvView )  throws Exception{
-			super(actorId, myCtx, "./srcMore/it/unibo/console/plans.txt", 
-			"./srcMore/it/unibo/console/WorldTheory.pl",
-			setTheEnv( outEnvView )  , "init");		
-			addInputPanel(80);
-			addCmdPanels();	
-	 	}
+	protected static IOutputEnvView setTheEnv(IOutputEnvView outEnvView ){
+		//EnvFrame env = new EnvFrame( "Env_console", java.awt.Color.cyan  , java.awt.Color.black );
+		//env.init();
+		//env.setSize(800,400);
+		
+		ConsoleGUI env = new ConsoleGUI();
+		env.setEnvVisible(true);
+		
+		//IOutputEnvView newOutEnvView = ((EnvFrame) env).getOutputEnvView();
+		
+		IOutputEnvView newOutEnvView = env;
+		return newOutEnvView;
+	}
+
+
+public AbstractConsole(String actorId, ActorContext myCtx, IOutputEnvView outEnvView )  throws Exception{
+	super(actorId, myCtx, "./srcMore/it/unibo/console/plans.txt", 
+	"./srcMore/it/unibo/console/WorldTheory.pl",
+	setTheEnv( outEnvView )  , "init");
+	//addInputPanel(80);
+	//addCmdPanels();	
+	}
 	protected void addInputPanel(int size){
 		((EnvFrame) env).addInputPanel(size);			
 	}
@@ -60,6 +67,28 @@ public abstract class AbstractConsole extends QActorPlanned implements IActivity
 	    	boolean returnValue = suspendWork;
 	    while(true){
 	    nPlanIter++;
+	    		{ String parg = "consult( \"talkTheory.pl\" )";
+	    		  aar = solveGoal( parg , 0, "","" , "" );
+	    		//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
+	    		if( aar.getInterrupted() ){
+	    			curPlanInExec   = "init";
+	    			if( ! aar.getGoon() ) break;
+	    		} 			
+	    		if( aar.getResult().equals("failure")){
+	    		if( ! switchToPlan("prologFailure").getGoon() ) break;
+	    		}else if( ! aar.getGoon() ) break;
+	    		}
+	    		{ String parg = "consult( \"ConsoleTheory.pl\" )";
+	    		  aar = solveGoal( parg , 0, "","" , "" );
+	    		//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
+	    		if( aar.getInterrupted() ){
+	    			curPlanInExec   = "init";
+	    			if( ! aar.getGoon() ) break;
+	    		} 			
+	    		if( aar.getResult().equals("failure")){
+	    		if( ! switchToPlan("prologFailure").getGoon() ) break;
+	    		}else if( ! aar.getGoon() ) break;
+	    		}
 	    		temporaryStr = " \"++++++++++++++++++ console(starts) ++++++++++++++++++\" ";
 	    		println( temporaryStr );  
 	    		if( ! switchToPlan("waitCommand").getGoon() ) break;
@@ -92,97 +121,32 @@ public abstract class AbstractConsole extends QActorPlanned implements IActivity
 	    		if( ! switchToPlan("handleTimeout").getGoon() ) break;
 	    		}
 	    		printCurrentEvent(false);
-	    		if( (guardVars = evalTheGuard( " !?have_map" )) != null ){
+	    		memoCurrentEvent( false );
 	    		//onEvent
 	    		if( currentEvent.getEventId().equals("local_gui_command") ){
 	    		 		String parg = "";
-	    		 		parg = updateVars(guardVars, Term.createTerm("command(C)"), Term.createTerm("command(navigate(START,GOAL))"), 
-	    		 			    		  					Term.createTerm(currentEvent.getMsg()), parg);
-	    		 			if( parg != null ){
-	    		 				 if( ! switchToPlan("navigation").getGoon() ) break; 
-	    		 			}//else println("guard it.unibo.xtext.qactor.impl.GuardImpl@7414683b (name: [, not: false) fails");  //parg is null when there is no guard (onEvent)
-	    		 }
-	    		}
-	    		if( (guardVars = evalTheGuard( " !?have_map" )) != null ){
-	    		//onEvent
-	    		if( currentEvent.getEventId().equals("local_gui_command") ){
-	    		 		String parg = "";
-	    		 		parg = updateVars(guardVars, Term.createTerm("command(C)"), Term.createTerm("command(navigate(GOAL))"), 
-	    		 			    		  					Term.createTerm(currentEvent.getMsg()), parg);
-	    		 			if( parg != null ){
-	    		 				 if( ! switchToPlan("navigation").getGoon() ) break; 
-	    		 			}//else println("guard it.unibo.xtext.qactor.impl.GuardImpl@7ac64f2b (name: [, not: false) fails");  //parg is null when there is no guard (onEvent)
-	    		 }
-	    		}
-	    		//onEvent
-	    		if( currentEvent.getEventId().equals("local_gui_command") ){
-	    		 		String parg = "";
-	    		 		parg = updateVars(null, Term.createTerm("command(C)"), Term.createTerm("command(load(PATH))"), 
+	    		 		parg = updateVars(null, Term.createTerm("local_gui_command(COMMAND)"), Term.createTerm("local_gui_command(loadmap(PATH))"), 
 	    		 			    		  					Term.createTerm(currentEvent.getMsg()), parg);
 	    		 			if( parg != null ){
 	    		 				 if( ! switchToPlan("loadMap").getGoon() ) break; 
 	    		 			}//else println("guard  fails");  //parg is null when there is no guard (onEvent)
 	    		 }
-	    		if( repeatPlan(0).getGoon() ) continue;
-	    break;
-	    }//while
-	    return returnValue;
-	    }catch(Exception e){
-	    println( getName() + " ERROR " + e.getMessage() );
-	    throw e;
-	    }
-	    }
-	    public boolean exploration() throws Exception{	//public to allow reflection
-	    try{
-	    	curPlanInExec =  "exploration";
-	    	boolean returnValue = suspendWork;
-	    while(true){
-	    nPlanIter++;
-	    		temporaryStr = " \"++++++++++++++++++ EXPLORE ++++++++++++++++++\" ";
-	    		println( temporaryStr );  
-	    		if( (guardVars = evalTheGuard( " ??msg(local_gui_command, \"event\" ,SENDER,none,command(explore(TYPE,MILS)),MSGNUM)" )) != null ){
-	    		temporaryStr = unifyMsgContent("explore(TYPE,MILS)","explore(TYPE,MILS)", guardVars ).toString();
-	    		emit( "explore", temporaryStr );
-	    		}
-	    		//senseEvent
-	    		timeoutval = 999999999;
-	    		aar = senseEvents( timeoutval,"update,local_gui_command,end","continue,continue,continue",
-	    		"" , "",ActionExecMode.synch );
-	    		if( ! aar.getGoon() || aar.getTimeRemained() <= 0 ){
-	    			println("			WARNING: sense timeout");
-	    			addRule("tout(senseevent,"+getName()+")");
-	    			//break;
-	    		}
-	    		if( (guardVars = evalTheGuard( " ??tout(X,Y)" )) != null ){
-	    		if( ! switchToPlan("handleTimeout").getGoon() ) break;
-	    		}
-	    		memoCurrentEvent( false );
-	    		printCurrentEvent(false);
 	    		//onEvent
-	    		if( currentEvent.getEventId().equals("update") ){
+	    		if( currentEvent.getEventId().equals("local_gui_command") ){
 	    		 		String parg = "";
-	    		 		parg = updateVars(null, Term.createTerm("update(ELEMENT)"), Term.createTerm("update(ELEMENT)"), 
+	    		 		parg = updateVars(null, Term.createTerm("local_gui_command(COMMAND)"), Term.createTerm("local_gui_command(findpath(START,GOAL))"), 
 	    		 			    		  					Term.createTerm(currentEvent.getMsg()), parg);
 	    		 			if( parg != null ){
-	    		 				 if( ! switchToPlan("updateMap").getGoon() ) break; 
+	    		 				 if( ! switchToPlan("findPath").getGoon() ) break; 
 	    		 			}//else println("guard  fails");  //parg is null when there is no guard (onEvent)
 	    		 }
 	    		//onEvent
 	    		if( currentEvent.getEventId().equals("local_gui_command") ){
 	    		 		String parg = "";
-	    		 		parg = updateVars(null, Term.createTerm("command(C)"), Term.createTerm("command(abort)"), 
+	    		 		parg = updateVars(null, Term.createTerm("local_gui_command(COMMAND)"), Term.createTerm("local_gui_command(navigate)"), 
 	    		 			    		  					Term.createTerm(currentEvent.getMsg()), parg);
 	    		 			if( parg != null ){
-	    		 				 if( ! switchToPlan("abortLastCommand").getGoon() ) break; 
-	    		 			}//else println("guard  fails");  //parg is null when there is no guard (onEvent)
-	    		 }
-	    		//onEvent
-	    		if( currentEvent.getEventId().equals("end") ){
-	    		 		String parg = "";
-	    		 		parg = updateVars(null, Term.createTerm("end"), Term.createTerm("end"), 
-	    		 			    		  					Term.createTerm(currentEvent.getMsg()), parg);
-	    		 			if( parg != null ){
-	    		 				 if( ! switchToPlan("endOfExploration").getGoon() ) break; 
+	    		 				 if( ! switchToPlan("navigation").getGoon() ) break; 
 	    		 			}//else println("guard  fails");  //parg is null when there is no guard (onEvent)
 	    		 }
 	    		if( repeatPlan(0).getGoon() ) continue;
@@ -194,46 +158,29 @@ public abstract class AbstractConsole extends QActorPlanned implements IActivity
 	    throw e;
 	    }
 	    }
-	    public boolean endOfExploration() throws Exception{	//public to allow reflection
+	    public boolean loadMap() throws Exception{	//public to allow reflection
 	    try{
-	    	curPlanInExec =  "endOfExploration";
+	    	curPlanInExec =  "loadMap";
 	    	boolean returnValue = suspendWork;
 	    while(true){
 	    nPlanIter++;
-	    		temporaryStr = " \"do you want to save the map or explore again??\" ";
+	    		if( (guardVars = evalTheGuard( " ??msg(local_gui_command, \"event\" ,SENDER,none,local_gui_command(loadmap(PATH)),MSGNUM)" )) != null ){
+	    		{ String parg = "loadMapFromFile(PATH)";
+	    		parg = substituteVars(guardVars,parg);
+	    		  aar = solveGoal( parg , 10000, "","" , "" );
+	    		//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
+	    		if( aar.getInterrupted() ){
+	    			curPlanInExec   = "loadMap";
+	    			if( ! aar.getGoon() ) break;
+	    		} 			
+	    		if( aar.getResult().equals("failure")){
+	    		if( ! switchToPlan("prologFailure").getGoon() ) break;
+	    		}else if( ! aar.getGoon() ) break;
+	    		}
+	    		}
+	    		temporaryStr = " \"++++++++++++++++++ MAP LOADED ++++++++++++++++++\" ";
 	    		println( temporaryStr );  
-	    		//senseEvent
-	    		timeoutval = 999999999;
-	    		aar = senseEvents( timeoutval,"local_gui_command","continue",
-	    		"" , "",ActionExecMode.synch );
-	    		if( ! aar.getGoon() || aar.getTimeRemained() <= 0 ){
-	    			println("			WARNING: sense timeout");
-	    			addRule("tout(senseevent,"+getName()+")");
-	    			//break;
-	    		}
-	    		if( (guardVars = evalTheGuard( " ??tout(X,Y)" )) != null ){
-	    		if( ! switchToPlan("handleTimeout").getGoon() ) break;
-	    		}
-	    		memoCurrentEvent( false );
-	    		printCurrentEvent(false);
-	    		//onEvent
-	    		if( currentEvent.getEventId().equals("local_gui_command") ){
-	    		 		String parg = "";
-	    		 		parg = updateVars(null, Term.createTerm("command(C)"), Term.createTerm("command(store(PATH))"), 
-	    		 			    		  					Term.createTerm(currentEvent.getMsg()), parg);
-	    		 			if( parg != null ){
-	    		 				 if( ! switchToPlan("storeMap").getGoon() ) break; 
-	    		 			}//else println("guard  fails");  //parg is null when there is no guard (onEvent)
-	    		 }
-	    		//onEvent
-	    		if( currentEvent.getEventId().equals("local_gui_command") ){
-	    		 		String parg = "";
-	    		 		parg = updateVars(null, Term.createTerm("command(C)"), Term.createTerm("command(explore(TYPE,MILS))"), 
-	    		 			    		  					Term.createTerm(currentEvent.getMsg()), parg);
-	    		 			if( parg != null ){
-	    		 				 if( ! switchToPlan("exploration").getGoon() ) break; 
-	    		 			}//else println("guard  fails");  //parg is null when there is no guard (onEvent)
-	    		 }
+	    		returnValue = continueWork;  
 	    break;
 	    }//while
 	    return returnValue;
@@ -242,17 +189,28 @@ public abstract class AbstractConsole extends QActorPlanned implements IActivity
 	    throw e;
 	    }
 	    }
-	    public boolean updateMap() throws Exception{	//public to allow reflection
+	    public boolean findPath() throws Exception{	//public to allow reflection
 	    try{
-	    	curPlanInExec =  "updateMap";
+	    	curPlanInExec =  "findPath";
 	    	boolean returnValue = suspendWork;
 	    while(true){
 	    nPlanIter++;
-	    		if( (guardVars = evalTheGuard( " ??msg(update, \"event\" ,SENDER,none,update(ELEMENT),MSGNUM)" )) != null ){
-	    		temporaryStr = "update(ELEMENT)";
-	    		temporaryStr = substituteVars(guardVars,temporaryStr);
-	    		println( temporaryStr );  
+	    		if( (guardVars = evalTheGuard( " ??msg(local_gui_command, \"event\" ,SENDER,none,local_gui_command(findpath(START,GOAL)),MSGNUM)" )) != null ){
+	    		{ String parg = "searchBestPath(START,GOAL)";
+	    		parg = substituteVars(guardVars,parg);
+	    		  aar = solveGoal( parg , 600000, "","" , "" );
+	    		//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
+	    		if( aar.getInterrupted() ){
+	    			curPlanInExec   = "findPath";
+	    			if( ! aar.getGoon() ) break;
+	    		} 			
+	    		if( aar.getResult().equals("failure")){
+	    		if( ! switchToPlan("prologFailure").getGoon() ) break;
+	    		}else if( ! aar.getGoon() ) break;
 	    		}
+	    		}
+	    		temporaryStr = " \"++++++++++++++++++ PATH FOUND ++++++++++++++++++\" ";
+	    		println( temporaryStr );  
 	    		returnValue = continueWork;  
 	    break;
 	    }//while
@@ -268,19 +226,60 @@ public abstract class AbstractConsole extends QActorPlanned implements IActivity
 	    	boolean returnValue = suspendWork;
 	    while(true){
 	    nPlanIter++;
-	    		temporaryStr = " \"++++++++++++++++++ NAVIGATE ++++++++++++++++++\" ";
+	    		temporaryStr = " \"++++++++++++++++++ NAVIGATION ++++++++++++++++++\" ";
 	    		println( temporaryStr );  
-	    		if( (guardVars = evalTheGuard( " ??msg(local_gui_command, \"event\" ,SENDER,none,command(navigate(START,GOAL)),MSGNUM)" )) != null ){
-	    		temporaryStr = unifyMsgContent("navigate(START,GOAL)","navigate(START,GOAL)", guardVars ).toString();
-	    		emit( "navigate", temporaryStr );
+	    		{ String parg = "sendMap";
+	    		  aar = solveGoal( parg , 60000, "","" , "" );
+	    		//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
+	    		if( aar.getInterrupted() ){
+	    			curPlanInExec   = "navigation";
+	    			if( ! aar.getGoon() ) break;
+	    		} 			
+	    		if( aar.getResult().equals("failure")){
+	    		if( ! switchToPlan("prologFailure").getGoon() ) break;
+	    		}else if( ! aar.getGoon() ) break;
 	    		}
-	    		if( (guardVars = evalTheGuard( " ??msg(local_gui_command, \"event\" ,SENDER,none,command(navigate(GOAL)),MSGNUM)" )) != null ){
-	    		temporaryStr = unifyMsgContent("navigate(START,GOAL)","navigate(GOAL)", guardVars ).toString();
-	    		emit( "navigate", temporaryStr );
+	    		{ String parg = "sendPlan";
+	    		  aar = solveGoal( parg , 60000, "","" , "" );
+	    		//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
+	    		if( aar.getInterrupted() ){
+	    			curPlanInExec   = "navigation";
+	    			if( ! aar.getGoon() ) break;
+	    		} 			
+	    		if( aar.getResult().equals("failure")){
+	    		if( ! switchToPlan("prologFailure").getGoon() ) break;
+	    		}else if( ! aar.getGoon() ) break;
 	    		}
+	    		{ String parg = "sendPositions";
+	    		  aar = solveGoal( parg , 60000, "","" , "" );
+	    		//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
+	    		if( aar.getInterrupted() ){
+	    			curPlanInExec   = "navigation";
+	    			if( ! aar.getGoon() ) break;
+	    		} 			
+	    		if( aar.getResult().equals("failure")){
+	    		if( ! switchToPlan("prologFailure").getGoon() ) break;
+	    		}else if( ! aar.getGoon() ) break;
+	    		}
+	    		if( ! switchToPlan("waitEndOfNavigation").getGoon() ) break;
+	    		returnValue = continueWork;  
+	    break;
+	    }//while
+	    return returnValue;
+	    }catch(Exception e){
+	    println( getName() + " ERROR " + e.getMessage() );
+	    throw e;
+	    }
+	    }
+	    public boolean waitEndOfNavigation() throws Exception{	//public to allow reflection
+	    try{
+	    	curPlanInExec =  "waitEndOfNavigation";
+	    	boolean returnValue = suspendWork;
+	    while(true){
+	    nPlanIter++;
 	    		//senseEvent
 	    		timeoutval = 999999999;
-	    		aar = senseEvents( timeoutval,"local_gui_command,end","continue,continue",
+	    		aar = senseEvents( timeoutval,"local_gui_command,update,end","continue,continue,continue",
 	    		"" , "",ActionExecMode.synch );
 	    		if( ! aar.getGoon() || aar.getTimeRemained() <= 0 ){
 	    			println("			WARNING: sense timeout");
@@ -290,16 +289,31 @@ public abstract class AbstractConsole extends QActorPlanned implements IActivity
 	    		if( (guardVars = evalTheGuard( " ??tout(X,Y)" )) != null ){
 	    		if( ! switchToPlan("handleTimeout").getGoon() ) break;
 	    		}
-	    		memoCurrentEvent( false );
 	    		printCurrentEvent(false);
+	    		memoCurrentEvent( false );
 	    		//onEvent
 	    		if( currentEvent.getEventId().equals("local_gui_command") ){
-	    		 		String parg = "";
-	    		 		parg = updateVars(null, Term.createTerm("command(C)"), Term.createTerm("command(abort)"), 
+	    		 		String parg="abort";
+	    		 		parg = updateVars(null,Term.createTerm("local_gui_command(COMMAND)"),  Term.createTerm("local_gui_command(abort)"), 
 	    		 			    		  					Term.createTerm(currentEvent.getMsg()), parg);
-	    		 			if( parg != null ){
-	    		 				 if( ! switchToPlan("abortLastCommand").getGoon() ) break; 
-	    		 			}//else println("guard  fails");  //parg is null when there is no guard (onEvent)
+	    		 		if( parg != null ) emit( "abort", parg );
+	    		 }
+	    		//onEvent
+	    		if( currentEvent.getEventId().equals("update") ){
+	    		 		String parg="updateMap(ELEMENT)";
+	    		 		parg = updateVars(null, Term.createTerm("update(ELEMENT)"), Term.createTerm("update(ELEMENT)"), 
+	    		 			    		  					Term.createTerm(currentEvent.getMsg()), parg);
+	    		 			if( parg != null ) {
+	    		 				aar = solveGoal( parg , 600000, "","" , "");
+	    		 				//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
+	    		 				if( aar.getInterrupted() ){
+	    		 					curPlanInExec   = "waitEndOfNavigation";
+	    		 					if( ! aar.getGoon() ) break;
+	    		 				} 			
+	    		 				if( aar.getResult().equals("failure")){
+	    		 					if( ! switchToPlan("prologFailure").getGoon() ) break;
+	    		 				}else if( ! aar.getGoon() ) break;
+	    		 			}
 	    		 }
 	    		//onEvent
 	    		if( currentEvent.getEventId().equals("end") ){
@@ -310,7 +324,7 @@ public abstract class AbstractConsole extends QActorPlanned implements IActivity
 	    		 				 if( ! switchToPlan("endOfNavigation").getGoon() ) break; 
 	    		 			}//else println("guard  fails");  //parg is null when there is no guard (onEvent)
 	    		 }
-	    		returnValue = continueWork;  
+	    		if( repeatPlan(0).getGoon() ) continue;
 	    break;
 	    }//while
 	    return returnValue;
@@ -325,71 +339,19 @@ public abstract class AbstractConsole extends QActorPlanned implements IActivity
 	    	boolean returnValue = suspendWork;
 	    while(true){
 	    nPlanIter++;
-	    		temporaryStr = " \"Robot reached the GOAL position\" ";
+	    		temporaryStr = " \"++++++++++++++++++ NAVIGATION ENDED :D ++++++++++++++++++\" ";
 	    		println( temporaryStr );  
-	    		if( ! switchToPlan("waitCommand").getGoon() ) break;
-	    break;
-	    }//while
-	    return returnValue;
-	    }catch(Exception e){
-	    println( getName() + " ERROR " + e.getMessage() );
-	    throw e;
-	    }
-	    }
-	    public boolean loadMap() throws Exception{	//public to allow reflection
-	    try{
-	    	curPlanInExec =  "loadMap";
-	    	boolean returnValue = suspendWork;
-	    while(true){
-	    nPlanIter++;
-	    		temporaryStr = " \"Map loaded\" ";
-	    		println( temporaryStr );  
-	    		if( (guardVars = evalTheGuard( " ??msg(local_gui_command, \"event\" ,SENDER,none,command(load(PATH)),MSGNUM)" )) != null ){
-	    		temporaryStr = "have_map";
-	    		temporaryStr = substituteVars(guardVars,temporaryStr);
-	    		addRule( temporaryStr );  
+	    		{ String parg = "enableManipulation";
+	    		  aar = solveGoal( parg , 600000, "","" , "" );
+	    		//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
+	    		if( aar.getInterrupted() ){
+	    			curPlanInExec   = "endOfNavigation";
+	    			if( ! aar.getGoon() ) break;
+	    		} 			
+	    		if( aar.getResult().equals("failure")){
+	    		if( ! switchToPlan("prologFailure").getGoon() ) break;
+	    		}else if( ! aar.getGoon() ) break;
 	    		}
-	    		returnValue = continueWork;  
-	    break;
-	    }//while
-	    return returnValue;
-	    }catch(Exception e){
-	    println( getName() + " ERROR " + e.getMessage() );
-	    throw e;
-	    }
-	    }
-	    public boolean storeMap() throws Exception{	//public to allow reflection
-	    try{
-	    	curPlanInExec =  "storeMap";
-	    	boolean returnValue = suspendWork;
-	    while(true){
-	    nPlanIter++;
-	    		temporaryStr = " \"Map saved\" ";
-	    		println( temporaryStr );  
-	    		if( (guardVars = evalTheGuard( " ??msg(local_gui_command, \"event\" ,SENDER,none,command(store(PATH)),MSGNUM)" )) != null ){
-	    		temporaryStr = "have_map";
-	    		temporaryStr = substituteVars(guardVars,temporaryStr);
-	    		addRule( temporaryStr );  
-	    		}
-	    		if( ! switchToPlan("waitCommand").getGoon() ) break;
-	    break;
-	    }//while
-	    return returnValue;
-	    }catch(Exception e){
-	    println( getName() + " ERROR " + e.getMessage() );
-	    throw e;
-	    }
-	    }
-	    public boolean abortLastCommand() throws Exception{	//public to allow reflection
-	    try{
-	    	curPlanInExec =  "abortLastCommand";
-	    	boolean returnValue = suspendWork;
-	    while(true){
-	    nPlanIter++;
-	    		temporaryStr = " \"Abort\" ";
-	    		println( temporaryStr );  
-	    		temporaryStr = unifyMsgContent("abort","abort", guardVars ).toString();
-	    		emit( "abort", temporaryStr );
 	    		if( ! switchToPlan("waitCommand").getGoon() ) break;
 	    break;
 	    }//while
@@ -407,6 +369,23 @@ public abstract class AbstractConsole extends QActorPlanned implements IActivity
 	    nPlanIter++;
 	    		temporaryStr = " \"timeout!! GOODBYE\" ";
 	    		println( temporaryStr );  
+	    break;
+	    }//while
+	    return returnValue;
+	    }catch(Exception e){
+	    println( getName() + " ERROR " + e.getMessage() );
+	    throw e;
+	    }
+	    }
+	    public boolean prologFailure() throws Exception{	//public to allow reflection
+	    try{
+	    	curPlanInExec =  "prologFailure";
+	    	boolean returnValue = suspendWork;
+	    while(true){
+	    nPlanIter++;
+	    		temporaryStr = " \"Prolog goal FAILURE\" ";
+	    		println( temporaryStr );  
+	    		returnValue = continueWork;  
 	    break;
 	    }//while
 	    return returnValue;

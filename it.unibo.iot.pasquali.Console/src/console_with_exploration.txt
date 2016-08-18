@@ -1,4 +1,4 @@
-RobotSystem exploreAndGo
+System exploreAndGo
 
 
 /*
@@ -7,19 +7,31 @@ RobotSystem exploreAndGo
  * ----------------------------------------------------
  */
  
-Event explore : explore(TYPE, MILS) // C to R, MILS is the maximum millisecond time
-Event navigate : navigate(START, GOAL) // C to R
-Event navigate : navigate(GOAL) // C to R
-Event abort : abort //C to R, abort exploration or navigation
+// Raised by Console to abort the current command
+Event abort : abort
+
+// Raised by Robot when it ends the current command
+Event end : end
+
+// Raised by Robot when find an unexpected
+// obstacle during th navigation
+Event update : update(ELEMENT)
+
+
  
-Event end : end //R to C, termination of exploration or navigation
-Event update : update(ELEMENT)//R to C, update the Map
+/*
+ * EVENTS FROM THE GUI
+ */
+  Event local_gui_command : local_gui_command(COMMAND)
  
  /*
-  * EVENTS FROM THE GUI
-  */
-  Event local_gui_command : command(C)
- 
+  * Button --> COMMAND
+  * 
+  * Load Map --> loadmap(PATH);
+  * Find Path –-> findpath;
+  * Start Navigation --> navigate;
+  * Abort --> abort;
+ */
  
 /*
  * ----------------------------------------------------
@@ -160,9 +172,9 @@ Context ctxConsole ip [ host="localhost" port=8010]
  }
  
  
- Robot scout QActor robot context ctxRobot{
+QActor robot context ctxRobot{
  	Plan init normal
-		println( "NEVER HERE. I'm just a place holder" ) 
+		println( "NEVER HERE. I'm just a placeholder" ) 
  }
  
  
