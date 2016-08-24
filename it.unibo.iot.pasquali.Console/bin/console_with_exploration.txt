@@ -1,0 +1,181 @@
+System exploreAndGo
+
+
+/*
+ * ----------------------------------------------------
+ * EVENTS emitted by the system components
+ * ----------------------------------------------------
+ */
+ 
+// Raised by Console to abort the current command
+Event abort : abort
+
+// Raised by Robot when it ends the current command
+Event end : end
+
+// Raised by Robot when find an unexpected
+// obstacle during th navigation
+Event update : update(ELEMENT)
+
+
+ 
+/*
+ * EVENTS FROM THE GUI
+ */
+  Event local_gui_command : local_gui_command(COMMAND)
+ 
+ /*
+  * Button --> COMMAND
+  * 
+  * Load Map --> loadmap(PATH);
+  * Find Path –-> findpath;
+  * Start Navigation --> navigate;
+  * Abort --> abort;
+ */
+ 
+/*
+ * ----------------------------------------------------
+ * CONTEXT for the Robot as independent device (standalone)
+ * ----------------------------------------------------
+ */
+Context ctxRobot ip [ host="localhost" port=8020] -standalone 
+  
+/*
+ * ----------------------------------------------------
+ * CONTEXT for the Console
+ * ----------------------------------------------------
+ */ 
+Context ctxConsole ip [ host="localhost" port=8010]
+
+
+/*
+ * ----------------------------------------------------
+ * CONSOLE with custom GUI
+ * ----------------------------------------------------
+ */
+ 
+ QActor console context ctxConsole -g cyan{
+ 	
+ 	Plan init normal
+ 		solve consult("talkTheory.pl") time(0) onFailSwitchTo  prologFailure ;
+		solve consult("ConsoleTheory.pl") time(0) onFailSwitchTo  prologFailure ;
+ 		println("++++++++++++++++++ console(starts) ++++++++++++++++++");
+ 		switchToPlan waitCommand
+ 		
+ 	Plan waitCommand
+ 	
+ 		println("++++++++++++++++++ WAIT COMMAND ++++++++++++++++++");
+ 		
+ 		sense time(999999999) local_gui_command -> continue;
+ 		[ ?? tout(X,Y) ] switchToPlan handleTimeout;
+ 		printCurrentEvent;
+ 		memoCurrentEvent;
+ 		
+ 		//onEvent local_gui_command : command(explore(TYPE, MILS)) ->	switchToPlan exploration; TODO <------------------
+ 		[ !? have_map ] onEvent local_gui_command : command(navigate(START, GOAL)) -> switchToPlan navigation;
+ 		//[ !? have_map ] onEvent local_gui_command : command(navigate(GOAL)) -> switchToPlan navigation; TODO <----------
+ 		onEvent local_gui_command : command(load(PATH)) -> switchToPlan loadMap;
+ 		
+ 		repeatPlan 0		
+ 	
+ 	
+ 	
+ 	Plan exploration //TODO not yet implemented
+ 	
+ 		println("++++++++++++++++++ EXPLORE ++++++++++++++++++");
+ 		
+ 		// discard all old map data
+ 		
+ 		[?? msg(local_gui_command, "event", SENDER, none, command(explore(TYPE, MILS)), MSGNUM)] emit explore : explore(TYPE, MILS);
+ 		
+ 		sense time(999999999) update, local_gui_command, end -> continue, continue, continue;
+ 		[ ?? tout(X,Y) ] switchToPlan handleTimeout;
+ 		memoCurrentEvent;
+ 		printCurrentEvent;
+ 		
+ 		onEvent update : update(ELEMENT) -> switchToPlan updateMap;
+ 		onEvent local_gui_command : command(abort) -> switchToPlan abortLastCommand;
+ 		onEvent end : end -> switchToPlan endOfExploration;
+ 		
+ 		repeatPlan 0
+ 	
+ 	Plan endOfExploration
+ 		println("do you want to save the map or explore again??");
+ 		
+ 		sense time(999999999) local_gui_command -> continue;
+ 		[ ?? tout(X,Y) ] switchToPlan handleTimeout;
+ 		memoCurrentEvent;
+ 		printCurrentEvent; 	
+ 		
+ 		onEvent local_gui_command : command(store(PATH)) -> switchToPlan storeMap;
+ 		onEvent local_gui_command : command(explore(TYPE, MILS)) ->	switchToPlan exploration
+ 		
+ 	
+ 	Plan updateMap resumeLastPlan
+ 		[?? msg(update, "event", SENDER, none, update(ELEMENT), MSGNUM)] println(update(ELEMENT))
+ 		
+ 	
+ 	
+ 	Plan navigation resumeLastPlan
+ 		println("++++++++++++++++++ NAVIGATE ++++++++++++++++++");
+ 		
+ 		//[?? msg(local_gui_command, "event", SENDER, none, command(navigate(START, GOAL)), MSGNUM)]emit navigate : navigate(START, GOAL);
+ 		//[?? msg(local_gui_command, "event", SENDER, none, command(navigate(GOAL)), MSGNUM)]emit navigate : navigate(GOAL);
+ 		
+ 		//at the moment the console find the best path
+ 		//the send the plan to the robot
+ 		
+ 		[?? msg(local_gui_command, "event", SENDER, none, command(navigate(START, GOAL)), MSGNUM)]
+			solve searchBestPath(START,GOAL) time(600000) onFailSwitchTo  prologFailure; // find the best path from start to goal
+		
+		solve sendPlan time(60000) onFailSwitchTo  prologFailure; //send the plan to the robot		
+ 		
+ 		sense time(999999999) local_gui_command, end -> continue, continue;
+ 		[ ?? tout(X,Y) ] switchToPlan handleTimeout;
+ 		memoCurrentEvent;
+ 		printCurrentEvent;
+ 		
+ 		onEvent local_gui_command : command(abort) -> switchToPlan abortLastCommand;
+ 		onEvent end : end -> switchToPlan endOfNavigation
+ 		
+ 	
+ 	Plan endOfNavigation
+ 		println("Robot reached the GOAL position");
+ 		switchToPlan waitCommand 	
+ 	
+ 	 	
+ 	Plan loadMap resumeLastPlan
+ 		[?? msg(local_gui_command, "event", SENDER, none, command(load(PATH)), MSGNUM)] solve loadMapFromFile(PATH) time(10000);
+ 		println("++++++++++++++++++ MAP LOADED ++++++++++++++++++") 		
+ 		// <-- waitCommand
+ 	
+ 	
+ 	Plan storeMap //TODO 
+ 		println("Map saved");
+ 		[?? msg(local_gui_command, "event", SENDER, none, command(store(PATH)), MSGNUM)] addRule have_map;
+ 		switchToPlan waitCommand
+ 		
+ 	
+ 	
+ 	Plan abortLastCommand
+ 		println("Abort");
+ 		emit abort : abort;
+ 		switchToPlan waitCommand
+ 	
+ 	
+ 	
+ 	Plan handleTimeout
+ 		println("timeout!! GOODBYE")
+ 	Plan prologFailure resumeLastPlan            
+		println("Prolog goal FAILURE" ) 	
+ 	
+ }
+ 
+ 
+QActor robot context ctxRobot{
+ 	Plan init normal
+		println( "NEVER HERE. I'm just a placeholder" ) 
+ }
+ 
+ 
+ 

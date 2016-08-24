@@ -67,18 +67,7 @@ public AbstractConsole(String actorId, ActorContext myCtx, IOutputEnvView outEnv
 	    	boolean returnValue = suspendWork;
 	    while(true){
 	    nPlanIter++;
-	    		{ String parg = "consult( \"talkTheory.pl\" )";
-	    		  aar = solveGoal( parg , 0, "","" , "" );
-	    		//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
-	    		if( aar.getInterrupted() ){
-	    			curPlanInExec   = "init";
-	    			if( ! aar.getGoon() ) break;
-	    		} 			
-	    		if( aar.getResult().equals("failure")){
-	    		if( ! switchToPlan("prologFailure").getGoon() ) break;
-	    		}else if( ! aar.getGoon() ) break;
-	    		}
-	    		{ String parg = "consult( \"ConsoleTheory.pl\" )";
+	    		{ String parg = "consult( \"consoleTheory.pl\" )";
 	    		  aar = solveGoal( parg , 0, "","" , "" );
 	    		//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
 	    		if( aar.getInterrupted() ){
@@ -167,7 +156,7 @@ public AbstractConsole(String actorId, ActorContext myCtx, IOutputEnvView outEnv
 	    		if( (guardVars = evalTheGuard( " ??msg(local_gui_command, \"event\" ,SENDER,none,local_gui_command(loadmap(PATH)),MSGNUM)" )) != null ){
 	    		{ String parg = "loadMapFromFile(PATH)";
 	    		parg = substituteVars(guardVars,parg);
-	    		  aar = solveGoal( parg , 10000, "","" , "" );
+	    		  aar = solveGoal( parg , 100000, "","" , "" );
 	    		//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
 	    		if( aar.getInterrupted() ){
 	    			curPlanInExec   = "loadMap";

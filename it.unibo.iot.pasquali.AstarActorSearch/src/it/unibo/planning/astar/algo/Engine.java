@@ -3,17 +3,17 @@ package it.unibo.planning.astar.algo;
 import java.util.ArrayList;
 import java.util.List;
 
-import it.unibo.console.Console;
 import it.unibo.planning.astar.domain.Move;
 import it.unibo.planning.astar.domain.Move.MoveType;
 import it.unibo.planning.astar.domain.Move.SpinDirection;
 import it.unibo.planning.astar.domain.State;
 import it.unibo.planning.astar.domain.State.Direction;
 import it.unibo.qactors.action.AsynchActionResult;
+import it.unibo.qactors.planned.QActorPlanned;
 
 public class Engine {
 	
-	public static Console actor;
+	public static QActorPlanned actor;
 	public static State goal;
 	public static final int DEFAULT_SPEED = 60;
 	public static final int DEFAULT_DURATION = 500;

@@ -9,5 +9,9 @@ public interface IMap {
 	
 	public String getDefaultRep();
 	public String getJSONRep();
+	void clearAll();
+	void addElementsFromString(String elem);
+	void addElementsFromList(List<String> els);
+	void removeElement(int c, int r);
 
 }

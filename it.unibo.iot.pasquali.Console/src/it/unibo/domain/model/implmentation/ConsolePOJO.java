@@ -6,9 +6,9 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Observable;
 
-import org.json.JSONObject;
+//import org.json.JSONObject;
 
-import com.google.gson.Gson;
+//import com.google.gson.Gson;
 
 import it.unibo.domain.model.interfaces.IConsole;
 import it.unibo.domain.model.interfaces.IMap;
@@ -22,7 +22,7 @@ public class ConsolePOJO extends Observable implements IConsole{
 	private boolean exploring;
 	private boolean navigating;
 	
-	private Gson jsonConverter = new Gson();
+	//private Gson jsonConverter = new Gson();
 	
 	/*
 	 * ============================================================
@@ -91,30 +91,30 @@ public class ConsolePOJO extends Observable implements IConsole{
 		
 		if(map == null)
 			throw new Exception("Map is Null");
-		
+		/*
 		try
 		{
-			jsonConverter.toJson(map, new FileWriter(filepath));
+			//jsonConverter.toJson(map, new FileWriter(filepath));
 		}
 		catch (IOException e)
 		{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
+		}*/
 	}
 
 	@Override
 	public IMap loadMap(String filepath) {
-
+/*
 		try
 		{
-			map = jsonConverter.fromJson(new FileReader(filepath), Map.class);			
+			//map = jsonConverter.fromJson(new FileReader(filepath), Map.class);			
 		}
 		catch (IOException e)
 		{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
+		}*/
 		
 		setChanged();
 		notifyObservers();

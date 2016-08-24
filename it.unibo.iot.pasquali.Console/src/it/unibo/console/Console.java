@@ -6,8 +6,73 @@ package it.unibo.console;
 import it.unibo.is.interfaces.IOutputEnvView;
 import it.unibo.qactors.ActorContext;
 
+import java.util.List;
+
+import it.unibo.console.gui.*;
+import it.unibo.domain.model.implmentation.Map;
+import it.unibo.domain.model.implmentation.MapElement;
+
 public class Console extends AbstractConsole { 
+	
+	private Map map;
+	
 	public Console(String actorId, ActorContext myCtx, IOutputEnvView outEnvView )  throws Exception{
 		super(actorId, myCtx, outEnvView);
+		((ConsoleGUI) env).setController(this);
 	}
+	
+	public void createMap(int x, int y)
+	{
+		map = new Map(x,y);
+	}
+	
+	public void setMapElements(List<String> elements)
+	{
+		map.addElementsFromList(elements);
+		((ConsoleGUI)env).setMap(map);
+	}
+	
+	public void setMapElements(String elements)
+	{
+		map.addElementsFromString(elements);
+		((ConsoleGUI)env).setMap(map);		
+	}
+	
+	
+	@Override
+	public void execAction(String cmd) {
+		
+		String[] command = cmd.split(" ");		
+		String[] params;
+		switch (command[0]){
+		case "LOAD":
+			String path = command[1].replace('\\', '/');
+			platform.raiseEvent("input", "local_gui_command", "local_gui_command(loadmap(\""+command[1]+"\"))");
+			break;
+		
+			
+		case "NAVIGATE":
+			platform.raiseEvent("input", "local_gui_command", "local_gui_command(navigate)");
+			break;
+			
+		case "FIND":
+			params = command[1].split(",");
+			
+			platform.raiseEvent("input", "local_gui_command", "local_gui_command(findpath("
+						+ "position(" + params[0] + "," + params[1]+")"
+								+ ","
+						+ "position(" + params[2] + "," + params[3]+")"
+								+ "))");
+						
+			break;
+						
+		case "ABORT":
+			platform.raiseEvent("input", "local_gui_command", "local_gui_command(abort)");
+			break;
+		default:
+			println("Invalid command");
+		}
+	}
+	
+	
 }

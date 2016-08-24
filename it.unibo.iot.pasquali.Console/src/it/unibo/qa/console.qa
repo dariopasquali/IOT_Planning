@@ -68,8 +68,7 @@ Context ctxConsole ip [ host="localhost" port=8010]
 QActor console context ctxConsole -g cyan{
 	
 	Plan init normal
-		solve consult("talkTheory.pl") time(0) onFailSwitchTo  prologFailure ;
-		solve consult("ConsoleTheory.pl") time(0) onFailSwitchTo  prologFailure ;
+		solve consult("consoleTheory.pl") time(0) onFailSwitchTo  prologFailure ;
 		
  		println("++++++++++++++++++ console(starts) ++++++++++++++++++");
  		switchToPlan waitCommand
@@ -93,7 +92,7 @@ QActor console context ctxConsole -g cyan{
 	
 	Plan loadMap resumeLastPlan
 		[?? msg(local_gui_command, "event", SENDER, none, local_gui_command (loadmap(PATH)), MSGNUM)]
-				 solve loadMapFromFile(PATH) time(10000) onFailSwitchTo prologFailure;
+				 solve loadMapFromFile(PATH) time(100000) onFailSwitchTo prologFailure;
 				
 		println("++++++++++++++++++ MAP LOADED ++++++++++++++++++")
 		

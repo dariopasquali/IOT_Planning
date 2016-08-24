@@ -12,14 +12,18 @@ import java.awt.Insets;
 import java.awt.Panel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JPanel;
 import javax.swing.border.TitledBorder;
 
+import it.unibo.console.gui.GridButtonPanel.CellState;
+import it.unibo.domain.model.implmentation.Map;
 import it.unibo.domain.model.interfaces.IConsole;
 import it.unibo.domain.model.interfaces.IMap;
+import it.unibo.domain.model.interfaces.IMapElement;
 import it.unibo.is.interfaces.IActivity;
 import it.unibo.is.interfaces.IActivityBase;
 import it.unibo.is.interfaces.IBasicEnvAwt;
@@ -59,6 +63,12 @@ public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt{
 	
 	private JTextArea txtOut;
 	
+	private JPanel panelMap;
+	private JSplitPane splitRight;
+	private GridButtonPanel gbp;
+	
+	private Map map;
+	
 	JButton btnFindPath, btnNavigate, btnManipulate, btnAbort, btnLoad;
 	
 	//private JFileChooser fileLoader, fileSaver;
@@ -97,7 +107,7 @@ public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt{
 	 */
 	private void initialize() {
 		frame = new JFrame();
-		frame.setBounds(100, 100, 1072, 566);
+		frame.setBounds(100, 100, 1134, 623);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		GridBagLayout gridBagLayout = new GridBagLayout();
 		gridBagLayout.columnWidths = new int[]{1056, 0};
@@ -241,6 +251,8 @@ public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt{
 		gbc_btnFindPath.gridx = 0;
 		gbc_btnFindPath.gridy = 7;
 		panel.add(btnFindPath, gbc_btnFindPath);
+		btnFindPath.addActionListener(new DefaultInputHandler());
+		btnFindPath.setEnabled(false);
 		
 		btnNavigate = new JButton("Start Navigation");
 		btnNavigate.setFont(new Font("Tahoma", Font.PLAIN, 15));
@@ -250,6 +262,8 @@ public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt{
 		gbc_btnNavigate.gridx = 0;
 		gbc_btnNavigate.gridy = 9;
 		panel.add(btnNavigate, gbc_btnNavigate);
+		btnNavigate.addActionListener(new DefaultInputHandler());
+		btnNavigate.setEnabled(false);
 		
 		btnManipulate = new JButton("Manipulate");
 		btnManipulate.setFont(new Font("Tahoma", Font.PLAIN, 15));
@@ -260,6 +274,8 @@ public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt{
 		gbc_btnManipulate.gridx = 0;
 		gbc_btnManipulate.gridy = 11;
 		panel.add(btnManipulate, gbc_btnManipulate);
+		//btnManipulate.addActionListener(new DefaultInputHandler());
+		btnManipulate.setEnabled(false);
 		
 		btnAbort = new JButton("Abort");
 		btnAbort.setFont(new Font("Tahoma", Font.PLAIN, 15));
@@ -270,16 +286,13 @@ public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt{
 		gbc_btnAbort.gridx = 0;
 		gbc_btnAbort.gridy = 13;
 		panel.add(btnAbort, gbc_btnAbort);
+		btnAbort.addActionListener(new DefaultInputHandler());
+		btnAbort.setEnabled(false);
 		
-		JSplitPane splitRight = new JSplitPane();
+		splitRight = new JSplitPane();
 		bodyPanel.setRightComponent(splitRight);
 		
-		JPanel panelMap = new JPanel();
-		splitRight.setLeftComponent(panelMap);
-		panelMap.setLayout(new GridLayout(20, 20, 0, 0));
-		
-		
-		
+		gbp = new GridButtonPanel();	
 		
 		JScrollPane scrollPane = new JScrollPane((Component) null);
 		splitRight.setRightComponent(scrollPane);
@@ -316,79 +329,54 @@ public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt{
 			case "Load Map":				
 				FileDialog loadDialog = new FileDialog(frame, "Choose the Map", FileDialog.LOAD);
 				loadDialog.setDirectory("C:\\");
-				loadDialog.setFile("*.json");
+				loadDialog.setFile("*.pl");
 				loadDialog.setVisible(true);
-				String filename = loadDialog.getDirectory()+loadDialog.getFile();				
+				String filename = loadDialog.getDirectory()+loadDialog.getFile();
+				if(filename.contains("null"))
+					break;
 				
-				controller.execAction("LOAD "+filename);			
+				btnFindPath.setEnabled(true);
+				controller.execAction("LOAD "+filename);
 				break;
 				
-			case "Store Map":				
-				FileDialog storeDialog = new FileDialog(frame, "Create a File", FileDialog.SAVE);
-				storeDialog.setDirectory("C:\\");
-				storeDialog.setFile("*.json");
-				storeDialog.setVisible(true);
-				filename = storeDialog.getDirectory()+storeDialog.getFile();
 				
-				controller.execAction("STORE "+filename);
-				break;
-				
-			case "Navigate":
+			case "Find Best Path":
 				
 				String sx = txtStartX.getText();
 				String sy = txtStartY.getText();
 				String gx = txtGoalX.getText();
 				String gy = txtGoalY.getText();
 				
-				if(!gx.equals("") && !gy.equals(""))
+				if(!gx.equals("") && !gy.equals("") && !sx.equals("") && !sy.equals(""))
 				{
-					if(!sx.equals("") && !sy.equals(""))
+					try
 					{
-						try
-						{
-							controller.execAction("NAVIGATE "
-								+Integer.parseInt(sx)+","						
-								+Integer.parseInt(sy)+","
-								+Integer.parseInt(gx)+","
-								+Integer.parseInt(gy)+","
-								);
-							
-							btnAbort.setEnabled(true);
-							
-							btnLoad.setEnabled(false);
-						}
-						catch(NumberFormatException e1)
-						{
-							println(e1.getMessage());
-						}
+						controller.execAction("FIND "
+							+Integer.parseInt(sx)+","						
+							+Integer.parseInt(sy)+","
+							+Integer.parseInt(gx)+","
+							+Integer.parseInt(gy)+","
+							);
+						
+						btnNavigate.setEnabled(true);							
+						btnLoad.setEnabled(false);
 					}
-					else
+					catch(NumberFormatException e1)
 					{
-						try
-						{
-							controller.execAction("NAVIGATE "
-								+Integer.parseInt(gx)+","
-								+Integer.parseInt(gy)+","
-								);
-							
-							btnAbort.setEnabled(true);
-							
-							btnNavigate.setEnabled(false);
-							btnLoad.setEnabled(false);
-						}
-						catch(NumberFormatException e1)
-						{
-							println(e1.getMessage());
-						}
+						println(e1.getMessage());
 					}
 				}
 				else
-					println("ERROR: invalid GOAL position");
+					println("INVALID COORDINATES!!");
 				break;
+			
+			case "Start Navigation":
+				controller.execAction("NAVIGATE ");
+				btnNavigate.setEnabled(false);
+				btnAbort.setEnabled(true);
 				
 			case "Abort":
-				controller.execAction("ABORT ");
-				
+				controller.execAction("ABORT ");				
 				btnAbort.setEnabled(false);
 				
 				btnNavigate.setEnabled(true);
@@ -537,6 +525,22 @@ public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt{
 	@Override
 	public void setEnvVisible(boolean b) {
 		setVisible(b);	
+	}
+
+	public void setMap(Map map) {
+
+		this.map = map;
+		
+		gbp.createGridPanel(map.getYmax()+1, map.getXmax()+1);
+		List<IMapElement> elements = map.getElements();
+		
+		for(IMapElement e : elements)
+		{
+			gbp.setCellState(e.getY(), e.getX(), CellState.OBSTACLE);
+		}
+		
+		panelMap = gbp.getPanel();
+		splitRight.setLeftComponent(panelMap);
 	}
 
 	
