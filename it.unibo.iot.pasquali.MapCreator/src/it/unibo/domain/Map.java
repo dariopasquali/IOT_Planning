@@ -3,6 +3,9 @@ package it.unibo.domain;
 import java.util.ArrayList;
 import java.util.List;
 
+import it.unibo.domain.interfaces.IMap;
+import it.unibo.domain.interfaces.IMapElement;
+
 
 public class Map implements IMap{
 

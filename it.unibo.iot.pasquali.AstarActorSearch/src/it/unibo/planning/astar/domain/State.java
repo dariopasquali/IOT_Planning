@@ -3,10 +3,10 @@ package it.unibo.planning.astar.domain;
 public class State implements Comparable<State>{
 	
 	public enum Direction {
-		NORTH ('N', 0),
-		EAST ('E', 1),
-		WEST ('W', 2),
-		SOUTH ('S', 3),
+		NORTH ('N', 3),
+		EAST ('E', 7),
+		WEST ('W', 11),
+		SOUTH ('S', 19),
 		NONE ('0', -1);
 		
 		private final char direction;

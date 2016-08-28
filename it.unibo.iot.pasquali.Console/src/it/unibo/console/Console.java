@@ -4,21 +4,29 @@ This code is generated only ONCE
 */
 package it.unibo.console;
 import it.unibo.is.interfaces.IOutputEnvView;
+import it.unibo.planning.astar.algo.Engine;
+import it.unibo.planning.astar.algo.SearchAgent;
+import it.unibo.planning.astar.domain.Move;
+import it.unibo.planning.astar.domain.State;
+import it.unibo.planning.astar.domain.State.Direction;
 import it.unibo.qactors.ActorContext;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import it.unibo.console.gui.*;
 import it.unibo.domain.model.implmentation.Map;
-import it.unibo.domain.model.implmentation.MapElement;
 
 public class Console extends AbstractConsole { 
 	
 	private Map map;
+	private ArrayList<it.unibo.planning.astar.domain.State> path;
 	
 	public Console(String actorId, ActorContext myCtx, IOutputEnvView outEnvView )  throws Exception{
 		super(actorId, myCtx, outEnvView);
 		((ConsoleGUI) env).setController(this);
+		
+		path = null;
 	}
 	
 	public void createMap(int x, int y)
@@ -38,6 +46,25 @@ public class Console extends AbstractConsole {
 		((ConsoleGUI)env).setMap(map);		
 	}
 	
+	public void searchBestPath(int sx, int sy, int gx, int gy)
+	{		
+		SearchAgent agent = new SearchAgent();
+		
+		it.unibo.planning.astar.domain.State start = 
+				new it.unibo.planning.astar.domain.State(sx, sy, Direction.NORTH, null, 0);
+		
+		it.unibo.planning.astar.domain.State goal = 
+				new it.unibo.planning.astar.domain.State(gx, gy, Direction.NONE, null, 0);
+		
+		path = agent.searchBestStatePath(this,start, goal);		
+	}
+	
+	public void showPathOnGui()
+	{
+		((ConsoleGUI)env).setPath(path);
+	}
+	
+	
 	
 	@Override
 	public void execAction(String cmd) {
@@ -46,7 +73,6 @@ public class Console extends AbstractConsole {
 		String[] params;
 		switch (command[0]){
 		case "LOAD":
-			String path = command[1].replace('\\', '/');
 			platform.raiseEvent("input", "local_gui_command", "local_gui_command(loadmap(\""+command[1]+"\"))");
 			break;
 		

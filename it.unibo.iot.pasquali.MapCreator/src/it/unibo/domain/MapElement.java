@@ -1,5 +1,7 @@
 package it.unibo.domain;
 
+import it.unibo.domain.interfaces.IMapElement;
+
 public class MapElement implements IMapElement{
 
 	private int x, y;
@@ -44,8 +46,8 @@ public class MapElement implements IMapElement{
 		MapElement e = (MapElement) o;
 		
 		if(this.getX()==e.getX() && this.getY()==e.getY())
-			return false;
-		else
 			return true;
+		else
+			return false;
 	}
 }

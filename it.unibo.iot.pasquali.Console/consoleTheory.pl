@@ -13,6 +13,10 @@ consoleTheory.pl
 %% ... 
 %% bordi e ostacoli sono equivalenti e trattati come element
 
+defaultSpeed(60).
+defaultDuration(500).
+
+
 add_tail([],X,[X]).
 add_tail([H|T],X,[H|L]) :-
 	add_tail(T,X,L).
@@ -22,12 +26,16 @@ getElements(List) :-
 	
 getElements(List, ID, ToList) :-
 	mapdata(ID, E), !,
-	actorPrintln(E),
 	add_tail(List, E, List1),
 	ID1 is ID + 1,
 	getElements(List1, ID1, ToList).
 	
 getElements(List, _, List).
+
+notContainsElement(E, []).
+notContainsElement(E, [E|_]) :- !, fail.
+notContainsElement(E, [H|T]) :-
+	containsElement(E,T).
 	
 
 loadMapFromFile(PATH) :-
@@ -65,17 +73,21 @@ loadMapFromFile(PATH) :-
 	assert(havemap).
 
 checkValidState( X , Y) :-
-	X > 0,
-	Y > 0,
+	X >= 0,
+	Y >= 0,
 	map(Xmax, Ymax),
 	X =< Xmax,
 	Y =< Ymax,
-	not element(X,Y).
+	getElements(List),
+	notContainsElement(element(X,Y), List).
 
 %% START -> position(X,Y)
 
 searchBestPath(position(Sx,Sy) , position(Gx,Gy)) :-
+	actorPrintln(position(Sx,Sy)),
+	actorPrintln(position(Gx,Gy)),	
 	havemap,
+	actorPrintln(havemap),
 	actorobj(Actor),
 	Actor <- searchBestPath(Sx,Sy,Gx,Gy),
 	Actor <- showPathOnGui,

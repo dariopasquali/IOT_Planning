@@ -18,12 +18,8 @@ import it.unibo.domain.MapElement;
 /**
  * @see http://stackoverflow.com/questions/7702697
  */
-public class GridButtonPanel {
+public class MapViewerPanel {
 
-	private JPanel p;
-	private Map map;
-	private int rows, cols;
-	
 	public enum CellState{
 		CLEAR,
 		OBSTACLE,
@@ -32,15 +28,50 @@ public class GridButtonPanel {
 		PATH
 	}
 	
-    private static final int N = 5;
+	private class ClickHandler implements ActionListener{
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+
+			String[] name = e.getActionCommand().split(" ");
+			System.out.println(e.getActionCommand());
+			int r = Integer.parseInt(name[0]);
+			int c = Integer.parseInt(name[1]);
+			
+			switchState(r,c);			
+		}		
+	}
+	
+	private JPanel p;
+	private Map map;
+	private int rows, cols;
     private JButton[][] matrix = null;
     
 
+	public void setMap(Map m){
+		this.map = m;
+	}
+	
+	public Map getMap()
+	{
+		return map;
+	}
+	
+	public int getRows()
+	{
+		return rows;
+	}
+	
+	public int getCols()
+	{
+		return cols;
+	}
+    
     private JButton getGridButton(int r, int c) {
         return matrix[r][c];
     }
 
-    private JButton createGridButton(final int row, final int col) {
+    private JButton createCell(final int row, final int col) {
         final JButton b = new JButton("");
         b.setActionCommand(row+" "+col);
         b.addActionListener(new ClickHandler());
@@ -80,7 +111,6 @@ public class GridButtonPanel {
     	getGridButton(y, x).setBackground(color);    
     }
     
-
     public JPanel createGridPanel(int rows, int cols) {
     	
     	this.rows = rows;
@@ -93,7 +123,7 @@ public class GridButtonPanel {
         {
         	for(int c = 0; c < cols; c++)
         	{
-        		JButton gb = createGridButton(r, c);
+        		JButton gb = createCell(r, c);
         		gb.setBackground(Color.WHITE);
                 gb.setPreferredSize(new Dimension(20,20));
                 matrix[r][c] = gb;
@@ -104,52 +134,10 @@ public class GridButtonPanel {
         return p;
     }
     
-    private void display() {
-        JFrame f = new JFrame("GridButton");
-        f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        f.add(createGridPanel(15,15));
-        f.pack();
-        f.setLocationRelativeTo(null);
-        f.setVisible(true);
-    }
-
-    public static void main(String[] args) {
-        EventQueue.invokeLater(new Runnable() {
-
-            @Override
-            public void run() {
-                new GridButtonPanel().display();
-            }
-        });
-    }
-
 	public JPanel getPanel() {
 		return p;
 	}
 	
-	public void setMap(Map m){
-		this.map = m;
-	}
-	
-	public Map getMap()
-	{
-		return map;
-	}
-	
-	private class ClickHandler implements ActionListener{
-
-		@Override
-		public void actionPerformed(ActionEvent e) {
-
-			String[] name = e.getActionCommand().split(" ");
-			System.out.println(e.getActionCommand());
-			int r = Integer.parseInt(name[0]);
-			int c = Integer.parseInt(name[1]);
-			
-			switchState(r,c);			
-		}		
-	}
-
 	public void switchState(int r, int c) {
 		
 		JButton b = getGridButton(r, c);
@@ -180,5 +168,26 @@ public class GridButtonPanel {
 		
 	}
 	
+	
+    /*
+    public static void main(String[] args) {
+        EventQueue.invokeLater(new Runnable() {
+
+            @Override
+            public void run() {
+                new MapViewerPanel().display();
+            }
+        });
+    }
+    
+    private void display() {
+        JFrame f = new JFrame("GridButton");
+        f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        f.add(createGridPanel(15,15));
+        f.pack();
+        f.setLocationRelativeTo(null);
+        f.setVisible(true);
+    }
+    */
 	
 }

@@ -1,4 +1,4 @@
-package it.unibo.domain;
+package it.unibo.domain.interfaces;
 
 public interface IMapElement {
 

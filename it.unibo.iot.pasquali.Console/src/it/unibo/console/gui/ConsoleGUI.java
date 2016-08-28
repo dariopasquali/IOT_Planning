@@ -12,37 +12,38 @@ import java.awt.Insets;
 import java.awt.Panel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.JButton;
-import javax.swing.JFileChooser;
 import javax.swing.JPanel;
 import javax.swing.border.TitledBorder;
 
-import it.unibo.console.gui.GridButtonPanel.CellState;
+import it.unibo.console.AbstractConsole;
+import it.unibo.console.gui.MapViewerPanel.CellState;
 import it.unibo.domain.model.implmentation.Map;
-import it.unibo.domain.model.interfaces.IConsole;
-import it.unibo.domain.model.interfaces.IMap;
+import it.unibo.domain.model.implmentation.MapElement;
 import it.unibo.domain.model.interfaces.IMapElement;
 import it.unibo.is.interfaces.IActivity;
 import it.unibo.is.interfaces.IActivityBase;
 import it.unibo.is.interfaces.IBasicEnvAwt;
-import it.unibo.is.interfaces.IBasicUniboEnv;
 import it.unibo.is.interfaces.IOutputEnvView;
 import it.unibo.is.interfaces.IOutputView;
+import it.unibo.planning.astar.algo.Engine;
+import it.unibo.planning.astar.domain.Move;
+import it.unibo.planning.astar.domain.State;
+import it.unibo.planning.astar.domain.State.Direction;
 
-import java.awt.Color;
 import javax.swing.JSplitPane;
 import javax.swing.JTextField;
 import javax.swing.JLabel;
 import java.awt.Font;
 import java.awt.Frame;
 import javax.swing.JTextArea;
-import javax.swing.JRadioButton;
-import java.awt.Choice;
 import javax.swing.JScrollPane;
 import javax.swing.JScrollBar;
-import java.awt.GridLayout;
+import javax.swing.UIManager;
+import java.awt.Color;
 
 public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt{
 
@@ -53,21 +54,17 @@ public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt{
 	
 	private JFrame frame;
 	
-	protected String curVal = "";
-
 	private IActivityBase controller;
-	private JTextField txtStartX;
-	private JTextField txtStartY;
-	private JTextField txtGoalX;
-	private JTextField txtGoalY;
 	
 	private JTextArea txtOut;
+	private JScrollBar scrollBar;
 	
 	private JPanel panelMap;
-	private JSplitPane splitRight;
-	private GridButtonPanel gbp;
+	private JSplitPane splitMapAndOutput;
+	private MapViewerPanel mapViewer;
 	
 	private Map map;
+	private ArrayList<State> path;
 	
 	JButton btnFindPath, btnNavigate, btnManipulate, btnAbort, btnLoad;
 	
@@ -148,6 +145,7 @@ public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt{
 		bodyPanel.setContinuousLayout(true);
 		bodyPanel.setOneTouchExpandable(true);
 		GridBagConstraints gbc_bodyPanel = new GridBagConstraints();
+		gbc_bodyPanel.gridheight = 2;
 		gbc_bodyPanel.insets = new Insets(0, 0, 5, 0);
 		gbc_bodyPanel.fill = GridBagConstraints.BOTH;
 		gbc_bodyPanel.gridx = 0;
@@ -155,13 +153,13 @@ public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt{
 		frame.getContentPane().add(bodyPanel, gbc_bodyPanel);
 		
 		JPanel panel = new JPanel();
-		panel.setBorder(new TitledBorder(null, "Navigation", TitledBorder.LEADING, TitledBorder.TOP, new Font("Tahoma", Font.PLAIN, 13), null));
+		panel.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Navigation", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
 		bodyPanel.setLeftComponent(panel);
 		GridBagLayout gbl_panel = new GridBagLayout();
 		gbl_panel.columnWidths = new int[]{136, 0, 46, 0};
 		gbl_panel.rowHeights = new int[]{0, 14, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-		gbl_panel.columnWeights = new double[]{0.0, 1.0, 1.0, Double.MIN_VALUE};
-		gbl_panel.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
+		gbl_panel.columnWeights = new double[]{1.0, 1.0, 1.0, Double.MIN_VALUE};
+		gbl_panel.rowWeights = new double[]{0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
 		panel.setLayout(gbl_panel);
 		
 		Component verticalStrut_2 = Box.createVerticalStrut(10);
@@ -171,77 +169,18 @@ public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt{
 		gbc_verticalStrut_2.gridy = 0;
 		panel.add(verticalStrut_2, gbc_verticalStrut_2);
 		
-		JLabel label = new JLabel("Start X");
-		label.setFont(new Font("Tahoma", Font.PLAIN, 15));
-		GridBagConstraints gbc_label = new GridBagConstraints();
-		gbc_label.insets = new Insets(0, 0, 5, 5);
-		gbc_label.gridx = 0;
-		gbc_label.gridy = 1;
-		panel.add(label, gbc_label);
-		
-		txtStartX = new JTextField();
-		txtStartX.setColumns(10);
-		GridBagConstraints gbc_txtStartX = new GridBagConstraints();
-		gbc_txtStartX.fill = GridBagConstraints.HORIZONTAL;
-		gbc_txtStartX.gridwidth = 2;
-		gbc_txtStartX.insets = new Insets(0, 0, 5, 0);
-		gbc_txtStartX.gridx = 1;
-		gbc_txtStartX.gridy = 1;
-		panel.add(txtStartX, gbc_txtStartX);
-		
-		JLabel label_1 = new JLabel("Start Y");
-		label_1.setFont(new Font("Tahoma", Font.PLAIN, 15));
-		GridBagConstraints gbc_label_1 = new GridBagConstraints();
-		gbc_label_1.insets = new Insets(0, 0, 5, 5);
-		gbc_label_1.gridx = 0;
-		gbc_label_1.gridy = 2;
-		panel.add(label_1, gbc_label_1);
-		
-		txtStartY = new JTextField();
-		txtStartY.setColumns(10);
-		GridBagConstraints gbc_txtStartY = new GridBagConstraints();
-		gbc_txtStartY.fill = GridBagConstraints.HORIZONTAL;
-		gbc_txtStartY.gridwidth = 2;
-		gbc_txtStartY.insets = new Insets(0, 0, 5, 0);
-		gbc_txtStartY.gridx = 1;
-		gbc_txtStartY.gridy = 2;
-		panel.add(txtStartY, gbc_txtStartY);
-		
-		JLabel label_2 = new JLabel("Goal X");
-		label_2.setFont(new Font("Tahoma", Font.PLAIN, 15));
-		GridBagConstraints gbc_label_2 = new GridBagConstraints();
-		gbc_label_2.insets = new Insets(0, 0, 5, 5);
-		gbc_label_2.gridx = 0;
-		gbc_label_2.gridy = 4;
-		panel.add(label_2, gbc_label_2);
-		
-		txtGoalX = new JTextField();
-		txtGoalX.setColumns(10);
-		GridBagConstraints gbc_txtGoalX = new GridBagConstraints();
-		gbc_txtGoalX.fill = GridBagConstraints.HORIZONTAL;
-		gbc_txtGoalX.gridwidth = 2;
-		gbc_txtGoalX.insets = new Insets(0, 0, 5, 0);
-		gbc_txtGoalX.gridx = 1;
-		gbc_txtGoalX.gridy = 4;
-		panel.add(txtGoalX, gbc_txtGoalX);
-		
-		JLabel label_3 = new JLabel("Goal Y");
-		label_3.setFont(new Font("Tahoma", Font.PLAIN, 15));
-		GridBagConstraints gbc_label_3 = new GridBagConstraints();
-		gbc_label_3.insets = new Insets(0, 0, 5, 5);
-		gbc_label_3.gridx = 0;
-		gbc_label_3.gridy = 5;
-		panel.add(label_3, gbc_label_3);
-		
-		txtGoalY = new JTextField();
-		txtGoalY.setColumns(10);
-		GridBagConstraints gbc_txtGoalY = new GridBagConstraints();
-		gbc_txtGoalY.fill = GridBagConstraints.HORIZONTAL;
-		gbc_txtGoalY.gridwidth = 2;
-		gbc_txtGoalY.insets = new Insets(0, 0, 5, 0);
-		gbc_txtGoalY.gridx = 1;
-		gbc_txtGoalY.gridy = 5;
-		panel.add(txtGoalY, gbc_txtGoalY);
+		JTextArea txtInstructions = new JTextArea();
+		txtInstructions.setText("- Load The Map\r\n- Left Click = Set START\r\n- Right Click = Set GOAL\r\n- Middle Click = CLEAR\r\n- Search Best Path\r\n- Start Navigation");
+		txtInstructions.setEditable(false);
+		txtInstructions.setEnabled(false);
+		GridBagConstraints gbc_txtInstructions = new GridBagConstraints();
+		gbc_txtInstructions.gridheight = 2;
+		gbc_txtInstructions.gridwidth = 3;
+		gbc_txtInstructions.insets = new Insets(0, 0, 5, 0);
+		gbc_txtInstructions.fill = GridBagConstraints.BOTH;
+		gbc_txtInstructions.gridx = 0;
+		gbc_txtInstructions.gridy = 1;
+		panel.add(txtInstructions, gbc_txtInstructions);
 		
 		btnFindPath = new JButton("Find Best Path");
 		btnFindPath.setFont(new Font("Tahoma", Font.PLAIN, 15));
@@ -249,7 +188,7 @@ public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt{
 		gbc_btnFindPath.gridwidth = 3;
 		gbc_btnFindPath.insets = new Insets(0, 0, 5, 0);
 		gbc_btnFindPath.gridx = 0;
-		gbc_btnFindPath.gridy = 7;
+		gbc_btnFindPath.gridy = 5;
 		panel.add(btnFindPath, gbc_btnFindPath);
 		btnFindPath.addActionListener(new DefaultInputHandler());
 		btnFindPath.setEnabled(false);
@@ -260,7 +199,7 @@ public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt{
 		gbc_btnNavigate.gridwidth = 3;
 		gbc_btnNavigate.insets = new Insets(0, 0, 5, 0);
 		gbc_btnNavigate.gridx = 0;
-		gbc_btnNavigate.gridy = 9;
+		gbc_btnNavigate.gridy = 7;
 		panel.add(btnNavigate, gbc_btnNavigate);
 		btnNavigate.addActionListener(new DefaultInputHandler());
 		btnNavigate.setEnabled(false);
@@ -272,7 +211,7 @@ public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt{
 		gbc_btnManipulate.gridwidth = 3;
 		gbc_btnManipulate.insets = new Insets(0, 0, 5, 0);
 		gbc_btnManipulate.gridx = 0;
-		gbc_btnManipulate.gridy = 11;
+		gbc_btnManipulate.gridy = 9;
 		panel.add(btnManipulate, gbc_btnManipulate);
 		//btnManipulate.addActionListener(new DefaultInputHandler());
 		btnManipulate.setEnabled(false);
@@ -282,30 +221,30 @@ public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt{
 		GridBagConstraints gbc_btnAbort = new GridBagConstraints();
 		gbc_btnAbort.anchor = GridBagConstraints.ABOVE_BASELINE;
 		gbc_btnAbort.gridwidth = 3;
-		gbc_btnAbort.insets = new Insets(0, 0, 0, 5);
 		gbc_btnAbort.gridx = 0;
 		gbc_btnAbort.gridy = 13;
 		panel.add(btnAbort, gbc_btnAbort);
 		btnAbort.addActionListener(new DefaultInputHandler());
 		btnAbort.setEnabled(false);
 		
-		splitRight = new JSplitPane();
-		bodyPanel.setRightComponent(splitRight);
+		splitMapAndOutput = new JSplitPane();
+		bodyPanel.setRightComponent(splitMapAndOutput);
 		
-		gbp = new GridButtonPanel();	
+		mapViewer = new MapViewerPanel();	
 		
-		JScrollPane scrollPane = new JScrollPane((Component) null);
-		splitRight.setRightComponent(scrollPane);
+		JScrollPane panelOutput = new JScrollPane((Component) null);
+		splitMapAndOutput.setRightComponent(panelOutput);
+		splitMapAndOutput.setLeftComponent(new JPanel());
 		
 		txtOut = new JTextArea();
 		txtOut.setRows(21);
 		txtOut.setFont(new Font("Monospaced", Font.PLAIN, 14));
 		txtOut.setEditable(false);	
-		scrollPane.setViewportView(txtOut);
+		panelOutput.setViewportView(txtOut);
 		
-		JScrollBar scrollBar = new JScrollBar();
-		scrollPane.setRowHeaderView(scrollBar);
-		scrollPane.add(scrollBar);
+		scrollBar = new JScrollBar();
+		panelOutput.setRowHeaderView(scrollBar);
+		panelOutput.add(scrollBar);
 		
 		
 		/*
@@ -342,33 +281,42 @@ public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt{
 				
 			case "Find Best Path":
 				
-				String sx = txtStartX.getText();
-				String sy = txtStartY.getText();
-				String gx = txtGoalX.getText();
-				String gy = txtGoalY.getText();
+				MapElement goal = mapViewer.getGoal();
+				MapElement start = mapViewer.getStart();				
 				
-				if(!gx.equals("") && !gy.equals("") && !sx.equals("") && !sy.equals(""))
+				if(goal == null)
 				{
-					try
-					{
-						controller.execAction("FIND "
-							+Integer.parseInt(sx)+","						
-							+Integer.parseInt(sy)+","
-							+Integer.parseInt(gx)+","
-							+Integer.parseInt(gy)+","
-							);
-						
-						btnNavigate.setEnabled(true);							
-						btnLoad.setEnabled(false);
-					}
-					catch(NumberFormatException e1)
-					{
-						println(e1.getMessage());
-					}
+					println("Please select GOAL position");
+					return;
 				}
-				else
-					println("INVALID COORDINATES!!");
-				break;
+				
+				if(start == null)
+				{
+					println("Please select START position");
+					return;
+				}
+				
+				int sx = start.getX();
+				int sy = start.getY();
+				int gx = goal.getX();
+				int gy = goal.getY();
+				
+				try
+				{
+					controller.execAction("FIND "
+						+sx+","						
+						+sy+","
+						+gx+","
+						+gy+","
+						);
+					
+					btnNavigate.setEnabled(true);							
+					btnLoad.setEnabled(false);
+				}
+				catch(NumberFormatException e1)
+				{
+					println(e1.getMessage());
+				}
 			
 			case "Start Navigation":
 				controller.execAction("NAVIGATE ");
@@ -402,9 +350,6 @@ public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt{
 	}//clear
 	
 
-	
-	
-	
 	/*
 	 * ROBA DELLE INTERFACCE, SERVE SOLO A FARE ANDARE IL FRAMEWORK
 	 */
@@ -418,6 +363,7 @@ public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt{
 	public void addOutput(String msg) {
 		txtOut.append(msg+"\n");
 		txtOut.validate();
+		txtOut.setCaretPosition(txtOut.getDocument().getLength());
 	}
 
 	@Override
@@ -425,6 +371,7 @@ public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt{
 		
 		txtOut.setText(msg);
 		txtOut.validate();
+		txtOut.setCaretPosition(txtOut.getDocument().getLength());
 	}
 
 	@Override
@@ -456,6 +403,7 @@ public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt{
 	public void println(String msg) {
 		txtOut.append(msg+"\n");
 		txtOut.validate();
+		txtOut.setCaretPosition(txtOut.getDocument().getLength());
 	}
 
 	@Override
@@ -530,17 +478,37 @@ public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt{
 	public void setMap(Map map) {
 
 		this.map = map;
+		mapViewer.setMap(map);
 		
-		gbp.createGridPanel(map.getYmax()+1, map.getXmax()+1);
+		mapViewer.createMapViewer(map.getYmax()+1, map.getXmax()+1);
 		List<IMapElement> elements = map.getElements();
 		
 		for(IMapElement e : elements)
 		{
-			gbp.setCellState(e.getY(), e.getX(), CellState.OBSTACLE);
+			mapViewer.setCellState(e.getX(), e.getY(), CellState.OBSTACLE);
 		}
 		
-		panelMap = gbp.getPanel();
-		splitRight.setLeftComponent(panelMap);
+		panelMap = mapViewer.getPanel();
+		splitMapAndOutput.setLeftComponent(panelMap);
+	}
+
+	public void setPath(ArrayList<State> path) {
+		
+		this.path = path;
+		
+		MapElement start = mapViewer.getStart();
+		MapElement goal = mapViewer.getGoal();
+		
+		it.unibo.planning.astar.domain.State current = 
+				new it.unibo.planning.astar.domain.State(start.getX(), start.getY(), Direction.NORTH, null, 0);
+		
+		//it.unibo.planning.astar.domain.State goalState = 
+		//		new it.unibo.planning.astar.domain.State(goal.getX(), goal.getY(), Direction.NORTH, null, 0);
+		
+		for(State s : path)
+		{
+			mapViewer.setCellState(s.getX(), s.getY(), CellState.PATH);			
+		}		
 	}
 
 	

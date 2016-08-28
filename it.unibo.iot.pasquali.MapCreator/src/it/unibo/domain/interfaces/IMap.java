@@ -1,4 +1,4 @@
-package it.unibo.domain;
+package it.unibo.domain.interfaces;
 
 import java.util.List;
 

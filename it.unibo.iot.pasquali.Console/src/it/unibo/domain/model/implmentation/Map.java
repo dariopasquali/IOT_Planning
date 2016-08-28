@@ -128,4 +128,14 @@ public class Map implements IMap{
 		elements = new ArrayList<IMapElement>();		
 	}
 
+	public boolean isCellClear(int x, int y) {
+
+		MapElement me = new MapElement(x,y);
+		
+		if(elements.contains(me))
+			return false;
+		else
+			return true;
+	}
+
 }

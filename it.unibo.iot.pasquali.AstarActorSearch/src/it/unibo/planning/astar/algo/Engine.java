@@ -13,12 +13,101 @@ import it.unibo.qactors.planned.QActorPlanned;
 
 public class Engine {
 	
-	public static QActorPlanned actor;
-	public static State goal;
-	public static final int DEFAULT_SPEED = 60;
-	public static final int DEFAULT_DURATION = 500;
+	private QActorPlanned actor;
+	private State goal;
+	private int DEFAULT_SPEED;
+	private int DEFAULT_DURATION;
 	
-	public static boolean isValidState(State state)
+	String elements="";
+	int xmax = -1;
+	int ymax = -1;
+	
+	public Engine(QActorPlanned actor, State goal)
+	{
+		this.actor = actor;
+		this.goal = goal;
+		loadParams();
+	}
+	
+	public Engine(QActorPlanned actor)
+	{
+		this.actor = actor;
+		loadParams();
+	}
+	
+	private void loadParams()
+	{
+		AsynchActionResult aar;
+		
+		String parg = "defaultSpeed(S)";
+		try
+		{
+			aar = actor.solveGoal(parg, 0, "", "", "");
+			String s[] = aar.getResult().split("\\(");
+			String s1[] = s[1].split("\\)");
+			
+			
+			this.DEFAULT_SPEED = Integer.parseInt(s1[0]);			
+			
+		} catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+		
+		parg = "defaultDuration(D)";
+		try
+		{
+			aar = actor.solveGoal(parg, 0, "", "", "");
+			String s[] = aar.getResult().split("\\(");
+			String s1[] = s[1].split("\\)");
+			
+			
+			this.DEFAULT_DURATION = Integer.parseInt(s1[0]);		
+			
+		} catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+	}
+	
+	public boolean isValidState(State state)
+	{
+		if(xmax == -1 || ymax==-1 || elements.equals(""))
+		{
+			AsynchActionResult aar;
+			
+			String parg = "map(Xmax,Ymax)";
+			try
+			{
+				aar = actor.solveGoal(parg, 0, "", "", "");
+				String s[] = aar.getResult().split(",");
+				String sl[] = s[0].split("\\(");
+				String sr[] = s[1].split("\\)");
+				
+				xmax = Integer.parseInt(sl[1]);
+				ymax = Integer.parseInt(sr[0]);
+				
+				parg = "getElements(List)";
+				aar = actor.solveGoal(parg, 0, "", "", "");
+				
+				String s0[] = aar.getResult().split("\\[");
+				elements = s0[1].split("\\]")[0];
+				
+			} catch (Exception e)
+			{
+				e.printStackTrace();
+				return false;
+			}
+		}
+		return (state.getX() >= 0 &&
+				state.getX() <= xmax &&
+				state.getY() >= 0 &&
+				state.getY() <= ymax &&
+				!elements.contains("element("+state.getX()+","+state.getY()+")"));		
+	}
+	
+	
+	public boolean isValidStatePrologCheck(State state)
 	{
 		AsynchActionResult aar;
 		
@@ -38,7 +127,7 @@ public class Engine {
 		}
 	}
 	
-	public static State makeMove(State start, Move move)
+	public State makeMove(State start, Move move)
 	{
 		State result = new State();
 		
@@ -61,20 +150,26 @@ public class Engine {
 			{
 			case NORTH:
 				result.setX(x);
-				result.setY(y+1);
+				result.setY(y-1);
+				break;
 				
 			case EAST:
 				result.setX(x+1);
 				result.setY(y);
+				break;
 				
 			case SOUTH:
 				result.setX(x);
-				result.setY(y-1);
+				result.setY(y+1);
+				break;
 				
 			case WEST:
 				result.setX(x-1);
 				result.setY(y);
-				default:
+				break;
+				
+			default:
+				break;
 			}
 			
 			if(!isValidState(result))
@@ -90,7 +185,7 @@ public class Engine {
 		return result;
 	}
 	
-	private static double evaluateState(State state) {
+	private double evaluateState(State state) {
 		//distanza in linea d'aria (pitagora)
 		
 		double catX = Math.abs(goal.getX()-state.getX());
@@ -100,7 +195,7 @@ public class Engine {
 		return H;		
 	}
 
-	private static Direction makeSpin(Direction start, SpinDirection dir)
+	private Direction makeSpin(Direction start, SpinDirection dir)
 	{
 		switch(start)
 		{
@@ -132,7 +227,7 @@ public class Engine {
 		}
 	}
 
-	public static List<Move> getPossibleMoves(State state)
+	public List<Move> getPossibleMoves(State state)
 	{
 		/*
 		 * move forward
@@ -150,17 +245,23 @@ public class Engine {
 		switch(state.getDirection())
 		{
 		case NORTH:
-			y += 1;
+			y -= 1;
+			break;
 			
 		case EAST:
 			x += 1;
+			break;
 			
 		case SOUTH:
-			y -= 1;
+			y += 1;
+			break;
 			
 		case WEST:
 			x -= 1;
+			break;
+			
 			default:
+				break;
 		}
 		
 		State s = new State();
@@ -168,7 +269,8 @@ public class Engine {
 		s.setY(y);
 		
 		if(isValidState(s))
-			possible.add(new Move());		
+			possible.add(new Move());
+		
 		possible.add(new Move(SpinDirection.RIGHT));
 		possible.add(new Move(SpinDirection.LEFT));
 		
@@ -176,7 +278,7 @@ public class Engine {
 	}
 
 	
-	public static boolean isGoalState(State current) {
+	public boolean isGoalState(State current) {
 		if(current == null)
 			return false;
 		

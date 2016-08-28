@@ -27,9 +27,9 @@ import javax.swing.JFileChooser;
 import javax.swing.JPanel;
 import javax.swing.border.TitledBorder;
 
-import it.unibo.domain.IMapElement;
 import it.unibo.domain.Map;
-import it.unibo.gui.GridButtonPanel.CellState;
+import it.unibo.domain.interfaces.IMapElement;
+import it.unibo.gui.MapViewerPanel.CellState;
 
 import java.awt.Color;
 import javax.swing.JSplitPane;
@@ -59,7 +59,7 @@ public class MapCreator extends Frame{
 	private JTextField txtW;
 	private JTextField txtH;
 	
-	private GridButtonPanel gbp;
+	private MapViewerPanel gbp;
 	
 	private Map map;
 	private JPanel panelMap;
@@ -241,7 +241,7 @@ public class MapCreator extends Frame{
 		
 		panelMap = new JPanel();
 		bodyPanel.setRightComponent(panelMap);		
-		gbp = new GridButtonPanel();
+		gbp = new MapViewerPanel();
 	}
 
 
