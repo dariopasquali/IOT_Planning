@@ -51,10 +51,10 @@ public class Console extends AbstractConsole {
 		SearchAgent agent = new SearchAgent();
 		
 		it.unibo.planning.astar.domain.State start = 
-				new it.unibo.planning.astar.domain.State(sx, sy, Direction.NORTH, null, 0);
+				new it.unibo.planning.astar.domain.State(sx, sy, Direction.NORTH, null, 0, map.getXmax());
 		
 		it.unibo.planning.astar.domain.State goal = 
-				new it.unibo.planning.astar.domain.State(gx, gy, Direction.NONE, null, 0);
+				new it.unibo.planning.astar.domain.State(gx, gy, Direction.NONE, null, 0, map.getXmax());
 		
 		path = agent.searchBestStatePath(this,start, goal);		
 	}

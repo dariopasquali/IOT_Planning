@@ -99,7 +99,7 @@ QActor console context ctxConsole -g cyan{
 	
 	Plan findPath resumeLastPlan
 		[?? msg(local_gui_command, "event", SENDER, none, local_gui_command (findpath(START,GOAL)), MSGNUM)]
-			solve searchBestPath(START,GOAL) time(600000) onFailSwitchTo  prologFailure;
+			solve searchBestPath(START,GOAL) time(210000000) onFailSwitchTo  prologFailure;
 		
 		println("++++++++++++++++++ PATH FOUND ++++++++++++++++++")
 	

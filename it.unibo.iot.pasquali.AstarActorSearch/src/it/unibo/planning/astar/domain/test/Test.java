@@ -11,8 +11,8 @@ public class Test {
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 
-		State est = new State(0,0,Direction.EAST, null, 0);
-		State west = new State(0,0,Direction.WEST, null, 0);
+		State est = new State(0,0,Direction.EAST, null, 0,5);
+		State west = new State(0,0,Direction.WEST, null, 0,5);
 		
 		System.out.println("hashcode est? "+(est.hashCode()));
 		System.out.println("hashcode west? "+(west.hashCode()));

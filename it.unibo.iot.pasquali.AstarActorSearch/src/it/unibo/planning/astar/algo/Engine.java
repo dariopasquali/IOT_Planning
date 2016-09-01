@@ -181,6 +181,7 @@ public class Engine {
 		result.setCost(start.getCost()+1);
 		result.setGenMove(move);
 		result.setHeuristic(evaluateState(result));
+		result.setXmax(xmax);
 		
 		return result;
 	}

@@ -500,7 +500,7 @@ public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt{
 		MapElement goal = mapViewer.getGoal();
 		
 		it.unibo.planning.astar.domain.State current = 
-				new it.unibo.planning.astar.domain.State(start.getX(), start.getY(), Direction.NORTH, null, 0);
+				new it.unibo.planning.astar.domain.State(start.getX(), start.getY(), Direction.NORTH, null, 0,0);
 		
 		//it.unibo.planning.astar.domain.State goalState = 
 		//		new it.unibo.planning.astar.domain.State(goal.getX(), goal.getY(), Direction.NORTH, null, 0);

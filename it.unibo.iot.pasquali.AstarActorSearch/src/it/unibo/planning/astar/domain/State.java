@@ -3,10 +3,10 @@ package it.unibo.planning.astar.domain;
 public class State implements Comparable<State>{
 	
 	public enum Direction {
-		NORTH ('N', 3),
-		EAST ('E', 7),
-		WEST ('W', 11),
-		SOUTH ('S', 19),
+		NORTH ('N', 1),
+		EAST ('E', 2),
+		WEST ('W', 3),
+		SOUTH ('S', 4),
 		NONE ('0', -1);
 		
 		private final char direction;
@@ -24,6 +24,8 @@ public class State implements Comparable<State>{
 	private int cost;
 	private double heuristic;
 	
+	int xmax = -1;
+	
 	public State()
 	{
 		this.x = -1;
@@ -35,7 +37,7 @@ public class State implements Comparable<State>{
 		this.heuristic = -1;
 	}
 	
-	public State(int x, int y, Direction direction, Move genMove, int cost)
+	public State(int x, int y, Direction direction, Move genMove, int cost, int xmax)
 	{
 		this.x = x;
 		this.y = y;
@@ -43,12 +45,14 @@ public class State implements Comparable<State>{
 		
 		this.genMove = genMove;
 		this.cost = cost;
+		
+		this.xmax = xmax+1;
 	}
 	
 	@Override
 	public String toString()
 	{
-		return "state("+x+","+y+","+direction+")";
+		return "state("+x+","+y+","+direction+","+hashCode()+")";
 	}
 
 	public Direction getDirection() {
@@ -106,9 +110,8 @@ public class State implements Comparable<State>{
 	
 	@Override
 	public int hashCode()
-	{
-		int prime = 37;
-		return prime * (x + y + direction.getValue());
+	{		
+		return (((xmax*y)+x)*xmax)+direction.getValue();
 	}
 	
 	@Override
@@ -117,7 +120,11 @@ public class State implements Comparable<State>{
 		if(!(o instanceof State))
 			return false;
 		
-		if(this.hashCode() == ((State) o).hashCode())
+		State s1 = ((State) o);
+		
+		if(this.x == s1.getX() &&
+				this.y == s1.getY() &&
+				this.getDirection().equals(s1.getDirection()))
 			return true;
 		else
 			return false;
@@ -126,12 +133,28 @@ public class State implements Comparable<State>{
 	@Override
 	public int compareTo(State s1) {
 		if(getF() == s1.getF())
-			return 0;
+		{
+			if(getHeuristic() == s1.getHeuristic())
+				return 0;
+			else if(getHeuristic() > s1.getHeuristic())
+				return 1;
+			else
+				return -1;
+		}
 		
 		else if(getF() > s1.getF())
 			return 1;
 		
 		else return -1;
 	}
+
+	public int getXmax() {
+		return xmax;
+	}
+
+	public void setXmax(int xmax) {
+		this.xmax = xmax;
+	}
+	
 	
 }
