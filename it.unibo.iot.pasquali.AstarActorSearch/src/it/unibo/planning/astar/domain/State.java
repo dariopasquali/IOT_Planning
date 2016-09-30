@@ -52,7 +52,7 @@ public class State implements Comparable<State>{
 	@Override
 	public String toString()
 	{
-		return "state("+x+","+y+","+direction+","+hashCode()+")";
+		return "state("+x+","+y+","+direction+")";
 	}
 
 	public Direction getDirection() {

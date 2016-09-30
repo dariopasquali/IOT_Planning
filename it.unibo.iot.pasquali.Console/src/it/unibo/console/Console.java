@@ -56,7 +56,11 @@ public class Console extends AbstractConsole {
 		it.unibo.planning.astar.domain.State goal = 
 				new it.unibo.planning.astar.domain.State(gx, gy, Direction.NONE, null, 0, map.getXmax());
 		
-		path = agent.searchBestStatePath(this,start, goal);		
+		long st = System.currentTimeMillis();
+		
+		path = agent.searchBestStatePath(this,start, goal);	
+		
+		println("Search Time --> " + (System.currentTimeMillis() - st) +" ms");
 	}
 	
 	public void showPathOnGui()

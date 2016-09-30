@@ -106,9 +106,6 @@ public class SearchAgent {
 		
 		while(!openSet.isEmpty())
 		{
-			System.out.println("Nodi Aperti: "+openSet.size());
-			System.out.println("Nodi Chiusi: "+closedSet.size());
-			
 			State current = openSet.get(0);
 			if(engine.isGoalState(current))
 				return recostructStatePath(current);

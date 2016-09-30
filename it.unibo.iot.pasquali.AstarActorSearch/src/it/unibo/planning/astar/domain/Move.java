@@ -5,16 +5,22 @@ import it.unibo.planning.astar.domain.Move.SpinDirection;
 public class Move {
 	
 	public enum SpinDirection {
-		LEFT ('L'),
-		RIGHT ('R');
+		LEFT ("L", 1),
+		RIGHT ("R", 1),
+		DOUBLELEFT("DL", 2),
+		DOUBLERIGHT("DR", 2);
 		
-		private final char direction;
+		private final String direction;
+		private final int cost;
 		
-	    private SpinDirection(char s) { direction = s; }
-	    public boolean equalsDirection(char otherDir){ return otherDir == direction; }
+	    private SpinDirection(String s, int cost) { direction = s; this.cost = cost; }
+	    public boolean equalsDirection(String otherDir){ return otherDir == direction; }
+	    public int getCost(){return cost;}
 	    public String toString(){switch(direction){
-	    case 'L': return "left";
-	    case 'R': return "right";
+	    case "L": return "left";
+	    case "R": return "right";
+	    case "DL": return "left";
+	    case "DR": return "right";
 	    default: return "";
 	    }
 	    }		

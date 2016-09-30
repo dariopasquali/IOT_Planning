@@ -130,6 +130,7 @@ public class Engine {
 	public State makeMove(State start, Move move)
 	{
 		State result = new State();
+		int cost = 1;
 		
 		if(move.getType().equals(MoveType.SPIN))
 		{
@@ -139,7 +140,9 @@ public class Engine {
 			if(!isValidState(result))
 				return null;
 			
-			result.setDirection(makeSpin(start.getDirection(), move.getSpin()));			
+			result.setDirection(makeSpin(start.getDirection(), move.getSpin()));
+			
+			cost = move.getSpin().getCost();
 		}
 		else
 		{
@@ -175,10 +178,11 @@ public class Engine {
 			if(!isValidState(result))
 				return null;
 			
-			result.setDirection(start.getDirection());			
+			result.setDirection(start.getDirection());	
+			cost = 1;
 		}
 		
-		result.setCost(start.getCost()+1);
+		result.setCost(start.getCost()+cost);
 		result.setGenMove(move);
 		result.setHeuristic(evaluateState(result));
 		result.setXmax(xmax);
@@ -203,26 +207,34 @@ public class Engine {
 		case NORTH:
 			if(dir.equals(SpinDirection.LEFT))
 				return Direction.WEST;
-			else
+			else if(dir.equals(SpinDirection.RIGHT))
 				return Direction.EAST;
+			else
+				return Direction.SOUTH;
 			
 		case EAST:
 			if(dir.equals(SpinDirection.LEFT))
 				return Direction.NORTH;
-			else
+			else if(dir.equals(SpinDirection.RIGHT))
 				return Direction.SOUTH;
+			else
+				return Direction.WEST;
 			
 		case WEST:
 			if(dir.equals(SpinDirection.LEFT))
 				return Direction.SOUTH;
-			else
+			else if(dir.equals(SpinDirection.RIGHT))
 				return Direction.NORTH;
+			else
+				return Direction.EAST;
 			
 		case SOUTH:
 			if(dir.equals(SpinDirection.LEFT))
 				return Direction.EAST;
-			else
+			else if(dir.equals(SpinDirection.RIGHT))
 				return Direction.WEST;
+			else
+				return Direction.NORTH;
 			
 		default: return null;
 		}
@@ -274,6 +286,8 @@ public class Engine {
 		
 		possible.add(new Move(SpinDirection.RIGHT));
 		possible.add(new Move(SpinDirection.LEFT));
+		possible.add(new Move(SpinDirection.DOUBLELEFT));
+		possible.add(new Move(SpinDirection.DOUBLERIGHT));
 		
 		return possible;
 	}

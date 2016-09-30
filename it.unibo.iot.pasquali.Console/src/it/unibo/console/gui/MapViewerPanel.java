@@ -137,6 +137,8 @@ public class MapViewerPanel {
 
 	public void setMap(Map m){
 		this.map = m;
+		start = null;
+		goal = null;
 	}
 	
 	public Map getMap()
