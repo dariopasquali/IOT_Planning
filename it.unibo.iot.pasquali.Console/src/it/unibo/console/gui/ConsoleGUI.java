@@ -494,6 +494,8 @@ public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt{
 
 	public void setPath(ArrayList<State> path) {
 		
+		mapViewer.clearPath();
+		
 		this.path = path;
 		
 		MapElement start = mapViewer.getStart();

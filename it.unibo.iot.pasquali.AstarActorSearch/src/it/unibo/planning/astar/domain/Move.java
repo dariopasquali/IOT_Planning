@@ -1,7 +1,5 @@
 package it.unibo.planning.astar.domain;
 
-import it.unibo.planning.astar.domain.Move.SpinDirection;
-
 public class Move {
 	
 	public enum SpinDirection {
@@ -19,8 +17,8 @@ public class Move {
 	    public String toString(){switch(direction){
 	    case "L": return "left";
 	    case "R": return "right";
-	    case "DL": return "left";
-	    case "DR": return "right";
+	    case "DL": return "doubleleft";
+	    case "DR": return "doubleright";
 	    default: return "";
 	    }
 	    }		

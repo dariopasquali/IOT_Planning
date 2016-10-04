@@ -4,10 +4,7 @@ This code is generated only ONCE
 */
 package it.unibo.console;
 import it.unibo.is.interfaces.IOutputEnvView;
-import it.unibo.planning.astar.algo.Engine;
 import it.unibo.planning.astar.algo.SearchAgent;
-import it.unibo.planning.astar.domain.Move;
-import it.unibo.planning.astar.domain.State;
 import it.unibo.planning.astar.domain.State.Direction;
 import it.unibo.qactors.ActorContext;
 
@@ -22,10 +19,11 @@ public class Console extends AbstractConsole {
 	private Map map;
 	private ArrayList<it.unibo.planning.astar.domain.State> path;
 	
+	private int sx, sy, gx, gy;
+	
 	public Console(String actorId, ActorContext myCtx, IOutputEnvView outEnvView )  throws Exception{
 		super(actorId, myCtx, outEnvView);
 		((ConsoleGUI) env).setController(this);
-		
 		path = null;
 	}
 	
@@ -36,7 +34,6 @@ public class Console extends AbstractConsole {
 	
 	public void setMapElements(List<String> elements)
 	{
-		map.addElementsFromList(elements);
 		((ConsoleGUI)env).setMap(map);
 	}
 	
@@ -48,6 +45,11 @@ public class Console extends AbstractConsole {
 	
 	public void searchBestPath(int sx, int sy, int gx, int gy)
 	{		
+		this.sx = sx;
+		this.sy = sy;
+		this.gx = gx;
+		this.gy = gy;
+		
 		SearchAgent agent = new SearchAgent();
 		
 		it.unibo.planning.astar.domain.State start = 
@@ -66,6 +68,56 @@ public class Console extends AbstractConsole {
 	public void showPathOnGui()
 	{
 		((ConsoleGUI)env).setPath(path);
+	}
+	
+	private String getPrologMap()
+	{
+		String data = "mapdata( "+map.toString()+" )";
+		//println(data);
+		return data;
+	}
+	
+	private String getPrologPlan()
+	{
+		String moves = "plan( [";
+		for(int i=0; i<path.size(); i++)
+		{
+			moves += path.get(i).getGenMove().toString();
+			if(i!=path.size()-1)
+				moves+=",";
+		}
+		moves+="])";
+		//println(moves);
+		return moves;
+	}
+	
+	private String getPrologPositions()
+	{
+		return "positions( "+sx+", "+sy+", "+gx+", "+gy+" )";
+		
+	}
+	
+
+	public void sendNavigationData()
+	{	
+		String pm = getPrologMap();
+		String pp = getPrologPlan();
+		String po = getPrologPositions();
+		
+		println(pm);
+		println(pp);
+		println(po);
+		
+		temporaryStr = unifyMsgContent("navdata(MAP,PLAN,POS)","navdata("+pm+","+pp+","+po+")", guardVars ).toString();
+		try
+		{
+			sendMsg("navdata","robot", ActorContext.dispatch, temporaryStr );
+		} catch (Exception e)
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 	}
 	
 	

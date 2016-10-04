@@ -93,19 +93,11 @@ searchBestPath(position(Sx,Sy) , position(Gx,Gy)) :-
 	Actor <- showPathOnGui,
 	assert(haveplan).
 
-sendMap :-
+sendNavigationData :-
 	havemap,
-	actorobj(Actor),
-	Actor <-  sendMap.
-	
-sendPlan :-
 	haveplan,
 	actorobj(Actor),
-	Actor <-  sendPlan.
-	
-sendPositions :-
-	actorobj(Actor),
-	Actor <-  sendPositions.
+	Actor <-  sendNavigationData.
 	
 enableManipulation :-
 	actorobj(Actor),

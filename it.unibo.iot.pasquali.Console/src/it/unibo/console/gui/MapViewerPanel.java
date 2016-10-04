@@ -228,6 +228,14 @@ public class MapViewerPanel {
 		map.clearAll();
 		
 	}
+
+	public void clearPath() {
+		for(int r = 0; r<rows; r++)
+			for(int c = 0; c<cols; c++)
+				if(!matrix[c][r].getBackground().equals(CellState.getColor(CellState.OBSTACLE)) &&
+						!matrix[c][r].getBackground().equals(CellState.getColor(CellState.START)))
+					matrix[c][r].setBackground(Color.WHITE);
+	}
 	
 	
     /*

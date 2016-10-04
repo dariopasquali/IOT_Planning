@@ -217,29 +217,7 @@ public AbstractConsole(String actorId, ActorContext myCtx, IOutputEnvView outEnv
 	    nPlanIter++;
 	    		temporaryStr = " \"++++++++++++++++++ NAVIGATION ++++++++++++++++++\" ";
 	    		println( temporaryStr );  
-	    		{ String parg = "sendMap";
-	    		  aar = solveGoal( parg , 60000, "","" , "" );
-	    		//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
-	    		if( aar.getInterrupted() ){
-	    			curPlanInExec   = "navigation";
-	    			if( ! aar.getGoon() ) break;
-	    		} 			
-	    		if( aar.getResult().equals("failure")){
-	    		if( ! switchToPlan("prologFailure").getGoon() ) break;
-	    		}else if( ! aar.getGoon() ) break;
-	    		}
-	    		{ String parg = "sendPlan";
-	    		  aar = solveGoal( parg , 60000, "","" , "" );
-	    		//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
-	    		if( aar.getInterrupted() ){
-	    			curPlanInExec   = "navigation";
-	    			if( ! aar.getGoon() ) break;
-	    		} 			
-	    		if( aar.getResult().equals("failure")){
-	    		if( ! switchToPlan("prologFailure").getGoon() ) break;
-	    		}else if( ! aar.getGoon() ) break;
-	    		}
-	    		{ String parg = "sendPositions";
+	    		{ String parg = "sendNavigationData";
 	    		  aar = solveGoal( parg , 60000, "","" , "" );
 	    		//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
 	    		if( aar.getInterrupted() ){

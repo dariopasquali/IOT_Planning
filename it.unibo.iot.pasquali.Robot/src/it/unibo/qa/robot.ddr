@@ -1,0 +1,99 @@
+RobotSystem exploreAndGo
+
+/*
+ * ----------------------------------------------------
+ * MESSAGES sent by the system components
+ * ----------------------------------------------------
+ */
+
+Dispatch navdata : navdata (MAP, PLAN, POS)
+Dispatch navack : navack
+
+/*
+ * MAP = mapdata ( [ map ( Xmax , Ymax ), [ mapdata( ID, element( X, Y ) ) ] ] )
+ * PLAN = plan ( [ robotmove || robotspin ( DIR ) ] )
+ * POS = positions ( Xs , Ys, Xg, Yg ) 
+ */
+
+
+/*
+ * ----------------------------------------------------
+ * EVENTS emitted by the system components
+ * ----------------------------------------------------
+ */
+ 
+// Raised by Console to abort the current command
+Event abort : abort
+
+// Raised by Robot when it ends the current command
+Event end : end
+
+// Raised by Robot when find an unexpected
+// obstacle during th navigation
+Event update : update(ELEMENT)
+ 
+ 
+ 
+/*
+ * ----------------------------------------------------
+ * CONTEXT for the Robot as independent device (standalone)
+ * ----------------------------------------------------
+ */
+Context ctxRobot ip [ host="localhost" port=8020] -standalone 
+  
+/*
+ * ----------------------------------------------------
+ * CONTEXT for the Console
+ * ----------------------------------------------------
+ */ 
+//Context ctxConsole ip [ host="localhost" port=8010]
+
+Robot mymock QActor robot context ctxRobot{
+	
+	Plan init normal
+		
+		solve consult("robotTheory.pl") time(210000000) onFailSwitchTo  prologFailure ;
+		solve consult("talkTheory.pl") time(210000000) onFailSwitchTo  prologFailure ;
+		
+ 		println("++++++++++++++++++ robot(starts) ++++++++++++++++++");
+ 		switchToPlan waitNavData
+ 		
+ 	Plan waitNavData
+ 		println("++++++++++++++++++ WAIT NAVIGATION DATA ++++++++++++++++++");
+ 		
+ 		receiveMsg time(600000000);
+ 		printCurrentMessage;
+ 		onMsg navdata : navdata(MAP, PLAN, POS) -> 
+ 				solve loadNavigationData(MAP, PLAN, POS) time(100000) onFailSwitchTo prologFailure;
+ 				
+ 		switchToPlan navigate
+ 		
+ 	
+ 	Plan navigate
+ 		
+ 		solve loadThePlan('path.txt') time(30000);
+ 		
+ 		println(" ");
+ 		println(" ");
+ 		println("++++++++++++++++++ Plan Loaded ++++++++++++++++++");	
+ 		solve showPlan(path) time(1000);
+ 		println("++++++++++++++++++ ++++++++++++++++++ ++++++++++++++++++");	
+ 		println(" ");
+ 		println(" ");
+ 		
+ 		solve runResumablePlan(path) time(100000000)
+ 		
+ 	Plan notifyEndOfNavigation	
+ 		println("è passato al piano successivo"); 		
+ 		solve notifyEnd time(10000) onFailSwitchTo prologFailure;	
+ 		println("ma la chiama prolog fallisce per un motivo non ben definito")
+	
+	
+	Plan handleTimeout
+ 		println("timeout!! GOODBYE")
+ 		
+ 	Plan prologFailure resumeLastPlan            
+		println("Prolog goal FAILURE" ) 
+	
+	
+}

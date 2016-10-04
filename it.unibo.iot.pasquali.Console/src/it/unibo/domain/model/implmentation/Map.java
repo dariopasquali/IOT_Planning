@@ -114,12 +114,15 @@ public class Map implements IMap{
 	{
 		String s = "";
 		
-		s += "map("+Xmax+","+Ymax+")";
+		s += "map("+Xmax+","+Ymax+"),[";
 		
 		for(int i = 0; i<elements.size(); i++)
 		{
-			s += "\nmapdata(" + (i+1) +", " + elements.get(i).toString() +")";
-		}		
+			s += "mapdata(" + (i+1) +", " + elements.get(i).toString() +")";
+			if(i!=elements.size()-1)
+				s+=",";
+		}
+		s+="]";
 		return s;
 	}
 

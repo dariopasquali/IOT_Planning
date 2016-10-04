@@ -6,16 +6,13 @@ System exploreAndGo
  * ----------------------------------------------------
  */
 
-Dispatch navdata : navdata (DATA)
+Dispatch navdata : navdata (MAP, PLAN, POS)
+Dispatch navack : navack
 
 /*
- * DATA: 
- * 
- * mapdata ( map ( Xmax , Ymax ) )
- * mapdata ( element ( X , Y ) )
- * plan ( robotmove )
- * plan ( robotspin ( DIR ) )
- * position ( X , Y ) 
+ * MAP = mapdata ( [ map ( Xmax , Ymax ), [ mapdata( ID, element( X, Y ) ) ] ] )
+ * PLAN = plan ( [ robotmove || robotspin ( DIR ) ] )
+ * POS = positions ( Xs , Ys, Xg, Yg ) 
  */
 
 
@@ -106,11 +103,32 @@ QActor console context ctxConsole -g cyan{
 	Plan navigation resumeLastPlan
 		println("++++++++++++++++++ NAVIGATION ++++++++++++++++++");
 		
-		solve sendMap time(60000) onFailSwitchTo  prologFailure;
-		solve sendPlan time(60000) onFailSwitchTo  prologFailure;
-		solve sendPositions time(60000) onFailSwitchTo  prologFailure;
+		solve sendNavigationData time(60000) onFailSwitchTo  prologFailure;
 		
-		switchToPlan waitEndOfNavigation
+		switchToPlan waitEndOfNavigation		
+	
+/*
+	Plan sendMap
+		solve sendMap time(60000) onFailSwitchTo  prologFailure;
+		receiveMsg time(30000);
+		onMsg navack : navack -> switchToPlan sendPlan;
+		
+		repeatPlan 0	
+		
+	Plan sendPlan
+		solve sendPlan time(60000) onFailSwitchTo  prologFailure;
+		receiveMsg time(30000);
+		onMsg navack : navack -> switchToPlan sendPositions;
+		
+		repeatPlan 0
+			
+	Plan sendPositions
+		solve sendPositions time(60000) onFailSwitchTo  prologFailure;
+		receiveMsg time(30000);
+		onMsg navack : navack -> switchToPlan waitEndOfNavigation;
+		
+		repeatPlan 0
+*/		
 		
 	Plan waitEndOfNavigation
 		sense time(999999999) local_gui_command, update, end -> continue, continue, continue;
