@@ -11,8 +11,15 @@ Dispatch navack : navack
 
 /*
  * MAP = mapdata ( [ map ( Xmax , Ymax ), [ mapdata( ID, element( X, Y ) ) ] ] )
- * PLAN = plan ( [ robotmove || robotspin ( DIR ) ] )
+ * PLAN = plan ( ALGOTYPE , [ t || d || l || r || dl || dr  ] )
  * POS = positions ( Xs , Ys, Xg, Yg ) 
+ * 
+ * t = forward tiled
+ * d = forward diagonal
+ * l = left (45 or 90 degrees)
+ * r = right 
+ * dl = double left (90 or 180 degrees)
+ * dr = double right 
  */
 
 
@@ -81,7 +88,7 @@ QActor console context ctxConsole -g cyan{
  		memoCurrentEvent;
  		
  		onEvent local_gui_command : local_gui_command (loadmap(PATH)) -> switchToPlan loadMap;
- 		onEvent local_gui_command : local_gui_command (findpath(START,GOAL)) -> switchToPlan findPath;
+ 		onEvent local_gui_command : local_gui_command (findpath(START,GOAL,ALGO)) -> switchToPlan findPath;
  		onEvent local_gui_command : local_gui_command (navigate) -> switchToPlan navigation;
  		
  		repeatPlan 0
@@ -95,8 +102,8 @@ QActor console context ctxConsole -g cyan{
 		
 	
 	Plan findPath resumeLastPlan
-		[?? msg(local_gui_command, "event", SENDER, none, local_gui_command (findpath(START,GOAL)), MSGNUM)]
-			solve searchBestPath(START,GOAL) time(210000000) onFailSwitchTo  prologFailure;
+		[?? msg(local_gui_command, "event", SENDER, none, local_gui_command (findpath(START,GOAL,ALGO)), MSGNUM)]
+			solve searchBestPath(START,GOAL,ALGO) time(210000000) onFailSwitchTo  prologFailure;
 		
 		println("++++++++++++++++++ PATH FOUND ++++++++++++++++++")
 	

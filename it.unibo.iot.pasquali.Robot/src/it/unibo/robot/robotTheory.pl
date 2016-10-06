@@ -93,12 +93,12 @@ loadMapFromData([E | T]) :-
 	assert(E),	
 	loadMapFromData(T).
 	
-setNavPlan(plan(PLAN)) :-
+setNavPlan(plan(ALGO,PLAN)) :-
 	actorobj(Actor),
 	defaultSpeed(SPEED),
 	defaultDuration(DUR),
 	actorPrintln("setNavigationPlan!!!!"),
-	Actor <- setNavigationPlan(PLAN, SPEED, DUR).
+	Actor <- setNavigationPlan(ALGO, PLAN, SPEED, DUR).
 	
 setPositions(positions(SX, SY, GX, GY)) :-
 	actorobj(Actor),
@@ -124,13 +124,12 @@ checkValidState( X , Y) :-
 
 %% START -> position(X,Y)
 
-searchBestPath(position(Sx,Sy) , position(Gx,Gy)) :-
+searchBestPath(position(Sx,Sy) , position(Gx,Gy), ALGO) :-
 	actorPrintln(position(Sx,Sy)),
 	actorPrintln(position(Gx,Gy)),	
 	havemap,
-	actorPrintln(havemap),
 	actorobj(Actor),
-	Actor <- searchBestPath(Sx,Sy,Gx,Gy),
+	Actor <- searchBestPath(Sx,Sy,Gx,Gy,ALGO),
 	Actor <- showPathOnGui,
 	assert(haveplan).
 

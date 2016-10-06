@@ -1,21 +1,9 @@
 package it.unibo.planning.astar.domain;
 
+import it.unibo.planning.astar.enums.Direction;
+
 public class State implements Comparable<State>{
 	
-	public enum Direction {
-		NORTH ('N', 1),
-		EAST ('E', 2),
-		WEST ('W', 3),
-		SOUTH ('S', 4),
-		NONE ('0', -1);
-		
-		private final char direction;
-		private final int value;
-	    private Direction(char s, int val) { direction = s; value = val;}
-	    public String toString(){ return ""+direction; }
-	    public int getValue() {return value; }		
-	}
-
 	private Direction direction;
 	private int x;
 	private int y;
@@ -32,6 +20,15 @@ public class State implements Comparable<State>{
 		this.y = -1;
 		this.direction = null;
 		
+		this.genMove = null;
+		this.cost = -1;
+		this.heuristic = -1;
+	}
+	
+	public State(int x, int y)
+	{
+		this.x = x;
+		this.y = y;
 		this.genMove = null;
 		this.cost = -1;
 		this.heuristic = -1;

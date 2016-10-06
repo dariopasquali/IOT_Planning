@@ -4,8 +4,11 @@ This code is generated only ONCE
 */
 package it.unibo.console;
 import it.unibo.is.interfaces.IOutputEnvView;
+import it.unibo.planning.astar.algo.EngineFactory;
 import it.unibo.planning.astar.algo.SearchAgent;
-import it.unibo.planning.astar.domain.State.Direction;
+import it.unibo.planning.astar.enums.Algo;
+import it.unibo.planning.astar.enums.Direction;
+import it.unibo.planning.astar.interfaces.IEngine;
 import it.unibo.qactors.ActorContext;
 
 import java.util.ArrayList;
@@ -20,6 +23,8 @@ public class Console extends AbstractConsole {
 	private ArrayList<it.unibo.planning.astar.domain.State> path;
 	
 	private int sx, sy, gx, gy;
+	
+	private Algo algorithm;
 	
 	public Console(String actorId, ActorContext myCtx, IOutputEnvView outEnvView )  throws Exception{
 		super(actorId, myCtx, outEnvView);
@@ -43,8 +48,10 @@ public class Console extends AbstractConsole {
 		((ConsoleGUI)env).setMap(map);		
 	}
 	
-	public void searchBestPath(int sx, int sy, int gx, int gy)
+	public void searchBestPath(int sx, int sy, int gx, int gy, String algo)
 	{		
+		algorithm = Algo.fromStringValue(algo);
+		
 		this.sx = sx;
 		this.sy = sy;
 		this.gx = gx;
@@ -60,7 +67,11 @@ public class Console extends AbstractConsole {
 		
 		long st = System.currentTimeMillis();
 		
-		path = agent.searchBestStatePath(this,start, goal);	
+		IEngine engine = EngineFactory.getEngine(algorithm, this);
+		
+		println("LET'S FIND BEST PATH");
+		
+		path = agent.searchBestStatePath(engine,start, goal);	
 		
 		println("Search Time --> " + (System.currentTimeMillis() - st) +" ms");
 	}
@@ -79,7 +90,7 @@ public class Console extends AbstractConsole {
 	
 	private String getPrologPlan()
 	{
-		String moves = "plan( [";
+		String moves = "plan("+algorithm.getValue()+", [";
 		for(int i=0; i<path.size(); i++)
 		{
 			moves += path.get(i).getGenMove().toString();
@@ -144,6 +155,7 @@ public class Console extends AbstractConsole {
 						+ "position(" + params[0] + "," + params[1]+")"
 								+ ","
 						+ "position(" + params[2] + "," + params[3]+")"
+								+ "," + params[4]
 								+ "))");
 						
 			break;

@@ -11,8 +11,16 @@ Dispatch navack : navack
 
 /*
  * MAP = mapdata ( [ map ( Xmax , Ymax ), [ mapdata( ID, element( X, Y ) ) ] ] )
- * PLAN = plan ( [ robotmove || robotspin ( DIR ) ] )
- * POS = positions ( Xs , Ys, Xg, Yg ) 
+ * PLAN = plan ( ALGOTYPE , [ t || d || l || r || dl || dr  ] )
+ * POS = positions ( Xs , Ys, Xg, Yg )
+ *
+ * t = forward tiled
+ * d = forward diagonal
+ * l = left (45 or 90 degrees)
+ * r = right 
+ * dl = double left (90 or 180 degrees)
+ * dr = double right 
+ *  
  */
 
 

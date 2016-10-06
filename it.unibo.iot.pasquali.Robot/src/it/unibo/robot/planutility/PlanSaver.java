@@ -4,9 +4,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-
-import it.unibo.planning.astar.domain.Move.SpinDirection;
 
 public class PlanSaver {
 	

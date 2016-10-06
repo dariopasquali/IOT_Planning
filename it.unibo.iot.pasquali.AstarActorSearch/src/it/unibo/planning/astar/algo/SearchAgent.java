@@ -7,6 +7,7 @@ import java.util.TreeMap;
 
 import it.unibo.planning.astar.domain.Move;
 import it.unibo.planning.astar.domain.State;
+import it.unibo.planning.astar.interfaces.IEngine;
 import it.unibo.qactors.planned.QActorPlanned;
 
 public class SearchAgent {
@@ -16,7 +17,7 @@ public class SearchAgent {
 	
 	private HashMap<State,State> cameFrom;
 	
-	private Engine engine;
+	private IEngine engine;
 	
 	public SearchAgent()
 	{
@@ -26,11 +27,12 @@ public class SearchAgent {
 	}
 	
 	
-	public ArrayList<Move> searchBestPath(QActorPlanned actor, State start, State goal)
+	public ArrayList<Move> searchBestPath(IEngine engine, State start, State goal)
 	{
 		System.out.println("LET'S FIND BEST PATH");
 		
-		engine = new Engine(actor, goal);
+		this.engine = engine;
+		engine.setGoal(goal);
 		
 		openSet.add(start);
 		
@@ -96,11 +98,12 @@ public class SearchAgent {
 	}
 	
 	// STATE VERSION
-	public ArrayList<State> searchBestStatePath(QActorPlanned actor, State start, State goal)
+	public ArrayList<State> searchBestStatePath(IEngine engine, State start, State goal)
 	{
 		System.out.println("LET'S FIND BEST PATH");
 		
-		engine = new Engine(actor, goal);
+		this.engine = engine;
+		engine.setGoal(goal);
 		
 		openSet.add(start);
 		

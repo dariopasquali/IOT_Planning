@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.TreeMap;
 
 import it.unibo.planning.astar.domain.State;
-import it.unibo.planning.astar.domain.State.Direction;
+import it.unibo.planning.astar.enums.Direction;
 
 public class Test {
 

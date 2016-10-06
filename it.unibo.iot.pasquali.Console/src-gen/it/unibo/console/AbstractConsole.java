@@ -123,7 +123,7 @@ public AbstractConsole(String actorId, ActorContext myCtx, IOutputEnvView outEnv
 	    		//onEvent
 	    		if( currentEvent.getEventId().equals("local_gui_command") ){
 	    		 		String parg = "";
-	    		 		parg = updateVars(null, Term.createTerm("local_gui_command(COMMAND)"), Term.createTerm("local_gui_command(findpath(START,GOAL))"), 
+	    		 		parg = updateVars(null, Term.createTerm("local_gui_command(COMMAND)"), Term.createTerm("local_gui_command(findpath(START,GOAL,ALGO))"), 
 	    		 			    		  					Term.createTerm(currentEvent.getMsg()), parg);
 	    		 			if( parg != null ){
 	    		 				 if( ! switchToPlan("findPath").getGoon() ) break; 
@@ -184,8 +184,8 @@ public AbstractConsole(String actorId, ActorContext myCtx, IOutputEnvView outEnv
 	    	boolean returnValue = suspendWork;
 	    while(true){
 	    nPlanIter++;
-	    		if( (guardVars = evalTheGuard( " ??msg(local_gui_command, \"event\" ,SENDER,none,local_gui_command(findpath(START,GOAL)),MSGNUM)" )) != null ){
-	    		{ String parg = "searchBestPath(START,GOAL)";
+	    		if( (guardVars = evalTheGuard( " ??msg(local_gui_command, \"event\" ,SENDER,none,local_gui_command(findpath(START,GOAL,ALGO)),MSGNUM)" )) != null ){
+	    		{ String parg = "searchBestPath(START,GOAL,ALGO)";
 	    		parg = substituteVars(guardVars,parg);
 	    		  aar = solveGoal( parg , 210000000, "","" , "" );
 	    		//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());

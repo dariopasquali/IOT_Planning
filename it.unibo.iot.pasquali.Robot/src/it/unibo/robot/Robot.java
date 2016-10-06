@@ -5,8 +5,11 @@ import java.util.List;
 
 import it.unibo.domain.model.implmentation.Map;
 import it.unibo.is.interfaces.IOutputEnvView;
+import it.unibo.planning.astar.algo.EngineFactory;
 import it.unibo.planning.astar.algo.SearchAgent;
-import it.unibo.planning.astar.domain.State.Direction;
+import it.unibo.planning.astar.enums.Algo;
+import it.unibo.planning.astar.enums.Direction;
+import it.unibo.planning.astar.interfaces.IEngine;
 import it.unibo.qactors.ActorContext;
 import it.unibo.robot.planutility.PlanSaver;
 public class Robot extends AbstractRobot { 
@@ -15,6 +18,7 @@ public class Robot extends AbstractRobot {
 	private ArrayList<it.unibo.planning.astar.domain.State> path;
 	
 	it.unibo.planning.astar.domain.State start, goal;
+	private Algo algorithm;
 	
 	
 	
@@ -37,8 +41,10 @@ public class Robot extends AbstractRobot {
 		map.addElementsFromString(elements);
 	}
 	
-	public void searchBestPath(int sx, int sy, int gx, int gy)
+	public void searchBestPath(int sx, int sy, int gx, int gy, String algo)
 	{		
+		this.algorithm = Algo.fromStringValue(algo);
+		
 		SearchAgent agent = new SearchAgent();
 		
 		it.unibo.planning.astar.domain.State start = 
@@ -49,7 +55,11 @@ public class Robot extends AbstractRobot {
 		
 		long st = System.currentTimeMillis();
 		
-		path = agent.searchBestStatePath(this,start, goal);	
+		IEngine engine = EngineFactory.getEngine(algorithm, this);
+		
+		println("LET'S FIND BEST PATH");
+		
+		path = agent.searchBestStatePath(engine,start, goal);	
 		
 		println("Search Time --> " + (System.currentTimeMillis() - st) +" ms");
 	}
@@ -62,10 +72,18 @@ public class Robot extends AbstractRobot {
 		}
 	}
 	
-	public void setNavigationPlan(String plan, int s, int t)
+	public void setNavigationPlan(String algo, String plan, int s, int t)
 	{
+		//NB: rotation step is 45 degrees
+		
+		this.algorithm = Algo.fromStringValue(algo);		
+		
 		String speed = ""+s;
 		String time = ""+t;
+		String diagoTime = ""+(Math.round(t*1.414));
+		
+		plan = plan.split("\\[")[1];
+		plan = plan.split("\\]")[0];
 		
 		println("Salvataggio piano in corso");
 		println(plan);
@@ -80,31 +98,48 @@ public class Robot extends AbstractRobot {
 		
 		for(String m : moves)
 		{
-			if(m.contains("robotmove"))
+			switch(m)
 			{
+			case "t":
 				planSaver.addForwardMove(speed, time);
-			}
-			else
-			{
-				if(m.contains("left"))
+				break;
+				
+			case "d":
+				planSaver.addForwardMove(speed, diagoTime);
+				break;
+				
+			case "l":
+				planSaver.addSpinMove(speed, time, "ml");
+				if(algorithm.equals(Algo.ONLY_TILED))
+					planSaver.addSpinMove(speed, time, "ml");
+				break;
+				
+			case "r":
+				planSaver.addSpinMove(speed, time, "mr");
+				if(algorithm.equals(Algo.ONLY_TILED))
+					planSaver.addSpinMove(speed, time, "mr");
+				break;
+				
+			case "dl":
+				planSaver.addSpinMove(speed, time, "ml");
+				planSaver.addSpinMove(speed, time, "ml");
+				if(algorithm.equals(Algo.ONLY_TILED))
 				{
 					planSaver.addSpinMove(speed, time, "ml");
-				}
-				else if(m.contains("right"))
-				{
-					planSaver.addSpinMove(speed, time, "mr");
-				}
-				else if(m.contains("doubleleft"))
-				{
-					planSaver.addSpinMove(speed, time, "ml");
 					planSaver.addSpinMove(speed, time, "ml");
 				}
-				else if(m.contains("doubleright"))
+				break;
+				
+			case "dr":
+				planSaver.addSpinMove(speed, time, "mr");
+				planSaver.addSpinMove(speed, time, "mr");
+				if(algorithm.equals(Algo.ONLY_TILED))
 				{
 					planSaver.addSpinMove(speed, time, "mr");
 					planSaver.addSpinMove(speed, time, "mr");
 				}
-			}
+				break;
+			}			
 		}
 		
 		planSaver.addPrint("fine Navigazione");

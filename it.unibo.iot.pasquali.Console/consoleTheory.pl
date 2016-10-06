@@ -83,13 +83,12 @@ checkValidState( X , Y) :-
 
 %% START -> position(X,Y)
 
-searchBestPath(position(Sx,Sy) , position(Gx,Gy)) :-
+searchBestPath(position(Sx,Sy) , position(Gx,Gy), ALGO) :-
 	actorPrintln(position(Sx,Sy)),
 	actorPrintln(position(Gx,Gy)),	
 	havemap,
-	actorPrintln(havemap),
 	actorobj(Actor),
-	Actor <- searchBestPath(Sx,Sy,Gx,Gy),
+	Actor <- searchBestPath(Sx,Sy,Gx,Gy,ALGO),
 	Actor <- showPathOnGui,
 	assert(haveplan).
 

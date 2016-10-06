@@ -29,10 +29,11 @@ import it.unibo.is.interfaces.IActivityBase;
 import it.unibo.is.interfaces.IBasicEnvAwt;
 import it.unibo.is.interfaces.IOutputEnvView;
 import it.unibo.is.interfaces.IOutputView;
-import it.unibo.planning.astar.algo.Engine;
+import it.unibo.planning.astar.algo.TiledEngine;
 import it.unibo.planning.astar.domain.Move;
 import it.unibo.planning.astar.domain.State;
-import it.unibo.planning.astar.domain.State.Direction;
+import it.unibo.planning.astar.enums.Algo;
+import it.unibo.planning.astar.enums.Direction;
 
 import javax.swing.JSplitPane;
 import javax.swing.JTextField;
@@ -44,6 +45,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JScrollBar;
 import javax.swing.UIManager;
 import java.awt.Color;
+import javax.swing.JRadioButton;
 
 public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt{
 
@@ -67,6 +69,12 @@ public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt{
 	private ArrayList<State> path;
 	
 	JButton btnFindPath, btnNavigate, btnManipulate, btnAbort, btnLoad;
+	private JRadioButton radioTiled;
+	private JRadioButton radioTiledDiago;
+	private JPanel panel_1;
+	private JLabel lblSelectTheAlgorithm;
+	
+	private Algo searchAlgorithm;
 	
 	//private JFileChooser fileLoader, fileSaver;
 
@@ -159,7 +167,7 @@ public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt{
 		gbl_panel.columnWidths = new int[]{136, 0, 46, 0};
 		gbl_panel.rowHeights = new int[]{0, 14, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 		gbl_panel.columnWeights = new double[]{1.0, 1.0, 1.0, Double.MIN_VALUE};
-		gbl_panel.rowWeights = new double[]{0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
+		gbl_panel.rowWeights = new double[]{0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
 		panel.setLayout(gbl_panel);
 		
 		Component verticalStrut_2 = Box.createVerticalStrut(10);
@@ -172,7 +180,6 @@ public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt{
 		JTextArea txtInstructions = new JTextArea();
 		txtInstructions.setText("- Load The Map\r\n- Left Click = Set START\r\n- Right Click = Set GOAL\r\n- Middle Click = CLEAR\r\n- Search Best Path\r\n- Start Navigation");
 		txtInstructions.setEditable(false);
-		txtInstructions.setEnabled(false);
 		GridBagConstraints gbc_txtInstructions = new GridBagConstraints();
 		gbc_txtInstructions.gridheight = 2;
 		gbc_txtInstructions.gridwidth = 3;
@@ -182,13 +189,44 @@ public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt{
 		gbc_txtInstructions.gridy = 1;
 		panel.add(txtInstructions, gbc_txtInstructions);
 		
+		panel_1 = new JPanel();
+		GridBagConstraints gbc_panel_1 = new GridBagConstraints();
+		gbc_panel_1.gridwidth = 3;
+		gbc_panel_1.insets = new Insets(0, 0, 5, 5);
+		gbc_panel_1.fill = GridBagConstraints.BOTH;
+		gbc_panel_1.gridx = 0;
+		gbc_panel_1.gridy = 3;
+		panel.add(panel_1, gbc_panel_1);
+		
+		lblSelectTheAlgorithm = new JLabel("Select The Algorithm");
+		panel_1.add(lblSelectTheAlgorithm);
+		
+		radioTiled = new JRadioButton("Only Tiled Moves");
+		radioTiled.setSelected(true);
+		radioTiled.addActionListener(new DefaultInputHandler());
+		GridBagConstraints gbc_radioTiled = new GridBagConstraints();
+		gbc_radioTiled.gridwidth = 3;
+		gbc_radioTiled.insets = new Insets(0, 0, 5, 0);
+		gbc_radioTiled.gridx = 0;
+		gbc_radioTiled.gridy = 4;
+		panel.add(radioTiled, gbc_radioTiled);
+		
+		radioTiledDiago = new JRadioButton("Tiled & Diagonal Moves");
+		radioTiledDiago.addActionListener(new DefaultInputHandler());
+		GridBagConstraints gbc_radioTiledDiago = new GridBagConstraints();
+		gbc_radioTiledDiago.gridwidth = 3;
+		gbc_radioTiledDiago.insets = new Insets(0, 0, 5, 0);
+		gbc_radioTiledDiago.gridx = 0;
+		gbc_radioTiledDiago.gridy = 5;
+		panel.add(radioTiledDiago, gbc_radioTiledDiago);
+		
 		btnFindPath = new JButton("Find Best Path");
 		btnFindPath.setFont(new Font("Tahoma", Font.PLAIN, 15));
 		GridBagConstraints gbc_btnFindPath = new GridBagConstraints();
 		gbc_btnFindPath.gridwidth = 3;
 		gbc_btnFindPath.insets = new Insets(0, 0, 5, 0);
 		gbc_btnFindPath.gridx = 0;
-		gbc_btnFindPath.gridy = 5;
+		gbc_btnFindPath.gridy = 7;
 		panel.add(btnFindPath, gbc_btnFindPath);
 		btnFindPath.addActionListener(new DefaultInputHandler());
 		btnFindPath.setEnabled(false);
@@ -199,7 +237,7 @@ public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt{
 		gbc_btnNavigate.gridwidth = 3;
 		gbc_btnNavigate.insets = new Insets(0, 0, 5, 0);
 		gbc_btnNavigate.gridx = 0;
-		gbc_btnNavigate.gridy = 7;
+		gbc_btnNavigate.gridy = 9;
 		panel.add(btnNavigate, gbc_btnNavigate);
 		btnNavigate.addActionListener(new DefaultInputHandler());
 		btnNavigate.setEnabled(false);
@@ -211,7 +249,7 @@ public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt{
 		gbc_btnManipulate.gridwidth = 3;
 		gbc_btnManipulate.insets = new Insets(0, 0, 5, 0);
 		gbc_btnManipulate.gridx = 0;
-		gbc_btnManipulate.gridy = 9;
+		gbc_btnManipulate.gridy = 11;
 		panel.add(btnManipulate, gbc_btnManipulate);
 		//btnManipulate.addActionListener(new DefaultInputHandler());
 		btnManipulate.setEnabled(false);
@@ -246,6 +284,7 @@ public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt{
 		panelOutput.setRowHeaderView(scrollBar);
 		panelOutput.add(scrollBar);
 		
+		searchAlgorithm = Algo.ONLY_TILED;
 		
 		/*
 		fileLoader = new JFileChooser();
@@ -308,6 +347,7 @@ public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt{
 						+sy+","
 						+gx+","
 						+gy+","
+						+searchAlgorithm.getValue()+","
 						);
 					
 					btnNavigate.setEnabled(true);							
@@ -331,6 +371,19 @@ public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt{
 				btnLoad.setEnabled(true);
 				
 				break;
+				
+			case "Only Tiled Moves":
+				radioTiled.setSelected(true);
+				radioTiledDiago.setSelected(false);
+				searchAlgorithm = Algo.ONLY_TILED;
+				break;
+				
+			case "Tiled & Diagonal Moves":
+				radioTiled.setSelected(false);
+				radioTiledDiago.setSelected(true);
+				searchAlgorithm = Algo.TILED_DIAGONAL;
+				break;
+				
 			default:
 				addOutput("Invalid command");
 			}
