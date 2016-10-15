@@ -36,7 +36,8 @@ public class Map implements IMap{
 
 	@Override
 	public void addElement(IMapElement newElement) {
-		elements.add(newElement);		
+		if(!elements.contains(newElement))
+			elements.add(newElement);		
 	}
 
 	@Override

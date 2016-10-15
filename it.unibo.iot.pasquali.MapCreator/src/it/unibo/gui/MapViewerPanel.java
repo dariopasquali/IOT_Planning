@@ -6,6 +6,9 @@ import java.awt.EventQueue;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JButton;
@@ -28,24 +31,152 @@ public class MapViewerPanel {
 		PATH
 	}
 	
-	private class ClickHandler implements ActionListener{
-
-		@Override
-		public void actionPerformed(ActionEvent e) {
-
-			String[] name = e.getActionCommand().split(" ");
-			System.out.println(e.getActionCommand());
-			int r = Integer.parseInt(name[0]);
-			int c = Integer.parseInt(name[1]);
-			
-			switchState(r,c);			
-		}		
-	}
+	
 	
 	private JPanel p;
 	private Map map;
 	private int rows, cols;
     private JButton[][] matrix = null;
+	private int brushSize;
+	private Color brushColor;
+	
+	private boolean paintFlag = false;
+	private boolean isPainting = false;
+	
+	private class ClickHandler implements MouseListener, MouseMotionListener{
+
+		private int r;
+		private int c;
+		
+		public ClickHandler(int r, int c)
+		{
+			this.r = r;
+			this.c = c;
+		}		
+		
+		/*
+		public void actionPerformed(ActionEvent e) {
+
+			String[] name = e.getActionCommand().split(" ");
+			System.out.println("WTF!!!"+e.getActionCommand());
+			int r = Integer.parseInt(name[0]);
+			int c = Integer.parseInt(name[1]);
+			
+			
+		}
+		*/
+
+		@Override
+		public void mouseClicked(MouseEvent e) {
+		/*	
+			int splitBrush = (int)brushSize/2;
+			
+			System.out.println(r);
+			System.out.println(c);
+			
+			if(e.getButton() == MouseEvent.BUTTON1)
+			{
+				if(splitBrush == 0)
+					setState(r,c, brushColor);
+				else
+				{
+					for(int row=r-splitBrush; row<=r+splitBrush; row++)
+						for(int col=c-splitBrush; col<=c+splitBrush; col++)
+						{
+							if(row>=0 && col>=0 && row<getRows() && col<getCols())
+								setState(row,col, brushColor);
+						}
+				}
+			}
+		*/			
+		}
+
+		@Override
+		public void mouseEntered(MouseEvent e) {
+			
+			
+		}
+
+		@Override
+		public void mouseExited(MouseEvent e) {
+						
+		}
+
+		@Override
+		public void mousePressed(MouseEvent e) {
+			
+			
+		}
+
+		@Override
+		public void mouseReleased(MouseEvent e) {
+			
+			if(paintFlag)
+			{
+				isPainting = !isPainting;
+				return;
+			}
+				
+			
+			int splitBrush = (int)brushSize/2;
+			
+			if(e.getButton() == MouseEvent.BUTTON1)
+			{
+				if(splitBrush == 0)
+					setState(r,c, brushColor);
+				else
+				{
+					for(int row=r-splitBrush; row<=r+splitBrush; row++)
+						for(int col=c-splitBrush; col<=c+splitBrush; col++)
+						{
+							if(row>=0 && col>=0 && row<getRows() && col<getCols())
+								setState(row,col, brushColor);
+						}
+				}
+			}
+		}
+
+		@Override
+		public void mouseDragged(MouseEvent e) {
+			
+			
+		}
+
+		@Override
+		public void mouseMoved(MouseEvent e) {
+			
+			if(!paintFlag || !isPainting)
+				return;
+			
+			System.out.println("MOVED");
+			
+			int splitBrush = (int)brushSize/2;
+			
+			if(splitBrush == 0)
+				setState(r,c, brushColor);
+			else
+			{
+				for(int row=r-splitBrush; row<=r+splitBrush; row++)
+					for(int col=c-splitBrush; col<=c+splitBrush; col++)
+					{
+						if(row>=0 && col>=0 && row<getRows() && col<getCols())
+							setState(row,col, brushColor);
+					}
+			}
+		}		
+	}
+	
+	
+	public void setPaintFlag(boolean value)
+	{
+		this.paintFlag = value;
+		System.out.println("let's paint");
+	}
+	
+	public void setBrushColor(Color color)
+	{
+		this.brushColor = color;
+	}
     
 
 	public void setMap(Map m){
@@ -73,8 +204,12 @@ public class MapViewerPanel {
 
     private JButton createCell(final int row, final int col) {
         final JButton b = new JButton("");
-        b.setActionCommand(row+" "+col);
-        b.addActionListener(new ClickHandler());
+        //b.setActionCommand(row+" "+col);
+        
+        ClickHandler handler = new ClickHandler(row, col);
+        
+        b.addMouseListener(handler);
+        b.addMouseMotionListener(handler);
         return b;
     }
     
@@ -138,17 +273,17 @@ public class MapViewerPanel {
 		return p;
 	}
 	
-	public void switchState(int r, int c) {
+	public void setState(int r, int c, Color color) {
 		
-		JButton b = getGridButton(r, c);
+		//JButton b = getGridButton(r, c);
+		//Color color = b.getBackground();
 		
-		Color color = b.getBackground();
-		if(color.equals(Color.WHITE))
+		if(color.equals(Color.BLACK))
 		{
 			getGridButton(r,c).setBackground(Color.BLACK);
 			map.addElement(new MapElement(c,r));
 		}
-		else if(color.equals(Color.BLACK))
+		else if(color.equals(Color.WHITE))
 		{
 			getGridButton(r,c).setBackground(Color.WHITE);
 			map.removeElement(c,r);
@@ -166,6 +301,11 @@ public class MapViewerPanel {
 		
 		map.clearAll();
 		
+	}
+
+	public void setBrushSize(int size) {
+		this.brushSize = size;
+		System.out.println("Brush size: "+brushSize);
 	}
 	
 	

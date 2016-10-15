@@ -12,6 +12,8 @@ import java.awt.Insets;
 import java.awt.Panel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -26,8 +28,11 @@ import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JPanel;
 import javax.swing.border.TitledBorder;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import it.unibo.domain.Map;
+import it.unibo.domain.MapElement;
 import it.unibo.domain.interfaces.IMapElement;
 import it.unibo.gui.MapViewerPanel.CellState;
 
@@ -44,6 +49,11 @@ import javax.swing.JScrollPane;
 import javax.swing.JScrollBar;
 import java.awt.GridLayout;
 import javax.swing.UIManager;
+import javax.swing.JSpinner;
+import javax.swing.JList;
+import javax.swing.AbstractListModel;
+import javax.swing.SpinnerListModel;
+import java.awt.event.KeyAdapter;
 
 public class MapCreator extends Frame{
 
@@ -58,6 +68,7 @@ public class MapCreator extends Frame{
 
 	private JTextField txtW;
 	private JTextField txtH;
+	private JSpinner spinBrush;
 	
 	private MapViewerPanel gbp;
 	
@@ -66,6 +77,10 @@ public class MapCreator extends Frame{
 	private JSplitPane bodyPanel;
 	
 	JButton btnGenerate, btnLoad, btnClear, btnSaveMap;
+	private JRadioButton radioBlack;
+	private JRadioButton radioWhite;
+	private JRadioButton rdbtnSingleCellPaint;
+	private JRadioButton rdbtnDragPaint;
 	
 	//private JFileChooser fileLoader, fileSaver;
 
@@ -159,9 +174,9 @@ public class MapCreator extends Frame{
 		bodyPanel.setLeftComponent(panel);
 		GridBagLayout gbl_panel = new GridBagLayout();
 		gbl_panel.columnWidths = new int[]{136, 0, 46, 0};
-		gbl_panel.rowHeights = new int[]{0, 14, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+		gbl_panel.rowHeights = new int[]{0, 14, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 		gbl_panel.columnWeights = new double[]{1.0, 1.0, 1.0, Double.MIN_VALUE};
-		gbl_panel.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
+		gbl_panel.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
 		panel.setLayout(gbl_panel);
 		
 		Component verticalStrut_2 = Box.createVerticalStrut(10);
@@ -210,7 +225,7 @@ public class MapCreator extends Frame{
 		btnGenerate = new JButton("Generate");
 		btnGenerate.setFont(new Font("Tahoma", Font.PLAIN, 15));
 		GridBagConstraints gbc_btnGenerate = new GridBagConstraints();
-		gbc_btnGenerate.gridwidth = 3;
+		gbc_btnGenerate.gridwidth = 4;
 		gbc_btnGenerate.insets = new Insets(0, 0, 5, 0);
 		gbc_btnGenerate.gridx = 0;
 		gbc_btnGenerate.gridy = 4;
@@ -222,26 +237,123 @@ public class MapCreator extends Frame{
 		btnClear.setFont(new Font("Tahoma", Font.PLAIN, 15));
 		btnClear.setEnabled(false);
 		GridBagConstraints gbc_btnClear = new GridBagConstraints();
-		gbc_btnClear.gridwidth = 3;
+		gbc_btnClear.gridwidth = 4;
 		gbc_btnClear.insets = new Insets(0, 0, 5, 0);
 		gbc_btnClear.gridx = 0;
 		gbc_btnClear.gridy = 5;
 		panel.add(btnClear, gbc_btnClear);
 		
+		JLabel lblSelectPrecision = new JLabel("Brush Size");
+		GridBagConstraints gbc_lblSelectPrecision = new GridBagConstraints();
+		gbc_lblSelectPrecision.anchor = GridBagConstraints.BELOW_BASELINE;
+		gbc_lblSelectPrecision.insets = new Insets(0, 0, 5, 5);
+		gbc_lblSelectPrecision.gridx = 0;
+		gbc_lblSelectPrecision.gridy = 8;
+		panel.add(lblSelectPrecision, gbc_lblSelectPrecision);
+		
+		spinBrush = new JSpinner();
+		spinBrush.setModel(new SpinnerListModel(new String[] {"1", "3", "5", "7", "9", "13", "15", "17"}));
+		GridBagConstraints gbc_spinBrush = new GridBagConstraints();
+		gbc_spinBrush.fill = GridBagConstraints.BOTH;
+		gbc_spinBrush.gridwidth = 3;
+		gbc_spinBrush.insets = new Insets(0, 0, 5, 0);
+		gbc_spinBrush.gridx = 1;
+		gbc_spinBrush.gridy = 8;
+		panel.add(spinBrush, gbc_spinBrush);
+		spinBrush.addChangeListener(new ChangeListener(){
+			@Override
+			public void stateChanged(ChangeEvent arg0) {
+				gbp.setBrushSize(Integer.parseInt((String)spinBrush.getValue()));				
+			}			
+		});
+		
+		radioBlack = new JRadioButton("Paint Black");
+		radioBlack.setSelected(true);
+		GridBagConstraints gbc_radioBlack = new GridBagConstraints();
+		gbc_radioBlack.insets = new Insets(0, 0, 5, 5);
+		gbc_radioBlack.gridx = 0;
+		gbc_radioBlack.gridy = 9;
+		radioBlack.addActionListener(new ActionListener(){
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				gbp.setBrushColor(Color.BLACK);
+				radioWhite.setSelected(false);
+				radioBlack.setSelected(true);
+			}
+			
+		});
+		panel.add(radioBlack, gbc_radioBlack);
+		
+		radioWhite = new JRadioButton("Paint White");
+		GridBagConstraints gbc_radioWhite = new GridBagConstraints();
+		gbc_radioWhite.insets = new Insets(0, 0, 5, 5);
+		gbc_radioWhite.gridx = 2;
+		gbc_radioWhite.gridy = 9;
+		radioWhite.addActionListener(new ActionListener(){
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				gbp.setBrushColor(Color.WHITE);
+				radioWhite.setSelected(true);
+				radioBlack.setSelected(false);
+			}
+			
+		});
+		panel.add(radioWhite, gbc_radioWhite);
+		
+		rdbtnSingleCellPaint = new JRadioButton("Single Cell Paint");
+		rdbtnSingleCellPaint.setSelected(true);
+		GridBagConstraints gbc_rdbtnSingleCellPaint = new GridBagConstraints();
+		gbc_rdbtnSingleCellPaint.insets = new Insets(0, 0, 5, 5);
+		gbc_rdbtnSingleCellPaint.gridx = 0;
+		gbc_rdbtnSingleCellPaint.gridy = 10;
+		rdbtnSingleCellPaint.addActionListener(new ActionListener(){
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				gbp.setPaintFlag(false);
+				rdbtnSingleCellPaint.setSelected(true);
+				rdbtnDragPaint.setSelected(false);
+			}
+			
+		});
+		panel.add(rdbtnSingleCellPaint, gbc_rdbtnSingleCellPaint);
+		
+		rdbtnDragPaint = new JRadioButton("Drag Paint");
+		GridBagConstraints gbc_rdbtnDragPaint = new GridBagConstraints();
+		gbc_rdbtnDragPaint.insets = new Insets(0, 0, 5, 5);
+		gbc_rdbtnDragPaint.gridx = 2;
+		gbc_rdbtnDragPaint.gridy = 10;
+		rdbtnDragPaint.addActionListener(new ActionListener(){
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				gbp.setPaintFlag(true);
+				rdbtnSingleCellPaint.setSelected(false);
+				rdbtnDragPaint.setSelected(true);
+			}
+			
+		});
+		panel.add(rdbtnDragPaint, gbc_rdbtnDragPaint);
+		
 		JTextArea txtInstructions = new JTextArea();
 		txtInstructions.setEditable(false);
 		txtInstructions.setText("- Insert Width\r\n- Insert Height\r\n- Click Generate\r\n- Click cell = Clear/Obstacle\r\n- Save Map");
 		GridBagConstraints gbc_txtInstructions = new GridBagConstraints();
-		gbc_txtInstructions.gridheight = 8;
+		gbc_txtInstructions.insets = new Insets(0, 0, 5, 5);
+		gbc_txtInstructions.gridheight = 3;
 		gbc_txtInstructions.gridwidth = 3;
 		gbc_txtInstructions.fill = GridBagConstraints.BOTH;
 		gbc_txtInstructions.gridx = 0;
-		gbc_txtInstructions.gridy = 6;
+		gbc_txtInstructions.gridy = 11;
 		panel.add(txtInstructions, gbc_txtInstructions);
 		
 		panelMap = new JPanel();
 		bodyPanel.setRightComponent(panelMap);		
 		gbp = new MapViewerPanel();
+		
+		
 	}
 
 
@@ -269,6 +381,7 @@ public class MapCreator extends Frame{
 				btnGenerate.setEnabled(true);
 				btnClear.setEnabled(true);
 				btnSaveMap.setEnabled(true);
+				//btnExpandMap.setEnabled(true);
 				break;
 				
 			case "Generate":
@@ -280,10 +393,11 @@ public class MapCreator extends Frame{
 					break;
 				
 				Map m = new Map(Integer.parseInt(w), Integer.parseInt(h));
-				setMap(m);
+				setMap(m,1);
 				
 				btnSaveMap.setEnabled(true);
 				btnClear.setEnabled(true);
+				//btnExpandMap.setEnabled(true);
 				
 				break;
 			
@@ -307,6 +421,39 @@ public class MapCreator extends Frame{
 				
 				break;
 				
+				/*
+			case "Generate Extended Map":
+				
+				int precision = Integer.parseInt((String)spinBrush.getValue());
+				
+				System.out.println("Precision: "+precision);
+				
+				Map expanded = new Map(map.getXmax()*precision, map.getYmax()*precision);
+				
+				List<IMapElement> elements = map.getElements();
+				
+				for(IMapElement el : elements)
+				{
+					expanded.addElement(new MapElement(el.getX()*precision, el.getY()*precision));
+					
+					for(int i=1; i<precision; i++)
+						expanded.addElement(new MapElement((precision*el.getX())+i, precision*el.getY()));
+					
+					for(int i=1; i<precision; i++)
+						expanded.addElement(new MapElement(precision*el.getX(), (precision*el.getY())+i));
+					
+					for(int i=1; i<precision; i++)
+						expanded.addElement(new MapElement(((precision*el.getX())+precision-1), (precision*el.getY())+i));
+					
+					for(int i=1; i<precision-1; i++)
+						expanded.addElement(new MapElement((precision*el.getX())+i, ((precision*el.getY())+precision-1)));		
+					
+					System.out.println("Expanded "+el.toString());
+				}
+				
+				panelMap = new JPanel();
+				setMap(expanded, precision);
+				*/
 			default:
 				
 			}
@@ -347,7 +494,7 @@ public class MapCreator extends Frame{
 					m.addElementsFromString(s[1]);
 				}
 			}
-			setMap(m);
+			setMap(m,1);
 		}
 		
 	}
@@ -355,17 +502,11 @@ public class MapCreator extends Frame{
 	
 		
 	
-	/*
-	 * ROBA DELLE INTERFACCE, SERVE SOLO A FARE ANDARE IL FRAMEWORK
-	 */
-
-	
-
-	public void setMap(Map map) {
+	public void setMap(Map map, int precision) {
 
 		this.map = map;
 		
-		gbp.createGridPanel(map.getYmax()+1, map.getXmax()+1);
+		gbp.createGridPanel(map.getYmax()+precision, map.getXmax()+precision);
 		List<IMapElement> elements = map.getElements();
 		
 		for(IMapElement e : elements)
@@ -377,6 +518,8 @@ public class MapCreator extends Frame{
 		bodyPanel.setRightComponent(panelMap);
 		
 		gbp.setMap(map);
+		gbp.setBrushSize(Integer.parseInt((String)spinBrush.getValue()));
+		gbp.setBrushColor(Color.BLACK);
 	}
 
 	public void storeMap(String fname) {

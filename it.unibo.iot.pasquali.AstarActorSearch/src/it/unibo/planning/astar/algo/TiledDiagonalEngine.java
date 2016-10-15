@@ -117,6 +117,7 @@ public class TiledDiagonalEngine implements IEngine{
 				!elements.contains("element("+state.getX()+","+state.getY()+")"));
 	}
 
+	
 	@Override
 	public boolean isValidStatePrologCheck(State state) {
 		// TODO Auto-generated method stub

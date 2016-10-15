@@ -104,12 +104,15 @@ public class TiledEngine implements IEngine{
 				return false;
 			}
 		}
+		
 		return (state.getX() >= 0 &&
 				state.getX() <= xmax &&
 				state.getY() >= 0 &&
 				state.getY() <= ymax &&
-				!elements.contains("element("+state.getX()+","+state.getY()+")"));		
+				!elements.contains("element("+state.getX()+","+state.getY()+")"));	
 	}
+	
+
 	
 	@Override
 	public boolean isValidStatePrologCheck(State state)
