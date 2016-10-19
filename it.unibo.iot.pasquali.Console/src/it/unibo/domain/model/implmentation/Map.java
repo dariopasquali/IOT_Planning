@@ -99,6 +99,7 @@ public class Map implements IMap{
 				MapElement me = new MapElement(Integer.parseInt(sh[1]), Integer.parseInt(st[0]));
 				elements.add(me);
 				i+=2;
+				System.out.println(i);
 			}	
 		}
 		catch(Exception e)

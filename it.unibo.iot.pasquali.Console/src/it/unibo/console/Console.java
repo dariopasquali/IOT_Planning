@@ -11,7 +11,12 @@ import it.unibo.planning.astar.enums.Direction;
 import it.unibo.planning.astar.interfaces.IEngine;
 import it.unibo.qactors.ActorContext;
 
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import it.unibo.console.gui.*;
@@ -24,6 +29,8 @@ public class Console extends AbstractConsole {
 	
 	private int sx, sy, gx, gy;
 	
+	private long startLoadTime;
+	
 	private Algo algorithm;
 	
 	public Console(String actorId, ActorContext myCtx, IOutputEnvView outEnvView )  throws Exception{
@@ -35,6 +42,7 @@ public class Console extends AbstractConsole {
 	public void createMap(int x, int y)
 	{
 		map = new Map(x,y);
+		startLoadTime = System.currentTimeMillis();
 	}
 	
 	public void setMapElements(List<String> elements)
@@ -45,7 +53,48 @@ public class Console extends AbstractConsole {
 	public void setMapElements(String elements)
 	{
 		map.addElementsFromString(elements);
-		((ConsoleGUI)env).setMap(map);		
+		((ConsoleGUI)env).setMap(map);
+		System.out.print("Map Loading time: "+(System.currentTimeMillis()-startLoadTime));
+	}
+	
+	public void loadMap(String path)
+	{
+		Map m = null;
+		
+		List<String> data = new ArrayList<String>();						
+		try
+		{
+			InputStream fs = new FileInputStream(path);
+			InputStreamReader inpsr = new InputStreamReader(fs);
+			BufferedReader br       = new BufferedReader(inpsr);
+			Iterator<String> lsit   = br.lines().iterator();
+
+			while(lsit.hasNext())
+			{
+				data.add(lsit.next());
+			}
+			br.close();
+			
+		} catch (Exception e)
+		{
+			System.out.println("QActor  ERROR " + e.getMessage());
+		}
+		
+		for(int i=0; i<data.size(); i++)
+		{
+			if(i == 0)
+			{
+				m = Map.createMapFromPrologRep(data.get(i));
+			}
+			else
+			{
+				String s[] = data.get(i).split(" ");
+				m.addElementsFromString(s[1]);
+			}
+		}
+		this.map = m;
+		((ConsoleGUI)env).setMap(m);
+	
 	}
 	
 	public void searchBestPath(int sx, int sy, int gx, int gy, String algo)
@@ -102,24 +151,27 @@ public class Console extends AbstractConsole {
 		return moves;
 	}
 	
-	private String getPrologPositions()
+	private String getPrologPosition()
 	{
-		return "positions( "+sx+", "+sy+", "+gx+", "+gy+" )";
+		return "position( "+sx+", "+sy+" )";
 		
 	}
 	
 
 	public void sendNavigationData()
 	{	
-		String pm = getPrologMap();
+		//String pm = getPrologMap();
 		String pp = getPrologPlan();
-		String po = getPrologPositions();
+		String po = getPrologPosition();
 		
-		println(pm);
+		//println(pm);
 		println(pp);
 		println(po);
 		
-		temporaryStr = unifyMsgContent("navdata(MAP,PLAN,POS)","navdata("+pm+","+pp+","+po+")", guardVars ).toString();
+		//temporaryStr = unifyMsgContent("navdata(MAP,PLAN,POS)","navdata("+pm+","+pp+","+po+")", guardVars ).toString();
+		
+		temporaryStr = unifyMsgContent("navdata(PLAN,POS)","navdata("+pp+","+po+")", guardVars ).toString();
+		println("temp string "+temporaryStr);
 		try
 		{
 			sendMsg("navdata","robot", ActorContext.dispatch, temporaryStr );

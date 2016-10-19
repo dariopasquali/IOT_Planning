@@ -6,13 +6,12 @@ System exploreAndGo
  * ----------------------------------------------------
  */
 
-Dispatch navdata : navdata (MAP, PLAN, POS)
-Dispatch navack : navack
+Dispatch navdata : navdata (PLAN, POS)
 
 /*
  * MAP = mapdata ( [ map ( Xmax , Ymax ), [ mapdata( ID, element( X, Y ) ) ] ] )
  * PLAN = plan ( ALGOTYPE , [ t || d || l || r || dl || dr  ] )
- * POS = positions ( Xs , Ys, Xg, Yg ) 
+ * POS = position ( Xs , Ys ) 
  * 
  * t = forward tiled
  * d = forward diagonal
@@ -96,7 +95,7 @@ QActor console context ctxConsole -g cyan{
 	
 	Plan loadMap resumeLastPlan
 		[?? msg(local_gui_command, "event", SENDER, none, local_gui_command (loadmap(PATH)), MSGNUM)]
-				 solve loadMapFromFile(PATH) time(100000) onFailSwitchTo prologFailure;
+				 solve loadMapFromFile(PATH) time(210000000) onFailSwitchTo prologFailure;
 				
 		println("++++++++++++++++++ MAP LOADED ++++++++++++++++++")
 		

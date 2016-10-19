@@ -54,6 +54,7 @@ import javax.swing.JList;
 import javax.swing.AbstractListModel;
 import javax.swing.SpinnerListModel;
 import java.awt.event.KeyAdapter;
+import javax.swing.JCheckBox;
 
 public class MapCreator extends Frame{
 
@@ -81,6 +82,7 @@ public class MapCreator extends Frame{
 	private JRadioButton radioWhite;
 	private JRadioButton rdbtnSingleCellPaint;
 	private JRadioButton rdbtnDragPaint;
+	private JCheckBox checkBound;
 	
 	//private JFileChooser fileLoader, fileSaver;
 
@@ -174,9 +176,9 @@ public class MapCreator extends Frame{
 		bodyPanel.setLeftComponent(panel);
 		GridBagLayout gbl_panel = new GridBagLayout();
 		gbl_panel.columnWidths = new int[]{136, 0, 46, 0};
-		gbl_panel.rowHeights = new int[]{0, 14, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+		gbl_panel.rowHeights = new int[]{0, 14, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 		gbl_panel.columnWeights = new double[]{1.0, 1.0, 1.0, Double.MIN_VALUE};
-		gbl_panel.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
+		gbl_panel.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
 		panel.setLayout(gbl_panel);
 		
 		Component verticalStrut_2 = Box.createVerticalStrut(10);
@@ -222,13 +224,21 @@ public class MapCreator extends Frame{
 		gbc_txtH.gridy = 3;
 		panel.add(txtH, gbc_txtH);
 		
+		checkBound = new JCheckBox("Insert External Boundaries");
+		GridBagConstraints gbc_checkBound = new GridBagConstraints();
+		gbc_checkBound.gridwidth = 4;
+		gbc_checkBound.insets = new Insets(0, 0, 5, 5);
+		gbc_checkBound.gridx = 0;
+		gbc_checkBound.gridy = 4;
+		panel.add(checkBound, gbc_checkBound);
+		
 		btnGenerate = new JButton("Generate");
 		btnGenerate.setFont(new Font("Tahoma", Font.PLAIN, 15));
 		GridBagConstraints gbc_btnGenerate = new GridBagConstraints();
 		gbc_btnGenerate.gridwidth = 4;
 		gbc_btnGenerate.insets = new Insets(0, 0, 5, 0);
 		gbc_btnGenerate.gridx = 0;
-		gbc_btnGenerate.gridy = 4;
+		gbc_btnGenerate.gridy = 5;
 		panel.add(btnGenerate, gbc_btnGenerate);
 		btnGenerate.addActionListener(new DefaultInputHandler());
 		
@@ -240,7 +250,7 @@ public class MapCreator extends Frame{
 		gbc_btnClear.gridwidth = 4;
 		gbc_btnClear.insets = new Insets(0, 0, 5, 0);
 		gbc_btnClear.gridx = 0;
-		gbc_btnClear.gridy = 5;
+		gbc_btnClear.gridy = 6;
 		panel.add(btnClear, gbc_btnClear);
 		
 		JLabel lblSelectPrecision = new JLabel("Brush Size");
@@ -248,7 +258,7 @@ public class MapCreator extends Frame{
 		gbc_lblSelectPrecision.anchor = GridBagConstraints.BELOW_BASELINE;
 		gbc_lblSelectPrecision.insets = new Insets(0, 0, 5, 5);
 		gbc_lblSelectPrecision.gridx = 0;
-		gbc_lblSelectPrecision.gridy = 8;
+		gbc_lblSelectPrecision.gridy = 9;
 		panel.add(lblSelectPrecision, gbc_lblSelectPrecision);
 		
 		spinBrush = new JSpinner();
@@ -258,7 +268,7 @@ public class MapCreator extends Frame{
 		gbc_spinBrush.gridwidth = 3;
 		gbc_spinBrush.insets = new Insets(0, 0, 5, 0);
 		gbc_spinBrush.gridx = 1;
-		gbc_spinBrush.gridy = 8;
+		gbc_spinBrush.gridy = 9;
 		panel.add(spinBrush, gbc_spinBrush);
 		spinBrush.addChangeListener(new ChangeListener(){
 			@Override
@@ -272,7 +282,7 @@ public class MapCreator extends Frame{
 		GridBagConstraints gbc_radioBlack = new GridBagConstraints();
 		gbc_radioBlack.insets = new Insets(0, 0, 5, 5);
 		gbc_radioBlack.gridx = 0;
-		gbc_radioBlack.gridy = 9;
+		gbc_radioBlack.gridy = 10;
 		radioBlack.addActionListener(new ActionListener(){
 
 			@Override
@@ -289,7 +299,7 @@ public class MapCreator extends Frame{
 		GridBagConstraints gbc_radioWhite = new GridBagConstraints();
 		gbc_radioWhite.insets = new Insets(0, 0, 5, 5);
 		gbc_radioWhite.gridx = 2;
-		gbc_radioWhite.gridy = 9;
+		gbc_radioWhite.gridy = 10;
 		radioWhite.addActionListener(new ActionListener(){
 
 			@Override
@@ -307,7 +317,7 @@ public class MapCreator extends Frame{
 		GridBagConstraints gbc_rdbtnSingleCellPaint = new GridBagConstraints();
 		gbc_rdbtnSingleCellPaint.insets = new Insets(0, 0, 5, 5);
 		gbc_rdbtnSingleCellPaint.gridx = 0;
-		gbc_rdbtnSingleCellPaint.gridy = 10;
+		gbc_rdbtnSingleCellPaint.gridy = 11;
 		rdbtnSingleCellPaint.addActionListener(new ActionListener(){
 
 			@Override
@@ -324,7 +334,7 @@ public class MapCreator extends Frame{
 		GridBagConstraints gbc_rdbtnDragPaint = new GridBagConstraints();
 		gbc_rdbtnDragPaint.insets = new Insets(0, 0, 5, 5);
 		gbc_rdbtnDragPaint.gridx = 2;
-		gbc_rdbtnDragPaint.gridy = 10;
+		gbc_rdbtnDragPaint.gridy = 11;
 		rdbtnDragPaint.addActionListener(new ActionListener(){
 
 			@Override
@@ -346,7 +356,7 @@ public class MapCreator extends Frame{
 		gbc_txtInstructions.gridwidth = 3;
 		gbc_txtInstructions.fill = GridBagConstraints.BOTH;
 		gbc_txtInstructions.gridx = 0;
-		gbc_txtInstructions.gridy = 11;
+		gbc_txtInstructions.gridy = 12;
 		panel.add(txtInstructions, gbc_txtInstructions);
 		
 		panelMap = new JPanel();
@@ -393,6 +403,22 @@ public class MapCreator extends Frame{
 					break;
 				
 				Map m = new Map(Integer.parseInt(w), Integer.parseInt(h));
+				
+				if(checkBound.isSelected())
+				{
+					for(int x = 0; x<m.getXmax(); x++)
+						m.addElement(new MapElement(x,0));
+					
+					for(int y = 0; y<m.getYmax(); y++)
+						m.addElement(new MapElement(0,y));
+					
+					for(int x = 0; x<m.getXmax(); x++)
+						m.addElement(new MapElement(x,m.getYmax()));
+					
+					for(int y = 0; y<=m.getYmax(); y++)
+						m.addElement(new MapElement(m.getXmax(),y));
+				}
+				
 				setMap(m,1);
 				
 				btnSaveMap.setEnabled(true);

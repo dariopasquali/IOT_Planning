@@ -107,8 +107,8 @@ protected alice.tuprolog.SolveInfo sol;
     		printCurrentMessage(false);
     		//onMsg
     		if( currentMessage.msgId().equals("navdata") ){
-    			String parg="loadNavigationData(MAP,PLAN,POS)";
-    			parg = updateVars(null, Term.createTerm("navdata(MAP,PLAN,POS)"), Term.createTerm("navdata(MAP,PLAN,POS)"), 
+    			String parg="loadNavigationData(PLAN,POS)";
+    			parg = updateVars(null, Term.createTerm("navdata(PLAN,POS)"), Term.createTerm("navdata(PLAN,POS)"), 
     				    		  					Term.createTerm(currentMessage.msgContent()), parg);
     				if( parg != null ) {
     					aar = solveGoal( parg , 100000, "","" , "");
@@ -121,6 +121,14 @@ protected alice.tuprolog.SolveInfo sol;
     						if( ! switchToPlan("prologFailure").getGoon() ) break;
     					}else if( ! aar.getGoon() ) break;
     				}
+    		}//onMsg
+    		if( currentMessage.msgId().equals("navdata") ){
+    			String parg = "";
+    			parg = updateVars(null, Term.createTerm("navdata(PLAN,POS)"), Term.createTerm("navdata(6,22)"), 
+    				    		  					Term.createTerm(currentMessage.msgContent()), parg);
+    				if( parg != null ){
+    					 if( ! switchToPlan("navigate").getGoon() ) break; 
+    				}//else println("guard  fails");  //parg is null when there is no guard (onEvent)
     		}if( ! switchToPlan("navigate").getGoon() ) break;
     break;
     }//while
@@ -136,7 +144,7 @@ protected alice.tuprolog.SolveInfo sol;
     	boolean returnValue = suspendWork;
     while(true){
     nPlanIter++;
-    		{ String parg = "loadThePlan( \"path.txt\" )";
+    		{ String parg = "loadThePlan( \"scout.txt\" )";
     		  aar = solveGoal( parg , 30000, "","" , "" );
     		//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
     		if( aar.getInterrupted() ){

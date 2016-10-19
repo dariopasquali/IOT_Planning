@@ -16,17 +16,26 @@ consoleTheory.pl
 defaultSpeed(60).
 defaultDuration(500).
 
+test_copy_term :-
+	actorPrintln("TEST COPY TERM"),
+	getElements(Lista),
+	acrtorPrintln(Lista),
+	copy_term(Lista, X),
+	actorPrintln(X).
+
 
 add_tail([],X,[X]).
 add_tail([H|T],X,[H|L]) :-
 	add_tail(T,X,L).
+
 
 getElements(List) :-
 	getElements([], 1, List).
 	
 getElements(List, ID, ToList) :-
 	mapdata(ID, E), !,
-	add_tail(List, E, List1),
+	%%add_tail(List, E, List1),
+	append(List, [E], List1),
 	ID1 is ID + 1,
 	getElements(List1, ID1, ToList).
 	
@@ -35,10 +44,11 @@ getElements(List, _, List).
 notContainsElement(E, []).
 notContainsElement(E, [E|_]) :- !, fail.
 notContainsElement(E, [H|T]) :-
-	containsElement(E,T).
+	containsElement(E,T)
+.
 	
 
-loadMapFromFile(PATH) :-
+loadMapFromFileProlog(PATH) :-
 	havemap, !,
 	retractall(mapdata(_,element(_,_))),
 	actorPrintln("retract map elements"),
@@ -58,7 +68,7 @@ loadMapFromFile(PATH) :-
 	Actor <- setMapElements(List),
 	assert(havemap).
 	
-loadMapFromFile(PATH) :-
+loadMapFromFileProlog(PATH) :-
 	actorobj(Actor),
 	Actor <- consultFromFile(PATH),
 	actorPrintln("consulted map data"),
@@ -70,6 +80,33 @@ loadMapFromFile(PATH) :-
 	getElements(List),
 	actorPrintln(List),
 	Actor <- setMapElements(List),
+	assert(havemap).
+	
+loadMapFromFile(PATH) :-
+	havemap, !,
+	retractall(mapdata(_,element(_,_))),
+	actorPrintln("retract map elements"),
+	retract(map(_,_)),
+	actorPrintln("retract map size"),
+	retract(havemap),
+	actorPrintln("retract map flag"),
+	actorobj(Actor),
+	Actor <- consultFromFile(PATH),
+	actorPrintln("consulted map data"),
+	map(Xmax, Ymax),
+	actorPrintln(Xmax),
+	actorPrintln(Ymax),
+	Actor <- loadMap(PATH),
+	assert(havemap).
+	
+loadMapFromFile(PATH) :-
+	actorobj(Actor),
+	Actor <- consultFromFile(PATH),
+	actorPrintln("consulted map data"),
+	map(Xmax, Ymax),
+	actorPrintln(Xmax),
+	actorPrintln(Ymax),
+	Actor <- loadMap(PATH),
 	assert(havemap).
 
 checkValidState( X , Y) :-

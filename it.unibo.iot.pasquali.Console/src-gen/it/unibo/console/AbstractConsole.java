@@ -156,7 +156,7 @@ public AbstractConsole(String actorId, ActorContext myCtx, IOutputEnvView outEnv
 	    		if( (guardVars = evalTheGuard( " ??msg(local_gui_command, \"event\" ,SENDER,none,local_gui_command(loadmap(PATH)),MSGNUM)" )) != null ){
 	    		{ String parg = "loadMapFromFile(PATH)";
 	    		parg = substituteVars(guardVars,parg);
-	    		  aar = solveGoal( parg , 100000, "","" , "" );
+	    		  aar = solveGoal( parg , 210000000, "","" , "" );
 	    		//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
 	    		if( aar.getInterrupted() ){
 	    			curPlanInExec   = "loadMap";

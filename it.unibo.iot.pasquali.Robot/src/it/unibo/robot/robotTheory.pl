@@ -15,7 +15,7 @@ robotTheory.pl
 
 defaultSpeed(60).
 defaultDuration(500).
-
+planName(scout).
 
 add_tail([],X,[X]).
 add_tail([H|T],X,[H|L]) :-
@@ -38,71 +38,22 @@ notContainsElement(E, [H|T]) :-
 	containsElement(E,T).
 	
 
-loadMapFromFile(PATH) :-
-	havemap, !,
-	retractall(mapdata(_,element(_,_))),
-	actorPrintln("retract map elements"),
-	retract(map(_,_)),
-	actorPrintln("retract map size"),
-	retract(havemap),
-	actorPrintln("retract map flag"),
-	actorobj(Actor),
-	Actor <- consultFromFile(PATH),
-	actorPrintln("consulted map data"),
-	map(Xmax, Ymax),
-	actorPrintln(Xmax),
-	actorPrintln(Ymax),
-	Actor <- createMap(Xmax, Ymax),
-	getElements(List),
-	actorPrintln(List),
-	Actor <- setMapElements(List),
-	assert(havemap).
-	
-loadMapFromFile(PATH) :-
-	actorobj(Actor),
-	Actor <- consultFromFile(PATH),
-	actorPrintln("consulted map data"),
-	map(Xmax, Ymax),
-	actorPrintln(Xmax),
-	actorPrintln(Ymax),
-	Actor <- createMap(Xmax, Ymax),
-	mapdata(ID,element(X,Y)),
-	getElements(List),
-	actorPrintln(List),
-	Actor <- setMapElements(List),
-	assert(havemap).
-
-loadMapFromData(mapdata(Map , E)) :-
-	actorobj(Actor),
-	assert(Map),
-	map(Xmax,Ymax),
-	actorPrintln(Xmax),
-	actorPrintln(Ymax),
-	Actor <- createMap(Xmax, Ymax),
-	loadMapFromData(E).
-	
-loadMapFromData([]) :-
-	actorobj(Actor),
-	getElements(List),
-	actorPrintln(List),
-	Actor <- setMapElements(List),
-	actorPrintln("Map Data loaded"),
-	assert(havemap).
-	
-loadMapFromData([E | T]) :-
-	assert(E),	
-	loadMapFromData(T).
-	
 setNavPlan(plan(ALGO,PLAN)) :-
 	actorobj(Actor),
 	defaultSpeed(SPEED),
 	defaultDuration(DUR),
+	planName(NAME),
+	actorPrintln(NAME),
 	actorPrintln("setNavigationPlan!!!!"),
-	Actor <- setNavigationPlan(ALGO, PLAN, SPEED, DUR).
+	Actor <- setNavigationPlan(NAME, ALGO, PLAN, SPEED, DUR).
 	
 setPositions(positions(SX, SY, GX, GY)) :-
 	actorobj(Actor),
 	Actor <- setPositions(SX, SY, GX, GY).
+	
+setPosition(position(SX, SY)) :-
+	actorobj(Actor),
+	Actor <- setPosition(SX, SY).
 
 loadNavigationData(MAP, PLAN, POS) :-
 	actorPrintln(MAP),
@@ -112,26 +63,13 @@ loadNavigationData(MAP, PLAN, POS) :-
 	loadMapFromData(MAP),
 	setNavPlan(PLAN),
 	setPositions(POS).
-
-checkValidState( X , Y) :-
-	X >= 0,
-	Y >= 0,
-	map(Xmax, Ymax),
-	X =< Xmax,
-	Y =< Ymax,
-	getElements(List),
-	notContainsElement(element(X,Y), List).
-
-%% START -> position(X,Y)
-
-searchBestPath(position(Sx,Sy) , position(Gx,Gy), ALGO) :-
-	actorPrintln(position(Sx,Sy)),
-	actorPrintln(position(Gx,Gy)),	
-	havemap,
-	actorobj(Actor),
-	Actor <- searchBestPath(Sx,Sy,Gx,Gy,ALGO),
-	Actor <- showPathOnGui,
-	assert(haveplan).
+	
+loadNavigationData(PLAN, POS) :-
+	actorPrintln(PLAN),
+	actorPrintln(POS),
+	actorPrintln("caricamento dati in corso...."),
+	setNavPlan(PLAN),
+	setPosition(POS).
 
 loadThePlan( FName ):-
 	actorobj(Actor),
@@ -152,12 +90,18 @@ myExecPlan(CURPLAN,Actor,P,PC) :-
 myRunTheSentence(CURPLAN, Actor, sentence( GUARD, MOVE, EVENTS, PLANS ) ):-
   	( GUARD = - G , !, retract(G),  ! ; GUARD, ! ),
   	 myExecuteCmd(CURPLAN, Actor, MOVE, EVENTS, PLANS, RESULT).
+  
+myExecuteCmd(CURPLAN, Actor, move(receiveAndSolve,RECEIVETIME, MSGLIST, PAYLOADLIST, SOLVELIST, SOLVETIME), Events, Plans, RES ):-
+	Actor <- receiveMessageAndSolve( RECEIVETIME, MSGLIST, PAYLOADLIST, SOLVELIST, SOLVETIME).
   	
+myExecuteCmd(CURPLAN, Actor, move(senseEvent,TIMEOUT,EVENTSLIST, PLANSLIST), Events, Plans, RES ):-
+	Actor <- mySenseEvent(TIMEOUT, EVENTSLIST, PLANSLIST).
   	
 myExecuteCmd(CURPLAN, Actor, move(robotmove,CMD,SPEED,DURATION,ANGLE), Events, Plans, RES ):-
  	!,
  	mapCmdToMove(CMD,MOVE),
-	Actor <- execRobotMove(CURPLAN, MOVE, SPEED, ANGLE, DURATION, Events, Plans).
+	Actor <- execRobotMove(CURPLAN, MOVE, SPEED, ANGLE, DURATION, Events, Plans),
+	Actor <- updateMyPosition(MOVE).
 
 myExecuteCmd(CURPLAN, Actor,  move(print,ARG), Events, Plans, done(print) ):-
 	text_term(ARGS,ARG),

@@ -1,0 +1,7 @@
+plan(1,init, sentence(true,move(print,"planner(starts"),'','' ))
+plan(2,init, sentence(true,move(solve,consult( "TotalOrderTheory.pl"),0,"prologFailure"),'','' ))
+plan(3,init, sentence(true,move(solve,moveTwice( PLAN),10000000,""),'','' ))
+plan(1,handleTimeout, sentence(true,move(print,"timeout!! GOODBYE"),'','' ))
+plan(2,handleTimeout, sentence(true,move(resumeplan),'','' ))
+plan(1,prologFailure, sentence(true,move(print,"Prolog goal FAILURE"),'','' ))
+plan(2,prologFailure, sentence(true,move(resumeplan),'','' ))
