@@ -19,7 +19,6 @@ import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.border.TitledBorder;
 
-import it.unibo.console.AbstractConsole;
 import it.unibo.console.gui.MapViewerPanel.CellState;
 import it.unibo.domain.model.implmentation.Map;
 import it.unibo.domain.model.implmentation.MapElement;
@@ -29,14 +28,11 @@ import it.unibo.is.interfaces.IActivityBase;
 import it.unibo.is.interfaces.IBasicEnvAwt;
 import it.unibo.is.interfaces.IOutputEnvView;
 import it.unibo.is.interfaces.IOutputView;
-import it.unibo.planning.astar.algo.TiledEngine;
-import it.unibo.planning.astar.domain.Move;
 import it.unibo.planning.astar.domain.State;
-import it.unibo.planning.astar.enums.Algo;
-import it.unibo.planning.astar.enums.Direction;
+import it.unibo.planning.domain.AbstractState;
+import it.unibo.search.algofactory.Algo;
 
 import javax.swing.JSplitPane;
-import javax.swing.JTextField;
 import javax.swing.JLabel;
 import java.awt.Font;
 import java.awt.Frame;
@@ -66,11 +62,11 @@ public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt{
 	private MapViewerPanel mapViewer;
 	
 	private Map map;
-	private ArrayList<State> path;
+	private ArrayList<it.unibo.planning.astar.domain.State> path;
 	
 	JButton btnFindPath, btnNavigate, btnManipulate, btnAbort, btnLoad;
-	private JRadioButton radioTiled;
-	private JRadioButton radioTiledDiago;
+	private JRadioButton radioRot;
+	private JRadioButton radioPos;
 	private JPanel panel_1;
 	private JLabel lblSelectTheAlgorithm;
 	
@@ -201,24 +197,24 @@ public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt{
 		lblSelectTheAlgorithm = new JLabel("Select The Algorithm");
 		panel_1.add(lblSelectTheAlgorithm);
 		
-		radioTiled = new JRadioButton("Only Tiled Moves");
-		radioTiled.setSelected(true);
-		radioTiled.addActionListener(new DefaultInputHandler());
-		GridBagConstraints gbc_radioTiled = new GridBagConstraints();
-		gbc_radioTiled.gridwidth = 3;
-		gbc_radioTiled.insets = new Insets(0, 0, 5, 0);
-		gbc_radioTiled.gridx = 0;
-		gbc_radioTiled.gridy = 4;
-		panel.add(radioTiled, gbc_radioTiled);
+		radioRot = new JRadioButton("Position & Rotation (A*)");
+		radioRot.setSelected(true);
+		radioRot.addActionListener(new DefaultInputHandler());
+		GridBagConstraints gbc_radioRot = new GridBagConstraints();
+		gbc_radioRot.gridwidth = 3;
+		gbc_radioRot.insets = new Insets(0, 0, 5, 0);
+		gbc_radioRot.gridx = 0;
+		gbc_radioRot.gridy = 4;
+		panel.add(radioRot, gbc_radioRot);
 		
-		radioTiledDiago = new JRadioButton("Tiled & Diagonal Moves");
-		radioTiledDiago.addActionListener(new DefaultInputHandler());
-		GridBagConstraints gbc_radioTiledDiago = new GridBagConstraints();
-		gbc_radioTiledDiago.gridwidth = 3;
-		gbc_radioTiledDiago.insets = new Insets(0, 0, 5, 0);
-		gbc_radioTiledDiago.gridx = 0;
-		gbc_radioTiledDiago.gridy = 5;
-		panel.add(radioTiledDiago, gbc_radioTiledDiago);
+		radioPos = new JRadioButton("Only Position (A*)");
+		radioPos.addActionListener(new DefaultInputHandler());
+		GridBagConstraints gbc_radioPos = new GridBagConstraints();
+		gbc_radioPos.gridwidth = 3;
+		gbc_radioPos.insets = new Insets(0, 0, 5, 0);
+		gbc_radioPos.gridx = 0;
+		gbc_radioPos.gridy = 5;
+		panel.add(radioPos, gbc_radioPos);
 		
 		btnFindPath = new JButton("Find Best Path");
 		btnFindPath.setFont(new Font("Tahoma", Font.PLAIN, 15));
@@ -284,15 +280,8 @@ public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt{
 		panelOutput.setRowHeaderView(scrollBar);
 		panelOutput.add(scrollBar);
 		
-		searchAlgorithm = Algo.ONLY_TILED;
+		searchAlgorithm = Algo.INCLUDE_DIRECTION;
 		
-		/*
-		fileLoader = new JFileChooser();
-		fileLoader.setFileSelectionMode(JFileChooser.FILES_ONLY);
-		
-		fileSaver = new JFileChooser();
-		fileSaver.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-		*/
 	}
 
 
@@ -372,16 +361,16 @@ public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt{
 				
 				break;
 				
-			case "Only Tiled Moves":
-				radioTiled.setSelected(true);
-				radioTiledDiago.setSelected(false);
-				searchAlgorithm = Algo.ONLY_TILED;
+			case "Position & Rotation (A*)":
+				radioRot.setSelected(true);
+				radioPos.setSelected(false);
+				searchAlgorithm = Algo.INCLUDE_DIRECTION;
 				break;
 				
-			case "Tiled & Diagonal Moves":
-				radioTiled.setSelected(false);
-				radioTiledDiago.setSelected(true);
-				searchAlgorithm = Algo.TILED_DIAGONAL;
+			case "Only Position (A*)":
+				radioRot.setSelected(false);
+				radioPos.setSelected(true);
+				searchAlgorithm = Algo.ONLY_POSITION;
 				break;
 				
 			default:
@@ -545,22 +534,22 @@ public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt{
 		splitMapAndOutput.setLeftComponent(panelMap);
 	}
 
-	public void setPath(ArrayList<State> path) {
+	public void setPath(ArrayList<State> arrayList) {
 		
 		mapViewer.clearPath();
 		
-		this.path = path;
+		this.path = arrayList;
 		
 		MapElement start = mapViewer.getStart();
 		MapElement goal = mapViewer.getGoal();
 		
-		it.unibo.planning.astar.domain.State current = 
-				new it.unibo.planning.astar.domain.State(start.getX(), start.getY(), Direction.NORTH, null, 0,0);
+		//it.unibo.planning.astar.domain.State current = 
+		//		new it.unibo.planning.astar.domain.State(start.getX(), start.getY(), Direction.NORTH, null, 0);
 		
 		//it.unibo.planning.astar.domain.State goalState = 
 		//		new it.unibo.planning.astar.domain.State(goal.getX(), goal.getY(), Direction.NORTH, null, 0);
 		
-		for(State s : path)
+		for(State s : arrayList)
 		{
 			mapViewer.setCellState(s.getX(), s.getY(), CellState.PATH);			
 		}		

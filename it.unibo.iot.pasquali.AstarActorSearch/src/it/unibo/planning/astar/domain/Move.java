@@ -1,52 +1,31 @@
 package it.unibo.planning.astar.domain;
 
-import it.unibo.planning.astar.enums.ForwardMoveType;
-import it.unibo.planning.astar.enums.MoveType;
-import it.unibo.planning.astar.enums.SpinDirection;
+import it.unibo.planning.domain.*;
+import it.unibo.planning.enums.*;
 
-public class Move {
+public class Move extends AbstractMove{
 	
-	private SpinDirection spin;
-	private ForwardMoveType forward;
-	private MoveType type;	
-	private String prologRep;
+	
 	
 	public Move()
 	{
-		this.type = MoveType.STEP;
-		this.forward = ForwardMoveType.TILED;
-		prologRep = ForwardMoveType.TILED.toString();
+		super();
 	}	
 	public Move(ForwardMoveType forward)
 	{
-		this.type = MoveType.STEP;
-		this.forward = forward;
-		prologRep = forward.toString();
+		super(forward);
 	}
 	
 	public Move(SpinDirection spinDir)
 	{
-		this.spin = spinDir;
-		this.type = MoveType.SPIN;
-		prologRep = spinDir.toString();
+		super(spinDir);
 	}
 	
 	@Override
 	public String toString()
 	{
-		return prologRep;
+		return super.toString();
 	}
 
-	public MoveType getType() {
-		return type;
-	}
-
-	public SpinDirection getSpin() {
-		return spin;
-	}
-	
-	public ForwardMoveType getForwardType() {
-		return forward;
-	}	
 	
 }

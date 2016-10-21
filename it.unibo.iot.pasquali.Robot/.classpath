@@ -14,7 +14,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/it.unibo.qactor.robot"/>
 	<classpathentry kind="lib" path="/it.unibo.iss.libs/libs/pi4j/pi4j-core.jar"/>
 	<classpathentry kind="lib" path="/it.unibo.iss.libs/libs/unibo/labbaseRobotSam.jar"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/it.unibo.iot.pasquali.AstarActorSearch"/>
 	<classpathentry kind="lib" path="/it.unibo.iss.libs/libs/unibo/RossiBth.jar"/>
 	<classpathentry kind="lib" path="/it.unibo.iss.libs/libs/unibo/qa18Akka.jar"/>
 	<classpathentry kind="output" path="bin"/>

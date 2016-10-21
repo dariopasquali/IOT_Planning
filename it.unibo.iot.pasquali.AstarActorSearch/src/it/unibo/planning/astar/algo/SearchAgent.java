@@ -3,60 +3,66 @@ package it.unibo.planning.astar.algo;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.TreeMap;
 
+import alice.tuprolog.interfaces.IEngine;
+import it.unibo.planning.agent.AbstractSearchAgent;
 import it.unibo.planning.astar.domain.Move;
 import it.unibo.planning.astar.domain.State;
-import it.unibo.planning.astar.interfaces.IEngine;
-import it.unibo.qactors.planned.QActorPlanned;
+import it.unibo.planning.astar.engine.DirAStarEngine;
+import it.unibo.planning.domain.AbstractMove;
+import it.unibo.planning.domain.AbstractState;
+import it.unibo.planning.domain.Path;
+import it.unibo.planning.engine.AbstractEngine;
 
-public class SearchAgent {
+public class SearchAgent extends AbstractSearchAgent{
 	
-	private ArrayList<State> closedSet;
-	private ArrayList<State> openSet;
+	private ArrayList<AbstractState> closedSet;
+	private ArrayList<AbstractState> openSet;
 	
-	private HashMap<State,State> cameFrom;
+	private HashMap<AbstractState,AbstractState> cameFrom;
 	
-	private IEngine engine;
+	private DirAStarEngine engine;
 	
 	public SearchAgent()
 	{
-		closedSet = new ArrayList<State>();
-		openSet = new ArrayList<State>();
-		cameFrom = new HashMap<State,State>();
+		closedSet = new ArrayList<AbstractState>();
+		openSet = new ArrayList<AbstractState>();
+		cameFrom = new HashMap<AbstractState,AbstractState>();
 	}
 	
 	
-	public ArrayList<Move> searchBestPath(IEngine engine, State start, State goal)
+	@Override
+	public Path searchBestPath(AbstractEngine engine, AbstractState start, AbstractState goal)
 	{
 		System.out.println("LET'S FIND BEST PATH");
 		
-		this.engine = engine;
+		Path path = new Path();
+		
+		this.engine = (DirAStarEngine) engine;
 		engine.setGoal(goal);
 		
 		openSet.add(start);
 		
 		while(!openSet.isEmpty())
 		{
-			System.out.println("Nodi Aperti: "+openSet.size());
-			System.out.println("Nodi Chiusi: "+closedSet.size());
-			
-			State current = openSet.get(0);
+		
+			AbstractState current = openSet.get(0);
 			if(engine.isGoalState(current))
-				return recostructPath(current);
+			{
+				path.setMoves(recostructPath(current));
+				path.setStates(recostructStatePath(current));
+				return path;
+			}
 			
 			openSet.remove(current);
 			closedSet.add(current);
 			
-			ArrayList<Move> possibleMoves = (ArrayList<Move>) engine.getPossibleMoves(current);
+			ArrayList<AbstractState> successors = ((DirAStarEngine)engine).getValidSuccessors(current);
 			
-			for (Move m : possibleMoves)
+			for (AbstractState ns : successors)
 			{
-				State ns = engine.makeMove(current, m);
 				if(ns != null)
-				{
-					
-					
+				{					
 					if(closedSet.contains(ns))
 						continue;
 					
@@ -83,84 +89,30 @@ public class SearchAgent {
 	}
 	
 	
-	private ArrayList<Move> recostructPath(State current) {
+	private ArrayList<AbstractMove> recostructPath(AbstractState current) {
 		
-		ArrayList<Move> path = new ArrayList<Move>();
-		path.add(current.getGenMove());
+		ArrayList<AbstractMove> path = new ArrayList<AbstractMove>();
+		path.add(((State)current).getGenMove());
 		
 		while(cameFrom.containsKey(current))
 		{
 			current = cameFrom.get(current);
-			if(current.getGenMove()!=null)
-				path.add(current.getGenMove());
+			if(((State)current).getGenMove()!=null)
+				path.add(((State)current).getGenMove());
 		}
 		return path;		
 	}
 	
-	// STATE VERSION
-	public ArrayList<State> searchBestStatePath(IEngine engine, State start, State goal)
-	{
-		System.out.println("LET'S FIND BEST PATH");
+	private ArrayList<AbstractState> recostructStatePath(AbstractState current) {
 		
-		this.engine = engine;
-		engine.setGoal(goal);
-		
-		openSet.add(start);
-		
-		while(!openSet.isEmpty())
-		{
-			State current = openSet.get(0);
-			if(engine.isGoalState(current))
-				return recostructStatePath(current);
-			
-			openSet.remove(current);
-			closedSet.add(current);
-			
-			ArrayList<Move> possibleMoves = (ArrayList<Move>) engine.getPossibleMoves(current);
-			
-			for (Move m : possibleMoves)
-			{
-				State ns = engine.makeMove(current, m);
-				if(ns != null)
-				{
-					
-					
-					if(closedSet.contains(ns))
-						continue;
-					
-					if(!openSet.contains(ns))
-						openSet.add(ns);
-					else
-					{
-						if(ns.getCost() >= openSet.get(openSet.indexOf(ns)).getCost())
-							continue;
-						else
-						{
-							openSet.remove(ns);
-							openSet.add(ns);
-						}
-					}
-					
-					cameFrom.put(ns,current);
-				}
-			}
-			
-			Collections.sort(openSet);
-		}
-		return null;		
-	}
-	
-	
-	private ArrayList<State> recostructStatePath(State current) {
-		
-		ArrayList<State> path = new ArrayList<State>();
-		path.add(current);
+		ArrayList<AbstractState> path = new ArrayList<AbstractState>();
+		path.add(((State)current));
 		
 		while(cameFrom.containsKey(current))
 		{
 			current = cameFrom.get(current);
-			if(current.getGenMove()!=null)
-				path.add(current);
+			if(((State)current).getGenMove()!=null)
+				path.add(((State)current));
 		}
 		
 		Collections.reverse(path);		

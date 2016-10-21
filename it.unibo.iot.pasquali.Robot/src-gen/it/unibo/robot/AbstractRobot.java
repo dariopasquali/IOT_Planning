@@ -121,14 +121,6 @@ protected alice.tuprolog.SolveInfo sol;
     						if( ! switchToPlan("prologFailure").getGoon() ) break;
     					}else if( ! aar.getGoon() ) break;
     				}
-    		}//onMsg
-    		if( currentMessage.msgId().equals("navdata") ){
-    			String parg = "";
-    			parg = updateVars(null, Term.createTerm("navdata(PLAN,POS)"), Term.createTerm("navdata(6,22)"), 
-    				    		  					Term.createTerm(currentMessage.msgContent()), parg);
-    				if( parg != null ){
-    					 if( ! switchToPlan("navigate").getGoon() ) break; 
-    				}//else println("guard  fails");  //parg is null when there is no guard (onEvent)
     		}if( ! switchToPlan("navigate").getGoon() ) break;
     break;
     }//while

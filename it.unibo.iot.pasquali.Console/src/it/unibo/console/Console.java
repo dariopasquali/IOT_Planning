@@ -4,12 +4,15 @@ This code is generated only ONCE
 */
 package it.unibo.console;
 import it.unibo.is.interfaces.IOutputEnvView;
-import it.unibo.planning.astar.algo.EngineFactory;
+import it.unibo.planning.astar.algo.AStarSearchAgent;
 import it.unibo.planning.astar.algo.SearchAgent;
-import it.unibo.planning.astar.enums.Algo;
+import it.unibo.planning.astar.engine.AStarEngine;
+import it.unibo.planning.astar.engine.DirAStarEngine;
 import it.unibo.planning.astar.enums.Direction;
-import it.unibo.planning.astar.interfaces.IEngine;
+import it.unibo.planning.domain.AbstractState;
+import it.unibo.planning.domain.Path;
 import it.unibo.qactors.ActorContext;
+import it.unibo.search.algofactory.Algo;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
@@ -25,7 +28,7 @@ import it.unibo.domain.model.implmentation.Map;
 public class Console extends AbstractConsole { 
 	
 	private Map map;
-	private ArrayList<it.unibo.planning.astar.domain.State> path;
+	private it.unibo.planning.astar.algo.Path path;
 	
 	private int sx, sy, gx, gy;
 	
@@ -106,28 +109,50 @@ public class Console extends AbstractConsole {
 		this.gx = gx;
 		this.gy = gy;
 		
+		/*
 		SearchAgent agent = new SearchAgent();
 		
 		it.unibo.planning.astar.domain.State start = 
-				new it.unibo.planning.astar.domain.State(sx, sy, Direction.NORTH, null, 0, map.getXmax());
+				new it.unibo.planning.astar.domain.State(sx, sy, Direction.NORTH, null, 0);
 		
 		it.unibo.planning.astar.domain.State goal = 
-				new it.unibo.planning.astar.domain.State(gx, gy, Direction.NONE, null, 0, map.getXmax());
+				new it.unibo.planning.astar.domain.State(gx, gy, Direction.NONE, null, 0);
 		
 		long st = System.currentTimeMillis();
 		
-		IEngine engine = EngineFactory.getEngine(algorithm, this);
+		DirAStarEngine engine = new DirAStarEngine();
+		engine.setIntMap(map.getIntMap(), map.getXmax(), map.getYmax());
 		
 		println("LET'S FIND BEST PATH");
 		
-		path = agent.searchBestStatePath(engine,start, goal);	
+		path = agent.searchBestPath(engine,start, goal);	
+		*/
+		
+		
+		AStarSearchAgent agent = new AStarSearchAgent();
+		
+		it.unibo.planning.astar.domain.State start = 
+				new it.unibo.planning.astar.domain.State(sx, sy, null, 0);
+		
+		it.unibo.planning.astar.domain.State goal = 
+				new it.unibo.planning.astar.domain.State(gx, gy, null, 0);
+		
+		long st = System.currentTimeMillis();
+		
+		AStarEngine engine = new AStarEngine();
+		engine.setIntMap(map.getIntMap(), map.getXmax(), map.getYmax());
+		
+		println("LET'S FIND BEST PATH");
+		
+		path = agent.searchBestPath(engine,start, goal);
+		
 		
 		println("Search Time --> " + (System.currentTimeMillis() - st) +" ms");
 	}
 	
 	public void showPathOnGui()
 	{
-		((ConsoleGUI)env).setPath(path);
+		((ConsoleGUI)env).setPath((ArrayList<it.unibo.planning.astar.domain.State>) path.getStates());
 	}
 	
 	private String getPrologMap()
@@ -140,10 +165,10 @@ public class Console extends AbstractConsole {
 	private String getPrologPlan()
 	{
 		String moves = "plan("+algorithm.getValue()+", [";
-		for(int i=0; i<path.size(); i++)
+		for(int i=0; i<path.getMoves().size(); i++)
 		{
-			moves += path.get(i).getGenMove().toString();
-			if(i!=path.size()-1)
+			moves += path.getMoves().get(i).toString();
+			if(i!=path.getMoves().size()-1)
 				moves+=",";
 		}
 		moves+="])";

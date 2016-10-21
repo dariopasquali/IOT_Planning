@@ -7,15 +7,14 @@ import java.util.List;
 import alice.tuprolog.Term;
 import it.unibo.domain.model.implmentation.Map;
 import it.unibo.is.interfaces.IOutputEnvView;
-import it.unibo.planning.astar.algo.EngineFactory;
 import it.unibo.planning.astar.algo.SearchAgent;
 import it.unibo.planning.astar.domain.Move;
-import it.unibo.planning.astar.enums.Algo;
+import it.unibo.planning.astar.domain.State;
 import it.unibo.planning.astar.enums.Direction;
-import it.unibo.planning.astar.enums.ForwardMoveType;
-import it.unibo.planning.astar.enums.MoveType;
-import it.unibo.planning.astar.enums.SpinDirection;
-import it.unibo.planning.astar.interfaces.IEngine;
+import it.unibo.planning.domain.AbstractState;
+import it.unibo.planning.enums.ForwardMoveType;
+import it.unibo.planning.enums.MoveType;
+import it.unibo.planning.enums.SpinDirection;
 import it.unibo.qactors.ActorContext;
 import it.unibo.qactors.action.AsynchActionResult;
 import it.unibo.qactors.action.IActorAction.ActionExecMode;
@@ -23,6 +22,7 @@ import it.unibo.robot.planutility.Plan;
 import it.unibo.robot.planutility.PlanExtension;
 import it.unibo.robot.planutility.PlanSaver;
 import it.unibo.robot.planutility.PlanSpinDirection;
+
 public class Robot extends AbstractRobot { 
 	
 	private Map map;
@@ -30,7 +30,6 @@ public class Robot extends AbstractRobot {
 	
 	private it.unibo.planning.astar.domain.State position, goal;
 	private Direction direction;
-	private Algo algorithm;
 	int spinFactor = 1;
 	
 	private HashMap<String, Move> moveMapping;
@@ -107,10 +106,6 @@ public class Robot extends AbstractRobot {
 	{
 		//NB: rotation step is 45 degrees
 		
-		this.algorithm = Algo.fromStringValue(algo);
-		if(algorithm.equals(Algo.ONLY_TILED))
-			spinFactor = 2;
-		
 		String speed = ""+s;
 		String time = ""+t;
 		String diagoTime = ""+(Math.round(t*1.414));
@@ -145,34 +140,20 @@ public class Robot extends AbstractRobot {
 				
 			case "l":
 				pathPlan.addSpinMove(speed, time, PlanSpinDirection.LEFT);
-				if(algorithm.equals(Algo.ONLY_TILED))
-					pathPlan.addSpinMove(speed, time, PlanSpinDirection.LEFT);
 				break;
 				
 			case "r":
 				pathPlan.addSpinMove(speed, time, PlanSpinDirection.RIGHT);
-				if(algorithm.equals(Algo.ONLY_TILED))
-					pathPlan.addSpinMove(speed, time, PlanSpinDirection.RIGHT);
 				break;
 				
 			case "dl":
 				pathPlan.addSpinMove(speed, time, PlanSpinDirection.LEFT);
 				pathPlan.addSpinMove(speed, time, PlanSpinDirection.LEFT);
-				if(algorithm.equals(Algo.ONLY_TILED))
-				{
-					pathPlan.addSpinMove(speed, time, PlanSpinDirection.LEFT);
-					pathPlan.addSpinMove(speed, time, PlanSpinDirection.LEFT);
-				}
 				break;
 				
 			case "dr":
 				pathPlan.addSpinMove(speed, time, PlanSpinDirection.RIGHT);
 				pathPlan.addSpinMove(speed, time, PlanSpinDirection.RIGHT);
-				if(algorithm.equals(Algo.ONLY_TILED))
-				{
-					pathPlan.addSpinMove(speed, time, PlanSpinDirection.RIGHT);
-					pathPlan.addSpinMove(speed, time, PlanSpinDirection.RIGHT);
-				}
 				break;
 			}			
 		}
@@ -190,6 +171,7 @@ public class Robot extends AbstractRobot {
 	}
 	
 	
+	/*
 	public void setPositions(int sx, int sy, int gx, int gy)
 	{
 		this.position =	new it.unibo.planning.astar.domain.State(sx, sy, Direction.NORTH, null, 0, Integer.MAX_VALUE);		
@@ -200,12 +182,12 @@ public class Robot extends AbstractRobot {
 		println(goal.toString());
 	
 	}
-	
+	*/
 	
 
 	public void setPosition(int sx, int sy)
 	{
-		this.position =	new it.unibo.planning.astar.domain.State(sx, sy, Direction.NORTH, null, 0, Integer.MAX_VALUE);		
+		this.position =	new it.unibo.planning.astar.domain.State(sx, sy);		
 		this.direction = Direction.NORTH;
 		
 		println(position.toString());
