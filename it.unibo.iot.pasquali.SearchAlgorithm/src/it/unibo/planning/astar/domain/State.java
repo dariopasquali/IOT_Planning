@@ -1,5 +1,7 @@
 package it.unibo.planning.astar.domain;
 
+import java.awt.Point;
+
 import it.unibo.planning.astar.enums.PositionMove;
 
 public class State implements Comparable<State>{
@@ -37,6 +39,15 @@ public class State implements Comparable<State>{
 		
 		this.genMove = genMove;
 		this.cost = cost;
+	}
+	
+	public State(Point point)
+	{
+		this.x = point.x;
+		this.y = point.y;
+		
+		this.genMove = null;
+		this.cost = -1;
 	}
 
 	@Override

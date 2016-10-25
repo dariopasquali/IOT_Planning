@@ -9,12 +9,14 @@ import javax.swing.Box;
 import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
-import java.awt.Panel;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -25,11 +27,20 @@ import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.JButton;
-import javax.swing.JFileChooser;
 import javax.swing.JPanel;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+
+import org.opencv.core.Core;
+import org.opencv.core.CvType;
+import org.opencv.core.Mat;
+import org.opencv.core.MatOfByte;
+import org.opencv.core.MatOfPoint;
+import org.opencv.core.Scalar;
+import org.opencv.core.Size;
+import org.opencv.highgui.Highgui;
+import org.opencv.imgproc.Imgproc;
 
 import it.unibo.domain.Map;
 import it.unibo.domain.MapElement;
@@ -44,17 +55,12 @@ import java.awt.Font;
 import java.awt.Frame;
 import javax.swing.JTextArea;
 import javax.swing.JRadioButton;
-import java.awt.Choice;
-import javax.swing.JScrollPane;
-import javax.swing.JScrollBar;
-import java.awt.GridLayout;
 import javax.swing.UIManager;
 import javax.swing.JSpinner;
-import javax.swing.JList;
-import javax.swing.AbstractListModel;
+import javax.imageio.ImageIO;
 import javax.swing.SpinnerListModel;
-import java.awt.event.KeyAdapter;
 import javax.swing.JCheckBox;
+import javax.swing.SwingUtilities;
 
 public class MapCreator extends Frame{
 
@@ -74,6 +80,12 @@ public class MapCreator extends Frame{
 	private MapViewerPanel gbp;
 	
 	private Map map;
+	private Map imageMap;
+	private Mat loadedImage;
+	
+	
+	private boolean haveMap, haveImage;
+	
 	private JPanel panelMap;
 	private JSplitPane bodyPanel;
 	
@@ -83,6 +95,13 @@ public class MapCreator extends Frame{
 	private JRadioButton rdbtnSingleCellPaint;
 	private JRadioButton rdbtnDragPaint;
 	private JCheckBox checkBound;
+	private JButton btnLoadImage;
+	private JButton btnSaveImage;
+
+	public JFrame mapFrame;
+
+	public it.unibo.gui.ImagePanel imagePanel;
+	private JButton btnIsEqual;
 	
 	//private JFileChooser fileLoader, fileSaver;
 
@@ -119,9 +138,9 @@ public class MapCreator extends Frame{
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		GridBagLayout gridBagLayout = new GridBagLayout();
 		gridBagLayout.columnWidths = new int[]{1056, 0};
-		gridBagLayout.rowHeights = new int[]{20, 0, 0, 0, 0, 0};
+		gridBagLayout.rowHeights = new int[]{20, 0, 0, 0, 0, 0, 0};
 		gridBagLayout.columnWeights = new double[]{1.0, Double.MIN_VALUE};
-		gridBagLayout.rowWeights = new double[]{0.0, 0.0, 0.0, 1.0, 0.0, Double.MIN_VALUE};
+		gridBagLayout.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 1.0, 0.0, Double.MIN_VALUE};
 		frame.getContentPane().setLayout(gridBagLayout);
 		
 		Component verticalStrut = Box.createVerticalStrut(20);
@@ -145,6 +164,11 @@ public class MapCreator extends Frame{
 		btnLoad.setFont(new Font("Tahoma", Font.PLAIN, 15));
 		boxMapManager.add(btnLoad);
 		
+		btnLoadImage = new JButton("Load Image");
+		btnLoadImage.setFont(new Font("Tahoma", Font.PLAIN, 15));
+		btnLoadImage.addActionListener(new DefaultInputHandler());
+		boxMapManager.add(btnLoadImage);
+		
 		Component horizontalStrut = Box.createHorizontalStrut(20);
 		boxMapManager.add(horizontalStrut);
 		
@@ -154,11 +178,21 @@ public class MapCreator extends Frame{
 		btnSaveMap.setFont(new Font("Tahoma", Font.PLAIN, 15));
 		boxMapManager.add(btnSaveMap);
 		
+		btnSaveImage = new JButton("Save Image");
+		btnSaveImage.setEnabled(false);
+		btnSaveImage.setFont(new Font("Tahoma", Font.PLAIN, 15));
+		btnSaveImage.addActionListener(new DefaultInputHandler());
+		boxMapManager.add(btnSaveImage);
+		
+		btnIsEqual = new JButton("Check Equality");
+		boxMapManager.add(btnIsEqual);
+		btnIsEqual.addActionListener(new DefaultInputHandler());
+		
 		Component verticalStrut_1 = Box.createVerticalStrut(20);
 		GridBagConstraints gbc_verticalStrut_1 = new GridBagConstraints();
 		gbc_verticalStrut_1.insets = new Insets(0, 0, 5, 0);
 		gbc_verticalStrut_1.gridx = 0;
-		gbc_verticalStrut_1.gridy = 2;
+		gbc_verticalStrut_1.gridy = 3;
 		frame.getContentPane().add(verticalStrut_1, gbc_verticalStrut_1);
 		
 		bodyPanel = new JSplitPane();
@@ -168,7 +202,7 @@ public class MapCreator extends Frame{
 		gbc_bodyPanel.insets = new Insets(0, 0, 5, 0);
 		gbc_bodyPanel.fill = GridBagConstraints.BOTH;
 		gbc_bodyPanel.gridx = 0;
-		gbc_bodyPanel.gridy = 3;
+		gbc_bodyPanel.gridy = 4;
 		frame.getContentPane().add(bodyPanel, gbc_bodyPanel);
 		
 		JPanel panel = new JPanel();
@@ -362,7 +396,10 @@ public class MapCreator extends Frame{
 		panelMap = new JPanel();
 		bodyPanel.setRightComponent(panelMap);		
 		gbp = new MapViewerPanel();
+		haveMap = false;
+		haveImage = false;
 		
+		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
 		
 	}
 
@@ -391,7 +428,31 @@ public class MapCreator extends Frame{
 				btnGenerate.setEnabled(true);
 				btnClear.setEnabled(true);
 				btnSaveMap.setEnabled(true);
-				//btnExpandMap.setEnabled(true);
+				btnSaveImage.setEnabled(true);
+				haveMap = true;
+				break;
+			
+			case "Load Image":
+				
+				loadDialog = new FileDialog(frame, "Choose the Image", FileDialog.LOAD);
+				loadDialog.setDirectory("C:\\");
+				loadDialog.setFile("*.jpg");
+				loadDialog.setVisible(true);
+				filename = loadDialog.getDirectory()+loadDialog.getFile();
+				if(filename.contains("null"))
+					break;
+				
+				panelMap = new JPanel();
+				
+				loadImage(filename);				
+				
+				btnGenerate.setEnabled(true);
+				btnClear.setEnabled(true);
+				btnSaveMap.setEnabled(true);
+				btnSaveImage.setEnabled(false);
+				haveImage = true;
+				
+				
 				break;
 				
 			case "Generate":
@@ -422,9 +483,10 @@ public class MapCreator extends Frame{
 				setMap(m,1);
 				
 				btnSaveMap.setEnabled(true);
+				btnSaveImage.setEnabled(true);
 				btnClear.setEnabled(true);
-				//btnExpandMap.setEnabled(true);
-				
+				haveMap = true;
+				haveImage = false;
 				break;
 			
 			case "Clear":
@@ -447,44 +509,183 @@ public class MapCreator extends Frame{
 				
 				break;
 				
-				/*
-			case "Generate Extended Map":
+			case "Save Image":
 				
-				int precision = Integer.parseInt((String)spinBrush.getValue());
+				storeDialog = new FileDialog(frame, "Create new Image", FileDialog.SAVE);
+				storeDialog.setDirectory("C:\\");
+				storeDialog.setFile(".jpg");
+				storeDialog.setVisible(true);
+				fname = storeDialog.getDirectory()+storeDialog.getFile();
+				if(fname.contains("null"))
+					break;
 				
-				System.out.println("Precision: "+precision);
+				storeMap(fname);
 				
-				Map expanded = new Map(map.getXmax()*precision, map.getYmax()*precision);
+				break;
 				
-				List<IMapElement> elements = map.getElements();
+			case "Check Equality":
 				
-				for(IMapElement el : elements)
+				if(!haveMap)
 				{
-					expanded.addElement(new MapElement(el.getX()*precision, el.getY()*precision));
-					
-					for(int i=1; i<precision; i++)
-						expanded.addElement(new MapElement((precision*el.getX())+i, precision*el.getY()));
-					
-					for(int i=1; i<precision; i++)
-						expanded.addElement(new MapElement(precision*el.getX(), (precision*el.getY())+i));
-					
-					for(int i=1; i<precision; i++)
-						expanded.addElement(new MapElement(((precision*el.getX())+precision-1), (precision*el.getY())+i));
-					
-					for(int i=1; i<precision-1; i++)
-						expanded.addElement(new MapElement((precision*el.getX())+i, ((precision*el.getY())+precision-1)));		
-					
-					System.out.println("Expanded "+el.toString());
+					System.out.println("please load a map");
+					break;
 				}
 				
-				panelMap = new JPanel();
-				setMap(expanded, precision);
-				*/
-			default:
+				if(!haveImage)
+				{
+					System.out.println("please load an image");
+					break;
+				}
 				
+				Integer[][] map1 = map.getIntMap();
+				Integer[][] map2 = imageMap.getIntMap();
+				
+				if(map1.length-1 != map2.length)
+				{
+					System.out.println("column number is different!");
+					break;
+				}
+				
+				if(map1[0].length-1 != map2[0].length)
+				{
+					System.out.println("row number is different");
+					break;
+				}
+				
+				boolean isEqual = true;
+				
+				for(int i=0; i<map1.length-1 && isEqual; i++)
+					for(int j=0; j<map1[i].length-1 && isEqual; j++)
+						isEqual = (map1[i][j] == map2[i][j]);
+				
+				if(isEqual)
+					System.out.println("YES");
+				else
+					System.out.println("NOPE");
+				
+				break;
+				
+			default:
+				break;
 			}
 		}
 
+		private Integer[][] matToIntMatrix(Mat image, int range)
+		{
+			MatOfByte matOfByte = new MatOfByte();
+		    Highgui.imencode(".jpg", image, matOfByte);
+		    byte[] byteArray = matOfByte.toArray();
+		    BufferedImage bufImage = null;
+		    try 
+		    {
+		        InputStream in = new ByteArrayInputStream(byteArray);
+		        bufImage = ImageIO.read(in);
+		        int width = bufImage.getWidth(null);
+			    int height = bufImage.getHeight(null);
+			    Integer[][] pixels = new Integer[width][height];
+			    for (int i = 0; i < width; i++) {
+			        for (int j = 0; j < height; j++) {
+			            pixels[i][j] = Math.abs(bufImage.getRGB(i, j)/range);
+			        }
+			    }
+
+			    return pixels;
+		    }
+		    catch (Exception e) {
+		        e.printStackTrace();
+		    }
+		    return null;
+		}
+		
+		private void loadImage(String filename)
+		{
+			Mat image = Highgui.imread(filename, Highgui.CV_LOAD_IMAGE_GRAYSCALE);
+		    System.out.println(image.size());
+		    System.out.println(CvType.channels(image.type()));
+		    
+		    int cleanSize = 3;
+		    Mat element = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new  Size(cleanSize + 1, cleanSize+1));
+		    Imgproc.erode(image, image, element);
+		    Imgproc.dilate(image, image, element);
+		    
+		    Mat tresh = new Mat();
+		    Imgproc.threshold(image, tresh, 180, 255, Imgproc.ADAPTIVE_THRESH_MEAN_C);
+		    
+		    List<MatOfPoint> contours = new ArrayList<MatOfPoint>();
+		    
+		    /*
+		    Imgproc.findContours(tresh, contours, new Mat(), Imgproc.RETR_LIST , Imgproc.CHAIN_APPROX_SIMPLE);
+		    Mat cMat = new Mat(tresh.size(), CvType.CV_8UC3, new Scalar(255,255,255));
+		    
+		    double area = Double.MIN_VALUE;
+		    for(int i=0; i<contours.size(); i++)
+		    	if(Imgproc.contourArea(contours.get(i)) > area)
+		    		area = Imgproc.contourArea(contours.get(i));
+		    
+		    for(int i=0; i<contours.size(); i++)
+		        if(Imgproc.contourArea(contours.get(i)) != area)
+		        	Imgproc.drawContours(cMat, contours, i, new Scalar(0,0,0));
+		    */
+		    Integer[][] pixels = matToIntMatrix(tresh, 16777215);
+		    imageMap = new Map(tresh.width(), tresh.height(), pixels);
+		    loadedImage = tresh;
+		    initializeImagePanel(loadedImage);
+		}
+		
+		private void initializeImagePanel(Mat image)
+		{
+			Mat colourImage = new Mat(image.size(), CvType.CV_8UC3);
+			
+			if(image.channels() == 1)
+				Imgproc.cvtColor(image, colourImage, Imgproc.COLOR_GRAY2RGB);
+			else
+				image.copyTo(colourImage);
+			
+			MatOfByte matOfByte = new MatOfByte();
+		    Highgui.imencode(".jpg", colourImage, matOfByte);
+		    byte[] byteArray = matOfByte.toArray();
+		    BufferedImage bufImage = null;
+		    try {
+		        InputStream in = new ByteArrayInputStream(byteArray);
+		        bufImage = ImageIO.read(in);
+		        mapFrame = new JFrame();
+		        
+		        imagePanel = new ImagePanel(bufImage, (Map) imageMap);
+		        imagePanel.addMouseListener(new MouseAdapter() {
+	                @Override
+	                public void mouseClicked(MouseEvent e) {
+	                	
+	                	Point panelPoint = e.getPoint();
+	                    Point imgContext = imagePanel.toImageContext(panelPoint);
+	                    System.out.println(imgContext.toString());
+	                	
+	                	if(SwingUtilities.isLeftMouseButton(e))
+	        			{
+	        				imagePanel.setStart(imgContext);
+	        			}
+	        			else if(SwingUtilities.isRightMouseButton(e))
+	        			{
+	        				imagePanel.setGoal(imgContext);
+	        			}                   
+	                }
+	            });
+		        
+		        mapFrame.setSize(image.width(), image.height());
+		        mapFrame.setResizable(false);
+		        mapFrame.getContentPane().add(imagePanel);
+		        mapFrame.pack();
+		        mapFrame.setVisible(true);    
+		        
+
+		        
+		        
+		 
+		    } catch (Exception e) {
+		        e.printStackTrace();
+		    }
+		}
+		
+		
 		private void loadMap(String filename) {
 			
 			Map m = null;
@@ -550,16 +751,41 @@ public class MapCreator extends Frame{
 
 	public void storeMap(String fname) {
 		
-		map = gbp.getMap();
-		
-		try
+		if(haveMap)
 		{
-			FileOutputStream fsout = new FileOutputStream( new File(fname) );
-			fsout.write(map.toString().getBytes());
-			fsout.close();
-		} catch (Exception e) {
-			System.out.println("QActor  ERROR " + e.getMessage());
- 		}
+			map = gbp.getMap();
+			
+			try
+			{
+				FileOutputStream fsout = new FileOutputStream( new File(fname) );
+				fsout.write(map.toString().getBytes());
+				fsout.close();
+			} catch (Exception e) {
+				System.out.println("QActor  ERROR " + e.getMessage());
+	 		}
+		}
+		else if(haveImage)
+		{
+			try
+			{
+				FileOutputStream fsout = new FileOutputStream( new File(fname) );
+				fsout.write(imageMap.toString().getBytes());
+				fsout.close();
+			} catch (Exception e) {
+				System.out.println("QActor  ERROR " + e.getMessage());
+	 		}
+		}		
+	}
+	
+	public void storeImage(String fname) {
+		
+		if(haveMap)
+		{
+			imageMap = gbp.getMap();			
+		}
+		
+		Mat toWrite = imageMap.getImage();		
+		Highgui.imwrite(fname, toWrite);
 		
 	}
 

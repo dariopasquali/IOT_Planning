@@ -1,6 +1,5 @@
 package it.unibo.console.gui;
 
-import java.awt.EventQueue;
 import java.awt.FileDialog;
 
 import javax.swing.JFrame;
@@ -10,6 +9,7 @@ import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
 import java.awt.Panel;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -22,18 +22,15 @@ import javax.swing.border.TitledBorder;
 import it.unibo.console.gui.MapViewerPanel.CellState;
 import it.unibo.domain.model.implmentation.Map;
 import it.unibo.domain.model.implmentation.MapElement;
+import it.unibo.domain.model.interfaces.IGUI;
 import it.unibo.domain.model.interfaces.IMapElement;
 import it.unibo.is.interfaces.IActivity;
 import it.unibo.is.interfaces.IActivityBase;
 import it.unibo.is.interfaces.IBasicEnvAwt;
 import it.unibo.is.interfaces.IOutputEnvView;
 import it.unibo.is.interfaces.IOutputView;
-import it.unibo.planning.astar.domain.State;
-import it.unibo.planning.domain.AbstractState;
-import it.unibo.search.algofactory.Algo;
 
 import javax.swing.JSplitPane;
-import javax.swing.JLabel;
 import java.awt.Font;
 import java.awt.Frame;
 import javax.swing.JTextArea;
@@ -41,13 +38,9 @@ import javax.swing.JScrollPane;
 import javax.swing.JScrollBar;
 import javax.swing.UIManager;
 import java.awt.Color;
-import javax.swing.JRadioButton;
 
-public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt{
+public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt, IGUI{
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 	
 	private JFrame frame;
@@ -62,38 +55,10 @@ public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt{
 	private MapViewerPanel mapViewer;
 	
 	private Map map;
-	private ArrayList<it.unibo.planning.astar.domain.State> path;
+	private ArrayList<Point> path;
 	
 	JButton btnFindPath, btnNavigate, btnManipulate, btnAbort, btnLoad;
-	private JRadioButton radioRot;
-	private JRadioButton radioPos;
-	private JPanel panel_1;
-	private JLabel lblSelectTheAlgorithm;
-	
-	private Algo searchAlgorithm;
-	
-	//private JFileChooser fileLoader, fileSaver;
 
-
-	/**
-	 * Launch the application.
-	 */
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					ConsoleGUI window = new ConsoleGUI();
-					window.frame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
-
-	/**
-	 * Create the application.
-	 */
 	public ConsoleGUI(IActivityBase controller) {
 		initialize();
 		this.controller = controller;
@@ -103,9 +68,6 @@ public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt{
 		initialize();
 	}
 
-	/**
-	 * Initialize the contents of the frame.
-	 */
 	private void initialize() {
 		frame = new JFrame();
 		frame.setBounds(100, 100, 1134, 623);
@@ -173,49 +135,6 @@ public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt{
 		gbc_verticalStrut_2.gridy = 0;
 		panel.add(verticalStrut_2, gbc_verticalStrut_2);
 		
-		JTextArea txtInstructions = new JTextArea();
-		txtInstructions.setText("- Load The Map\r\n- Left Click = Set START\r\n- Right Click = Set GOAL\r\n- Middle Click = CLEAR\r\n- Search Best Path\r\n- Start Navigation");
-		txtInstructions.setEditable(false);
-		GridBagConstraints gbc_txtInstructions = new GridBagConstraints();
-		gbc_txtInstructions.gridheight = 2;
-		gbc_txtInstructions.gridwidth = 3;
-		gbc_txtInstructions.insets = new Insets(0, 0, 5, 0);
-		gbc_txtInstructions.fill = GridBagConstraints.BOTH;
-		gbc_txtInstructions.gridx = 0;
-		gbc_txtInstructions.gridy = 1;
-		panel.add(txtInstructions, gbc_txtInstructions);
-		
-		panel_1 = new JPanel();
-		GridBagConstraints gbc_panel_1 = new GridBagConstraints();
-		gbc_panel_1.gridwidth = 3;
-		gbc_panel_1.insets = new Insets(0, 0, 5, 5);
-		gbc_panel_1.fill = GridBagConstraints.BOTH;
-		gbc_panel_1.gridx = 0;
-		gbc_panel_1.gridy = 3;
-		panel.add(panel_1, gbc_panel_1);
-		
-		lblSelectTheAlgorithm = new JLabel("Select The Algorithm");
-		panel_1.add(lblSelectTheAlgorithm);
-		
-		radioRot = new JRadioButton("Position & Rotation (A*)");
-		radioRot.setSelected(true);
-		radioRot.addActionListener(new DefaultInputHandler());
-		GridBagConstraints gbc_radioRot = new GridBagConstraints();
-		gbc_radioRot.gridwidth = 3;
-		gbc_radioRot.insets = new Insets(0, 0, 5, 0);
-		gbc_radioRot.gridx = 0;
-		gbc_radioRot.gridy = 4;
-		panel.add(radioRot, gbc_radioRot);
-		
-		radioPos = new JRadioButton("Only Position (A*)");
-		radioPos.addActionListener(new DefaultInputHandler());
-		GridBagConstraints gbc_radioPos = new GridBagConstraints();
-		gbc_radioPos.gridwidth = 3;
-		gbc_radioPos.insets = new Insets(0, 0, 5, 0);
-		gbc_radioPos.gridx = 0;
-		gbc_radioPos.gridy = 5;
-		panel.add(radioPos, gbc_radioPos);
-		
 		btnFindPath = new JButton("Find Best Path");
 		btnFindPath.setFont(new Font("Tahoma", Font.PLAIN, 15));
 		GridBagConstraints gbc_btnFindPath = new GridBagConstraints();
@@ -279,9 +198,7 @@ public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt{
 		scrollBar = new JScrollBar();
 		panelOutput.setRowHeaderView(scrollBar);
 		panelOutput.add(scrollBar);
-		
-		searchAlgorithm = Algo.INCLUDE_DIRECTION;
-		
+				
 	}
 
 
@@ -336,7 +253,7 @@ public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt{
 						+sy+","
 						+gx+","
 						+gy+","
-						+searchAlgorithm.getValue()+","
+						+"t"+","
 						);
 					
 					btnNavigate.setEnabled(true);							
@@ -361,18 +278,6 @@ public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt{
 				
 				break;
 				
-			case "Position & Rotation (A*)":
-				radioRot.setSelected(true);
-				radioPos.setSelected(false);
-				searchAlgorithm = Algo.INCLUDE_DIRECTION;
-				break;
-				
-			case "Only Position (A*)":
-				radioRot.setSelected(false);
-				radioPos.setSelected(true);
-				searchAlgorithm = Algo.ONLY_POSITION;
-				break;
-				
 			default:
 				addOutput("Invalid command");
 			}
@@ -380,17 +285,46 @@ public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt{
 		
 	}
 
-	
+	@Override
 	public void setController(IActivityBase controller) {
 		this.controller = controller;		
 	}
 	
-	
+	@Override
 	public synchronized void clear(  ){
 		txtOut.setText("");
 		txtOut.validate();
 	}//clear
 	
+	
+	@Override
+	public void setPath(List<Point> list) {
+		
+		mapViewer.clearPath();		
+		this.path = (ArrayList<Point>) list;
+		
+		for(Point p : list)
+		{
+			mapViewer.setCellState(p.x, p.y, CellState.PATH);			
+		}		
+	}
+
+	public void setMap(Map map) {
+
+		this.map = map;
+		mapViewer.setMap(map);
+		
+		mapViewer.createMapViewer(map.getYmax()+1, map.getXmax()+1);
+		List<IMapElement> elements = map.getElements();
+		
+		for(IMapElement e : elements)
+		{
+			mapViewer.setCellState(e.getX(), e.getY(), CellState.OBSTACLE);
+		}
+		
+		panelMap = mapViewer.getPanel();
+		splitMapAndOutput.setLeftComponent(panelMap);
+	}
 
 	/*
 	 * ROBA DELLE INTERFACCE, SERVE SOLO A FARE ANDARE IL FRAMEWORK
@@ -517,43 +451,7 @@ public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt{
 		setVisible(b);	
 	}
 
-	public void setMap(Map map) {
-
-		this.map = map;
-		mapViewer.setMap(map);
-		
-		mapViewer.createMapViewer(map.getYmax()+1, map.getXmax()+1);
-		List<IMapElement> elements = map.getElements();
-		
-		for(IMapElement e : elements)
-		{
-			mapViewer.setCellState(e.getX(), e.getY(), CellState.OBSTACLE);
-		}
-		
-		panelMap = mapViewer.getPanel();
-		splitMapAndOutput.setLeftComponent(panelMap);
-	}
-
-	public void setPath(ArrayList<State> arrayList) {
-		
-		mapViewer.clearPath();
-		
-		this.path = arrayList;
-		
-		MapElement start = mapViewer.getStart();
-		MapElement goal = mapViewer.getGoal();
-		
-		//it.unibo.planning.astar.domain.State current = 
-		//		new it.unibo.planning.astar.domain.State(start.getX(), start.getY(), Direction.NORTH, null, 0);
-		
-		//it.unibo.planning.astar.domain.State goalState = 
-		//		new it.unibo.planning.astar.domain.State(goal.getX(), goal.getY(), Direction.NORTH, null, 0);
-		
-		for(State s : arrayList)
-		{
-			mapViewer.setCellState(s.getX(), s.getY(), CellState.PATH);			
-		}		
-	}
+	
 
 	
 	

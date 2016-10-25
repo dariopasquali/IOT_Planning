@@ -95,7 +95,7 @@ QActor console context ctxConsole -g cyan{
 	
 	Plan loadMap resumeLastPlan
 		[?? msg(local_gui_command, "event", SENDER, none, local_gui_command (loadmap(PATH)), MSGNUM)]
-				 solve loadMapFromFile(PATH) time(210000000) onFailSwitchTo prologFailure;
+				 solve loadMapButton(PATH) time(210000000) onFailSwitchTo prologFailure;
 				
 		println("++++++++++++++++++ MAP LOADED ++++++++++++++++++")
 		

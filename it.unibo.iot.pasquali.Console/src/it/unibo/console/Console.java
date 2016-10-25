@@ -3,18 +3,17 @@
 This code is generated only ONCE
 */
 package it.unibo.console;
+
 import it.unibo.is.interfaces.IOutputEnvView;
 import it.unibo.planning.astar.algo.AStarSearchAgent;
-import it.unibo.planning.astar.algo.SearchAgent;
 import it.unibo.planning.astar.engine.AStarEngine;
-import it.unibo.planning.astar.engine.DirAStarEngine;
-import it.unibo.planning.astar.enums.Direction;
-import it.unibo.planning.domain.AbstractState;
-import it.unibo.planning.domain.Path;
 import it.unibo.qactors.ActorContext;
 import it.unibo.search.algofactory.Algo;
 
+import java.awt.Point;
+import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -22,23 +21,36 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.imageio.ImageIO;
+
+import org.opencv.core.Core;
+import org.opencv.core.CvType;
+import org.opencv.core.Mat;
+import org.opencv.core.MatOfByte;
+import org.opencv.core.Size;
+import org.opencv.highgui.Highgui;
+import org.opencv.imgproc.Imgproc;
+
 import it.unibo.console.gui.*;
+import it.unibo.console.ImageGui.*;
+import it.unibo.domain.model.implmentation.IntMap;
 import it.unibo.domain.model.implmentation.Map;
+import it.unibo.domain.model.interfaces.IMap;
+import it.unibo.domain.model.interfaces.IGUI;
 
 public class Console extends AbstractConsole { 
 	
-	private Map map;
+	private IMap map;
 	private it.unibo.planning.astar.algo.Path path;
 	
-	private int sx, sy, gx, gy;
-	
-	private long startLoadTime;
-	
+	private int sx, sy, gx, gy;	
+	private long startLoadTime;	
 	private Algo algorithm;
 	
 	public Console(String actorId, ActorContext myCtx, IOutputEnvView outEnvView )  throws Exception{
 		super(actorId, myCtx, outEnvView);
-		((ConsoleGUI) env).setController(this);
+		System.loadLibrary( Core.NATIVE_LIBRARY_NAME );
+		((IGUI) env).setController(this);
 		path = null;
 	}
 	
@@ -50,17 +62,18 @@ public class Console extends AbstractConsole {
 	
 	public void setMapElements(List<String> elements)
 	{
-		((ConsoleGUI)env).setMap(map);
+		((ConsoleGUI)env).setMap((Map)map);
 	}
 	
 	public void setMapElements(String elements)
 	{
 		map.addElementsFromString(elements);
-		((ConsoleGUI)env).setMap(map);
+		((ConsoleGUI)env).setMap((Map)map);
 		System.out.print("Map Loading time: "+(System.currentTimeMillis()-startLoadTime));
 	}
 	
-	public void loadMap(String path)
+	// BUTTON MAP - ConsoleGUI
+	public void loadMapButton(String path)
 	{
 		Map m = null;
 		
@@ -100,6 +113,56 @@ public class Console extends AbstractConsole {
 	
 	}
 	
+		
+	//IMAGE MAP - ImageGUI
+	public void loadMapImage(String path)
+	{
+		Mat image = Highgui.imread(path, Highgui.CV_LOAD_IMAGE_GRAYSCALE);
+	    System.out.println(image.size());
+	    System.out.println(CvType.channels(image.type()));
+	    
+	    int cleanSize = 5;
+	    Mat element = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new  Size(cleanSize + 1, cleanSize+1));
+	    Imgproc.erode(image, image, element);
+	    Imgproc.dilate(image, image, element);
+	    
+	    Mat tresh = new Mat();
+	    Imgproc.threshold(image, tresh, 180, 255, Imgproc.THRESH_BINARY);
+	    
+	    Integer[][] pixels = matToIntMatrix(tresh, 16777215);
+		
+		map = new IntMap(image.width(), image.height(), pixels);
+		((ImageGUI)env).setMap(map, tresh);
+	
+	}
+	
+	private Integer[][] matToIntMatrix(Mat image, int range)
+	{
+		MatOfByte matOfByte = new MatOfByte();
+	    Highgui.imencode(".jpg", image, matOfByte);
+	    byte[] byteArray = matOfByte.toArray();
+	    BufferedImage bufImage = null;
+	    try 
+	    {
+	        InputStream in = new ByteArrayInputStream(byteArray);
+	        bufImage = ImageIO.read(in);
+	        int width = bufImage.getWidth(null);
+		    int height = bufImage.getHeight(null);
+		    Integer[][] pixels = new Integer[width][height];
+		    for (int i = 0; i < width; i++) {
+		        for (int j = 0; j < height; j++) {
+		            pixels[i][j] = Math.abs(bufImage.getRGB(i, j)/range);
+		        }
+		    }
+
+		    return pixels;
+	    }
+	    catch (Exception e) {
+	        e.printStackTrace();
+	    }
+	    return null;
+	}
+	
 	public void searchBestPath(int sx, int sy, int gx, int gy, String algo)
 	{		
 		algorithm = Algo.fromStringValue(algo);
@@ -109,50 +172,24 @@ public class Console extends AbstractConsole {
 		this.gx = gx;
 		this.gy = gy;
 		
-		/*
-		SearchAgent agent = new SearchAgent();
-		
-		it.unibo.planning.astar.domain.State start = 
-				new it.unibo.planning.astar.domain.State(sx, sy, Direction.NORTH, null, 0);
-		
-		it.unibo.planning.astar.domain.State goal = 
-				new it.unibo.planning.astar.domain.State(gx, gy, Direction.NONE, null, 0);
-		
-		long st = System.currentTimeMillis();
-		
-		DirAStarEngine engine = new DirAStarEngine();
-		engine.setIntMap(map.getIntMap(), map.getXmax(), map.getYmax());
-		
-		println("LET'S FIND BEST PATH");
-		
-		path = agent.searchBestPath(engine,start, goal);	
-		*/
-		
-		
 		AStarSearchAgent agent = new AStarSearchAgent();
 		
-		it.unibo.planning.astar.domain.State start = 
-				new it.unibo.planning.astar.domain.State(sx, sy, null, 0);
-		
-		it.unibo.planning.astar.domain.State goal = 
-				new it.unibo.planning.astar.domain.State(gx, gy, null, 0);
-		
 		long st = System.currentTimeMillis();
 		
-		AStarEngine engine = new AStarEngine();
+		AStarEngine engine = new AStarEngine();		
+		
 		engine.setIntMap(map.getIntMap(), map.getXmax(), map.getYmax());
 		
 		println("LET'S FIND BEST PATH");
 		
-		path = agent.searchBestPath(engine,start, goal);
-		
+		path = agent.searchBestPath(engine,new Point(sx,sy), new Point(gx,gy));		
 		
 		println("Search Time --> " + (System.currentTimeMillis() - st) +" ms");
 	}
 	
 	public void showPathOnGui()
 	{
-		((ConsoleGUI)env).setPath((ArrayList<it.unibo.planning.astar.domain.State>) path.getStates());
+		((IGUI)env).setPath(path.getPoints());
 	}
 	
 	private String getPrologMap()
@@ -182,7 +219,6 @@ public class Console extends AbstractConsole {
 		
 	}
 	
-
 	public void sendNavigationData()
 	{	
 		//String pm = getPrologMap();

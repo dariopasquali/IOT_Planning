@@ -81,7 +81,8 @@ loadMapFromFileProlog(PATH) :-
 	actorPrintln(List),
 	Actor <- setMapElements(List),
 	assert(havemap).
-	
+
+/*	
 loadMapFromFile(PATH) :-
 	havemap, !,
 	retractall(mapdata(_,element(_,_))),
@@ -98,8 +99,10 @@ loadMapFromFile(PATH) :-
 	actorPrintln(Ymax),
 	Actor <- loadMap(PATH),
 	assert(havemap).
-	
-loadMapFromFile(PATH) :-
+*/
+
+/*	
+loadMap(PATH) :-
 	actorobj(Actor),
 	Actor <- consultFromFile(PATH),
 	actorPrintln("consulted map data"),
@@ -108,18 +111,28 @@ loadMapFromFile(PATH) :-
 	actorPrintln(Ymax),
 	Actor <- loadMap(PATH),
 	assert(havemap).
-
-checkValidState( X , Y) :-
-	X >= 0,
-	Y >= 0,
-	map(Xmax, Ymax),
-	X =< Xmax,
-	Y =< Ymax,
-	getElements(List),
-	notContainsElement(element(X,Y), List).
-
-%% START -> position(X,Y)
-
+*/
+	
+loadMapImage(PATH) :-
+	actorobj(Actor),
+	%%Actor <- consultFromFile(PATH),
+	actorPrintln("consulted map data"),
+	%%map(Xmax, Ymax),
+	%%actorPrintln(Xmax),
+	%%actorPrintln(Ymax),
+	Actor <- loadMapImage(PATH),
+	assert(havemap).
+	
+loadMapButton(PATH) :-
+	actorobj(Actor),
+	%%Actor <- consultFromFile(PATH),
+	actorPrintln("consulted map data"),
+	%%map(Xmax, Ymax),
+	%%actorPrintln(Xmax),
+	%%actorPrintln(Ymax),
+	Actor <- loadMapButton(PATH),
+	assert(havemap).
+	
 searchBestPath(position(Sx,Sy) , position(Gx,Gy), ALGO) :-
 	actorPrintln(position(Sx,Sy)),
 	actorPrintln(position(Gx,Gy)),	

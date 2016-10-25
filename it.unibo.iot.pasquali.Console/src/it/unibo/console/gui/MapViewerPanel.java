@@ -44,7 +44,7 @@ public class MapViewerPanel {
 	    		return Color.RED;
 	    		
 	    	case PATH:
-	    		return Color.YELLOW;
+	    		return Color.RED;
 	    		
 	    	default:
 	    		return Color.WHITE;
@@ -157,7 +157,7 @@ public class MapViewerPanel {
 	}
     
     private JButton getCell(int r, int c) {
-        return matrix[r][c];
+        return matrix[c][r];
     }
 
     private JButton createCell(final int row, final int col) {
@@ -176,7 +176,7 @@ public class MapViewerPanel {
     	
     	this.rows = rows;
     	this.cols = cols;
-    	matrix = new JButton[rows][cols];
+    	matrix = new JButton[cols][rows];
     	
         p = new JPanel(new GridLayout(rows, cols));
         
@@ -187,7 +187,7 @@ public class MapViewerPanel {
         		JButton gb = createCell(r, c);
         		gb.setBackground(Color.WHITE);
                 gb.setPreferredSize(new Dimension(20,20));
-                matrix[r][c] = gb;
+                matrix[c][r] = gb;
                 p.add(gb);
         	}
         }

@@ -1,17 +1,31 @@
 package it.unibo.domain;
 
+import java.awt.Color;
+import java.awt.image.BufferedImage;
+import java.awt.image.DataBufferByte;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import it.unibo.domain.interfaces.IMap;
+import javax.imageio.ImageIO;
+
+import org.opencv.core.CvType;
+import org.opencv.core.Mat;
+import org.opencv.core.MatOfByte;
+import org.opencv.highgui.Highgui;
+
 import it.unibo.domain.interfaces.IMapElement;
 
 
-public class Map implements IMap{
+
+public class Map {
 
 	private ArrayList<IMapElement> elements = new ArrayList<IMapElement>();	
 	private int Xmax;
 	private int Ymax;
+	private Integer[][] intmap;
+	
 	
 	public static Map createMapFromPrologRep(String map)
 	{
@@ -25,32 +39,49 @@ public class Map implements IMap{
 		return new Map(Integer.parseInt(sh[1]), Integer.parseInt(st[0]));
 	}
 	
+	public Map(int width, int heigh, Integer[][] intmap)
+	{
+		this.Xmax = width;
+		this.Ymax = heigh;
+		this.intmap = intmap;
+		
+		for(int i = 0; i<Xmax; i++)
+			for(int j = 0; j<Ymax; j++)
+				if(intmap[i][j]!=0)
+					elements.add(new MapElement(i,j));
+				
+	}
+	
 	public Map(int x, int y) {
 		this.Xmax = x;
 		this.Ymax = y;
+		
+		intmap = new Integer[x+1][y+1];
+		for(int k=0; k<=Xmax; k++)
+		{
+			for(int j = 0; j<=Ymax; j++)
+			{
+				intmap[k][j] = 0;
+			}
+		}
 	}
 
 	public Map() {
 		// TODO Auto-generated constructor stub
 	}
 
-	@Override
 	public void addElement(IMapElement newElement) {
-		if(!elements.contains(newElement))
-			elements.add(newElement);		
+		elements.add(newElement);		
 	}
 
-	@Override
 	public List<IMapElement> getElements() {
 		return elements;
 	}
 
-	@Override
 	public String getDefaultRep() {
 		return toString();
 	}
 
-	@Override
 	public String getJSONRep() {
 		return toString();
 	}
@@ -63,14 +94,12 @@ public class Map implements IMap{
 		return Xmax;
 	}
 
-	@Override
 	public void removeElement(int c, int r) {
 		MapElement toRemove = new MapElement(c,r);		
 		elements.remove(toRemove);		
 	}
 	
 
-	@Override
 	public void addElementsFromList(List<String> els) {
 		
 		for(String e : els)
@@ -84,7 +113,43 @@ public class Map implements IMap{
 		}
 	}	
 	
-	@Override
+	public Integer[][] getIntMap()
+	{
+		return intmap;
+	}
+	
+	public Mat getImage()
+	{
+		Mat image = new Mat(Xmax, Ymax, CvType.CV_8UC3);
+		
+		MatOfByte matOfByte = new MatOfByte();
+	    Highgui.imencode(".jpg", image, matOfByte);
+	    byte[] byteArray = matOfByte.toArray();
+	    BufferedImage bufImage = null;
+	    try 
+	    {
+	        InputStream in = new ByteArrayInputStream(byteArray);
+	        bufImage = ImageIO.read(in);
+	        
+	        for(int i=0; i<Xmax; i++)
+	        	for(int j=0; j<Ymax; j++)
+	        		if(intmap[i][j] == 0)
+	        			bufImage.setRGB(i, j, Color.white.getRGB());
+	        		else
+	        			bufImage.setRGB(i, j, Color.black.getRGB());	
+	        
+	        byte[] data = ((DataBufferByte) bufImage.getRaster().getDataBuffer()).getData();
+	        image.put(0, 0, data);
+	    }
+	    catch(Exception e)
+	    {
+	    	e.printStackTrace();
+	    }
+	    
+	    return image;
+	}
+	
+	
 	public void addElementsFromString(String elem) {
 				
 		int i = 0;
@@ -98,6 +163,7 @@ public class Map implements IMap{
 				String[] st = els[i+1].split("\\)");
 				
 				MapElement me = new MapElement(Integer.parseInt(sh[1]), Integer.parseInt(st[0]));
+				intmap[Integer.parseInt(sh[1])][Integer.parseInt(st[0])] = 1;
 				elements.add(me);
 				i+=2;
 			}	
@@ -106,7 +172,6 @@ public class Map implements IMap{
 		{
 			e.printStackTrace();
 		}
-		
 	}
 
 	
@@ -115,18 +180,29 @@ public class Map implements IMap{
 	{
 		String s = "";
 		
-		s += "map("+Xmax+","+Ymax+")";
+		s += "map("+Xmax+","+Ymax+")\n";
 		
 		for(int i = 0; i<elements.size(); i++)
 		{
-			s += "\nmapdata(" + (i+1) +", " + elements.get(i).toString() +")";
-		}		
+			s += "mapdata(" + (i+1) +", " + elements.get(i).toString() +")";
+			if(i!=elements.size()-1)
+				s+="\n";
+		}
 		return s;
 	}
 
-	@Override
 	public void clearAll() {
 		elements = new ArrayList<IMapElement>();		
+	}
+
+	public boolean isCellClear(int x, int y) {
+
+		MapElement me = new MapElement(x,y);
+		
+		if(elements.contains(me))
+			return false;
+		else
+			return true;
 	}
 
 }

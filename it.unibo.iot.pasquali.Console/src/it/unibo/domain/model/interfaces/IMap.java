@@ -8,10 +8,14 @@ public interface IMap {
 	public List<IMapElement> getElements();
 	
 	public String getDefaultRep();
-	public String getJSONRep();
-	void clearAll();
+	public String getJSONRep();	
 	void addElementsFromString(String elem);
 	void addElementsFromList(List<String> els);
 	void removeElement(int c, int r);
+	
+	public Integer[][] getIntMap();
+	public int getXmax();
+	public int getYmax();
+	void clearAll();
 
 }

@@ -1,8 +1,10 @@
 package it.unibo.planning.astar.algo;
 
+import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.TreeMap;
 
 import it.unibo.planning.astar.domain.Move;
@@ -31,9 +33,12 @@ public class AStarSearchAgent {
 	}
 	
 	
-	public Path searchBestPath(IEngine engine, State start, State goal)
+	public Path searchBestPath(IEngine engine, Point startPoint, Point goalPoint)
 	{
 		System.out.println("LET'S FIND BEST PATH");
+		
+		State start = new State(startPoint);		
+		State goal = new State(goalPoint);
 		
 		Path path = new Path();
 		
@@ -44,11 +49,12 @@ public class AStarSearchAgent {
 		
 		while(!openSet.isEmpty())
 		{
+			//System.out.println(openSet.size());
 			State current = openSet.get(0);
 			if(engine.isGoalState(current))
 			{
 				path.setMoves(recostructPath(start, current));
-				path.setStates(recostructStatePath(current));
+				path.setPoints(fromStateToPoint(recostructStatePath(current)));
 				return path;
 			}
 			
@@ -83,6 +89,8 @@ public class AStarSearchAgent {
 			
 			Collections.sort((ArrayList<State>)openSet);
 		}
+		
+		System.out.println("Open set is empty, maybe we have a problem");
 		return null;		
 	}
 	
@@ -138,6 +146,18 @@ public class AStarSearchAgent {
 	}
 	*/
 	
+	private List<Point> fromStateToPoint(ArrayList<State> states) {
+
+		ArrayList<Point> points = new ArrayList<Point>();
+		
+		for(State s : states)
+			points.add(new Point(s.getX(), s.getY()));
+		
+		return points;
+		
+	}
+
+
 	private ArrayList<Move> recostructPath(State start, State current) {
 		
 		

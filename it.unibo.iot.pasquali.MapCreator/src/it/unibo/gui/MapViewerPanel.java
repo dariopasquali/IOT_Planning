@@ -54,41 +54,9 @@ public class MapViewerPanel {
 			this.c = c;
 		}		
 		
-		/*
-		public void actionPerformed(ActionEvent e) {
-
-			String[] name = e.getActionCommand().split(" ");
-			System.out.println("WTF!!!"+e.getActionCommand());
-			int r = Integer.parseInt(name[0]);
-			int c = Integer.parseInt(name[1]);
-			
-			
-		}
-		*/
-
 		@Override
 		public void mouseClicked(MouseEvent e) {
-		/*	
-			int splitBrush = (int)brushSize/2;
 			
-			System.out.println(r);
-			System.out.println(c);
-			
-			if(e.getButton() == MouseEvent.BUTTON1)
-			{
-				if(splitBrush == 0)
-					setState(r,c, brushColor);
-				else
-				{
-					for(int row=r-splitBrush; row<=r+splitBrush; row++)
-						for(int col=c-splitBrush; col<=c+splitBrush; col++)
-						{
-							if(row>=0 && col>=0 && row<getRows() && col<getCols())
-								setState(row,col, brushColor);
-						}
-				}
-			}
-		*/			
 		}
 
 		@Override
@@ -199,12 +167,11 @@ public class MapViewerPanel {
 	}
     
     private JButton getGridButton(int r, int c) {
-        return matrix[r][c];
+        return matrix[c][r];
     }
 
     private JButton createCell(final int row, final int col) {
         final JButton b = new JButton("");
-        //b.setActionCommand(row+" "+col);
         
         ClickHandler handler = new ClickHandler(row, col);
         
@@ -250,7 +217,7 @@ public class MapViewerPanel {
     	
     	this.rows = rows;
     	this.cols = cols;
-    	matrix = new JButton[rows][cols];
+    	matrix = new JButton[cols][rows];
     	
         p = new JPanel(new GridLayout(rows, cols));
         
@@ -261,7 +228,7 @@ public class MapViewerPanel {
         		JButton gb = createCell(r, c);
         		gb.setBackground(Color.WHITE);
                 gb.setPreferredSize(new Dimension(20,20));
-                matrix[r][c] = gb;
+                matrix[c][r] = gb;
                 p.add(gb);
         	}
         }
@@ -309,25 +276,6 @@ public class MapViewerPanel {
 	}
 	
 	
-    /*
-    public static void main(String[] args) {
-        EventQueue.invokeLater(new Runnable() {
 
-            @Override
-            public void run() {
-                new MapViewerPanel().display();
-            }
-        });
-    }
-    
-    private void display() {
-        JFrame f = new JFrame("GridButton");
-        f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        f.add(createGridPanel(15,15));
-        f.pack();
-        f.setLocationRelativeTo(null);
-        f.setVisible(true);
-    }
-    */
 	
 }

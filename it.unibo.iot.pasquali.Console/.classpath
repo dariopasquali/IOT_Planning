@@ -15,5 +15,6 @@
 	<classpathentry kind="lib" path="/it.unibo.iss.libs/libs/unibo/qa18Akka.jar"/>
 	<classpathentry kind="lib" path="/it.unibo.iss.libs/libs/unibo/RossiBth.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/it.unibo.iot.pasquali.SearchAlgorithm"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/OpenCV-2.4.13"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

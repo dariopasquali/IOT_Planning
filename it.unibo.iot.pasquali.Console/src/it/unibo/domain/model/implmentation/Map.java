@@ -14,6 +14,7 @@ public class Map implements IMap{
 	private int Ymax;
 	private Integer[][] intmap;
 	
+	
 	public static Map createMapFromPrologRep(String map)
 	{
 		if(!map.contains("map"))
@@ -26,14 +27,22 @@ public class Map implements IMap{
 		return new Map(Integer.parseInt(sh[1]), Integer.parseInt(st[0]));
 	}
 	
+	public Map(int width, int heigh, Integer[][] intmap)
+	{
+		this.Xmax = width;
+		this.Ymax = heigh;
+		this.intmap = intmap;
+		
+	}
+	
 	public Map(int x, int y) {
 		this.Xmax = x;
 		this.Ymax = y;
 		
-		intmap = new Integer[y+1][x+1];
-		for(int k=0; k<=Ymax; k++)
+		intmap = new Integer[x+1][y+1];
+		for(int k=0; k<=Xmax; k++)
 		{
-			for(int j = 0; j<=Xmax; j++)
+			for(int j = 0; j<=Ymax; j++)
 			{
 				intmap[k][j] = 0;
 			}
@@ -64,10 +73,12 @@ public class Map implements IMap{
 		return toString();
 	}
 	
+	@Override
 	public int getYmax() {
 		return Ymax;
 	}
 	
+	@Override
 	public int getXmax() {
 		return Xmax;
 	}
@@ -112,7 +123,7 @@ public class Map implements IMap{
 				String[] st = els[i+1].split("\\)");
 				
 				MapElement me = new MapElement(Integer.parseInt(sh[1]), Integer.parseInt(st[0]));
-				intmap[Integer.parseInt(st[0])][Integer.parseInt(sh[1])] = 1;
+				intmap[Integer.parseInt(sh[1])][Integer.parseInt(st[0])] = 1;
 				elements.add(me);
 				i+=2;
 			}	

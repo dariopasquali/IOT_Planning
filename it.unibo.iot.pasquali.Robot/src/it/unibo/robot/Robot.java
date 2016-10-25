@@ -7,11 +7,8 @@ import java.util.List;
 import alice.tuprolog.Term;
 import it.unibo.domain.model.implmentation.Map;
 import it.unibo.is.interfaces.IOutputEnvView;
-import it.unibo.planning.astar.algo.SearchAgent;
-import it.unibo.planning.astar.domain.Move;
-import it.unibo.planning.astar.domain.State;
-import it.unibo.planning.astar.enums.Direction;
-import it.unibo.planning.domain.AbstractState;
+import it.unibo.planning.domain.Move;
+import it.unibo.planning.enums.Direction;
 import it.unibo.planning.enums.ForwardMoveType;
 import it.unibo.planning.enums.MoveType;
 import it.unibo.planning.enums.SpinDirection;
@@ -26,9 +23,9 @@ import it.unibo.robot.planutility.PlanSpinDirection;
 public class Robot extends AbstractRobot { 
 	
 	private Map map;
-	private ArrayList<it.unibo.planning.astar.domain.State> path;
+	private ArrayList<it.unibo.planning.domain.State> path;
 	
-	private it.unibo.planning.astar.domain.State position, goal;
+	private it.unibo.planning.domain.State position, goal;
 	private Direction direction;
 	int spinFactor = 1;
 	
@@ -95,7 +92,7 @@ public class Robot extends AbstractRobot {
 	
 	public void showPathOnGui()
 	{
-		for(it.unibo.planning.astar.domain.State s : path)
+		for(it.unibo.planning.domain.State s : path)
 		{
 			System.out.println(s.toString());
 		}
@@ -187,7 +184,7 @@ public class Robot extends AbstractRobot {
 
 	public void setPosition(int sx, int sy)
 	{
-		this.position =	new it.unibo.planning.astar.domain.State(sx, sy);		
+		this.position =	new it.unibo.planning.domain.State(sx, sy);		
 		this.direction = Direction.NORTH;
 		
 		println(position.toString());
@@ -203,9 +200,9 @@ public class Robot extends AbstractRobot {
 	
 	
 
-	private it.unibo.planning.astar.domain.State makeMove(it.unibo.planning.astar.domain.State state, Move move)
+	private it.unibo.planning.domain.State makeMove(it.unibo.planning.domain.State state, Move move)
 	{
-		it.unibo.planning.astar.domain.State result = new it.unibo.planning.astar.domain.State();
+		it.unibo.planning.domain.State result = new it.unibo.planning.domain.State();
 		
 		
 		if(move.getType().equals(MoveType.SPIN))

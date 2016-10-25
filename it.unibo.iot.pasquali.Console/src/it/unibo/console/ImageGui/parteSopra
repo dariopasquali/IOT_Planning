@@ -1,0 +1,22 @@
+	protected static IOutputEnvView setTheEnv(IOutputEnvView outEnvView ){
+		//EnvFrame env = new EnvFrame( "Env_console", java.awt.Color.cyan  , java.awt.Color.black );
+		//env.init();
+		//env.setSize(800,400);
+		
+		ImageGUI env = new ImageGUI();
+		env.setEnvVisible(true);
+		
+		//IOutputEnvView newOutEnvView = ((EnvFrame) env).getOutputEnvView();
+		
+		IOutputEnvView newOutEnvView = env;
+		return newOutEnvView;
+	}
+
+
+public AbstractConsole(String actorId, ActorContext myCtx, IOutputEnvView outEnvView )  throws Exception{
+	super(actorId, myCtx, "./srcMore/it/unibo/console/plans.txt", 
+	"./srcMore/it/unibo/console/WorldTheory.pl",
+	setTheEnv( outEnvView )  , "init");
+	//addInputPanel(80);
+	//addCmdPanels();	
+	}

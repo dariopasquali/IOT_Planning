@@ -10,8 +10,8 @@ import it.unibo.planning.astar.interfaces.IEngine;
 public class AStarEngine implements IEngine{
 
 	private State goal;	
-	int xmax = -1;
-	int ymax = -1;	
+	int width = -1;
+	int heigh = -1;	
 	
 	private Integer[][] intmap;
 	
@@ -26,20 +26,20 @@ public class AStarEngine implements IEngine{
 	}
 	
 	@Override
-	public void setIntMap(Integer[][] map, int xmax, int ymax)
+	public void setIntMap(Integer[][] map, int width, int heigh)
 	{
 		this.intmap = map;
-		this.xmax = xmax;
-		this.ymax = ymax;
+		this.width = width;
+		this.heigh = heigh;
 		
-		for(int k=0; k<=ymax; k++)
-		{
-			for(int j = 0; j<=xmax; j++)
-			{
-				System.out.print(intmap[k][j]);
-			}
-			System.out.println("");
-		}
+//		for(int k=0; k<this.width; k++)
+//		{
+//			for(int j = 0; j<this.heigh; j++)
+//			{
+//				System.out.print(intmap[k][j]);
+//			}
+//			System.out.println();
+//		}
 	}
 	
 	@Override
@@ -53,10 +53,10 @@ public class AStarEngine implements IEngine{
 	@Override
 	public boolean isValidState(State state) {
 		return (state.getX() >= 0 &&
-				state.getX() <= xmax &&
+				state.getX() <= width &&
 				state.getY() >= 0 &&
-				state.getY() <= ymax &&
-				intmap[state.getY()][state.getX()] != 1);
+				state.getY() <= heigh &&
+				intmap[state.getX()][state.getY()] != 1);
 	}
 
 	

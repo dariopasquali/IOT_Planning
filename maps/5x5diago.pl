@@ -1,0 +1,7 @@
+map(5,5)
+mapdata(1, element(5,5))
+mapdata(2, element(4,4))
+mapdata(3, element(3,3))
+mapdata(4, element(2,3))
+mapdata(5, element(2,2))
+mapdata(6, element(1,1))

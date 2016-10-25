@@ -1,5 +1,6 @@
 package it.unibo.planning.astar.algo;
 
+import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,16 +10,16 @@ import it.unibo.planning.astar.domain.State;
 
 public class Path{
 
-	private ArrayList<State> states;
+	private ArrayList<Point> states;
 	private ArrayList<Move> moves;
 	
 	public Path()
 	{
-		states = new ArrayList<State>();
+		states = new ArrayList<Point>();
 		moves = new ArrayList<Move>();
 	}
 	
-	public List<State> getStates() {
+	public List<Point> getPoints() {
 		return states;
 	}
 
@@ -26,8 +27,8 @@ public class Path{
 		return moves;
 	}
 
-	public void setStates(List<State> states) {
-		this.states = (ArrayList<State>)states;		
+	public void setPoints(List<Point> states) {
+		this.states = (ArrayList<Point>)states;		
 	}
 
 	public void setMoves(List<Move> moves) {
@@ -35,7 +36,7 @@ public class Path{
 		
 	}
 
-	public void addState(State state) {
+	public void addState(Point state) {
 		states.add(state);
 		
 	}
