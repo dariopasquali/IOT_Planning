@@ -82,54 +82,15 @@ loadMapFromFileProlog(PATH) :-
 	Actor <- setMapElements(List),
 	assert(havemap).
 
-/*	
-loadMapFromFile(PATH) :-
-	havemap, !,
-	retractall(mapdata(_,element(_,_))),
-	actorPrintln("retract map elements"),
-	retract(map(_,_)),
-	actorPrintln("retract map size"),
-	retract(havemap),
-	actorPrintln("retract map flag"),
-	actorobj(Actor),
-	Actor <- consultFromFile(PATH),
-	actorPrintln("consulted map data"),
-	map(Xmax, Ymax),
-	actorPrintln(Xmax),
-	actorPrintln(Ymax),
-	Actor <- loadMap(PATH),
-	assert(havemap).
-*/
-
-/*	
-loadMap(PATH) :-
-	actorobj(Actor),
-	Actor <- consultFromFile(PATH),
-	actorPrintln("consulted map data"),
-	map(Xmax, Ymax),
-	actorPrintln(Xmax),
-	actorPrintln(Ymax),
-	Actor <- loadMap(PATH),
-	assert(havemap).
-*/
-	
 loadMapImage(PATH) :-
 	actorobj(Actor),
-	%%Actor <- consultFromFile(PATH),
 	actorPrintln("consulted map data"),
-	%%map(Xmax, Ymax),
-	%%actorPrintln(Xmax),
-	%%actorPrintln(Ymax),
 	Actor <- loadMapImage(PATH),
 	assert(havemap).
 	
 loadMapButton(PATH) :-
 	actorobj(Actor),
-	%%Actor <- consultFromFile(PATH),
 	actorPrintln("consulted map data"),
-	%%map(Xmax, Ymax),
-	%%actorPrintln(Xmax),
-	%%actorPrintln(Ymax),
 	Actor <- loadMapButton(PATH),
 	assert(havemap).
 	

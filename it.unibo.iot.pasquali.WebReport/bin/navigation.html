@@ -1,0 +1,288 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.o../html4/strict.dtd">
+<html>
+
+	<link rel="stylesheet" type="text/css" href="../../css/tabStyle.css">
+	<script type="text/javascript" src="../css/issStyle.js"></script>
+	<style>
+h2 {
+    font: 100% Lucida Sans;
+    background-color: #f6d8f8;
+}
+h3 {
+    font: 90% Lucida Sans; 
+    width: 100%;
+    background-color: #f3f3f7;
+    color: #191818;
+}
+#i {
+     color: #ff1010;
+} 
+b{
+	font: 100% Lucida Console;
+	color: #2219fd;
+    font-weight: bold;
+}
+tt{
+	font: 90% Lucida Console;
+	color: #c90b46;
+    font-weight: bold;
+}
+
+.entity_title{
+	font-size: x-large;
+	font-weight: bold; 
+	background: #28c717;
+	width: 100%;
+}
+
+.subtytle{
+	font: 100% Lucida Console;
+	color: black;
+    font-weight: bold;
+}
+
+</style>
+	
+	<head>
+		<title>Scout System Report Navigation</title>
+	</head>
+    
+	<body>    
+	 
+		<div class="container wrapper"> 
+			<div class="wrapper">
+				<div id="main"> 
+				
+					<h1>Scout System - Navigation</h1>
+					<button onclick="window.location.href='home.html'">Home</button>
+					
+					<div style="background-color:#fbffb6; width:100%;float:left;"> 
+						<h3>VISION</h3>
+						
+						Create a system that can navigate autonomously in an unknown environment.<br>
+					</div> 
+					
+					<div style="background-color:#ecf8d1; width:100%;float:left;">     
+						<h3>GOALS</h3>
+						<ul>
+						
+							<li> Design and build the Navigation Phase in both the entities of the System, assuming a complete defined map</li>
+							<li> Study Artificial Intelligence algorithms to define the best path between two given point</li>
+							<li> Create a reactive navigation plan that can be interpreted and executed by an autonomous agent</li>
+							<li> Design an build a simulated and/or concrete autonomous agent.</li>
+						
+						</ul>				 
+					</div>
+					  
+					    
+					<div style="background-color:#d5faf1; width:100%;float:left;">
+						<h3>WORK TO DO</h3>
+						<ol>
+							<li>Build the Navigation Model of the of the Robot.</li>
+							<li>Build the Navigation Model of the Console.</li>
+							<li>Testing the components (unit testing).</li>
+							<li>Define a valid algorithm to compute the navigation plan.</li>
+							<li>Define a proper way to express the plan statements</li>
+							<li>Build a simulated system and test it</li>
+							<li>Build a concrete system and test it</li>
+						</ol>				    
+					</div>  
+					  
+					<br>
+					
+					<div class="entity_title">Robot Analysis</div>					
+										    
+					<h2>Robot Model - Structure</h2> 
+					
+					<tt>Name</tt>: Robot<br>
+					<tt>Context</tt>: ctxRobot<br>
+					
+					The Robot is a composed entity that can navigate autonomously in the environment;<br>
+					It's based on Raspberry Pi technology and equipped with sensor and motor, based on the DDR architecture:
+					
+					<ul>
+						<li><i>Two DC Motors</i>, that allow the Robot to move in the environment, do strict curves and change his speed;</li>
+						<li><i>Sonar sensor</i>, allow the Robot to sense objects in front of him;</li>
+						<li><i>Gyroscope</i>, to compute the Robot orientation;</li>
+						<li><i>Two Encoders</i>, to compute the Robot move distance</li>
+					</ul>
+					
+					The Robot offers a limited set of features:
+					<ul>
+						<li>Navigate from a START point to a GOAL point;</li>
+						<li>Abort the Navigation in every moment;</li>
+						<li>Avoid unexpected obstacles.</li>
+					</ul>
+					
+					<br>					
+					<h2>Robot Model - Behavior</h2>					
+					<br>
+					
+					<tt>Assumption 0</tt>: Robot start position is exactly the user defined START POSITION, Robot start direction is the Map NORTH.
+					<br>
+					<ol>
+						<li>At the Beginning of the Navigation phase the Robot waits the Navigation Data (Plan and START position) from the Console;</li>
+						<li>When it received the Data, it convert them in a runnable and complete Plan;</li>
+						<li>Then it runs the Navigation Plan:
+							<ul>
+								<li>Before each forward movement, it check the presence of unexpected obstacles;</li>
+								<li>If it find and obstacle, after a defined timeout,<br> it send the current position and new obstacle position to Console,<br> then wait the new Navigation Data,<br> create the new Plan and run it</li>
+								<li>Before every move it upgrade it's current position or direction.</li>
+							</ul>
+						</li>
+						<li>When it reached GOAL communicate, it to Console.</li>
+					</ol> 
+					
+					
+					<div class="entity_title">Console Analysis</div>
+					<br>
+					
+					<h2>Console Model - Structure</h2> 
+					
+					<tt>Name</tt>: Console<br>
+					<tt>Context</tt>: ctxConsole<br>
+					
+					The Console is an atomic entity able to interact with the User and equipped with better computational capabilities.
+					<br>To handle that tasks, It must be implemented on a desktop or mobile architecture and show an appropriate GUI.
+					
+					The Console offers a limited set of features:
+					<ul>
+						<li>Load an Environment map and show it on GUI;</li>
+						<li>Compute the best path from a START to a GOAL point (selected by the User), and show it on GUI;</li>
+						<li>Start the Robot Navigation;</li>
+						<li>Abort the Navigation in every moment.</li>
+					</ul>
+					
+					<br>					
+					<h2>Robot Model - Behavior</h2>
+									
+					<ol>
+						<li>At the Beginning of the Navigation phase the Console waits that the user select the Map file;</li>
+						<li>When it received that, it load the Map and show it on GUI;</li>
+						<li>Now the user can select the START and the GOAL point;</li>
+						<li>When user decide to start the Navigation, the Console send the Navigation Data to the Robot.<br>
+							During the Navigation can happen that:
+							<ul>
+								<li>In Every moment the User can abort the Navigation, so Console have to transmit this command to Robot</li>
+								<li>If Robot find an unexpected obstacle it sends it's current position and the new obstacle position,<br>
+								so Console have to compute the new best path to GOAL point, and send it to Robot;</li>
+								<li>Robot reach GOAL and navigation ends.</li>
+							</ul>
+						</li>
+					</ol> 
+					
+					<br>
+					<div class="entity_title">Interaction</div>
+					<br>
+					
+					I prefer to analyze the of both the entities in the same paragraph.<br>
+					In this section i have to choose the type and format of data transmitted between Robot and Console.
+					
+					<ul>
+						<li>
+							<tt>local_gui_command : local_gui_command (COMMAND)</tt>, this <b>event</b> is emitted by the GUI on user interaction, Console sense this event in order to handle the user interaction.
+							The payload COMMAND can be:
+							<ul>
+								<li><i>loadmap ( PATH )</i>,<br> where PATH is the absolute filepath of the map file;</li>
+								<li><i>findpath ( START , GOAL , ALGO )</i>,<br> START and GOAL are in the format position(X,Y), ALGO isn't used at the moment but it can be used to select the planning algorithm in the future;</li>
+								<li><i>navigate</i>,<br> to start the Robot navigation;</li>
+								<li><i>abort</i>,<br> to stop the Robot Navigation.</li> 
+							</ul>
+						</li>
+						
+						<li>
+							<tt>navdata : navdata ( PLAN , POS )</tt>, this <b>message</b> is send from the Console to the Robot to transmit the navigation data (before and during the Navigation, if is needed).
+							<br>I prefer the message form because Console perfectly knows the receiver of the data, furthermore a message is safer than an event, and i don't want to lose those data.
+							<br>This message also command the start of the Robot Navigation.
+							<ul>
+								<li>POS is the same of START and GOAL, position(X,Y);</li>
+								<li>
+									PLAN is more complex, Since a plan can be very long I prefer to encode possible moves in a very short codification.<br>
+									So i assume that a robot can only execute 3 kind of moves:
+									<ul>
+										<li>
+											<tt>move forward</tt> of a defined distance. this is encoded with <tt>t</tt> if the move is parallel to X or Y axis, or <tt>d</tt> if the move is diagonal.<br>
+											diagonal is different by horizontal or vertical move because the diagonal of a square is longer than the side, so the Robot has to increase the move forward distance.
+										</li>
+										<li>
+											<tt>spin left</tt> of a defined angle, this is encoded with <tt>l</tt>;
+										</li>
+										<li>
+											<tt>spin right</tt> of a defined angle, this is encoded with <tt>r</tt>; 
+										</li>
+									</ul>
+									
+									So PLAN is a PROLOG-like list of that encoded moves: plan ( LIST_OF_MOVES ).									
+								</li>
+							</ul>
+						</li>
+						
+						<li>
+							<tt>update : update ( ELEMENT , CURRENT )</tt>, is an <b>event</b> emitted by Robot and sensed by Console. It is used to request a new plan when an unexpected obstacle is detected.
+							<br> ELEMENT and CURRENT are in the format position ( X , Y );
+						</li>
+						
+						<li>
+							<tt>abort : abort</tt>, is an <b>event</b> emitted by Console and sensed by Robot, it's used to abort the Navigation;
+						</li>
+						
+						<li>
+							<tt>end : end</tt>, is and <b>event</b> emitted by Robot when it reach the GOAL.
+						</li>						
+					</ul> 
+					
+					For update,and end, i prefer the event form because the Console may not be the only entity concerned to listen that events.
+					<br> The same applies to abort, maybe i have multiple robots.
+					
+					<br><br>
+					<div class="entity_title">Navigation Problem Analysis</div>
+					<br>
+					
+					As I said in the <a href="home.html">home page</a>, I delegate the task to compute the best path to the Console,<br>
+					so Robot is just an executor, something that receive a sequence of command and simply execute them (this is very very similar to ButtonLedSystem).
+					<br><br>
+					Since Console compute the path isn't necessary to transmit the Map to the Robot, it only needs path and start position (to dynamically compute the current position).
+					<br>
+					Anyhow, i assume that:
+					<br><br>
+					<tt>Assumption 1</tt>: The (static) map is divided in squared cells of uniform size. The size of a cell is based on robot dimensions. Consequently, the navigation is discrete.
+					<br>
+					
+					<h2>Detect Obstacles</h2><br>
+					
+					In Order to detect unexpected obstacles Robot can use the Sonar.
+					<br>The problem is <b>when</b> be sensitive.<br>
+					
+					<br><tt>Assumption 2</tt>: Robot can only step forward of a defined distance, or turn left/right of a defined angle.
+					<br><br>
+					
+					During a rotation the Robot position doesen't change, so it can find an unexpected obstacle only during a step forward.<br>
+					There are a lot of available techniques, i decide to adopt a pessimistic one:<br>
+					The detection distance of Sonar is equal to step distance, before every forward movement Robot listen to Sonar to know if the next cell is clear.
+					<br>This solution is a bit pessimistic but very simple to implement ad also is the normal behavior of an intelligent agent.
+					
+					
+					<br><h2>Handle dynamic obstacles</h2><br>
+					
+					The requirements said that:<br><br>
+					
+					<i>During the navigation we assume that the plan is dynamic so, the Robot must detect unexpected obstacles.<br>
+						When an unexpected obstacle is found:</i>
+						<ol>
+							<li><i>The Robot stops and waits a defined time.</i></li>
+							<li><i>After that, if the obstacle is still there, the Robot must generate an alternative plan for the current position to GOAL, that avoid the new obstacle.</i>
+						</ol>
+						
+					Since the Robot is less powerful than Console, and also it don't known the full map, I once again decide to delegate the task to compute the alternative plan to Console. 
+					
+									
+				</div>
+			</div>    
+		    &emsp; 
+		<div style="background-color:#0ce0f2; width:100%;text-align:center;font-size:small;color:white">
+		By DP   
+		</div>    
+	
+	</body>
+</html>

@@ -1,4 +1,4 @@
-System exploreAndGo
+System scout
 
 /*
  * ----------------------------------------------------
@@ -9,16 +9,13 @@ System exploreAndGo
 Dispatch navdata : navdata (PLAN, POS)
 
 /*
- * MAP = mapdata ( [ map ( Xmax , Ymax ), [ mapdata( ID, element( X, Y ) ) ] ] )
- * PLAN = plan ( ALGOTYPE , [ t || d || l || r || dl || dr  ] )
+ * PLAN = plan ([ t || d || l || r ] )
  * POS = position ( Xs , Ys ) 
  * 
  * t = forward tiled
  * d = forward diagonal
- * l = left (45 or 90 degrees)
+ * l = left
  * r = right 
- * dl = double left (90 or 180 degrees)
- * dr = double right 
  */
 
 
@@ -36,7 +33,7 @@ Event end : end
 
 // Raised by Robot when find an unexpected
 // obstacle during th navigation
-Event update : update(ELEMENT, CURRENT)
+Event update : update(POS, NEWELEMENT)
  
 /*
  * ----------------------------------------------------
@@ -49,7 +46,7 @@ Event update : update(ELEMENT, CURRENT)
   * Button --> COMMAND
   * 
   * Load Map --> loadmap(PATH);
-  * Find Path –-> findpath(START,GOAL);
+  * Find Path –-> findpath(START,GOAL,ALGO);
   * Start Navigation --> navigate;
   * Abort --> abort;
  */
@@ -121,7 +118,7 @@ QActor console context ctxConsole -g cyan{
  		memoCurrentEvent;
  		
  		onEvent local_gui_command : local_gui_command(abort) -> emit abort : abort; 				
-		onEvent update : update (ELEMENT, CURRENT) -> solve updateMapAndReplan(ELEMENT , CURRENT) time(600000) onFailSwitchTo  prologFailure;		
+		onEvent update : update(POS, NEWELEMENT) -> solve updateMapAndReplan(NEWELEMENT , POS) time(600000) onFailSwitchTo  prologFailure;		
 		onEvent end : end -> switchToPlan endOfNavigation;
 		
 		repeatPlan 0
@@ -129,8 +126,7 @@ QActor console context ctxConsole -g cyan{
 	Plan endOfNavigation
 	
 		println("++++++++++++++++++ NAVIGATION ENDED :D ++++++++++++++++++");
-	
-		solve enableManipulation time(600000) onFailSwitchTo  prologFailure;
+		println("TODOOOOOOO");
 		switchToPlan waitCommand	
 	
 	

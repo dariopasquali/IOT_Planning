@@ -201,7 +201,7 @@ public class Console extends AbstractConsole {
 	
 	private String getPrologPlan()
 	{
-		String moves = "plan("+algorithm.getValue()+", [";
+		String moves = "plan("+"t"+", [";
 		for(int i=0; i<path.getMoves().size(); i++)
 		{
 			moves += path.getMoves().get(i).toString();

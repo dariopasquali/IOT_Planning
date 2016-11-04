@@ -36,7 +36,7 @@ Event end : end
 
 // Raised by Robot when find an unexpected
 // obstacle during th navigation
-Event update : update(ELEMENT)
+Event update : update(ELEMENT, CURRENT)
  
 /*
  * ----------------------------------------------------
@@ -95,7 +95,7 @@ QActor console context ctxConsole -g cyan{
 	
 	Plan loadMap resumeLastPlan
 		[?? msg(local_gui_command, "event", SENDER, none, local_gui_command (loadmap(PATH)), MSGNUM)]
-				 solve loadMapButton(PATH) time(210000000) onFailSwitchTo prologFailure;
+				 solve loadMapImage(PATH) time(210000000) onFailSwitchTo prologFailure;
 				
 		println("++++++++++++++++++ MAP LOADED ++++++++++++++++++")
 		
@@ -113,29 +113,6 @@ QActor console context ctxConsole -g cyan{
 		
 		switchToPlan waitEndOfNavigation		
 	
-/*
-	Plan sendMap
-		solve sendMap time(60000) onFailSwitchTo  prologFailure;
-		receiveMsg time(30000);
-		onMsg navack : navack -> switchToPlan sendPlan;
-		
-		repeatPlan 0	
-		
-	Plan sendPlan
-		solve sendPlan time(60000) onFailSwitchTo  prologFailure;
-		receiveMsg time(30000);
-		onMsg navack : navack -> switchToPlan sendPositions;
-		
-		repeatPlan 0
-			
-	Plan sendPositions
-		solve sendPositions time(60000) onFailSwitchTo  prologFailure;
-		receiveMsg time(30000);
-		onMsg navack : navack -> switchToPlan waitEndOfNavigation;
-		
-		repeatPlan 0
-*/		
-		
 	Plan waitEndOfNavigation
 		sense time(999999999) local_gui_command, update, end -> continue, continue, continue;
  		[ ?? tout(X,Y) ] switchToPlan handleTimeout;
@@ -144,7 +121,7 @@ QActor console context ctxConsole -g cyan{
  		memoCurrentEvent;
  		
  		onEvent local_gui_command : local_gui_command(abort) -> emit abort : abort; 				
-		onEvent update : update (ELEMENT) -> solve updateMap(ELEMENT) time(600000) onFailSwitchTo  prologFailure;		
+		onEvent update : update (ELEMENT, CURRENT) -> solve updateMapAndReplan(ELEMENT , CURRENT) time(600000) onFailSwitchTo  prologFailure;		
 		onEvent end : end -> switchToPlan endOfNavigation;
 		
 		repeatPlan 0
