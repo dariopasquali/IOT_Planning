@@ -10,6 +10,7 @@ import it.unibo.qactors.action.AsynchActionResult;
 import it.unibo.qactors.action.IActorAction;
 import it.unibo.qactors.action.IActorAction.ActionExecMode;
 import it.unibo.baseEnv.basicFrame.EnvFrame;
+import it.unibo.console.gui.ConsoleGUI;
 import alice.tuprolog.SolveInfo;
 import it.unibo.is.interfaces.IActivity;
 import it.unibo.is.interfaces.IIntent;
@@ -19,22 +20,28 @@ public abstract class AbstractConsole extends QActorPlanned implements IActivity
 	protected boolean actionResult = true;
 	protected alice.tuprolog.SolveInfo sol;
 	
-			protected static IOutputEnvView setTheEnv(IOutputEnvView outEnvView ){
-				EnvFrame env = new EnvFrame( "Env_console", java.awt.Color.cyan  , java.awt.Color.black );
-				env.init();
-				env.setSize(800,400);
-				IOutputEnvView newOutEnvView = ((EnvFrame) env).getOutputEnvView();
-				return newOutEnvView;
-			}
-	
-	
-		public AbstractConsole(String actorId, ActorContext myCtx, IOutputEnvView outEnvView )  throws Exception{
-			super(actorId, myCtx, "./srcMore/it/unibo/console/plans.txt", 
-			"./srcMore/it/unibo/console/WorldTheory.pl",
-			setTheEnv( outEnvView )  , "init");		
-			addInputPanel(80);
-			addCmdPanels();	
-	 	}
+	protected static IOutputEnvView setTheEnv(IOutputEnvView outEnvView ){
+		//EnvFrame env = new EnvFrame( "Env_console", java.awt.Color.cyan  , java.awt.Color.black );
+		//env.init();
+		//env.setSize(800,400);
+		
+		ConsoleGUI env = new ConsoleGUI();
+		env.setEnvVisible(true);
+		
+		//IOutputEnvView newOutEnvView = ((EnvFrame) env).getOutputEnvView();
+		
+		IOutputEnvView newOutEnvView = env;
+		return newOutEnvView;
+	}
+
+
+public AbstractConsole(String actorId, ActorContext myCtx, IOutputEnvView outEnvView )  throws Exception{
+	super(actorId, myCtx, "./srcMore/it/unibo/console/plans.txt", 
+	"./srcMore/it/unibo/console/WorldTheory.pl",
+	setTheEnv( outEnvView )  , "init");
+	//addInputPanel(80);
+	//addCmdPanels();	
+	}
 	protected void addInputPanel(int size){
 		((EnvFrame) env).addInputPanel(size);			
 	}
@@ -147,7 +154,7 @@ public abstract class AbstractConsole extends QActorPlanned implements IActivity
 	    while(true){
 	    nPlanIter++;
 	    		if( (guardVars = evalTheGuard( " ??msg(local_gui_command, \"event\" ,SENDER,none,local_gui_command(loadmap(PATH)),MSGNUM)" )) != null ){
-	    		{ String parg = "loadMapImage(PATH)";
+	    		{ String parg = "loadMapButton(PATH)";
 	    		parg = substituteVars(guardVars,parg);
 	    		  aar = solveGoal( parg , 210000000, "","" , "" );
 	    		//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
