@@ -1,8 +1,8 @@
 System scout
 
-// --------------------------------
+// ------------------------------------------------------------------
 //		EXPLORATION - INTERACTION
-// --------------------------------
+// ------------------------------------------------------------------
 
 // From Console to Robot to start Exploration
 Dispatch explore : explore
@@ -19,9 +19,9 @@ Event expdata : expdata ( POS , STATE )
 //STATE = clear || object
 //maybe i can send only the obstacle cell
 
-// --------------------------------
+// ------------------------------------------------------------------
 //		NAVIGATION - INTERACTION
-// --------------------------------
+// ------------------------------------------------------------------
 
 // From Console to Robot to start the Navigation
 Dispatch navdata : navdata ( PLAN , POS )
@@ -42,15 +42,20 @@ Event update : update ( ELEMENT , CURRENT )
 //CURRENT = position ( X , Y )
 
 
-// --------------------------------
+// ------------------------------------------------------------------
 //		COMMON - INTERACTION
-// --------------------------------
+// ------------------------------------------------------------------
 
 // Raised by Console to abort the current command
 Event abort : abort
 
 // Raised by Robot when it ends the current command
 Event end : end
+
+
+// ------------------------------------------------------------------
+//		LOCAL - INTERACTION
+// ------------------------------------------------------------------
 
 
 // Raised by the GUI on user interaction
@@ -65,18 +70,18 @@ Event local_gui_command : local_gui_command(COMMAND)
 //Abort --> abort;
 
 
-// --------------------------------
+// ------------------------------------------------------------------
 //			CONTEXTS
-// --------------------------------
+// ------------------------------------------------------------------
 
 Context ctxRobot ip [ host="localhost" port=8020] -standalone 
 Context ctxConsole ip [ host="localhost" port=8010]
 
 QActor console context ctxConsole -g cyan{
 	
-// --------------------------------
+// ------------------------------------------------------------------
 //			NORMAL PLANS
-// --------------------------------
+// ------------------------------------------------------------------
 	
 	Plan init normal
 		solve consult("expConsoleTheory.pl") time(0) onFailSwitchTo  consultPrologFailure ;
@@ -181,9 +186,9 @@ QActor console context ctxConsole -g cyan{
 		println("++++++++++++++++++ COMMAND ABORTED ++++++++++++++++++");
 		switchToPlan waitGUICommand	
 
-// --------------------------------
+// ------------------------------------------------------------------
 //	PROLOG FAILURE ERROR HANDLERS
-// --------------------------------
+// ------------------------------------------------------------------
 		
 	Plan handleTimeout
  		println("timeout!! GOODBYE")

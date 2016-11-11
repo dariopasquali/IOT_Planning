@@ -4,7 +4,6 @@ navConsoleTheory.pl
 ===============================================================
 */
 
-
 %% Mappa nel formato
 %% map(Xmax, Ymax). 
 %% mapdata(ID, element(X,Y)).
@@ -46,6 +45,17 @@ loadMapFromFileProlog(PATH) :-
 	actorPrintln(List),
 	Actor <- setMapElements(List),
 	assert(havemap).
+
+loadMap(PATH) :-
+	gui(MODE),
+	loadMap(PATH,MODE).
+
+loadMap(PATH, button) :-
+	loadMapButton(PATH).
+	
+loadMap(PATH, image) :-
+	loadMapImage(PATH).
+
 
 loadMapImage(PATH) :-
 	actorobj(Actor),

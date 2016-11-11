@@ -1,8 +1,8 @@
 System scout
 
-// --------------------------------
+// ------------------------------------------------------------------
 //		EXPLORATION - INTERACTION
-// --------------------------------
+// ------------------------------------------------------------------
 
 // From Console to Robot to start Exploration
 Dispatch explore : explore
@@ -19,12 +19,12 @@ Event expdata : expdata ( POS , STATE )
 //STATE = clear || object
 //maybe i can send only the obstacle cell
 
-// --------------------------------
+// ------------------------------------------------------------------
 //		NAVIGATION - INTERACTION
-// --------------------------------
+// ------------------------------------------------------------------
 
 // From Console to Robot to start the Navigation
-Dispatch navdata : navdata ( PLAN , POS )
+Dispatch navigate : navigate ( PLAN , POS )
 
 //PLAN = plan ( [ t || d || l || r ] )
 //POS = position ( Xs , Ys ) 
@@ -37,20 +37,25 @@ Dispatch navdata : navdata ( PLAN , POS )
 
 // Raised by Robot when find an unexpected
 // obstacle during the navigation
-Event update : update ( ELEMENT , CURRENT )
+Event update : update ( OBJECT , CURRENT )
 //ELEMENT = potition ( X , Y )
 //CURRENT = position ( X , Y )
 
 
-// --------------------------------
+// ------------------------------------------------------------------
 //		COMMON - INTERACTION
-// --------------------------------
+// ------------------------------------------------------------------
 
 // Raised by Console to abort the current command
 Event abort : abort
 
 // Raised by Robot when it ends the current command
 Event end : end
+
+
+// ------------------------------------------------------------------
+//		LOCAL - INTERACTION
+// ------------------------------------------------------------------
 
 
 // Raised by the GUI on user interaction
@@ -65,18 +70,18 @@ Event local_gui_command : local_gui_command(COMMAND)
 //Abort --> abort;
 
 
-// --------------------------------
+// ------------------------------------------------------------------
 //			CONTEXTS
-// --------------------------------
+// ------------------------------------------------------------------
 
 Context ctxRobot ip [ host="localhost" port=8020] -standalone 
 Context ctxConsole ip [ host="localhost" port=8010]
 
 QActor console context ctxConsole -g cyan{
 	
-// --------------------------------
+// ------------------------------------------------------------------
 //			NORMAL PLANS
-// --------------------------------
+// ------------------------------------------------------------------
 	
 	Plan init normal
 		solve consult("expConsoleTheory.pl") time(0) onFailSwitchTo  consultPrologFailure ;
@@ -132,7 +137,7 @@ QActor console context ctxConsole -g cyan{
 			
 	Plan loadMap
 		[?? msg(local_gui_command, "event", SENDER, none, local_gui_command (loadmap(PATH)), MSGNUM)]
-			 solve loadMapButton(PATH) time(210000000) onFailSwitchTo loadMapFailure;
+			 solve loadMap(PATH) time(210000000) onFailSwitchTo loadMapFailure;
 				
 		println("++++++++++++++++++ MAP LOADED ++++++++++++++++++")
 		
@@ -163,8 +168,8 @@ QActor console context ctxConsole -g cyan{
  		
  		onEvent local_gui_command : local_gui_command(abort) -> switchToPlan abortCommand; 
  						
-		onEvent update : update (ELEMENT, CURRENT) ->
-			 solve updateMapAndReplan(ELEMENT , CURRENT) time(600000)
+		onEvent update : update (OBJECT, CURRENT) ->
+			 solve updateMapAndReplan(OBJECT , CURRENT) time(600000)
 			 onFailSwitchTo  alternativeFindpathFailure;	
 			 	
 		onEvent end : end -> switchToPlan endOfNavigation;
@@ -181,9 +186,9 @@ QActor console context ctxConsole -g cyan{
 		println("++++++++++++++++++ COMMAND ABORTED ++++++++++++++++++");
 		switchToPlan waitGUICommand	
 
-// --------------------------------
+// ------------------------------------------------------------------
 //	PROLOG FAILURE ERROR HANDLERS
-// --------------------------------
+// ------------------------------------------------------------------
 		
 	Plan handleTimeout
  		println("timeout!! GOODBYE")

@@ -151,11 +151,11 @@ public class Console extends AbstractConsole {
 		println(pp);
 		println(po);
 		
-		temporaryStr = unifyMsgContent("navdata(PLAN,POS)","navdata("+pp+","+po+")", guardVars ).toString();
+		temporaryStr = unifyMsgContent("navigate(PLAN,POS)","navigate("+pp+","+po+")", guardVars ).toString();
 		println("temp string "+temporaryStr);
 		try
 		{
-			sendMsg("navdata","robot", ActorContext.dispatch, temporaryStr );
+			sendMsg("navigate","robot", ActorContext.dispatch, temporaryStr );
 		} catch (Exception e)
 		{
 			e.printStackTrace();

@@ -4,8 +4,17 @@ consoleTheory.pl
 ===============================================================
 */
 
-defaultSpeed(60).
-defaultDuration(500).
+
+%% CONSOLE CONFIG -------------------------------
+
+%%gui(image).
+gui(button).
+
+
+%%defaultSpeed(60).
+%%defaultDuration(500).
+
+%%-----------------------------------------------
 
 getElements(List) :-
 	getElements([], 1, List).
