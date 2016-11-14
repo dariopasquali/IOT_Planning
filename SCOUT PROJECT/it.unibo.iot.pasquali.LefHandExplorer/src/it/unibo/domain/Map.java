@@ -70,34 +70,34 @@ public class Map {
 
 	public boolean isCellClear(int x, int y) {
 		
-		return(intmap[y][x]==CLEAR);
+		return(intmap[x][y]==CLEAR);
 	}
 	
 	public boolean isCellNone(int x, int y) {
 		
-		return(intmap[y][x]==NONE);
+		return(intmap[x][y]==NONE);
 	}
 	
 	public boolean isCellObj(int x, int y) {
 		
-		return(intmap[y][x]==OBJ);
+		return(intmap[x][y]==OBJ);
 	}
 	
 	public void setCellClear(int x, int y) {
 		
-		intmap[y][x]=CLEAR;
+		intmap[x][y]=CLEAR;
 		noneCounter --;
 	}
 	
 	public void setCellNone(int x, int y) {
 		
-		intmap[y][x]=NONE;
+		intmap[x][y]=NONE;
 		noneCounter ++;
 	}
 	
 	public void setCellObj(int x, int y) {
 		
-		intmap[y][x]=OBJ;
+		intmap[x][y]=OBJ;
 		noneCounter --;
 	}
 	
@@ -150,6 +150,19 @@ public class Map {
 					intmap[k][j] = OBJ;
 			}
 		}
+	}
+
+	public void setElement(int x, int y, int state) {
+		
+		if(state != Map.CLEAR || state != Map.NONE || state != Map.OBJ)
+			return;
+		
+		if(x>=0 &&
+				x<width &&
+				y >= 0 &&
+				y < height)
+			intmap[x][y] = state;
+		
 	}
 	
 }
