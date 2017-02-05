@@ -1,8 +1,8 @@
 package it.unibo.planning.astar.domain;
 
-import it.unibo.planning.astar.enums.ForwardMoveType;
-import it.unibo.planning.astar.enums.MoveType;
-import it.unibo.planning.astar.enums.SpinDirection;
+import it.unibo.planning.enums.ForwardMoveType;
+import it.unibo.planning.enums.MoveType;
+import it.unibo.planning.enums.SpinDirection;
 
 public class Move {
 	

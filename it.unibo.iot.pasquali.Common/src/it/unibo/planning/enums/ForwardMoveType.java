@@ -1,4 +1,4 @@
-package it.unibo.planning.astar.enums;
+package it.unibo.planning.enums;
 
 public enum ForwardMoveType {
 	
@@ -8,13 +8,35 @@ public enum ForwardMoveType {
 		private final String direction;
 		private final int cost;
 		
-	    private ForwardMoveType(String s, int cost) { direction = s; this.cost = cost; }
-	    public boolean equalsDirection(String otherDir){ return otherDir == direction; }
-	    public int getCost(){return cost;}
-	    public String toString(){switch(direction){
-	    case "T": return "t";
-	    case "D": return "d";
-	    default: return "";
+	    private ForwardMoveType(String s, int cost)
+	    {
+	    	direction = s;
+	    	this.cost = cost;
 	    }
-    }
+	    
+	    public boolean equalsDirection(String otherDir)
+	    {
+	    	return otherDir == direction;
+	    }
+	    
+	    public int getCost(){return cost;}
+	    
+	    public String toString()
+	    {
+	    	switch(direction)
+	    	{
+	    		case "T": return "t";
+	    		case "D": return "d";
+	    		default: return "";
+	    	}
+	    }
+	    
+	    public static ForwardMoveType fromString(String dir)
+	    {
+	    	for(ForwardMoveType pm : ForwardMoveType.values())
+	    		if(dir.equals(pm.toString()))
+	    			return pm;
+	    	
+	    	return null;
+	    }
 }

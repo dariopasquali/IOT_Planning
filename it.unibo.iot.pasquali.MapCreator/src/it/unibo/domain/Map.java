@@ -71,7 +71,9 @@ public class Map {
 	}
 
 	public void addElement(IMapElement newElement) {
-		elements.add(newElement);		
+		
+		if(!elements.contains(newElement))
+			elements.add(newElement);		
 	}
 
 	public List<IMapElement> getElements() {

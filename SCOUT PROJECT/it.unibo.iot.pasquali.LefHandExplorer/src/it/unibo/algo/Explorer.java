@@ -3,26 +3,29 @@ package it.unibo.algo;
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 
 import it.unibo.domain.Map;
-import it.unibo.domain.Move;
 import it.unibo.domain.State;
 import it.unibo.engine.Engine;
+import it.unibo.gui.MapViewerPanel;
 import it.unibo.planning.astar.algo.AStarSearchAgent;
 import it.unibo.planning.astar.algo.Path;
 import it.unibo.planning.astar.engine.AStarEngine;
-import it.unibo.planning.astar.enums.PositionMove;
+import it.unibo.planning.enums.PositionMove;
 
 public class Explorer {
 
 	private boolean explore;
 	private Engine engine;
 
-	public void startExploration(Point start, Map map) {
+	public void startExploration(Point start, Map map, MapViewerPanel viewer) {
 
-		Engine engine = new Engine(start, map);
-
+		engine = new Engine(start, map, viewer);
+		explore = true;
+		
+		engine.setCurrentClear();
+		
+		findLeftWall();
 	}
 
 	private void findLeftWall() {
@@ -30,16 +33,17 @@ public class Explorer {
 			endOfExploration();
 
 		if (engine.checkObjFront()) {
-			engine.turnRight();
+			engine.turnDoubleRight();
 			followWall();
 		}
 
-		if (!engine.checkObjLeft()) {
+		if (explore && !engine.checkObjLeft()) {
 			do {
 				engine.moveForward();
-
+				engine.addCurrentToVisited();
+				
 				if (engine.checkObjFront()) {
-					engine.turnRight();
+					engine.turnDoubleRight();
 					break;
 				}
 
@@ -55,48 +59,54 @@ public class Explorer {
 
 	private void followWall() {
 		
+		if(!explore)
+			return;
+		
 		do{
 			
 			if(!engine.checkObjFront())
 			{
 				engine.moveForward();
 				
-				if(engine.currentAlreadyVisited())
+				if(engine.isCurrentAlreadyVisited())
 				{
-					if(engine.moreToExplore())
+					Point n = findNearestNotExploredCell();
+					
+					if(n == null)
 					{
-						Point n = findNearestNotExploredCell();
-						
-						ArrayList<Move> path = computeBestPath(n);;
-						
-						engine.travel(path);
-						
-						findLeftWall();
-					}
-					else
 						explore = false;
+						break;
+					}
+					
+					Path path = computeBestPath(n);;
+					
+					engine.travel(path);
+					
+					findLeftWall();
 				}
+				
+				engine.addCurrentToVisited();
 			}
 			else
 			{
 				if(!engine.checkObjLeft() && !engine.checkExploredLeft())
 				{
-					engine.turnRight();
+					engine.turnDoubleLeft();
 				}
 				else
-					engine.turnLeft();
+					engine.turnDoubleRight();
 			}			
-		}while(engine.checkObjLeft());
+		}while(explore && engine.checkObjLeft());
 		
 		if(explore)
 		{
-			engine.turnLeft();
+			engine.turnDoubleLeft();
 			findLeftWall();
 		}
 		
 	}
 
-	private ArrayList<Move> computeBestPath(Point goal) {
+	private Path computeBestPath(Point goal) {
 
 		AStarSearchAgent agent = new AStarSearchAgent();
 		
@@ -104,36 +114,41 @@ public class Explorer {
 		
 		AStarEngine ae = new AStarEngine();		
 		
-		Map m = engine.getCurrentMap();
-		m.fillUnexploredCell();
+		Map astarMap = new Map(engine.getCurrentMap().getYMax(),
+								engine.getCurrentMap().getXMax(),
+								engine.getCurrentMap().getIntMap());
 		
-		ae.setIntMap(m.getIntMap(), m.getWidth(), m.getHeight());
+		astarMap.fillUnexploredCell();
+		astarMap.setCellClear(goal.y, goal.x);
 		
-		System.out.println("LET'S FIND BEST PATH");
+		System.out.println("SEARCH MAP ---- ");		
+		ae.setIntMap(astarMap.getIntMap(), astarMap.getYMax(), astarMap.getXMax());
+		
+		//System.out.println("LET'S FIND BEST PATH");
 		
 		State current = engine.getCurrent();
 		
-		Path path = agent.searchBestPath(ae, current.getCoordinates(),
-				PositionMove.valueOf(current.getDirection().toString()),goal);		
+		Path path = agent.searchBestPath(ae,
+										current.getCoordinates(),
+										PositionMove.fromDirection(current.getDirection().toString()),
+										goal);		
 		
 		System.out.println("Search Time --> " + (System.currentTimeMillis() - st) +" ms");
 		
-		List<it.unibo.planning.astar.domain.Move> moves = path.getMoves();		
-		ArrayList<Move> myMoves = new ArrayList<Move>();
-		
-		for(it.unibo.planning.astar.domain.Move mm : moves)
-		{
-			myMoves.add(new Move(mm));
-		}
-		
-		return myMoves;
+		return path;
 	}
 
-	private Point findNearestNotExploredCell() {
-		ArrayList<State> neighbours = engine.getUnexploredNeighbours();
-		Collections.sort(neighbours);
+
+	private Point findNearestNotExploredCell()
+	{
+		ArrayList<State> unexplored = engine.getUnexploredNeighbors();
 		
-		return neighbours.get(0).getCoordinates();
+		if(unexplored.isEmpty())
+			return null;
+		
+		Collections.sort(unexplored);
+		
+		return unexplored.get(0).getCoordinates();
 	}
 
 	
@@ -141,4 +156,10 @@ public class Explorer {
 		System.out.println("Si cazzo ce l'abbiamo fatta");
 	}
 
+	@Override
+	public String toString()
+	{
+		return engine.toString();
+	}
+	
 }

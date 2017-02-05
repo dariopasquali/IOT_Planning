@@ -50,4 +50,6 @@ public class MapElement implements IMapElement{
 		else
 			return false;
 	}
+
+
 }

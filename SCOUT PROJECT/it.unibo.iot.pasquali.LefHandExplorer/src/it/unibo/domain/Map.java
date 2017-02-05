@@ -2,51 +2,64 @@ package it.unibo.domain;
 
 
 
-public class Map {
+public class Map{
 
 	public static final int NONE = -1,
 							CLEAR = 0,
 							OBJ = 1;
 	
-	private int width;
-	private int height;
+	private int xmax; //aka X
+	private int ymax; //aka Y
 	private Integer[][] intmap;
 	
-	private int noneCounter;
+	/*
+	 * MAP FORMAT
+	 * 			N
+	 * 		------ X
+	 * 		|
+	 * 	W	|		E
+	 * 		|
+	 * 		Y
+	 * 			S
+	 */
 	
-	public Map(int width, int height, Integer[][] intmap)
+	
+	public Map(int ymax, int xmax, Integer[][] intmap)
 	{
-		this.width = width;
-		this.height = height;
-		this.intmap = intmap;
-		noneCounter = 0;
+		this.xmax = xmax;
+		this.ymax = ymax;
+		this.intmap = new Integer[ymax+1][xmax+1];
+		
+		for(int y=0; y<=ymax; y++)
+			for(int x=0; x<=xmax; x++)
+				this.intmap[y][x] = intmap[y][x];
+		
+		//this.intmap = intmap.clone();
 		
 	}
 	
-	public Map(int x, int y) {
-		this.width = x;
-		this.height = y;
+	public Map(int ymax, int xmax) {
+
+		this.ymax = ymax;
+		this.xmax = xmax;
 		
-		noneCounter = 0;
-		
-		intmap = new Integer[y+1][x+1];
-		for(int k=0; k<=width; k++)
-		{
-			for(int j = 0; j<=height; j++)
-			{
-				intmap[k][j] = NONE;
-				noneCounter++;
-				
-			}
-		}
+		intmap = new Integer[ymax+1][xmax+1];
+		clearAll();
 	}
 	
-	public int getHeight() {
-		return height;
+	public Map(Map currentMap) {
+		this.ymax = currentMap.ymax;
+		this.xmax = currentMap.xmax;
+		this.intmap = currentMap.intmap.clone();
+	}
+
+	
+	public int getYMax() {
+		return ymax;
 	}
 	
-	public int getWidth() {
-		return width;
+	public int getXMax() {
+		return xmax;
 	}
 
 	public Integer[][] getIntMap()
@@ -56,57 +69,77 @@ public class Map {
 	
 	public void clearAll() {
 		
-		noneCounter = 0;
-		
-		for(int k=0; k<=height; k++)
+		for(int y=0; y<=ymax; y++)
 		{
-			for(int j = 0; j<=width; j++)
+			for(int x = 0; x<=xmax; x++)
 			{
-				intmap[k][j] = NONE;
-				noneCounter++;
+				intmap[y][x] = NONE;
 			}
 		}	
 	}
 
-	public boolean isCellClear(int x, int y) {
+	
+	public boolean isCellClear(int y, int x) {
 		
-		return(intmap[x][y]==CLEAR);
+		return y>=0 &&
+				y<=ymax &&
+				x>=0 &&
+				x<=xmax &&
+				(intmap[y][x]==CLEAR);
 	}
 	
-	public boolean isCellNone(int x, int y) {
+	public boolean isCellNone(int y, int x) {
 		
-		return(intmap[x][y]==NONE);
+		return y>=0 &&
+				y<=ymax &&
+				x>=0 &&
+				x<=xmax &&
+				(intmap[y][x]==NONE);
 	}
 	
-	public boolean isCellObj(int x, int y) {
+	public boolean isCellObj(int y, int x) {
 		
-		return(intmap[x][y]==OBJ);
+		return y>=0 &&
+				y<=ymax &&
+				x>=0 &&
+				x<=xmax &&
+				(intmap[y][x]==OBJ);
 	}
 	
-	public void setCellClear(int x, int y) {
+	public void setCellClear(int y, int x) {
 		
-		intmap[x][y]=CLEAR;
-		noneCounter --;
-	}
-	
-	public void setCellNone(int x, int y) {
+		if(!(y>=0 &&
+				y<=ymax &&
+				x>=0 &&
+				x<=xmax))
+			return;
 		
-		intmap[x][y]=NONE;
-		noneCounter ++;
+		intmap[y][x]=CLEAR;
 	}
 	
-	public void setCellObj(int x, int y) {
+	public void setCellNone(int y, int x) {
 		
-		intmap[x][y]=OBJ;
-		noneCounter --;
+		if(!(y>=0 &&
+				y<=ymax &&
+				x>=0 &&
+				x<=xmax))
+			return;
+		
+		intmap[y][x]=NONE;
 	}
 	
-	public boolean moreToExplore()
-	{
-		return noneCounter > 0;
+	public void setCellObj(int y, int x) {
+		
+		if(!(y>=0 &&
+				y<=ymax &&
+				x>=0 &&
+				x<=xmax))
+			return;
+		
+		intmap[y][x]=OBJ;
 	}
 	
-	public void addElementsFromString(String elem) {
+	public void addElementFromString(String elem) {
 
 		int i = 0;
 		String[] els = elem.split(",");
@@ -115,10 +148,10 @@ public class Map {
 		{
 			while(i < els.length)
 			{
-				String[] sh = els[i].split("\\(");
-				String[] st = els[i+1].split("\\)");
+				String[] x = els[i].split("\\(");
+				String[] y = els[i+1].split("\\)");
 				
-				intmap[Integer.parseInt(st[0])][Integer.parseInt(sh[1])] = 1;
+				intmap[Integer.parseInt(y[0])][Integer.parseInt(x[1])] = OBJ;
 				i+=2;
 			}	
 		}
@@ -133,36 +166,104 @@ public class Map {
 		if(!map.contains("map"))
 			return null;
 		
-		String[] s = map.split(",");
-		String[] sh = s[0].split("\\(");
-		String[] st = s[1].split("\\)");
+		/*
+		 * read
+		 * ---->X
+		 * |
+		 * |
+		 * Y
+		 * 
+		 * save
+		 * ----> Y
+		 * |
+		 * |
+		 * X
+		 */
 		
-		return new Map(Integer.parseInt(sh[1]), Integer.parseInt(st[0]));
+		
+		String[] s = map.split(",");
+		String[] sxmax = s[0].split("\\(");
+		String[] symax = s[1].split("\\)");
+		
+		return new Map(Integer.parseInt(symax[0]), Integer.parseInt(sxmax[1]));
 	}
-	
+		
 	public void fillUnexploredCell()
 	{
-		for(int k=0; k<=height; k++)
+		for(int y=0; y<=ymax; y++)
 		{
-			for(int j = 0; j<=width; j++)
+			for(int x = 0; x<=xmax; x++)
 			{
-				if(intmap[k][j] == NONE)
-					intmap[k][j] = OBJ;
+				if(intmap[y][x] == NONE)
+					intmap[y][x] = OBJ;
 			}
 		}
 	}
 
-	public void setElement(int x, int y, int state) {
+	public void setElement(int y, int x, int state) {
 		
 		if(state != Map.CLEAR || state != Map.NONE || state != Map.OBJ)
 			return;
 		
-		if(x>=0 &&
-				x<width &&
-				y >= 0 &&
-				y < height)
-			intmap[x][y] = state;
+		if(y>=0 &&
+				y<ymax &&
+				x >= 0 &&
+				x < xmax)
+			intmap[y][x] = state;
 		
 	}
+	
+	@Override
+	public String toString()
+	{
+		String s = "  ";
+		
+		for(int x=0; x<=xmax; x++)
+			s+=x;
+		
+		s+="\n";
+		
+		for(int y=0; y<=ymax; y++)
+		{
+			s+=y+" ";
+			for(int x=0; x<=xmax; x++)
+			{
+				if(intmap[y][x] == NONE)
+					s += "-";
+				if(intmap[y][x] == CLEAR)
+					s += "0";
+				if(intmap[y][x] == OBJ)
+					s += "1";
+			}
+			s+="\n";
+		}
+		
+		return s;
+	}
+
+	public boolean isValidCell(int y, int x)
+	{
+		return y>=0 && y <= ymax && x >=0 && x <= xmax;
+	}
+	
+	
+	
+	public void transpose() {
+		Integer[][] temp = new Integer[xmax+1][ymax+1];
+		
+		for(int y=0; y<=ymax; y++)
+		{
+			for(int x=0; x<=xmax; x++)
+			{
+				temp[x][y] = intmap[y][x];
+			}
+		}
+		int tempXmax = xmax;
+		this.xmax = ymax;
+		this.ymax = tempXmax;
+		this.intmap = temp;
+	}
+	
+
 	
 }

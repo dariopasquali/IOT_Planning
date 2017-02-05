@@ -3,7 +3,7 @@ package it.unibo.planning.astar.interfaces;
 import java.util.List;
 
 import it.unibo.planning.astar.domain.State;
-import it.unibo.planning.astar.enums.PositionMove;
+import it.unibo.planning.enums.PositionMove;
 
 public interface IEngine {
 

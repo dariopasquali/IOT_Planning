@@ -36,21 +36,25 @@ public class MapViewerPanel {
 	
 	private JPanel p;
 	private Map map;
-	private int rows, cols;
+	
+	private int ymax, // RIGHE
+				xmax; // COLONNE
+	
     private JButton[][] matrix = null;
+    private boolean enableClick;
     
     private Point start;
 
     
 	private class ClickHandler implements MouseListener{
 
-		private int r;
-		private int c;
+		private int y;
+		private int x;
 		
-		public ClickHandler(int r, int c)
+		public ClickHandler(int y, int x)
 		{
-			this.r = r;
-			this.c = c;
+			this.y = y;
+			this.x = x;
 		}		
 		
 		@Override
@@ -75,6 +79,7 @@ public class MapViewerPanel {
 			
 		}
 
+		//TODO
 		@Override
 		public void mouseReleased(MouseEvent e) {
 			
@@ -82,13 +87,18 @@ public class MapViewerPanel {
 			{
 				if(start != null)
 				{
-					setCellState(start.y, start.x, CellState.NONE);
+					setCellState(start.y, start.x, CellState.CLEAR);
 				}
 				
-				setCellState(r,c, CellState.START);
-				start = new Point(c, r);
+				setCellState(y,x, CellState.START);
+				start = new Point(x, y);
 			}
 		}				
+	}
+	
+	public MapViewerPanel(boolean enableClick)
+	{
+		this.enableClick = enableClick;
 	}
 	
 	
@@ -101,51 +111,107 @@ public class MapViewerPanel {
 		return map;
 	}
 	
-	public int getRows()
+	public int getYMax()
 	{
-		return rows;
+		return ymax;
 	}
 	
-	public int getCols()
+	public int getXMax()
 	{
-		return cols;
+		return xmax;
 	}
     
-    private JButton getGridButton(int r, int c) {
-        return matrix[c][r];
+    private JButton getGridButton(int y, int x) {
+        return matrix[y][x];
     }
 
-    private JButton createCell(final int row, final int col) {
+    private JButton createCell(final int y, final int x) {
         final JButton b = new JButton("");
         
-        ClickHandler handler = new ClickHandler(row, col);
+        ClickHandler handler = new ClickHandler(y, x);
         
-        b.addMouseListener(handler);
+        if(enableClick)
+        	b.addMouseListener(handler);
         return b;
     }
     
-    public void setCellState(int x, int y, CellState state)
+    public void setCellState(int y, int x, CellState state)
     {
     	getGridButton(y, x).setBackground(state.getColor());
-    	map.setElement(x, y, state.getMapState());
+    	p.revalidate();
+    	p.repaint();
     }
     
-    public JPanel createGridPanel(int rows, int cols) {
+    public void setCellClear(int y, int x)
+    {
+    	if(!(y>=0 &&
+				y<=ymax &&
+				x>=0 &&
+				x<=xmax))
+			return;
     	
-    	this.rows = rows;
-    	this.cols = cols;
-    	matrix = new JButton[cols][rows];
+    	getGridButton(y, x).setBackground(CellState.CLEAR.getColor());
+    	p.revalidate();
+    	p.repaint();
     	
-        p = new JPanel(new GridLayout(rows, cols));
+    }
+    
+    public void setCellObj(int y, int x)
+    {
+    	if(!(y>=0 &&
+				y<=ymax &&
+				x>=0 &&
+				x<=xmax))
+			return;
+    	
+    	getGridButton(y, x).setBackground(CellState.OBJECT.getColor());
+    	getGridButton(y, x).setEnabled(false);
+    	p.revalidate();
+    	p.repaint();
+    	
+    }
+    
+    public void setCellNone(int y, int x)
+    {
+    	if(!(y>=0 &&
+				y<=ymax &&
+				x>=0 &&
+				x<=xmax))
+			return;
+    	
+    	getGridButton(y, x).setBackground(CellState.NONE.getColor());
+    	p.repaint();
+    	
+    }
+    
+	public void setCellPos(int y, int x) {
+    	
+		if(!(y>=0 &&
+				y<=ymax &&
+				x>=0 &&
+				x<=xmax))
+			return;
+    	
+    	getGridButton(y, x).setBackground(CellState.START.getColor());
+    	p.repaint();
+	}
+    
+    public JPanel createGridPanel(int ymax, int xmax) {
+    	
+    	this.ymax = ymax;
+    	this.xmax = xmax;
+    	matrix = new JButton[ymax][xmax];
+    	
+        p = new JPanel(new GridLayout(ymax, xmax));
         
-        for(int r = 0; r < rows; r ++)
+        for(int y = 0; y < ymax; y ++)
         {
-        	for(int c = 0; c < cols; c++)
+        	for(int x = 0; x < xmax; x++)
         	{
-        		JButton gb = createCell(r, c);
+        		JButton gb = createCell(y, x);
         		gb.setBackground(CellState.NONE.getColor());
-                gb.setPreferredSize(new Dimension(20,20));
-                matrix[c][r] = gb;
+        		gb.setPreferredSize(new Dimension(20,20));
+                matrix[y][x] = gb;
                 p.add(gb);
         	}
         }
@@ -160,14 +226,22 @@ public class MapViewerPanel {
 	
 	public void clearAll() {
 		
-		for(int r = 0; r<rows; r++)
-			for(int c = 0; c<cols; c++)
-				matrix[c][r].setBackground(Color.GRAY);
+		for(int y = 0; y<ymax; y++)
+			for(int x = 0; x<xmax; x++)
+				matrix[y][x].setBackground(Color.GRAY);
 		
 		map.clearAll();		
 	}
 
 
+	public Point getStart() {
+		return start;
+	}
+
+
+
+
+	
 	
 	
 

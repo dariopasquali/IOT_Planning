@@ -10,10 +10,10 @@ import java.util.TreeMap;
 import it.unibo.planning.astar.domain.Move;
 import it.unibo.planning.astar.domain.State;
 import it.unibo.planning.astar.engine.AStarEngine;
-import it.unibo.planning.astar.enums.ForwardMoveType;
-import it.unibo.planning.astar.enums.PositionMove;
-import it.unibo.planning.astar.enums.SpinDirection;
 import it.unibo.planning.astar.interfaces.IEngine;
+import it.unibo.planning.enums.ForwardMoveType;
+import it.unibo.planning.enums.PositionMove;
+import it.unibo.planning.enums.SpinDirection;
 
 
 public class AStarSearchAgent {
@@ -90,7 +90,7 @@ public class AStarSearchAgent {
 			Collections.sort((ArrayList<State>)openSet);
 		}
 		
-		System.out.println("Open set is empty, maybe we have a problem");
+		System.out.println("Open set is empty, maybe we have a problem, or maybe WE CAN'T MOVE!!");
 		return null;		
 	}
 	
@@ -154,7 +154,7 @@ public class AStarSearchAgent {
 			Collections.sort((ArrayList<State>)openSet);
 		}
 		
-		System.out.println("Open set is empty, maybe we have a problem");
+		System.out.println("Open set is empty, maybe we have a problem, or maybe WE CAN'T MOVE!!");
 		return null;		
 	}
 	
@@ -250,6 +250,7 @@ public class AStarSearchAgent {
 				
 	}
 	
+	//START DIRECTION PASSED AS PARAMETER
 	private ArrayList<Move> recostructPath(State start, PositionMove startPosition, State current) {
 		
 		
@@ -266,6 +267,8 @@ public class AStarSearchAgent {
 		ArrayList<Move> path = new ArrayList<Move>();
 		
 		PositionMove actual = startPosition;
+		
+		Collections.reverse(dirs);
 		
 		for(PositionMove next : dirs)
 		{
@@ -284,17 +287,23 @@ public class AStarSearchAgent {
 		
 		int spins = (next.getPhase()-actual.getPhase())/45;
 		
+		if(spins > 4)
+			spins = spins - 8;
+		
+		if(spins < -4)
+			spins = 8 + spins;
+		
 		if(spins > 0)
-		{
-			for(int i=0; i<Math.abs(spins); i++)
+		{	
+			for(int i=0; i<spins; i++)
 				moves.add(new Move(SpinDirection.RIGHT));
 		}
-		else if(spins < 0)
+		else if(spins<0)
 		{
 			for(int i=0; i<Math.abs(spins); i++)
 				moves.add(new Move(SpinDirection.LEFT));
 		}
-		
+			
 		if(next.getPhase()%90 != 0)
 			moves.add(new Move(ForwardMoveType.DIAGONAL));
 		else

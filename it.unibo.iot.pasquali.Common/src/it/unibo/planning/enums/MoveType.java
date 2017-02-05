@@ -1,4 +1,4 @@
-package it.unibo.planning.astar.enums;
+package it.unibo.planning.enums;
 
 public enum MoveType {
 	STEP,

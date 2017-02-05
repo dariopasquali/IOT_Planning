@@ -4,16 +4,33 @@ import java.util.ArrayList;
 import java.util.List;
 
 import it.unibo.planning.astar.domain.State;
-import it.unibo.planning.astar.enums.PositionMove;
 import it.unibo.planning.astar.interfaces.IEngine;
+import it.unibo.planning.enums.PositionMove;
 
 public class AStarEngine implements IEngine{
 
 	private State goal;	
-	int width = -1;
-	int heigh = -1;	
+	int xmax = -1;
+	int ymax = -1;	
 	
 	private Integer[][] intmap;
+	//refactor of the intmap
+	/*			NORTH
+	 * 		---------->X
+	 * 		|
+	 * 		|
+	 * WESR	|			EAST
+	 * 		|
+	 * 		\/
+	 * 		Y
+	 * 			SOUTH 
+	 * 
+	 * so width = xmax
+	 * and height = ymax
+	 * 
+	 * and the intmap is intmap[y][x] like the explorer
+	 * because is better, shout up 
+	 */
 	
 	public AStarEngine()
 	{
@@ -26,20 +43,13 @@ public class AStarEngine implements IEngine{
 	}
 	
 	@Override
-	public void setIntMap(Integer[][] map, int width, int heigh)
+	public void setIntMap(Integer[][] map, int ymax, int xmax)
 	{
-		this.intmap = map;
-		this.width = width;
-		this.heigh = heigh;
+		this.intmap = map.clone();
+		this.ymax = ymax;
+		this.xmax = xmax;
 		
-//		for(int k=0; k<this.width; k++)
-//		{
-//			for(int j = 0; j<this.heigh; j++)
-//			{
-//				System.out.print(intmap[k][j]);
-//			}
-//			System.out.println();
-//		}
+		//printIntMap();
 	}
 	
 	@Override
@@ -52,11 +62,12 @@ public class AStarEngine implements IEngine{
 
 	@Override
 	public boolean isValidState(State state) {
+		
 		return (state.getX() >= 0 &&
-				state.getX() <= width &&
+				state.getX() <= xmax &&
 				state.getY() >= 0 &&
-				state.getY() <= heigh &&
-				intmap[state.getX()][state.getY()] != 1);
+				state.getY() <= ymax &&
+				intmap[state.getY()][state.getX()] != 1);
 	}
 
 	
@@ -77,49 +88,47 @@ public class AStarEngine implements IEngine{
 		switch(dir)
 		{
 		case NORTH:
-			result.setX(x);
-			result.setY(y-1);
+			y-=1;
 			break;
 		
 		case NORTH_EAST:
-			result.setX(x+1);
-			result.setY(y-1);
+			x+=1;
+			y-=1;
 			break;
 			
 		case EAST:
-			result.setX(x+1);
-			result.setY(y);
+			x+=1;
 			break;
 			
 		case SOUTH_EAST:
-			result.setX(x+1);
-			result.setY(y+1);
+			x+=1;
+			y+=1;
 			break;
 			
 		case SOUTH:
-			result.setX(x);
-			result.setY(y+1);
+			y+=1;
 			break;
 			
 		case SOUTH_WEST:
-			result.setX(x-1);
-			result.setY(y+1);
+			x-=1;
+			y+=1;
 			break;
 			
 		case WEST:
-			result.setX(x-1);
-			result.setY(y);
+			x-=1;
 			break;
 			
 		case NORTH_WEST:
-			result.setX(x-1);
-			result.setY(y-1);
+			x-=1;
+			y-=1;
 			break;
 			
 		default:
 			break;
 		}
 		
+		result.setX(x);
+		result.setY(y);
 		result.setCost(start.getCost()+dir.getCost());
 		result.setPositionGenMove(dir);
 		result.setHeuristic(evaluateState(result));
@@ -131,9 +140,7 @@ public class AStarEngine implements IEngine{
 	@Override
 	public List<State> getValidSuccessors(State state) {
 
-		ArrayList<State> valid = new ArrayList<State>();
-		
-		
+		ArrayList<State> valid = new ArrayList<State>();		
 		
 		for(PositionMove pm : PositionMove.values())
 		{
@@ -192,6 +199,28 @@ public class AStarEngine implements IEngine{
 		
 		return valid;
 		
+	}
+	
+	private void printIntMap()
+	{
+		String s = "  ";
+		
+		for(int x=0; x<=xmax; x++)
+			s+=x;
+		
+		s+="\n";
+		
+		for(int y=0; y<=ymax; y++)
+		{
+			s+=y+" ";
+			for(int x=0; x<=xmax; x++)
+			{
+				s+=intmap[y][x];
+			}
+			s+="\n";
+		}
+		
+		System.out.println(s);
 	}
 
 }

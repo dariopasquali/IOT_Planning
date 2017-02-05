@@ -32,6 +32,7 @@ import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import it.unibo.algo.Explorer;
 import it.unibo.domain.Map;
 import it.unibo.gui.MapViewerPanel.CellState;
 
@@ -61,9 +62,7 @@ public class MapExplorer extends Frame{
 	private JFrame frame;
 	
 	protected String curVal = "";
-	
-	
-	
+		
 	private Map map;
 	private Map unexploredMap;
 		
@@ -154,6 +153,8 @@ public class MapExplorer extends Frame{
 		btnExplore = new JButton("EXPLORE");
 		btnExplore.setEnabled(false);
 		btnExplore.setFont(new Font("Tahoma", Font.PLAIN, 15));
+		btnExplore.addActionListener(new DefaultInputHandler());
+		
 		boxMapManager.add(btnExplore);
 		
 		Component verticalStrut_1 = Box.createVerticalStrut(20);
@@ -181,8 +182,8 @@ public class MapExplorer extends Frame{
 		panelExploredMap = new JPanel();
 		bodyPanel.setRightComponent(panelExploredMap);
 		
-		mapViewer = new MapViewerPanel();
-		unexploredMapViewer = new MapViewerPanel();
+		mapViewer = new MapViewerPanel(true);
+		unexploredMapViewer = new MapViewerPanel(false);
 	}
 
 
@@ -226,6 +227,22 @@ public class MapExplorer extends Frame{
 				
 				break;
 				
+			case "EXPLORE":
+				
+				Point start = mapViewer.getStart();
+				
+				if(start == null)
+				{
+					System.out.println("START NON SELEZIONATO");
+					return;
+				}
+				
+				ExploreThread et = new ExploreThread(start, map, unexploredMapViewer);
+				et.start();
+				
+				
+				break;
+				
 			default:
 				break;
 			}
@@ -263,31 +280,55 @@ public class MapExplorer extends Frame{
 				else
 				{
 					String s[] = data.get(i).split(" ");
-					m.addElementsFromString(s[1]);
+					m.addElementFromString(s[1]);
 				}
 			}
-			setMap(m,1);
+			setMap(m);
 			setUnexploredMap();
 		}
-		
+	
+		private class ExploreThread extends Thread
+		{
+			private Point start;
+			private Map exploredMap;
+			private MapViewerPanel viewer;
+
+			public ExploreThread(Point start, Map map, MapViewerPanel viewer)
+			{
+				this.start = start;
+				this.exploredMap = map;
+				this.viewer = viewer;
+			}
+			
+			@Override
+			public void run() {
+				Explorer explorer = new Explorer();
+				explorer.startExploration(start, map, unexploredMapViewer);				
+			}
+			
+		}
 	}
 
 	
 		
 	
-	public void setMap(Map map, int precision) {
+	public void setMap(Map map) {
 
 		this.map = map;
 		
-		mapViewer.createGridPanel(map.getHeight()+precision, map.getWidth()+precision);
+		mapViewer.createGridPanel(map.getYMax()+1, map.getXMax()+1);
 		Integer[][] intmap = map.getIntMap();
 		
-		for(int k=0; k<=map.getWidth(); k++)
+		System.out.println(map.toString());
+		
+		for(int y=0; y<=map.getYMax(); y++)
 		{
-			for(int j = 0; j<=map.getHeight(); j++)
+			for(int x = 0; x<=map.getXMax(); x++)
 			{
-				if(intmap[k][j] == Map.OBJ)
-					mapViewer.setCellState(k, j, CellState.OBJECT);
+				if(intmap[y][x] == Map.OBJ)
+					mapViewer.setCellState(y, x, CellState.OBJECT);
+				else
+					mapViewer.setCellState(y, x, CellState.CLEAR);
 				
 			}
 		}
@@ -300,16 +341,15 @@ public class MapExplorer extends Frame{
 	
 	public void setUnexploredMap() {
 
-		unexploredMapViewer.createGridPanel(map.getHeight(), map.getWidth());
+		unexploredMapViewer.createGridPanel(map.getYMax()+1, map.getXMax()+1);
 		
-		this.unexploredMap = new Map(map.getWidth(), map.getHeight());
+		this.unexploredMap = new Map(map.getYMax(), map.getXMax());
 		
-		for(int k=0; k<=map.getWidth(); k++)
+		for(int y=0; y<=map.getYMax(); y++)
 		{
-			for(int j = 0; j<=map.getHeight(); j++)
+			for(int x = 0; x<=map.getXMax(); x++)
 			{
-				mapViewer.setCellState(k, j, CellState.OBJECT);
-				
+				unexploredMapViewer.setCellState(y, x, CellState.NONE);				
 			}
 		}
 		

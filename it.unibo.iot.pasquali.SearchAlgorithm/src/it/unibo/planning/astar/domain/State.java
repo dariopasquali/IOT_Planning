@@ -2,12 +2,12 @@ package it.unibo.planning.astar.domain;
 
 import java.awt.Point;
 
-import it.unibo.planning.astar.enums.PositionMove;
+import it.unibo.planning.enums.PositionMove;
 
 public class State implements Comparable<State>{
 	
-	private int x;
 	private int y;
+	private int x;
 	
 	private PositionMove genMove;
 	private int cost;
@@ -15,27 +15,27 @@ public class State implements Comparable<State>{
 	
 	public State()
 	{
-		this.x = -1;
 		this.y = -1;
+		this.x = -1;
 		
 		this.genMove = null;
 		this.cost = -1;
 		this.heuristic = -1;
 	}
 	
-	public State(int x, int y)
+	public State(int y, int x)
 	{
-		this.x = x;
 		this.y = y;
+		this.x = x;
 		this.genMove = null;
 		this.cost = -1;
 		this.heuristic = -1;
 	}
 	
-	public State(int x, int y, PositionMove genMove, int cost)
+	public State(int y, int x, PositionMove genMove, int cost)
 	{
+		this.y = y;
 		this.x = x;
-		this.y = y;		
 		
 		this.genMove = genMove;
 		this.cost = cost;
@@ -48,12 +48,6 @@ public class State implements Comparable<State>{
 		
 		this.genMove = null;
 		this.cost = -1;
-	}
-
-	@Override
-	public String toString()
-	{
-		return "state("+x+","+y+")";
 	}
 
 
@@ -133,5 +127,11 @@ public class State implements Comparable<State>{
 		
 		else return -1;
 	}	
+	
+	@Override
+	public String toString()
+	{
+		return "state("+y+","+x+")";
+	}
 	
 }

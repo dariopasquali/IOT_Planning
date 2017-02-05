@@ -110,117 +110,32 @@ Robot scout QActor robot context ctxRobot{
  		
  		repeatPlan 0		
  
- 
+ // EXPLORATION PLANS----------------------------------------------
  		
  	Plan exploration
  		println("")
- 		
- 	Plan explorationDebug
- 		println("")
  
  	Plan findLeftWall
- 		println("findLeftWall");
+ 		println("findLeftWall") 		
  		
-//
-//		if(not explore)
-//			endOfExploration()
-//
-//		if(object front)
-//		{
-//			turn right
-//			followWall()
-//		}
-//
-// 		if(no object left)
-// 		{
-// 			turn left
-//			keepMoveForward()
-// 		}
-//		else
-//			followWall()
- 		
-		[ not !? explore ] switchToPlan endOfExploration;
- 		
- 		sense time(1000) obstacle -> turnRight;
- 		sense time(1000) obstacleLeft -> followWall;
- 		 		
- 		solve turnLeft time(100000000);
- 		switchToPlan keepMoveForward
- 		
- 		
- 	Plan keepMoveForward	 
- 		
-// 		while(no object front && no object left)
-// 		{
-// 			move forward
-// 			set current cell as clear
-// 		}
-//			if(object front)
-// 			{
-//				turn right
-//				followWall()
-//			}	
-// 			if(object left)
-// 				followWall()
-
-		println("forward");
-		
-		solve moveForward time(100000000); //and set the new cell clear
-		
-		sense time(1000) obstacle -> turnRight;
- 		sense time(1000) obstacleLeft -> followWall; 
-					 
+ 	Plan keepMoveForward	  
 		repeatPlan 0
  		
- 	Plan turnRight 
- 		
- 		println("I hit a wall, turn right and follow");
- 		solve setObjectFront time(100000000);
- 		solve turnRight time(100000000);
- 		switchToPlan followWall
+ 	Plan turnRight  		
+ 		println("I hit a wall, turn right and follow")
  		
  	
  	Plan followWall
- 		println("followWall");
- 		
-//		do
-//		{
-//			if(no object front)
-//			{
-//				move forward
-//				set clear current
-// 					
-//				if(current already visited)
-//				{
-//					sto blocco non ha alcun senso
-//					cioè, ha senso se lo faccio andare sapendo la mappa
-//					ma io non conosco la mappa,
-//					quindi il sapere se c'è' ancora qualcsa da esplorare
-//					è fottutamente complesso
-					
-//				} 	
-//			}
-//			else
-//				turnRight()
-//
-//		}while(object left)
-//		
-//		if(explore)
-//			findLeftWall()
-		
-		sense time(1000) obstacle -> turnRight;		
-		solve moveForward time(100000000); //and set the new cell clear
-		
-		solve checkForLoop time(1000000000)
-		
- 		
- 		
+ 		println("followWall") 		
  		
  		
  	Plan moveAway
  		println("moveAway")
  		
- 		
+ // DEBUG EXPLORATION PLANS -----------------------------------		
+ 	
+ 	 Plan explorationDebug
+ 		println("")
  		
  		
  	Plan endOfExploration

@@ -2,30 +2,38 @@ package it.unibo.domain;
 
 import java.awt.Point;
 
-import it.unibo.enums.Direction;
+import it.unibo.planning.enums.Direction;
 
 public class State implements Comparable<State>{
 
-	private Point point;
+	private int x;
+	private int y;
 	private Direction dir;
 	
 	private double cost;
 	
 	public State() {
-		this.point = null;
+		this.x = -1;
+		this.y = -1;
 		this.dir = Direction.NONE;
 		cost = 0;
 	}
 	
-	public State(Point point, Direction dir) {
-		this.point = point;
+	public State(int y, int x, Direction dir) {
+		this.y = y;
+		this.x = x;
 		this.dir = dir;
 		cost = 0;
 	}
 	
-	public Point getCoordinates()
+	public int getY()
 	{
-		return point;
+		return y;
+	}
+	
+	public int getX()
+	{
+		return x;
 	}
 	
 	public Direction getDirection()
@@ -33,22 +41,19 @@ public class State implements Comparable<State>{
 		return dir;
 	}
 	
-	public void setCoordinates(Point point)
+	public void setX(int x)
 	{
-		this.point = point;
+		this.x = x;
+	}
+	
+	public void setY(int y)
+	{
+		this.y = y;
 	}
 	
 	public void setDirection(Direction dir)
 	{
 		this.dir = dir;
-	}
-
-	public int getX() {
-		return point.x;
-	}
-	
-	public int getY() {
-		return point.y;
 	}
 
 	public double getCost() {
@@ -71,8 +76,8 @@ public class State implements Comparable<State>{
 		
 		State ss = (State) s;
 		
-		return point.x == ss.getX() &&
-				point.y == ss.getY();		
+		return y == ss.getY() &&
+				x == ss.getX();		
 	}
 	
 	@Override
@@ -86,6 +91,15 @@ public class State implements Comparable<State>{
 			return -1;	
 	}
 	
+	@Override
+	public String toString()
+	{
+		return "state("+y+","+x+","+dir.toString()+","+getCost()+")";
+	}
+
+	public Point getCoordinates() {
+		return new Point(x,y);
+	}
 	
 
 }

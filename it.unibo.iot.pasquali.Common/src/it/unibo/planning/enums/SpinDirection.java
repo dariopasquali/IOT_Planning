@@ -1,6 +1,7 @@
-package it.unibo.planning.astar.enums;
+package it.unibo.planning.enums;
 
 public enum SpinDirection {
+	
 		LEFT ("L", 10, -1),
 		RIGHT ("R", 10, 1),
 		DOUBLELEFT("DL", 20, -2),
@@ -16,8 +17,11 @@ public enum SpinDirection {
 	    	this.cost = cost;
 	    	this.rotation = rotation;
 	    }
+	    
 	    public boolean equalsDirection(String otherDir)
-	    { return otherDir == direction; }
+	    {
+	    	return otherDir == direction;
+	    }
 	    
 	    public int getCost(){return cost;}
 	    public int getRotation(){return rotation;}
@@ -32,5 +36,14 @@ public enum SpinDirection {
 			    case "DR": return "dr";
 			    default: return "";
 		    }
+	    }
+	    
+	    public static SpinDirection fromString(String dir)
+	    {
+	    	for(SpinDirection pm : SpinDirection.values())
+	    		if(dir.equals(pm.toString()))
+	    			return pm;
+	    	
+	    	return null;
 	    }
 }
