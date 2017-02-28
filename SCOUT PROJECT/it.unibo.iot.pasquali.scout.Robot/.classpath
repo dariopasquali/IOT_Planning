@@ -14,5 +14,6 @@
 	<classpathentry kind="lib" path="/it.unibo.iss.libs/libs/unibo/uniboInterfaces.jar"/>
 	<classpathentry kind="lib" path="/it.unibo.iss.libs/libs/unibo/unibonoawtsupports.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/it.unibo.qactor.robot"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/it.unibo.iot.pasquali.SearchAlgorithm"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

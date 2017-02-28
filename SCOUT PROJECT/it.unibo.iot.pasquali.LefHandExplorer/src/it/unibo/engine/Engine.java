@@ -455,7 +455,7 @@ public class Engine {
 		 * to use tiled and also diagonal to minimize the travel time
 		 * 
 		 * when the travel is over maybe the Robot non be tiled oriented
-		 * so I choose to single turn right because the algorithm is a left wall follower
+		 * so I choose to only turn right because the algorithm is a left wall follower
 		 * and it's convenient
 		 */
 	

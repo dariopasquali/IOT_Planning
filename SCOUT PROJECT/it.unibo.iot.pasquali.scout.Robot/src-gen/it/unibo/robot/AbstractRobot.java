@@ -183,7 +183,442 @@ protected alice.tuprolog.SolveInfo sol;
     	boolean returnValue = suspendWork;
     while(true){
     nPlanIter++;
-    		temporaryStr = " \"\" ";
+    		temporaryStr = " \"Let's explore!!\" ";
+    		println( temporaryStr );  
+    		if( (guardVars = evalTheGuard( " ??msg(_,_,SENDER,X,explore(START,BOUNDS),MSGNUM)" )) != null ){
+    		{ String parg = "initExploreMap(START,BOUNDS)";
+    		parg = substituteVars(guardVars,parg);
+    		  aar = solveGoal( parg , 0, "","" , "" );
+    		//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
+    		if( aar.getInterrupted() ){
+    			curPlanInExec   = "explorationDebug";
+    			if( ! aar.getGoon() ) break;
+    		} 			
+    		if( aar.getResult().equals("failure")){
+    		if( ! aar.getGoon() ) break;
+    		}else if( ! aar.getGoon() ) break;
+    		}
+    		}
+    		{ String parg = "assert(explore(true))";
+    		  aar = solveGoal( parg , 0, "","" , "" );
+    		//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
+    		if( aar.getInterrupted() ){
+    			curPlanInExec   = "explorationDebug";
+    			if( ! aar.getGoon() ) break;
+    		} 			
+    		if( aar.getResult().equals("failure")){
+    		if( ! aar.getGoon() ) break;
+    		}else if( ! aar.getGoon() ) break;
+    		}
+    		if( ! switchToPlan("findLeftWall").getGoon() ) break;
+    break;
+    }//while
+    return returnValue;
+    }catch(Exception e){
+    println( getName() + " ERROR " + e.getMessage() );
+    throw e;
+    }
+    }
+    public boolean findLeftWall() throws Exception{	//public to allow reflection
+    try{
+    	curPlanInExec =  "findLeftWall";
+    	boolean returnValue = suspendWork;
+    while(true){
+    nPlanIter++;
+    		temporaryStr = " \"Find Left Wall!\" ";
+    		println( temporaryStr );  
+    		//senseEvent
+    		timeoutval = 1000;
+    		aar = senseEvents( timeoutval,"obstacle","turnRightAndFollow",
+    		"" , "",ActionExecMode.synch );
+    		if( ! aar.getGoon() || aar.getTimeRemained() <= 0 ){
+    			println("			WARNING: sense timeout");
+    			addRule("tout(senseevent,"+getName()+")");
+    			//break;
+    		}
+    		//senseEvent
+    		timeoutval = 1000;
+    		aar = senseEvents( timeoutval,"obstacleLeft","followWall",
+    		"" , "",ActionExecMode.synch );
+    		if( ! aar.getGoon() || aar.getTimeRemained() <= 0 ){
+    			println("			WARNING: sense timeout");
+    			addRule("tout(senseevent,"+getName()+")");
+    			//break;
+    		}
+    		temporaryStr = " \"Forward Step\" ";
+    		println( temporaryStr );  
+    		{ String parg = "moveForward";
+    		  aar = solveGoal( parg , 10000000, "","" , "" );
+    		//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
+    		if( aar.getInterrupted() ){
+    			curPlanInExec   = "findLeftWall";
+    			if( ! aar.getGoon() ) break;
+    		} 			
+    		if( aar.getResult().equals("failure")){
+    		if( ! aar.getGoon() ) break;
+    		}else if( ! aar.getGoon() ) break;
+    		}
+    		{ String parg = "addCurrentToVisited";
+    		  aar = solveGoal( parg , 10000000, "","" , "" );
+    		//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
+    		if( aar.getInterrupted() ){
+    			curPlanInExec   = "findLeftWall";
+    			if( ! aar.getGoon() ) break;
+    		} 			
+    		if( aar.getResult().equals("failure")){
+    		if( ! aar.getGoon() ) break;
+    		}else if( ! aar.getGoon() ) break;
+    		}
+    		if( repeatPlan(0).getGoon() ) continue;
+    break;
+    }//while
+    return returnValue;
+    }catch(Exception e){
+    println( getName() + " ERROR " + e.getMessage() );
+    throw e;
+    }
+    }
+    public boolean turnRightAndFollow() throws Exception{	//public to allow reflection
+    try{
+    	curPlanInExec =  "turnRightAndFollow";
+    	boolean returnValue = suspendWork;
+    while(true){
+    nPlanIter++;
+    		temporaryStr = " \"turn right and follow\" ";
+    		println( temporaryStr );  
+    		{ String parg = "turnDoubleRight";
+    		  aar = solveGoal( parg , 0, "","" , "" );
+    		//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
+    		if( aar.getInterrupted() ){
+    			curPlanInExec   = "turnRightAndFollow";
+    			if( ! aar.getGoon() ) break;
+    		} 			
+    		if( aar.getResult().equals("failure")){
+    		if( ! aar.getGoon() ) break;
+    		}else if( ! aar.getGoon() ) break;
+    		}
+    		if( ! switchToPlan("followWall").getGoon() ) break;
+    break;
+    }//while
+    return returnValue;
+    }catch(Exception e){
+    println( getName() + " ERROR " + e.getMessage() );
+    throw e;
+    }
+    }
+    public boolean turnLeftAndFind() throws Exception{	//public to allow reflection
+    try{
+    	curPlanInExec =  "turnLeftAndFind";
+    	boolean returnValue = suspendWork;
+    while(true){
+    nPlanIter++;
+    		temporaryStr = " \"Wall Found!! - Left\" ";
+    		println( temporaryStr );  
+    		{ String parg = "turnDoubleLeft";
+    		  aar = solveGoal( parg , 0, "","" , "" );
+    		//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
+    		if( aar.getInterrupted() ){
+    			curPlanInExec   = "turnLeftAndFind";
+    			if( ! aar.getGoon() ) break;
+    		} 			
+    		if( aar.getResult().equals("failure")){
+    		if( ! aar.getGoon() ) break;
+    		}else if( ! aar.getGoon() ) break;
+    		}
+    		if( ! switchToPlan("findLeftWall").getGoon() ) break;
+    break;
+    }//while
+    return returnValue;
+    }catch(Exception e){
+    println( getName() + " ERROR " + e.getMessage() );
+    throw e;
+    }
+    }
+    public boolean turnLeft() throws Exception{	//public to allow reflection
+    try{
+    	curPlanInExec =  "turnLeft";
+    	boolean returnValue = suspendWork;
+    while(true){
+    nPlanIter++;
+    		temporaryStr = " \"turn Left\" ";
+    		println( temporaryStr );  
+    		{ String parg = "turnDoubleLeft";
+    		  aar = solveGoal( parg , 0, "","" , "" );
+    		//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
+    		if( aar.getInterrupted() ){
+    			curPlanInExec   = "turnLeft";
+    			if( ! aar.getGoon() ) break;
+    		} 			
+    		if( aar.getResult().equals("failure")){
+    		if( ! aar.getGoon() ) break;
+    		}else if( ! aar.getGoon() ) break;
+    		}
+    		returnValue = continueWork;  
+    break;
+    }//while
+    return returnValue;
+    }catch(Exception e){
+    println( getName() + " ERROR " + e.getMessage() );
+    throw e;
+    }
+    }
+    public boolean turnRight() throws Exception{	//public to allow reflection
+    try{
+    	curPlanInExec =  "turnRight";
+    	boolean returnValue = suspendWork;
+    while(true){
+    nPlanIter++;
+    		temporaryStr = " \"turn Right\" ";
+    		println( temporaryStr );  
+    		{ String parg = "turnDoubleLeft";
+    		  aar = solveGoal( parg , 0, "","" , "" );
+    		//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
+    		if( aar.getInterrupted() ){
+    			curPlanInExec   = "turnRight";
+    			if( ! aar.getGoon() ) break;
+    		} 			
+    		if( aar.getResult().equals("failure")){
+    		if( ! aar.getGoon() ) break;
+    		}else if( ! aar.getGoon() ) break;
+    		}
+    		returnValue = continueWork;  
+    break;
+    }//while
+    return returnValue;
+    }catch(Exception e){
+    println( getName() + " ERROR " + e.getMessage() );
+    throw e;
+    }
+    }
+    public boolean followWall() throws Exception{	//public to allow reflection
+    try{
+    	curPlanInExec =  "followWall";
+    	boolean returnValue = suspendWork;
+    while(true){
+    nPlanIter++;
+    		temporaryStr = " \"Follow Wall\" ";
+    		println( temporaryStr );  
+    		//senseEvent
+    		timeoutval = 1000;
+    		aar = senseEvents( timeoutval,"obstacleLeft","continue",
+    		"" , "",ActionExecMode.synch );
+    		if( ! aar.getGoon() || aar.getTimeRemained() <= 0 ){
+    			println("			WARNING: sense timeout");
+    			addRule("tout(senseevent,"+getName()+")");
+    			//break;
+    		}
+    		else{ if( ! switchToPlan("turnLeftAndFind").getGoon() ) break;
+    		}//senseEvent
+    		timeoutval = 1000;
+    		aar = senseEvents( timeoutval,"obstacle","frontWallFound",
+    		"" , "",ActionExecMode.synch );
+    		if( ! aar.getGoon() || aar.getTimeRemained() <= 0 ){
+    			println("			WARNING: sense timeout");
+    			addRule("tout(senseevent,"+getName()+")");
+    			//break;
+    		}
+    		else{ if( ! switchToPlan("moveAndCheckLoop").getGoon() ) break;
+    		}if( repeatPlan(0).getGoon() ) continue;
+    break;
+    }//while
+    return returnValue;
+    }catch(Exception e){
+    println( getName() + " ERROR " + e.getMessage() );
+    throw e;
+    }
+    }
+    public boolean frontWallFound() throws Exception{	//public to allow reflection
+    try{
+    	curPlanInExec =  "frontWallFound";
+    	boolean returnValue = suspendWork;
+    while(true){
+    nPlanIter++;
+    		temporaryStr = " \"I hit a wall\" ";
+    		println( temporaryStr );  
+    		//senseEvent
+    		timeoutval = 1000;
+    		aar = senseEvents( timeoutval,"obstacleLeft","assertObstacleLeft",
+    		"" , "",ActionExecMode.synch );
+    		if( ! aar.getGoon() || aar.getTimeRemained() <= 0 ){
+    			println("			WARNING: sense timeout");
+    			addRule("tout(senseevent,"+getName()+")");
+    			//break;
+    		}
+    		else{ { String parg = "assert(obstacle(none))";
+    		  aar = solveGoal( parg , 0, "","" , "" );
+    		//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
+    		if( aar.getInterrupted() ){
+    			curPlanInExec   = "frontWallFound";
+    			if( ! aar.getGoon() ) break;
+    		} 			
+    		if( aar.getResult().equals("failure")){
+    		if( ! aar.getGoon() ) break;
+    		}else if( ! aar.getGoon() ) break;
+    		}
+    		}{ String parg = "senseAndCheckLeft";
+    		  aar = solveGoal( parg , 1000000, "","" , "" );
+    		//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
+    		if( aar.getInterrupted() ){
+    			curPlanInExec   = "frontWallFound";
+    			if( ! aar.getGoon() ) break;
+    		} 			
+    		if( aar.getResult().equals("failure")){
+    		if( ! aar.getGoon() ) break;
+    		}else if( ! aar.getGoon() ) break;
+    		}
+    		if( (guardVars = evalTheGuard( " !?notLeftObjectAndNotExplored(true)" )) != null ){
+    		if( ! switchToPlan("turnLeft").getGoon() ) break;
+    		}
+    		else{ if( ! switchToPlan("turnRight").getGoon() ) break;
+    		}returnValue = continueWork; //we must restore nPlanIter and curPlanInExec of the 'interrupted' plan
+    break;
+    }//while
+    return returnValue;
+    }catch(Exception e){
+    println( getName() + " ERROR " + e.getMessage() );
+    throw e;
+    }
+    }
+    public boolean assertObstacleLeft() throws Exception{	//public to allow reflection
+    try{
+    	curPlanInExec =  "assertObstacleLeft";
+    	boolean returnValue = suspendWork;
+    while(true){
+    nPlanIter++;
+    		{ String parg = "assert(obstacle(left))";
+    		  aar = solveGoal( parg , 0, "","" , "" );
+    		//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
+    		if( aar.getInterrupted() ){
+    			curPlanInExec   = "assertObstacleLeft";
+    			if( ! aar.getGoon() ) break;
+    		} 			
+    		if( aar.getResult().equals("failure")){
+    		if( ! aar.getGoon() ) break;
+    		}else if( ! aar.getGoon() ) break;
+    		}
+    		returnValue = continueWork;  
+    break;
+    }//while
+    return returnValue;
+    }catch(Exception e){
+    println( getName() + " ERROR " + e.getMessage() );
+    throw e;
+    }
+    }
+    public boolean moveAndCheckLoop() throws Exception{	//public to allow reflection
+    try{
+    	curPlanInExec =  "moveAndCheckLoop";
+    	boolean returnValue = suspendWork;
+    while(true){
+    nPlanIter++;
+    		temporaryStr = " \"let's move\" ";
+    		println( temporaryStr );  
+    		{ String parg = "moveForward";
+    		  aar = solveGoal( parg , 100000, "","" , "" );
+    		//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
+    		if( aar.getInterrupted() ){
+    			curPlanInExec   = "moveAndCheckLoop";
+    			if( ! aar.getGoon() ) break;
+    		} 			
+    		if( aar.getResult().equals("failure")){
+    		if( ! aar.getGoon() ) break;
+    		}else if( ! aar.getGoon() ) break;
+    		}
+    		{ String parg = "checkCurrentAlreadyVisited";
+    		  aar = solveGoal( parg , 100000, "","" , "" );
+    		//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
+    		if( aar.getInterrupted() ){
+    			curPlanInExec   = "moveAndCheckLoop";
+    			if( ! aar.getGoon() ) break;
+    		} 			
+    		if( aar.getResult().equals("failure")){
+    		if( ! aar.getGoon() ) break;
+    		}else if( ! aar.getGoon() ) break;
+    		}
+    		if( (guardVars = evalTheGuard( " !?currentAlreadyVisited(false)" )) != null ){
+    		if( ! switchToPlan("solveLoop").getGoon() ) break;
+    		}
+    		else{ { String parg = "addCurrentToVisited";
+    		parg = substituteVars(guardVars,parg);
+    		  aar = solveGoal( parg , 10000000, "","" , "" );
+    		//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
+    		if( aar.getInterrupted() ){
+    			curPlanInExec   = "moveAndCheckLoop";
+    			if( ! aar.getGoon() ) break;
+    		} 			
+    		if( aar.getResult().equals("failure")){
+    		if( ! aar.getGoon() ) break;
+    		}else if( ! aar.getGoon() ) break;
+    		}
+    		}returnValue = continueWork; //we must restore nPlanIter and curPlanInExec of the 'interrupted' plan
+    break;
+    }//while
+    return returnValue;
+    }catch(Exception e){
+    println( getName() + " ERROR " + e.getMessage() );
+    throw e;
+    }
+    }
+    public boolean solveLoop() throws Exception{	//public to allow reflection
+    try{
+    	curPlanInExec =  "solveLoop";
+    	boolean returnValue = suspendWork;
+    while(true){
+    nPlanIter++;
+    		temporaryStr = " \"I'm in a looooop\" ";
+    		println( temporaryStr );  
+    		{ String parg = "findNearestNotExploredCell";
+    		  aar = solveGoal( parg , 1000000, "","" , "" );
+    		//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
+    		if( aar.getInterrupted() ){
+    			curPlanInExec   = "solveLoop";
+    			if( ! aar.getGoon() ) break;
+    		} 			
+    		if( aar.getResult().equals("failure")){
+    		if( ! aar.getGoon() ) break;
+    		}else if( ! aar.getGoon() ) break;
+    		}
+    		if( (guardVars = evalTheGuard( " !?explore(false)" )) != null ){
+    		if( ! switchToPlan("endOfExploration").getGoon() ) break;
+    		}
+    		{ String parg = "computeBestPath";
+    		  aar = solveGoal( parg , 1000000000, "","" , "" );
+    		//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
+    		if( aar.getInterrupted() ){
+    			curPlanInExec   = "solveLoop";
+    			if( ! aar.getGoon() ) break;
+    		} 			
+    		if( aar.getResult().equals("failure")){
+    		if( ! aar.getGoon() ) break;
+    		}else if( ! aar.getGoon() ) break;
+    		}
+    		{ String parg = "travel";
+    		  aar = solveGoal( parg , 1000000000, "","" , "" );
+    		//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
+    		if( aar.getInterrupted() ){
+    			curPlanInExec   = "solveLoop";
+    			if( ! aar.getGoon() ) break;
+    		} 			
+    		if( aar.getResult().equals("failure")){
+    		if( ! aar.getGoon() ) break;
+    		}else if( ! aar.getGoon() ) break;
+    		}
+    		if( ! switchToPlan("findLeftWall").getGoon() ) break;
+    break;
+    }//while
+    return returnValue;
+    }catch(Exception e){
+    println( getName() + " ERROR " + e.getMessage() );
+    throw e;
+    }
+    }
+    public boolean endOfExploration() throws Exception{	//public to allow reflection
+    try{
+    	curPlanInExec =  "endOfExploration";
+    	boolean returnValue = suspendWork;
+    while(true){
+    nPlanIter++;
+    		temporaryStr = " \"Exploration done\" ";
     		println( temporaryStr );  
     break;
     }//while

@@ -292,7 +292,7 @@ public abstract class AbstractConsole extends QActorPlanned implements IActivity
 	    while(true){
 	    nPlanIter++;
 	    		if( (guardVars = evalTheGuard( " ??msg(local_gui_command, \"event\" ,SENDER,none,local_gui_command(loadmap(PATH)),MSGNUM)" )) != null ){
-	    		{ String parg = "loadMapButton(PATH)";
+	    		{ String parg = "loadMap(PATH)";
 	    		parg = substituteVars(guardVars,parg);
 	    		  aar = solveGoal( parg , 210000000, "","" , "" );
 	    		//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
@@ -404,8 +404,8 @@ public abstract class AbstractConsole extends QActorPlanned implements IActivity
 	    		 }
 	    		//onEvent
 	    		if( currentEvent.getEventId().equals("update") ){
-	    		 		String parg="updateMapAndReplan(ELEMENT,CURRENT)";
-	    		 		parg = updateVars(null, Term.createTerm("update(ELEMENT,CURRENT)"), Term.createTerm("update(ELEMENT,CURRENT)"), 
+	    		 		String parg="updateMapAndReplan(OBJECT,CURRENT)";
+	    		 		parg = updateVars(null, Term.createTerm("update(OBJECT,CURRENT)"), Term.createTerm("update(OBJECT,CURRENT)"), 
 	    		 			    		  					Term.createTerm(currentEvent.getMsg()), parg);
 	    		 			if( parg != null ) {
 	    		 				aar = solveGoal( parg , 600000, "","" , "");

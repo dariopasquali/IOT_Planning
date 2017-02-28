@@ -24,7 +24,7 @@ Event expdata : expdata ( POS , STATE )
 // ------------------------------------------------------------------
 
 // From Console to Robot to start the Navigation
-Dispatch navdata : navdata ( PLAN , POS )
+Dispatch navigate : navigate ( PLAN , POS )
 
 //PLAN = plan ( [ t || d || l || r ] )
 //POS = position ( Xs , Ys ) 
@@ -37,7 +37,7 @@ Dispatch navdata : navdata ( PLAN , POS )
 
 // Raised by Robot when find an unexpected
 // obstacle during the navigation
-Event update : update ( ELEMENT , CURRENT )
+Event update : update ( OBJECT , CURRENT )
 //ELEMENT = potition ( X , Y )
 //CURRENT = position ( X , Y )
 
@@ -137,7 +137,7 @@ QActor console context ctxConsole -g cyan{
 			
 	Plan loadMap
 		[?? msg(local_gui_command, "event", SENDER, none, local_gui_command (loadmap(PATH)), MSGNUM)]
-			 solve loadMapButton(PATH) time(210000000) onFailSwitchTo loadMapFailure;
+			 solve loadMap(PATH) time(210000000) onFailSwitchTo loadMapFailure;
 				
 		println("++++++++++++++++++ MAP LOADED ++++++++++++++++++")
 		
@@ -168,8 +168,8 @@ QActor console context ctxConsole -g cyan{
  		
  		onEvent local_gui_command : local_gui_command(abort) -> switchToPlan abortCommand; 
  						
-		onEvent update : update (ELEMENT, CURRENT) ->
-			 solve updateMapAndReplan(ELEMENT , CURRENT) time(600000)
+		onEvent update : update (OBJECT, CURRENT) ->
+			 solve updateMapAndReplan(OBJECT , CURRENT) time(600000)
 			 onFailSwitchTo  alternativeFindpathFailure;	
 			 	
 		onEvent end : end -> switchToPlan endOfNavigation;
