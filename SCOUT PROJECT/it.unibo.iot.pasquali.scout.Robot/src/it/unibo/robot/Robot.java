@@ -17,6 +17,7 @@ import it.unibo.planning.enums.SpinDirection;
 import it.unibo.qactors.ActorContext;
 import it.unibo.qactors.action.AsynchActionResult;
 import it.unibo.qactors.action.IActorAction.ActionExecMode;
+import it.unibo.robot.exputility.Engine;
 import it.unibo.robot.planutility.Plan;
 import it.unibo.robot.planutility.PlanExtension;
 import it.unibo.robot.planutility.PlanSaver;
@@ -31,8 +32,7 @@ public class Robot extends AbstractRobot {
 	private Direction direction;
 	int spinFactor = 1;
 	
-	private ExplorationMap expMap = null;
-	private ExplorationState expState = null;
+	private Engine exploreEngine = null;
 	
 	
 	
@@ -104,9 +104,8 @@ public class Robot extends AbstractRobot {
 		// for debug use
 		// i know the initial position referred to a well defined map
 		
-		
-		expMap.setCellClear(expState.getY(), expState.getX());
-		notifyClearCell();
+		exploreEngine = new Engine(startX, startY, mapWidth, mapHeight);		
+		exploreEngine.setCurrentClear();
 	}
 	
 

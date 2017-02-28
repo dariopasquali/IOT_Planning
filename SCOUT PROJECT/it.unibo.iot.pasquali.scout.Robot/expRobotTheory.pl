@@ -27,11 +27,13 @@ defaultExpSpinDuration(1000).
 
 initExploreMap :-
 	actorobj(Actor),
-	Acotr <- initExploreMap.
+	Acotr <- initExploreMap,
+	assert ( newCell ( position (0,0) ) ).
 	
 initExploreMap( position( SX , SY ), map ( W , H ) ):-
 	actorobj(Actor),
-	Actor <- initExplorerMap(SX, SY, W, H).
+	Actor <- initExplorerMap(SX, SY, W, H),
+	assert ( newCell ( position ( SX , SY ) ) ).
 	
 %% -------- SENSE/CHECK STATE -----------------------
 

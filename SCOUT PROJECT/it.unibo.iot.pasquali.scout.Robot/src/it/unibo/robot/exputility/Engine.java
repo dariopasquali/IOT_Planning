@@ -1,10 +1,12 @@
 package it.unibo.robot.exputility;
 
 import java.awt.Point;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
+import it.unibo.domain.State;
 import it.unibo.domain.model.implmentation.ExplorationMap;
 import it.unibo.domain.model.implmentation.ExplorationState;
 import it.unibo.planning.astar.algo.Path;
@@ -234,6 +236,11 @@ public class Engine {
 		return s;
 	}
 	
+	private ExplorationState moveBackwardSafe(ExplorationState start)
+	{		
+		return moveForwardSafe(turnDoubleLeftSafe(turnDoubleLeftSafe(start)));
+	}
+	
 	private ExplorationState moveDoubleLeftSafe(ExplorationState s)
 	{
 		return moveForwardSafe(turnDoubleLeftSafe(s));
@@ -341,6 +348,63 @@ public class Engine {
 		
 		if(!state.getDirection().isTiled())
 			turnRight();
-	}		
+	}	
+	
+	
+	public ArrayList<ExplorationState> getUnexploredNeighbors()
+	{
+		//search only top left and right neighbor 
+		
+		ArrayList<ExplorationState> neighList = new ArrayList<ExplorationState>();
+		ArrayList<ExplorationState> closedList = new ArrayList<ExplorationState>();
+		ArrayList<ExplorationState> unexpList = new ArrayList<ExplorationState>();
+		
+		ExplorationState actual = state;
+		neighList.add(actual);
+		
+		while(unexpList.isEmpty() && !neighList.isEmpty())
+		{
+			//Collections.sort(neighList);
+			actual = neighList.get(0);
+			neighList.remove(actual);  
+			closedList.add(actual);			
+			
+			for(int i=0; i<4; i++)
+			{
+				ExplorationState next = null;
+				switch(i)
+				{
+				case 0:
+					next = moveDoubleRightSafe(actual);					
+					break;
+					
+				case 1:
+					next = moveForwardSafe(actual);
+					break;
+					
+				case 2:
+					next = moveDoubleLeftSafe(actual);
+					break;
+					
+				case 3:
+					next = moveBackwardSafe(actual);
+					break;
+				default:
+					break;
+				}
+				
+				if(next!=null && closedList.contains(next))
+					continue;
+				
+				if(next!=null && isClearState(next) && !neighList.contains(next))
+					neighList.add(next);
+				
+				if(next!=null && isUnexploredState(next) && !unexpList.contains(next))
+					unexpList.add(next);
+			}			
+		}		
+	
+		return unexpList;
+	}
 	
 }

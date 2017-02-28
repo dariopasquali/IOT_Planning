@@ -117,6 +117,7 @@ Robot scout QActor robot context ctxRobot{
  	 Plan explorationDebug
  		println("Let's explore!!");
  		[?? msg(_, _, SENDER, X, explore(START,BOUNDS), MSGNUM)] solve 	initExploreMap(START, BOUNDS) time(0);
+ 		
  		solve assert(explore(true)) time(0);
  		
  		switchToPlan findLeftWall
@@ -216,7 +217,9 @@ Robot scout QActor robot context ctxRobot{
  		
  		switchToPlan findLeftWall
  		
- 		
+ 	
+ 	Plan notifyClearCell
+ 		println("notify clear cell");
  		
  		
  		
