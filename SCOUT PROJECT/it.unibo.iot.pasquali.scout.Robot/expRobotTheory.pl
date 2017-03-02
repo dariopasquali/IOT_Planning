@@ -28,12 +28,12 @@ defaultExpSpinDuration(1000).
 initExploreMap :-
 	actorobj(Actor),
 	Acotr <- initExploreMap,
-	assert ( newCell ( position (0,0) ) ).
+	assert ( newCell ( position (0,0) , clear ) ).
 	
 initExploreMap( position( SX , SY ), map ( W , H ) ):-
 	actorobj(Actor),
 	Actor <- initExplorerMap(SX, SY, W, H),
-	assert ( newCell ( position ( SX , SY ) ) ).
+	assert ( newCell ( position ( SX , SY ) , clear ) ).
 	
 %% -------- SENSE/CHECK STATE -----------------------
 
@@ -69,7 +69,7 @@ checkCurrentAlreadyVisited :-
 updateModel( DIR , STATE ) :-
 	actorobj(Actor),
 	Actor <- updateModel( DIR , STATE ) returns POSITION,
-	assert( newPosition( POSITION , STATE ).
+	assert( newCell( POSITION , STATE ).
 	
 	
 %%---------------- MOVE -----------------------
@@ -80,20 +80,23 @@ moveforward :-
 	defaulExpSpeed(SPEED),
 	defaultExpDuration(TIME),	
 	myExecuteCmd(_, Actor, move(robotmove,forward,SPEED,TIME,0), "", "", RES ),
-	Actor <- makeMove(forward) .
+	Actor <- makeMove(forward),
+	Actor <- addCurrentToVisited.
 	
 turnDoubleRight :-
 	actorobj(Actor),
 	defaulExpSpinSpeed(SPEED),
 	defaultExpSpinDuration(TIME),	
-	myExecuteCmd(_, Actor, move(robotmove,right,SPEED,TIME,0), "", "", RES ).
+	myExecuteCmd(_, Actor, move(robotmove,right,SPEED,TIME,0), "", "", RES ),
+	Actor <- turn(doubleRight).
 	
 
 turnDoubleLeft :-
 	actorobj(Actor),
 	defaulExpSpinSpeed(SPEED),
 	defaultExpSpinDuration(TIME),	
-	myExecuteCmd(_, Actor, move(robotmove,left,SPEED,TIME,0), "", "", RES ).
+	myExecuteCmd(_, Actor, move(robotmove,left,SPEED,TIME,0), "", "", RES ),
+	Actor <- turn(doubleLeft).
 	
 	
 %% ----------------- LOOP AVOIDANCE ------------------------

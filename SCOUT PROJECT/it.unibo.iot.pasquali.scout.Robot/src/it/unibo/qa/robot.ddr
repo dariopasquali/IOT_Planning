@@ -116,6 +116,8 @@ Robot scout QActor robot context ctxRobot{
  		println("Let's explore!!");
  		[?? msg(_, _, SENDER, X, explore(START,BOUNDS), MSGNUM)] solve 	initExploreMap(START, BOUNDS) time(0);
  		
+ 		switchToPlan notifyCell;
+ 		
  		solve assert(explore(true)) time(0);
  		
  		switchToPlan findLeftWall
@@ -194,31 +196,31 @@ Robot scout QActor robot context ctxRobot{
  		
  		// OBSTACLE LEFT
  		
- 		onEvent obstacle : obstacle(left) -> solve assert(obstacle(left, obstacle)) time(0) else
+ 		onEvent obstacle : obstacle(left) -> solve assert(obstacle(left, object)) time(0) else
  										solve assert(obstacle(left, clear)) time(0);
  										
  		[!? obstacle(left, clear)] solve updateModel(left, clear) time(0);
 		[?? obstacle(left, clear)] switchToPlan notifyCell;		
  		
- 		[!? obstacle(left, obstacle)] solve updateModel(left, obstacle) time(0);
- 		[!? obstacle(left, obstacle)] switchToPlan notifyCell;								
- 		[?? obstacle(left, obstacle)] switchToPlan turnLeftAndFind;									
+ 		[!? obstacle(left, object)] solve updateModel(left, object) time(0);
+ 		[!? obstacle(left, object)] switchToPlan notifyCell;								
+ 		[?? obstacle(left, object)] switchToPlan turnLeftAndFind;									
  		 										
  					
  		sense time(1000) obstacle -> continue;
  		
  		// OBSTACLE FRONT
  		
- 		onEvent obstacle : obstacle(front) -> solve assert(obstacle(front, obstacle)) time(0) else
+ 		onEvent obstacle : obstacle(front) -> solve assert(obstacle(front, object)) time(0) else
  										solve assert(obstacle(front, clear)) time(0);
  										
  		[!? obstacle(front, clear)] solve updateModel(front, clear) time(0);
 		[!? obstacle(front, clear)] switchToPlan notifyCell;									
  		[?? obstacle(front, clear)] switchToPlan moveAndCheckLoop;		
  		
- 		[!? obstacle(front, obstacle)] solve updateModel(front, obstacle) time(0);
- 		[!? obstacle(front, obstacle)] switchToPlan notifyCell;								
- 		[?? obstacle(front, obstacle)] switchToPlan frontWallFound;
+ 		[!? obstacle(front, object)] solve updateModel(front, object) time(0);
+ 		[!? obstacle(front, object)] switchToPlan notifyCell;								
+ 		[?? obstacle(front, object)] switchToPlan frontWallFound;
  		
  		repeatPlan 0 		
  		 		
@@ -233,14 +235,14 @@ Robot scout QActor robot context ctxRobot{
  		
  		sense time(1000) obstacle -> continue;
  		
- 		onEvent obstacle : obstacle(left) -> solve assert(obstacle(left, obstacle)) time(0) else
+ 		onEvent obstacle : obstacle(left) -> solve assert(obstacle(left, object)) time(0) else
  										solve assert(obstacle(left, clear)) time(0);
  										
  		[!? obstacle(left, clear)] solve updateModel(left, clear) time(0);
 		[!? obstacle(left, clear)] switchToPlan notifyCell;		
  		
- 		[!? obstacle(left, obstacle)] solve updateModel(left, obstacle) time(0);
- 		[!? obstacle(left, obstacle)] switchToPlan notifyCell;
+ 		[!? obstacle(left, object)] solve updateModel(left, object) time(0);
+ 		[!? obstacle(left, object)] switchToPlan notifyCell;
  		
  		solve senseAndCheckLeft time (1000000);
  		
@@ -279,7 +281,7 @@ Robot scout QActor robot context ctxRobot{
  	
  	Plan notifyCell resumeLastPlan
  		println("notify clear cell");
- 		[?? newPosition(POS, STATE) ] emit expdata : expdata( POS , STATE )
+ 		[?? newCell(POS, STATE) ] emit expdata : expdata( POS , STATE )
  		
  		
  	Plan endOfExploration

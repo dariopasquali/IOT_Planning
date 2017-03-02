@@ -32,7 +32,7 @@ public class Robot extends AbstractRobot {
 	private Direction direction;
 	int spinFactor = 1;
 	
-	private Engine exploreEngine = null;
+	private Engine engine = null;
 	
 	
 	
@@ -104,8 +104,8 @@ public class Robot extends AbstractRobot {
 		// for debug use
 		// i know the initial position referred to a well defined map
 		
-		exploreEngine = new Engine(startX, startY, mapWidth, mapHeight);		
-		exploreEngine.setCurrentClear();
+		engine = new Engine(startX, startY, mapWidth, mapHeight);		
+		engine.setCurrentClear();
 	}
 	
 
@@ -118,18 +118,43 @@ public class Robot extends AbstractRobot {
 	// EXPLORATION MANAGEMENT **********************************************
 	
 	
-	
-	
-	
-	// EXPLORATION INTERACTION ************************************************
-	
-	private void notifyClearCell() {
-		// TODO Auto-generated method stub
-		
+	public void makeMove(String direction)
+	{
+		if(direction.equals("forward"))
+			engine.moveForward();
+		else
+			engine.moveBackward();
 	}
 	
+	public void turn(String spinDir)
+	{
+		if(spinDir.equals("doubleRight"))
+			engine.turnDoubleRight();
+		else
+			engine.turnDoubleLeft();
+	}
 	
+	public void addCurrentToVisited()
+	{
+		engine.addCurrentToVisited();
+	}
 	
+	public boolean checkCurrentAlreadyVisited()
+	{
+		return engine.isCurrentAlreadyVisited();
+	}	
+	
+	public boolean checkLeftVisited()
+	{
+		return engine.checkExploredLeft();
+	}	
+	
+	public String updateModel(String dir, String state)
+	{
+		ExplorationState next = engine.checkAndUpdate(dir, state);
+		
+		return "position( "+next.getX()+" , "+next.getY()+" )";
+	}
 	
 	
 	//GUI INTERACTION **************************************************

@@ -279,6 +279,30 @@ public class Engine {
 	
 // STATE CHECKS ----------------------------------------------------
 	
+	public ExplorationState checkAndUpdate(String direction, String upState)
+	{
+		ExplorationState next = null;
+		
+		if(direction.equals("front"))
+			next = moveForwardSafe(state);			
+		else
+			next = moveBackwardSafe(state);
+		
+		if(upState.equals("clear"))
+		{
+			map.setCellClear(next.getY(), next.getX());
+		}
+		else
+		{
+			map.setCellClear(next.getY(), next.getX());
+		}
+		
+		return next;
+	}
+	
+	
+	
+	
 	public boolean checkExploredLeft() {
 		
 		ExplorationState leftState = moveForwardSafe(turnDoubleLeftSafe(state));
