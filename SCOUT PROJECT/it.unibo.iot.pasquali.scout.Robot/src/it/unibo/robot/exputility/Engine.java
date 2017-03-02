@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
-import it.unibo.domain.State;
 import it.unibo.domain.model.implmentation.ExplorationMap;
 import it.unibo.domain.model.implmentation.ExplorationState;
 import it.unibo.planning.astar.algo.Path;

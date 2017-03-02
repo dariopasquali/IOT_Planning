@@ -101,7 +101,7 @@ Robot scout QActor robot context ctxRobot{
  		
  		onMsg explore : explore -> switchToPlan exploration;
  		onMsg explore : explore ( START , BOUNDS ) -> switchToPlan explorationDebug;
- 		onMsg navigate : navigate(PLAN, POS) -> switchToPlan navigation;
+ 		//onMsg navigate : navigate(PLAN, POS) -> switchToPlan navigation;
  		
  		repeatPlan 0		
  
@@ -286,57 +286,7 @@ Robot scout QActor robot context ctxRobot{
  		println("Exploration done")	
  
  		
- 	Plan navigation //TODO è totalmente sbagliato
  	
- 		[ !? planFilename(FILENAME) ]  solve loadThePlan(FILENAME) time(300000000);
-  		
- 		println("++++++++++++++++++ Plan Loaded ++++++++++++++++++");	
- 		println(" ");
- 		println(" ");
- 		
- 		[ !? planName(PLANNAME) ] solve showPlan(path) time(1000);
- 		
- 		println(" ");
- 		println(" ");
- 		println("++++++++++++++++++ ++++++++++++++++++ ++++++++++++++++++");	
-
- 		solve runResumablePlan(path) time(2100000000)
- 	
- 	Plan abort 
- 		println("Current command aborted");
- 		switchToPlan waitConsoleCommand
- 		
- 	Plan waitAndEvaluate resumeLastPlan
- 		
- 		println("maybe there is an unexpected static obstacle");
- 		delay time(60000);
- 		println("are you there obstalce ??");
- 		
- 		sense time(5000) obstacle -> notifyUnexpectedObstacle	
- 		
- 		
- 	Plan notifyUnexpectedObstacle
- 		
- 		println("I found an unexpected static obstacle");
- 		
- 		solve getCurrentPosition(CURRENT) time(2100000000) onFailSwitchTo navigationFailure;
- 		solve getObstaclePosition(OBJECT) time(2100000000) onFailSwitchTo navigationFailure;
- 	
- 		emit update : update(OBJECT , CURRENT);
- 		
- 		println("Unexpected Obstacle notified, I wait the new plan");
- 		
- 		switchToPlan waitConsoleCommand 		
- 		
- 	
- 	Plan notifyEndOfNavigation	
- 	
- 		println("è passato al piano successivo"); 	
- 			
- 		solve notifyEnd time(10000) onFailSwitchTo generalPrologFailure;	
- 		
- 		println("ma la chiama prolog fallisce per un motivo non ben definito")
-		//TODO	
 	
 // ------------------------------------------------------------------
 //	PROLOG FAILURE ERROR HANDLERS
