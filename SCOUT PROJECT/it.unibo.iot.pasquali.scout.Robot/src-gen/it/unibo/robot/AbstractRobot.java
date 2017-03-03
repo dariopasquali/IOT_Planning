@@ -199,6 +199,7 @@ protected alice.tuprolog.SolveInfo sol;
     		}else if( ! aar.getGoon() ) break;
     		}
     		}
+    		if( ! switchToPlan("notifyCell").getGoon() ) break;
     		{ String parg = "assert(explore(true))";
     		  aar = solveGoal( parg , 0, "","" , "" );
     		//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
@@ -229,21 +230,151 @@ protected alice.tuprolog.SolveInfo sol;
     		println( temporaryStr );  
     		//senseEvent
     		timeoutval = 1000;
-    		aar = senseEvents( timeoutval,"obstacle","turnRightAndFollow",
+    		aar = senseEvents( timeoutval,"obstacle","continue",
     		"" , "",ActionExecMode.synch );
     		if( ! aar.getGoon() || aar.getTimeRemained() <= 0 ){
     			println("			WARNING: sense timeout");
     			addRule("tout(senseevent,"+getName()+")");
     			//break;
     		}
+    		//onEvent
+    		if( currentEvent.getEventId().equals("obstacle") ){
+    		 		String parg="assert(obstacle(front,obstacle))";
+    		 		parg = updateVars(null, Term.createTerm("obstacle(DIRECTION)"), Term.createTerm("obstacle(front)"), 
+    		 			    		  					Term.createTerm(currentEvent.getMsg()), parg);
+    		 			if( parg != null ) {
+    		 				aar = solveGoal( parg , 0, "","" , "");
+    		 				//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
+    		 				if( aar.getInterrupted() ){
+    		 					curPlanInExec   = "findLeftWall";
+    		 					if( ! aar.getGoon() ) break;
+    		 				} 			
+    		 				if( aar.getResult().equals("failure")){
+    		 					if( ! aar.getGoon() ) break;
+    		 				}else if( ! aar.getGoon() ) break;
+    		 			}
+    		 }
+    		else{ { String parg = "assert(obstacle(front,clear))";
+    		  aar = solveGoal( parg , 0, "","" , "" );
+    		//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
+    		if( aar.getInterrupted() ){
+    			curPlanInExec   = "findLeftWall";
+    			if( ! aar.getGoon() ) break;
+    		} 			
+    		if( aar.getResult().equals("failure")){
+    		if( ! aar.getGoon() ) break;
+    		}else if( ! aar.getGoon() ) break;
+    		}
+    		}if( (guardVars = evalTheGuard( " !?obstacle(front,clear)" )) != null ){
+    		{ String parg = "updateModel(front,clear)";
+    		parg = substituteVars(guardVars,parg);
+    		  aar = solveGoal( parg , 0, "","" , "" );
+    		//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
+    		if( aar.getInterrupted() ){
+    			curPlanInExec   = "findLeftWall";
+    			if( ! aar.getGoon() ) break;
+    		} 			
+    		if( aar.getResult().equals("failure")){
+    		if( ! aar.getGoon() ) break;
+    		}else if( ! aar.getGoon() ) break;
+    		}
+    		}
+    		if( (guardVars = evalTheGuard( " ??obstacle(front,clear)" )) != null ){
+    		if( ! switchToPlan("notifyCell").getGoon() ) break;
+    		}
+    		if( (guardVars = evalTheGuard( " !?obstacle(front,obstacle)" )) != null ){
+    		{ String parg = "updateModel(front,obstacle)";
+    		parg = substituteVars(guardVars,parg);
+    		  aar = solveGoal( parg , 0, "","" , "" );
+    		//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
+    		if( aar.getInterrupted() ){
+    			curPlanInExec   = "findLeftWall";
+    			if( ! aar.getGoon() ) break;
+    		} 			
+    		if( aar.getResult().equals("failure")){
+    		if( ! aar.getGoon() ) break;
+    		}else if( ! aar.getGoon() ) break;
+    		}
+    		}
+    		if( (guardVars = evalTheGuard( " !?obstacle(front,obstacle)" )) != null ){
+    		if( ! switchToPlan("notifyCell").getGoon() ) break;
+    		}
+    		if( (guardVars = evalTheGuard( " ??obstacle(front,obstacle)" )) != null ){
+    		if( ! switchToPlan("turnRightAndFollow").getGoon() ) break;
+    		}
     		//senseEvent
     		timeoutval = 1000;
-    		aar = senseEvents( timeoutval,"obstacleLeft","followWall",
+    		aar = senseEvents( timeoutval,"obstacle","continue",
     		"" , "",ActionExecMode.synch );
     		if( ! aar.getGoon() || aar.getTimeRemained() <= 0 ){
     			println("			WARNING: sense timeout");
     			addRule("tout(senseevent,"+getName()+")");
     			//break;
+    		}
+    		//onEvent
+    		if( currentEvent.getEventId().equals("obstacle") ){
+    		 		String parg="assert(obstacle(left,obstacle))";
+    		 		parg = updateVars(null, Term.createTerm("obstacle(DIRECTION)"), Term.createTerm("obstacle(left)"), 
+    		 			    		  					Term.createTerm(currentEvent.getMsg()), parg);
+    		 			if( parg != null ) {
+    		 				aar = solveGoal( parg , 0, "","" , "");
+    		 				//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
+    		 				if( aar.getInterrupted() ){
+    		 					curPlanInExec   = "findLeftWall";
+    		 					if( ! aar.getGoon() ) break;
+    		 				} 			
+    		 				if( aar.getResult().equals("failure")){
+    		 					if( ! aar.getGoon() ) break;
+    		 				}else if( ! aar.getGoon() ) break;
+    		 			}
+    		 }
+    		else{ { String parg = "assert(obstacle(left,clear))";
+    		  aar = solveGoal( parg , 0, "","" , "" );
+    		//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
+    		if( aar.getInterrupted() ){
+    			curPlanInExec   = "findLeftWall";
+    			if( ! aar.getGoon() ) break;
+    		} 			
+    		if( aar.getResult().equals("failure")){
+    		if( ! aar.getGoon() ) break;
+    		}else if( ! aar.getGoon() ) break;
+    		}
+    		}if( (guardVars = evalTheGuard( " !?obstacle(left,clear)" )) != null ){
+    		{ String parg = "updateModel(left,clear)";
+    		parg = substituteVars(guardVars,parg);
+    		  aar = solveGoal( parg , 0, "","" , "" );
+    		//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
+    		if( aar.getInterrupted() ){
+    			curPlanInExec   = "findLeftWall";
+    			if( ! aar.getGoon() ) break;
+    		} 			
+    		if( aar.getResult().equals("failure")){
+    		if( ! aar.getGoon() ) break;
+    		}else if( ! aar.getGoon() ) break;
+    		}
+    		}
+    		if( (guardVars = evalTheGuard( " ??obstacle(left,clear)" )) != null ){
+    		if( ! switchToPlan("notifyCell").getGoon() ) break;
+    		}
+    		if( (guardVars = evalTheGuard( " !?obstacle(left,obstacle)" )) != null ){
+    		{ String parg = "updateModel(left,obstacle)";
+    		parg = substituteVars(guardVars,parg);
+    		  aar = solveGoal( parg , 0, "","" , "" );
+    		//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
+    		if( aar.getInterrupted() ){
+    			curPlanInExec   = "findLeftWall";
+    			if( ! aar.getGoon() ) break;
+    		} 			
+    		if( aar.getResult().equals("failure")){
+    		if( ! aar.getGoon() ) break;
+    		}else if( ! aar.getGoon() ) break;
+    		}
+    		}
+    		if( (guardVars = evalTheGuard( " !?obstacle(left,obstacle)" )) != null ){
+    		if( ! switchToPlan("notifyCell").getGoon() ) break;
+    		}
+    		if( (guardVars = evalTheGuard( " ??obstacle(left,obstacle)" )) != null ){
+    		if( ! switchToPlan("followWall").getGoon() ) break;
     		}
     		temporaryStr = " \"Forward Step\" ";
     		println( temporaryStr );  
@@ -400,25 +531,156 @@ protected alice.tuprolog.SolveInfo sol;
     		println( temporaryStr );  
     		//senseEvent
     		timeoutval = 1000;
-    		aar = senseEvents( timeoutval,"obstacleLeft","continue",
+    		aar = senseEvents( timeoutval,"obstacle","continue",
     		"" , "",ActionExecMode.synch );
     		if( ! aar.getGoon() || aar.getTimeRemained() <= 0 ){
     			println("			WARNING: sense timeout");
     			addRule("tout(senseevent,"+getName()+")");
     			//break;
     		}
-    		else{ if( ! switchToPlan("turnLeftAndFind").getGoon() ) break;
-    		}//senseEvent
+    		//onEvent
+    		if( currentEvent.getEventId().equals("obstacle") ){
+    		 		String parg="assert(obstacle(left,object))";
+    		 		parg = updateVars(null, Term.createTerm("obstacle(DIRECTION)"), Term.createTerm("obstacle(left)"), 
+    		 			    		  					Term.createTerm(currentEvent.getMsg()), parg);
+    		 			if( parg != null ) {
+    		 				aar = solveGoal( parg , 0, "","" , "");
+    		 				//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
+    		 				if( aar.getInterrupted() ){
+    		 					curPlanInExec   = "followWall";
+    		 					if( ! aar.getGoon() ) break;
+    		 				} 			
+    		 				if( aar.getResult().equals("failure")){
+    		 					if( ! aar.getGoon() ) break;
+    		 				}else if( ! aar.getGoon() ) break;
+    		 			}
+    		 }
+    		else{ { String parg = "assert(obstacle(left,clear))";
+    		  aar = solveGoal( parg , 0, "","" , "" );
+    		//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
+    		if( aar.getInterrupted() ){
+    			curPlanInExec   = "followWall";
+    			if( ! aar.getGoon() ) break;
+    		} 			
+    		if( aar.getResult().equals("failure")){
+    		if( ! aar.getGoon() ) break;
+    		}else if( ! aar.getGoon() ) break;
+    		}
+    		}if( (guardVars = evalTheGuard( " !?obstacle(left,clear)" )) != null ){
+    		{ String parg = "updateModel(left,clear)";
+    		parg = substituteVars(guardVars,parg);
+    		  aar = solveGoal( parg , 0, "","" , "" );
+    		//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
+    		if( aar.getInterrupted() ){
+    			curPlanInExec   = "followWall";
+    			if( ! aar.getGoon() ) break;
+    		} 			
+    		if( aar.getResult().equals("failure")){
+    		if( ! aar.getGoon() ) break;
+    		}else if( ! aar.getGoon() ) break;
+    		}
+    		}
+    		if( (guardVars = evalTheGuard( " ??obstacle(left,clear)" )) != null ){
+    		if( ! switchToPlan("notifyCell").getGoon() ) break;
+    		}
+    		if( (guardVars = evalTheGuard( " !?obstacle(left,object)" )) != null ){
+    		{ String parg = "updateModel(left,object)";
+    		parg = substituteVars(guardVars,parg);
+    		  aar = solveGoal( parg , 0, "","" , "" );
+    		//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
+    		if( aar.getInterrupted() ){
+    			curPlanInExec   = "followWall";
+    			if( ! aar.getGoon() ) break;
+    		} 			
+    		if( aar.getResult().equals("failure")){
+    		if( ! aar.getGoon() ) break;
+    		}else if( ! aar.getGoon() ) break;
+    		}
+    		}
+    		if( (guardVars = evalTheGuard( " !?obstacle(left,object)" )) != null ){
+    		if( ! switchToPlan("notifyCell").getGoon() ) break;
+    		}
+    		if( (guardVars = evalTheGuard( " ??obstacle(left,object)" )) != null ){
+    		if( ! switchToPlan("turnLeftAndFind").getGoon() ) break;
+    		}
+    		//senseEvent
     		timeoutval = 1000;
-    		aar = senseEvents( timeoutval,"obstacle","frontWallFound",
+    		aar = senseEvents( timeoutval,"obstacle","continue",
     		"" , "",ActionExecMode.synch );
     		if( ! aar.getGoon() || aar.getTimeRemained() <= 0 ){
     			println("			WARNING: sense timeout");
     			addRule("tout(senseevent,"+getName()+")");
     			//break;
     		}
-    		else{ if( ! switchToPlan("moveAndCheckLoop").getGoon() ) break;
-    		}if( repeatPlan(0).getGoon() ) continue;
+    		//onEvent
+    		if( currentEvent.getEventId().equals("obstacle") ){
+    		 		String parg="assert(obstacle(front,object))";
+    		 		parg = updateVars(null, Term.createTerm("obstacle(DIRECTION)"), Term.createTerm("obstacle(front)"), 
+    		 			    		  					Term.createTerm(currentEvent.getMsg()), parg);
+    		 			if( parg != null ) {
+    		 				aar = solveGoal( parg , 0, "","" , "");
+    		 				//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
+    		 				if( aar.getInterrupted() ){
+    		 					curPlanInExec   = "followWall";
+    		 					if( ! aar.getGoon() ) break;
+    		 				} 			
+    		 				if( aar.getResult().equals("failure")){
+    		 					if( ! aar.getGoon() ) break;
+    		 				}else if( ! aar.getGoon() ) break;
+    		 			}
+    		 }
+    		else{ { String parg = "assert(obstacle(front,clear))";
+    		  aar = solveGoal( parg , 0, "","" , "" );
+    		//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
+    		if( aar.getInterrupted() ){
+    			curPlanInExec   = "followWall";
+    			if( ! aar.getGoon() ) break;
+    		} 			
+    		if( aar.getResult().equals("failure")){
+    		if( ! aar.getGoon() ) break;
+    		}else if( ! aar.getGoon() ) break;
+    		}
+    		}if( (guardVars = evalTheGuard( " !?obstacle(front,clear)" )) != null ){
+    		{ String parg = "updateModel(front,clear)";
+    		parg = substituteVars(guardVars,parg);
+    		  aar = solveGoal( parg , 0, "","" , "" );
+    		//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
+    		if( aar.getInterrupted() ){
+    			curPlanInExec   = "followWall";
+    			if( ! aar.getGoon() ) break;
+    		} 			
+    		if( aar.getResult().equals("failure")){
+    		if( ! aar.getGoon() ) break;
+    		}else if( ! aar.getGoon() ) break;
+    		}
+    		}
+    		if( (guardVars = evalTheGuard( " !?obstacle(front,clear)" )) != null ){
+    		if( ! switchToPlan("notifyCell").getGoon() ) break;
+    		}
+    		if( (guardVars = evalTheGuard( " ??obstacle(front,clear)" )) != null ){
+    		if( ! switchToPlan("moveAndCheckLoop").getGoon() ) break;
+    		}
+    		if( (guardVars = evalTheGuard( " !?obstacle(front,object)" )) != null ){
+    		{ String parg = "updateModel(front,object)";
+    		parg = substituteVars(guardVars,parg);
+    		  aar = solveGoal( parg , 0, "","" , "" );
+    		//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
+    		if( aar.getInterrupted() ){
+    			curPlanInExec   = "followWall";
+    			if( ! aar.getGoon() ) break;
+    		} 			
+    		if( aar.getResult().equals("failure")){
+    		if( ! aar.getGoon() ) break;
+    		}else if( ! aar.getGoon() ) break;
+    		}
+    		}
+    		if( (guardVars = evalTheGuard( " !?obstacle(front,object)" )) != null ){
+    		if( ! switchToPlan("notifyCell").getGoon() ) break;
+    		}
+    		if( (guardVars = evalTheGuard( " ??obstacle(front,object)" )) != null ){
+    		if( ! switchToPlan("frontWallFound").getGoon() ) break;
+    		}
+    		if( repeatPlan(0).getGoon() ) continue;
     break;
     }//while
     return returnValue;
@@ -437,14 +699,31 @@ protected alice.tuprolog.SolveInfo sol;
     		println( temporaryStr );  
     		//senseEvent
     		timeoutval = 1000;
-    		aar = senseEvents( timeoutval,"obstacleLeft","assertObstacleLeft",
+    		aar = senseEvents( timeoutval,"obstacle","continue",
     		"" , "",ActionExecMode.synch );
     		if( ! aar.getGoon() || aar.getTimeRemained() <= 0 ){
     			println("			WARNING: sense timeout");
     			addRule("tout(senseevent,"+getName()+")");
     			//break;
     		}
-    		else{ { String parg = "assert(obstacle(none))";
+    		//onEvent
+    		if( currentEvent.getEventId().equals("obstacle") ){
+    		 		String parg="assert(obstacle(left,object))";
+    		 		parg = updateVars(null, Term.createTerm("obstacle(DIRECTION)"), Term.createTerm("obstacle(left)"), 
+    		 			    		  					Term.createTerm(currentEvent.getMsg()), parg);
+    		 			if( parg != null ) {
+    		 				aar = solveGoal( parg , 0, "","" , "");
+    		 				//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
+    		 				if( aar.getInterrupted() ){
+    		 					curPlanInExec   = "frontWallFound";
+    		 					if( ! aar.getGoon() ) break;
+    		 				} 			
+    		 				if( aar.getResult().equals("failure")){
+    		 					if( ! aar.getGoon() ) break;
+    		 				}else if( ! aar.getGoon() ) break;
+    		 			}
+    		 }
+    		else{ { String parg = "assert(obstacle(left,clear))";
     		  aar = solveGoal( parg , 0, "","" , "" );
     		//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
     		if( aar.getInterrupted() ){
@@ -455,7 +734,41 @@ protected alice.tuprolog.SolveInfo sol;
     		if( ! aar.getGoon() ) break;
     		}else if( ! aar.getGoon() ) break;
     		}
-    		}{ String parg = "senseAndCheckLeft";
+    		}if( (guardVars = evalTheGuard( " !?obstacle(left,clear)" )) != null ){
+    		{ String parg = "updateModel(left,clear)";
+    		parg = substituteVars(guardVars,parg);
+    		  aar = solveGoal( parg , 0, "","" , "" );
+    		//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
+    		if( aar.getInterrupted() ){
+    			curPlanInExec   = "frontWallFound";
+    			if( ! aar.getGoon() ) break;
+    		} 			
+    		if( aar.getResult().equals("failure")){
+    		if( ! aar.getGoon() ) break;
+    		}else if( ! aar.getGoon() ) break;
+    		}
+    		}
+    		if( (guardVars = evalTheGuard( " !?obstacle(left,clear)" )) != null ){
+    		if( ! switchToPlan("notifyCell").getGoon() ) break;
+    		}
+    		if( (guardVars = evalTheGuard( " !?obstacle(left,object)" )) != null ){
+    		{ String parg = "updateModel(left,object)";
+    		parg = substituteVars(guardVars,parg);
+    		  aar = solveGoal( parg , 0, "","" , "" );
+    		//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
+    		if( aar.getInterrupted() ){
+    			curPlanInExec   = "frontWallFound";
+    			if( ! aar.getGoon() ) break;
+    		} 			
+    		if( aar.getResult().equals("failure")){
+    		if( ! aar.getGoon() ) break;
+    		}else if( ! aar.getGoon() ) break;
+    		}
+    		}
+    		if( (guardVars = evalTheGuard( " !?obstacle(left,object)" )) != null ){
+    		if( ! switchToPlan("notifyCell").getGoon() ) break;
+    		}
+    		{ String parg = "senseAndCheckLeft";
     		  aar = solveGoal( parg , 1000000, "","" , "" );
     		//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
     		if( aar.getInterrupted() ){
@@ -471,32 +784,6 @@ protected alice.tuprolog.SolveInfo sol;
     		}
     		else{ if( ! switchToPlan("turnRight").getGoon() ) break;
     		}returnValue = continueWork; //we must restore nPlanIter and curPlanInExec of the 'interrupted' plan
-    break;
-    }//while
-    return returnValue;
-    }catch(Exception e){
-    println( getName() + " ERROR " + e.getMessage() );
-    throw e;
-    }
-    }
-    public boolean assertObstacleLeft() throws Exception{	//public to allow reflection
-    try{
-    	curPlanInExec =  "assertObstacleLeft";
-    	boolean returnValue = suspendWork;
-    while(true){
-    nPlanIter++;
-    		{ String parg = "assert(obstacle(left))";
-    		  aar = solveGoal( parg , 0, "","" , "" );
-    		//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
-    		if( aar.getInterrupted() ){
-    			curPlanInExec   = "assertObstacleLeft";
-    			if( ! aar.getGoon() ) break;
-    		} 			
-    		if( aar.getResult().equals("failure")){
-    		if( ! aar.getGoon() ) break;
-    		}else if( ! aar.getGoon() ) break;
-    		}
-    		returnValue = continueWork;  
     break;
     }//while
     return returnValue;
@@ -536,7 +823,7 @@ protected alice.tuprolog.SolveInfo sol;
     		}else if( ! aar.getGoon() ) break;
     		}
     		if( (guardVars = evalTheGuard( " !?currentAlreadyVisited(false)" )) != null ){
-    		if( ! switchToPlan("solveLoop").getGoon() ) break;
+    		if( ! switchToPlan("loopAvoidance").getGoon() ) break;
     		}
     		else{ { String parg = "addCurrentToVisited";
     		parg = substituteVars(guardVars,parg);
@@ -559,9 +846,9 @@ protected alice.tuprolog.SolveInfo sol;
     throw e;
     }
     }
-    public boolean solveLoop() throws Exception{	//public to allow reflection
+    public boolean loopAvoidance() throws Exception{	//public to allow reflection
     try{
-    	curPlanInExec =  "solveLoop";
+    	curPlanInExec =  "loopAvoidance";
     	boolean returnValue = suspendWork;
     while(true){
     nPlanIter++;
@@ -571,7 +858,7 @@ protected alice.tuprolog.SolveInfo sol;
     		  aar = solveGoal( parg , 1000000, "","" , "" );
     		//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
     		if( aar.getInterrupted() ){
-    			curPlanInExec   = "solveLoop";
+    			curPlanInExec   = "loopAvoidance";
     			if( ! aar.getGoon() ) break;
     		} 			
     		if( aar.getResult().equals("failure")){
@@ -585,7 +872,7 @@ protected alice.tuprolog.SolveInfo sol;
     		  aar = solveGoal( parg , 1000000000, "","" , "" );
     		//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
     		if( aar.getInterrupted() ){
-    			curPlanInExec   = "solveLoop";
+    			curPlanInExec   = "loopAvoidance";
     			if( ! aar.getGoon() ) break;
     		} 			
     		if( aar.getResult().equals("failure")){
@@ -596,7 +883,7 @@ protected alice.tuprolog.SolveInfo sol;
     		  aar = solveGoal( parg , 1000000000, "","" , "" );
     		//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
     		if( aar.getInterrupted() ){
-    			curPlanInExec   = "solveLoop";
+    			curPlanInExec   = "loopAvoidance";
     			if( ! aar.getGoon() ) break;
     		} 			
     		if( aar.getResult().equals("failure")){
@@ -604,6 +891,27 @@ protected alice.tuprolog.SolveInfo sol;
     		}else if( ! aar.getGoon() ) break;
     		}
     		if( ! switchToPlan("findLeftWall").getGoon() ) break;
+    break;
+    }//while
+    return returnValue;
+    }catch(Exception e){
+    println( getName() + " ERROR " + e.getMessage() );
+    throw e;
+    }
+    }
+    public boolean notifyCell() throws Exception{	//public to allow reflection
+    try{
+    	curPlanInExec =  "notifyCell";
+    	boolean returnValue = suspendWork;
+    while(true){
+    nPlanIter++;
+    		temporaryStr = " \"notify clear cell\" ";
+    		println( temporaryStr );  
+    		if( (guardVars = evalTheGuard( " ??newCell(POS,STATE)" )) != null ){
+    		temporaryStr = unifyMsgContent("expdata(POS,STATE)","expdata(POS,STATE)", guardVars ).toString();
+    		emit( "expdata", temporaryStr );
+    		}
+    		returnValue = continueWork;  
     break;
     }//while
     return returnValue;
@@ -967,6 +1275,7 @@ protected alice.tuprolog.SolveInfo sol;
      RobotComponent motorleft 
      RobotComponent motorright 
     sensor distFrontMock simulated debug=0   
+    sensor distLeftMock simulated debug=0   
     Composed component motors
     */
     protected void addSensorObservers(){

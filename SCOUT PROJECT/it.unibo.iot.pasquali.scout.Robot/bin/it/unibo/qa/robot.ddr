@@ -58,10 +58,8 @@ Event end : end
 // The user can define the sensing distance in the sensorTheory.pl
 
 //FrontSonar
-Event obstacle : obstacle
-//LeftSonar
-Event obstacleLeft : obstacleLeft
-
+Event obstacle : obstacle (DIRECTION)
+// DIRECTION = front || left
 
 
 // ------------------------------------------------------------------
@@ -117,6 +115,9 @@ Robot scout QActor robot context ctxRobot{
  	 Plan explorationDebug
  		println("Let's explore!!");
  		[?? msg(_, _, SENDER, X, explore(START,BOUNDS), MSGNUM)] solve 	initExploreMap(START, BOUNDS) time(0);
+ 		
+ 		switchToPlan notifyCell;
+ 		
  		solve assert(explore(true)) time(0);
  		
  		switchToPlan findLeftWall
@@ -124,9 +125,41 @@ Robot scout QActor robot context ctxRobot{
  		
  	Plan findLeftWall
  		println("Find Left Wall!");
+ 		 
+ 		sense time(1000) obstacle -> continue;
+ 		
+ 		// OBSTACLE FRONT
+ 		
+ 		onEvent obstacle : obstacle(front) -> solve assert(obstacle(front, obstacle)) time(0) else
+ 										solve assert(obstacle(front, clear)) time(0);
+ 										
+ 		[!? obstacle(front, clear)] solve updateModel(front, clear) time(0);
+		[?? obstacle(front, clear)] switchToPlan notifyCell;
+		// [?? obstacle(front, clear)] continue	
+ 		
+ 		[!? obstacle(front, obstacle)] solve updateModel(front, obstacle) time(0);
+ 		[!? obstacle(front, obstacle)] switchToPlan notifyCell;								
+ 		[?? obstacle(front, obstacle)] switchToPlan turnRightAndFollow; 
  		 		
- 		sense time(1000) obstacle -> turnRightAndFollow;  // ho muro davanti - giro e seguo		
- 		sense time(1000) obstacleLeft -> followWall; // ho muro a sinistra - seguo
+ 				
+ 		// ----------------------------------------------------------------------------------
+ 		
+ 		sense time(1000) obstacle -> continue;
+ 		
+ 		// OBSTACLE LEFT
+ 		
+ 		onEvent obstacle : obstacle(left) -> solve assert(obstacle(left, obstacle)) time(0) else
+ 										solve assert(obstacle(left, clear)) time(0);
+ 										
+ 		[!? obstacle(left, clear)] solve updateModel(left, clear) time(0);
+		[?? obstacle(left, clear)] switchToPlan notifyCell;
+		// [?? obstacle(left, clear)] continue			
+ 		
+ 		[!? obstacle(left, obstacle)] solve updateModel(left, obstacle) time(0);
+ 		[!? obstacle(left, obstacle)] switchToPlan notifyCell;								
+ 		[?? obstacle(left, obstacle)] switchToPlan followWall;
+ 		
+ 		// -----------------------------------------------------------------------------------
  		
  		println("Forward Step");	
  		
@@ -158,12 +191,38 @@ Robot scout QActor robot context ctxRobot{
  		
  	Plan followWall
  		println("Follow Wall");
- 			
- 		sense time(1000) obstacleLeft -> continue else switchToPlan turnLeftAndFind;
  		
- 		sense time(1000) obstacle -> frontWallFound else switchToPlan moveAndCheckLoop;
+ 		sense time(1000) obstacle -> continue;
  		
- 		repeatPlan 		
+ 		// OBSTACLE LEFT
+ 		
+ 		onEvent obstacle : obstacle(left) -> solve assert(obstacle(left, object)) time(0) else
+ 										solve assert(obstacle(left, clear)) time(0);
+ 										
+ 		[!? obstacle(left, clear)] solve updateModel(left, clear) time(0);
+		[?? obstacle(left, clear)] switchToPlan notifyCell;		
+ 		
+ 		[!? obstacle(left, object)] solve updateModel(left, object) time(0);
+ 		[!? obstacle(left, object)] switchToPlan notifyCell;								
+ 		[?? obstacle(left, object)] switchToPlan turnLeftAndFind;									
+ 		 										
+ 					
+ 		sense time(1000) obstacle -> continue;
+ 		
+ 		// OBSTACLE FRONT
+ 		
+ 		onEvent obstacle : obstacle(front) -> solve assert(obstacle(front, object)) time(0) else
+ 										solve assert(obstacle(front, clear)) time(0);
+ 										
+ 		[!? obstacle(front, clear)] solve updateModel(front, clear) time(0);
+		[!? obstacle(front, clear)] switchToPlan notifyCell;									
+ 		[?? obstacle(front, clear)] switchToPlan moveAndCheckLoop;		
+ 		
+ 		[!? obstacle(front, object)] solve updateModel(front, object) time(0);
+ 		[!? obstacle(front, object)] switchToPlan notifyCell;								
+ 		[?? obstacle(front, object)] switchToPlan frontWallFound;
+ 		
+ 		repeatPlan 0 		
  		 		
  		 		
  		 		
@@ -172,7 +231,19 @@ Robot scout QActor robot context ctxRobot{
  	Plan frontWallFound
  		println("I hit a wall"); 		
  		
- 		sense time(1000) obstacleLeft -> assertObstacleLeft else solve assert(obstacle(none)) time(0);
+ 		// OBSTACLE LEFT
+ 		
+ 		sense time(1000) obstacle -> continue;
+ 		
+ 		onEvent obstacle : obstacle(left) -> solve assert(obstacle(left, object)) time(0) else
+ 										solve assert(obstacle(left, clear)) time(0);
+ 										
+ 		[!? obstacle(left, clear)] solve updateModel(left, clear) time(0);
+		[!? obstacle(left, clear)] switchToPlan notifyCell;		
+ 		
+ 		[!? obstacle(left, object)] solve updateModel(left, object) time(0);
+ 		[!? obstacle(left, object)] switchToPlan notifyCell;
+ 		
  		solve senseAndCheckLeft time (1000000);
  		
  		[!? notLeftObjectAndNotExplored(true)] switchToPlan turnLeft
@@ -180,11 +251,6 @@ Robot scout QActor robot context ctxRobot{
  		 
  		resumeLastPlan // return to followWall
  		 
- 	
- 	Plan assertObstacleLeft resumeLastPlan
- 		solve assert(obstacle(left)) time(0) 
- 		
- 	
  	Plan moveAndCheckLoop
  		println("let's move");
  		
@@ -192,18 +258,14 @@ Robot scout QActor robot context ctxRobot{
  		
  		solve checkCurrentAlreadyVisited time(100000);
  		
- 		[!? currentAlreadyVisited(false)] switchToPlan solveLoop
+ 		[!? currentAlreadyVisited(false)] switchToPlan loopAvoidance
  		 else solve addCurrentToVisited time (10000000);
  		
  		resumeLastPlan
  		
- 		
- 		
- 		
- 		
+ 	 	
  	
- 	
- 	Plan solveLoop	
+ 	Plan loopAvoidance	
  		println("I'm in a looooop");
  		
  		solve findNearestNotExploredCell time(1000000);
@@ -216,14 +278,16 @@ Robot scout QActor robot context ctxRobot{
  		
  		switchToPlan findLeftWall
  		
- 		
- 		
- 		
+ 	
+ 	Plan notifyCell resumeLastPlan
+ 		println("notify clear cell");
+ 		[?? newCell(POS, STATE) ] emit expdata : expdata( POS , STATE )
  		
  		
  	Plan endOfExploration
  		println("Exploration done")	
  
+ // *********** NAVIGATION PLANS **********************
  		
  	Plan navigation //TODO è totalmente sbagliato
  	

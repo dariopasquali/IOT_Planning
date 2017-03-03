@@ -97,6 +97,11 @@ public class Robot extends AbstractRobot {
 		navMap.addElementsFromString(elements);
 	}
 	
+	@Override
+	protected void addSensorObservers(){
+		
+	}
+	
 	// INITIALIZATION - EXPLORATION *************************************************
 	
 	public void initExploreMap(int startX, int startY, int mapWidth, int mapHeight)
