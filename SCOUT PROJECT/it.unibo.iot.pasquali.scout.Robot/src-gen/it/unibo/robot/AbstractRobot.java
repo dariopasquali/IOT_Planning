@@ -1284,19 +1284,19 @@ protected alice.tuprolog.SolveInfo sol;
     		//println( "robot sensor class= "  + sensor.getClass().getName() );
         	if( sensor instanceof DistanceSensor){
         		DistanceSensor sensorDistance  = (DistanceSensor) sensor;
-        		ISensorObserver<IDistanceSensorData> obs = new SensorObserver<IDistanceSensorData>(this,outView);
+        		ISensorObserver<IDistanceSensorData> obs = new SensorObserver<IDistanceSensorData>(this,outView,"front", 100);
         //		println( "avatar add observer to  "  + sensorDistance.getDefStringRep() );
         		sensorDistance.addObserver(  obs  ) ;
         	}
         	if( sensor instanceof LineSensor){
         		LineSensor sensorLine = (LineSensor) sensor;
-         		ISensorObserver<ILineSensorData> obs = new SensorObserver<ILineSensorData>(this,outView);
+         		ISensorObserver<ILineSensorData> obs = new SensorObserver<ILineSensorData>(this,outView,"",0);
         //		println( "avatar add observer to  "  + sensorLine.getDefStringRep() );
         		sensorLine.addObserver(  obs  ) ;
         	}
          	if( sensor instanceof MagnetometerSensor){
         		MagnetometerSensor sensorMagneto = (MagnetometerSensor) sensor;
-         		ISensorObserver<IMagnetometerSensorData> obs = new SensorObserver<IMagnetometerSensorData>(this,outView);
+         		ISensorObserver<IMagnetometerSensorData> obs = new SensorObserver<IMagnetometerSensorData>(this,outView, "",0);
         //		println( "avatar add observer to  "  + sensorMagneto.getDefStringRep() );
         		sensorMagneto.addObserver(  obs  ) ;
         	}

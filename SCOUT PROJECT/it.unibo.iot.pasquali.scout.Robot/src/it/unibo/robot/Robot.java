@@ -3,11 +3,16 @@ package it.unibo.robot;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 
 import alice.tuprolog.Term;
-import it.unibo.domain.model.implmentation.ExplorationMap;
 import it.unibo.domain.model.implmentation.ExplorationState;
 import it.unibo.domain.model.implmentation.NavigationMap;
+import it.unibo.iot.configurator.Configurator;
+import it.unibo.iot.models.sensorData.SensorType;
+import it.unibo.iot.models.sensorData.distance.IDistanceSensorData;
+import it.unibo.iot.sensors.ISensor;
+import it.unibo.iot.sensors.distanceSensor.DistanceSensor;
 import it.unibo.is.interfaces.IOutputEnvView;
 import it.unibo.planning.astar.domain.Move;
 import it.unibo.planning.enums.Direction;
@@ -99,6 +104,14 @@ public class Robot extends AbstractRobot {
 	
 	@Override
 	protected void addSensorObservers(){
+		
+		Set<ISensor<?>> sensors = Configurator.getInstance().getSensors(SensorType.DISTANCE);
+		
+		for(ISensor<?> sense : sensors)
+		{
+			DistanceSensor s = (DistanceSensor)sense;
+			s.addObserver(new SensorObserver<IDistanceSensorData>(this,outView,s.getPosition().getDefStringRep(), 5));
+		}
 		
 	}
 	

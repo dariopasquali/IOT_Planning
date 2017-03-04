@@ -3,23 +3,40 @@ package it.unibo.robot;
 import it.unibo.contactEvent.interfaces.IContactEventPlatform;
 import it.unibo.contactEvent.platform.ContactEventPlatform;
 import it.unibo.iot.models.sensorData.ISensorData;
+import it.unibo.iot.models.sensorData.distance.DistanceSensorData;
 import it.unibo.iot.sensors.ISensorObserver;
 import it.unibo.is.interfaces.IOutputView;
 import it.unibo.qactors.QActor;
 import it.unibo.system.SituatedPlainObject;
 
-public class SensorObserver<T extends ISensorData> extends SituatedPlainObject implements ISensorObserver<T>{
-protected	IContactEventPlatform platform;
-protected QActor actor;
-	public SensorObserver(QActor actor, IOutputView outView) { 
+public class SensorObserver<T extends ISensorData> extends SituatedPlainObject implements ISensorObserver<T>
+{
+	protected	IContactEventPlatform platform;
+	protected QActor actor;
+	
+	private String sonarPosition;
+	
+	private int sensingDistance;
+	
+	
+	public SensorObserver(QActor actor, IOutputView outView, String sonarPosition, int sensingDistance) 
+	{ 
 		super(outView);
 		this.actor = actor;
-		try {
+		
+		this.sonarPosition = sonarPosition;
+		this.sensingDistance = sensingDistance;
+		
+		try
+		{
 			platform = ContactEventPlatform.getPlatform();
-		} catch (Exception e) {
+		}
+		catch (Exception e)
+		{
  			e.printStackTrace();
 		}
 	}
+	
 	@Override
 	public void notify(T data) {
 		try {
@@ -36,10 +53,20 @@ protected QActor actor;
  					distance( VALUE, DIRECTION, POSITION )
  					magnetometer(x(VX),y(VY),z(VZ),POSITION)
   			*/
- 			platform.raiseEvent("sensor", "sensordata", "sensordata("+data.getDefStringRep()+")" );
+			
+			DistanceSensorData dist = (DistanceSensorData) data;
+			
+			if(dist.getDistance().getDistanceCm() <= sensingDistance)
+			{
+				platform.raiseEvent("sensor", "obstacle", "obstacle("+sonarPosition+")" );
+			}
+			
+			
 			//String goal = "sensor( DATA )".replace("DATA", data.getDefStringRep());
 			//actor.solveGoal( goal , 0, "","" , "" );
-		} catch (Exception e) {
+		}
+		catch (Exception e) 
+		{
  			e.printStackTrace();
 		}
 	}
