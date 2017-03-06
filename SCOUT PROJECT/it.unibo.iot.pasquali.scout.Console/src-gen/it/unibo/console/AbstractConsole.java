@@ -248,35 +248,73 @@ public abstract class AbstractConsole extends QActorPlanned implements IActivity
 	    	boolean returnValue = suspendWork;
 	    while(true){
 	    nPlanIter++;
-	    		//ReceiveMsg
-	    		 		 aar = receiveAMsg(999999999, "abort" , "abortCommand" ); 	//could block
-	    				if( aar.getInterrupted() ){
-	    					curPlanInExec   = "playTheGame";
-	    					if( ! aar.getGoon() ) break;
-	    				} 			
-	    				if( ! aar.getGoon() ){
-	    					System.out.println("			WARNING: receiveMsg in " + getName() + " TOUT " + aar.getTimeRemained() + "/" +  999999999);
-	    					addRule("tout(receive,"+getName()+")");
-	    				} 		 
-	    				//println(getName() + " received " + aar.getResult() );
-	    		printCurrentMessage(false);
-	    		//onMsg
-	    		if( currentMessage.msgId().equals("expdata") ){
-	    			String parg="updateMap(POS,STATE)";
-	    			parg = updateVars(null, Term.createTerm("expdata(POS,STATE)"), Term.createTerm("expdata(POS,STATE)"), 
-	    				    		  					Term.createTerm(currentMessage.msgContent()), parg);
-	    				if( parg != null ) {
-	    					aar = solveGoal( parg , 210000000, "","" , "");
-	    					//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
-	    					if( aar.getInterrupted() ){
-	    						curPlanInExec   = "waitEndOfExploration";
-	    						if( ! aar.getGoon() ) break;
-	    					} 			
-	    					if( aar.getResult().equals("failure")){
-	    						if( ! switchToPlan("explorationFailure").getGoon() ) break;
-	    					}else if( ! aar.getGoon() ) break;
-	    				}
-	    		}returnValue = continueWork;  
+	    		//senseEvent
+	    		timeoutval = 999999999;
+	    		aar = senseEvents( timeoutval,"local_gui_command,expdata,end","continue,continue,continue",
+	    		"" , "",ActionExecMode.synch );
+	    		if( ! aar.getGoon() || aar.getTimeRemained() <= 0 ){
+	    			println("			WARNING: sense timeout");
+	    			addRule("tout(senseevent,"+getName()+")");
+	    			//break;
+	    		}
+	    		memoCurrentEvent( false );
+	    		printCurrentEvent(false);
+	    		//onEvent
+	    		if( currentEvent.getEventId().equals("expdata") ){
+	    		 		String parg="updateMap(POS,STATE)";
+	    		 		parg = updateVars(null, Term.createTerm("expdata(POS,STATE)"), Term.createTerm("expdata(POS,STATE)"), 
+	    		 			    		  					Term.createTerm(currentEvent.getMsg()), parg);
+	    		 			if( parg != null ) {
+	    		 				aar = solveGoal( parg , 210000000, "","" , "");
+	    		 				//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
+	    		 				if( aar.getInterrupted() ){
+	    		 					curPlanInExec   = "waitEndOfExploration";
+	    		 					if( ! aar.getGoon() ) break;
+	    		 				} 			
+	    		 				if( aar.getResult().equals("failure")){
+	    		 					if( ! switchToPlan("explorationFailure").getGoon() ) break;
+	    		 				}else if( ! aar.getGoon() ) break;
+	    		 			}
+	    		 }
+	    		//onEvent
+	    		if( currentEvent.getEventId().equals("local_gui_command") ){
+	    		 		String parg = "";
+	    		 		parg = updateVars(null, Term.createTerm("local_gui_command(COMMAND)"), Term.createTerm("local_gui_command(abort)"), 
+	    		 			    		  					Term.createTerm(currentEvent.getMsg()), parg);
+	    		 			if( parg != null ){
+	    		 				 if( ! switchToPlan("abortCommand").getGoon() ) break; 
+	    		 			}//else println("guard  fails");  //parg is null when there is no guard (onEvent)
+	    		 }
+	    		//onEvent
+	    		if( currentEvent.getEventId().equals("end") ){
+	    		 		String parg = "";
+	    		 		parg = updateVars(null, Term.createTerm("end"), Term.createTerm("end"), 
+	    		 			    		  					Term.createTerm(currentEvent.getMsg()), parg);
+	    		 			if( parg != null ){
+	    		 				 if( ! switchToPlan("endOfExploration").getGoon() ) break; 
+	    		 			}//else println("guard  fails");  //parg is null when there is no guard (onEvent)
+	    		 }
+	    		if( repeatPlan(0).getGoon() ) continue;
+	    		returnValue = continueWork;  
+	    break;
+	    }//while
+	    return returnValue;
+	    }catch(Exception e){
+	    println( getName() + " ERROR " + e.getMessage() );
+	    throw e;
+	    }
+	    }
+	    public boolean endOfExploration() throws Exception{	//public to allow reflection
+	    try{
+	    	curPlanInExec =  "endOfExploration";
+	    	boolean returnValue = suspendWork;
+	    while(true){
+	    nPlanIter++;
+	    		temporaryStr = " \"Exploration ENDED\" ";
+	    		println( temporaryStr );  
+	    		temporaryStr = " \"Please Save the map, or clear and repeat\" ";
+	    		println( temporaryStr );  
+	    		if( ! switchToPlan("waitGUICommand").getGoon() ) break;
 	    break;
 	    }//while
 	    return returnValue;

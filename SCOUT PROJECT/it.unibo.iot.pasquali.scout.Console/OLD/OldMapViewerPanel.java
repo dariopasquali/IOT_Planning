@@ -20,7 +20,7 @@ import it.unibo.model.implmentation.MapElement;
 import it.unibo.model.interfaces.IMap;
 
 
-public class MapViewerPanel {
+public class OldMapViewerPanel {
 
 	public enum CellState{
 		CLEAR,

@@ -12,10 +12,9 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import it.unibo.gui.ConsoleGUI;
+import it.unibo.gui.NavigationGUI;
 import it.unibo.is.interfaces.IOutputEnvView;
-import it.unibo.model.implmentation.IntMap;
-import it.unibo.model.implmentation.Map;
+import it.unibo.model.implementation.Map;
 import it.unibo.model.interfaces.IGUI;
 import it.unibo.model.interfaces.IMap;
 import it.unibo.planning.astar.algo.AStarSearchAgent;
@@ -60,7 +59,7 @@ public class Console extends AbstractConsole {
 	// BUTTON MAP - ConsoleGUI
 	public void loadMapButton(String path)
 	{
-		IntMap m = null;
+		Map m = null;
 			
 		List<String> data = new ArrayList<String>();						
 		try
@@ -85,16 +84,16 @@ public class Console extends AbstractConsole {
 		{
 			if(i == 0)
 			{
-				m = IntMap.createMapFromPrologRep(data.get(i));
+				m = Map.createMapFromPrologRep(data.get(i));
 			}
 			else
 			{
 				String s[] = data.get(i).split(" ");
-				m.addElementsFromString(s[1]);
+				m.addElementFromString(s[1]);
 			}
 		}
 		this.map = m;
-		((ConsoleGUI)env).setMap(m);
+		((NavigationGUI)env).setMap(m);
 		
 	}	
 

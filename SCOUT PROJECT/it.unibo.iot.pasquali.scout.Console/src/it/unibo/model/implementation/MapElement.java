@@ -1,4 +1,4 @@
-package it.unibo.model.implmentation;
+package it.unibo.model.implementation;
 
 import it.unibo.model.interfaces.IMapElement;
 
@@ -6,7 +6,7 @@ public class MapElement implements IMapElement{
 
 	private int x, y;
 	
-	public MapElement(int x, int y) {
+	public MapElement(int y, int x) {
 		this.x = x;
 		this.y = y;
 	}

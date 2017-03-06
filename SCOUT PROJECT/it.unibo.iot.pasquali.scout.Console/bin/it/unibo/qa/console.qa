@@ -127,13 +127,30 @@ QActor console context ctxConsole -g cyan{
 		switchToPlan waitEndOfExploration
 			
 	Plan waitEndOfExploration resumeLastPlan
-		receiveMsg time(999999999) react event abort -> abortCommand;
+		sense time(999999999) local_gui_command, expdata, end -> continue, continue, continue;
 		
-		printCurrentMessage;
+		memoCurrentEvent;
+		printCurrentEvent;
+		
+		onEvent expdata : expdata(POS , STATE) ->
+			solve updateMap(POS , STATE) time(210000000) onFailSwitchTo explorationFailure;
 			
-		onMsg expdata : expdata(POS , STATE) ->
-			solve updateMap(POS , STATE) time(210000000) onFailSwitchTo explorationFailure
+		onEvent local_gui_command : local_gui_command(abort) ->	switchToPlan abortCommand;
+		
+		onEvent end : end -> switchToPlan endOfExploration;
 			
+			
+		repeatPlan 0
+			
+			
+	Plan endOfExploration
+		println("Exploration ENDED");
+		println("Please Save the map, or clear and repeat");
+		
+		switchToPlan waitGUICommand
+			
+// --------------------- NAVIGATION --------------------------------
+
 			
 	Plan loadMap
 		[?? msg(local_gui_command, "event", SENDER, none, local_gui_command (loadmap(PATH)), MSGNUM)]

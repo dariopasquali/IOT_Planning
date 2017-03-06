@@ -37,6 +37,24 @@ public class SensorObserver<T extends ISensorData> extends SituatedPlainObject i
 		}
 	}
 	
+	public SensorObserver(QActor actor, IOutputView outView) 
+	{ 
+		super(outView);
+		this.actor = actor;
+		
+		this.sonarPosition = "front";
+		this.sensingDistance = 5;
+		
+		try
+		{
+			platform = ContactEventPlatform.getPlatform();
+		}
+		catch (Exception e)
+		{
+ 			e.printStackTrace();
+		}
+	}
+	
 	@Override
 	public void notify(T data) {
 		try {

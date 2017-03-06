@@ -19,14 +19,14 @@ import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.border.TitledBorder;
 
-import it.unibo.gui.MapViewerPanel.CellState;
+import it.unibo.gui.NavigationViewer.CellState;
 import it.unibo.is.interfaces.IActivity;
 import it.unibo.is.interfaces.IActivityBase;
 import it.unibo.is.interfaces.IBasicEnvAwt;
 import it.unibo.is.interfaces.IOutputEnvView;
 import it.unibo.is.interfaces.IOutputView;
-import it.unibo.model.implmentation.Map;
-import it.unibo.model.implmentation.MapElement;
+import it.unibo.model.implementation.Map;
+import it.unibo.model.implementation.MapElement;
 import it.unibo.model.interfaces.IGUI;
 import it.unibo.model.interfaces.IMap;
 import it.unibo.model.interfaces.IMapElement;
@@ -40,7 +40,7 @@ import javax.swing.JScrollBar;
 import javax.swing.UIManager;
 import java.awt.Color;
 
-public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt, IGUI{
+public class NavigationGUI extends Frame implements IOutputEnvView, IBasicEnvAwt, IGUI{
 
 	private static final long serialVersionUID = 1L;
 	
@@ -53,19 +53,19 @@ public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt, I
 	
 	private JPanel panelMap;
 	private JSplitPane splitMapAndOutput;
-	private MapViewerPanel mapViewer;
+	private NavigationViewer navViewer;
 	
 	private IMap map;
 	private ArrayList<Point> path;
 	
 	JButton btnFindPath, btnNavigate, btnManipulate, btnAbort, btnLoad;
 
-	public ConsoleGUI(IActivityBase controller) {
+	public NavigationGUI(IActivityBase controller) {
 		initialize();
 		this.controller = controller;
 	}
 	
-	public ConsoleGUI() {
+	public NavigationGUI() {
 		initialize();
 	}
 
@@ -184,7 +184,7 @@ public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt, I
 		splitMapAndOutput = new JSplitPane();
 		bodyPanel.setRightComponent(splitMapAndOutput);
 		
-		mapViewer = new MapViewerPanel();	
+		navViewer = new NavigationViewer(true);	
 		
 		JScrollPane panelOutput = new JScrollPane((Component) null);
 		splitMapAndOutput.setRightComponent(panelOutput);
@@ -227,8 +227,8 @@ public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt, I
 				
 			case "Find Best Path":
 				
-				MapElement goal = mapViewer.getGoal();
-				MapElement start = mapViewer.getStart();				
+				MapElement goal = navViewer.getGoal();
+				MapElement start = navViewer.getStart();				
 				
 				if(goal == null)
 				{
@@ -301,29 +301,27 @@ public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt, I
 	@Override
 	public void setPath(List<Point> list) {
 		
-		mapViewer.clearPath();		
+		navViewer.clearPath();		
 		this.path = (ArrayList<Point>) list;
 		
 		for(Point p : list)
 		{
-			mapViewer.setCellState(p.x, p.y, CellState.PATH);			
+			navViewer.setCellState(p.x, p.y, CellState.PATH);			
 		}		
 	}
 
 	public void setMap(IMap map) {
 
 		this.map = map;
-		mapViewer.setMap(map);
-		
-		mapViewer.createMapViewer(map.getHeight()+1, map.getWidth()+1);
+		navViewer.createGridPanel(map.getHeight()+1, map.getWidth()+1);
 		List<IMapElement> elements = map.getElements();
 		
 		for(IMapElement e : elements)
 		{
-			mapViewer.setCellState(e.getX(), e.getY(), CellState.OBSTACLE);
+			navViewer.setCellState(e.getX(), e.getY(), CellState.OBJECT);
 		}
 		
-		panelMap = mapViewer.getPanel();
+		panelMap = navViewer.getPanel();
 		splitMapAndOutput.setLeftComponent(panelMap);
 	}
 
