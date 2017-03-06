@@ -289,7 +289,15 @@ Robot scout QActor robot context ctxRobot{
  
  // *********** NAVIGATION PLANS **********************
  		
- 	Plan navigation //TODO è totalmente sbagliato
+ 	Plan navigation
+ 		println("I Received some navigation data");
+ 		[?? msg(_, _, SENDER, X, navigate(PLAN, POS), MSGNUM)] 
+ 			solve loadNavigationData(PLAN, POS) time (100000) onFailSwitchTo loadMapFailure;
+ 		
+ 		switchToPlan startNavigation 	
+ 		
+ 		
+ 	Plan startNavigation
  	
  		[ !? planFilename(FILENAME) ]  solve loadThePlan(FILENAME) time(300000000);
   		
@@ -313,7 +321,7 @@ Robot scout QActor robot context ctxRobot{
  		
  		println("maybe there is an unexpected static obstacle");
  		delay time(60000);
- 		println("are you there obstalce ??");
+ 		println("are you there obstacle ??");
  		
  		sense time(5000) obstacle -> notifyUnexpectedObstacle	
  		
@@ -338,7 +346,7 @@ Robot scout QActor robot context ctxRobot{
  			
  		solve notifyEnd time(10000) onFailSwitchTo generalPrologFailure;	
  		
- 		println("ma la chiama prolog fallisce per un motivo non ben definito")
+ 		println("ma la chiamata prolog fallisce per un motivo non ben definito")
 		//TODO	
 	
 // ------------------------------------------------------------------
