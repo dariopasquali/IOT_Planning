@@ -257,9 +257,9 @@ public class Map implements IMap{
 		
 		int i=1;
 		
-		for(int y=0; y<ymax; y++)
+		for(int y=0; y<=ymax; y++)
 		{
-			for(int x=0; x<xmax; x++)
+			for(int x=0; x<=xmax; x++)
 			{
 				if(intmap[y][x] == OBJ)
 				{
@@ -289,9 +289,9 @@ public class Map implements IMap{
 
 		List<IMapElement> list = new ArrayList<IMapElement>();
 		
-		for(int y=0; y<ymax; y++)
+		for(int y=0; y<=ymax; y++)
 		{
-			for(int x=0; x<xmax; x++)
+			for(int x=0; x<=xmax; x++)
 			{
 				if(intmap[y][x] == OBJ)
 					list.add(new MapElement(y,x));

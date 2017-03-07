@@ -57,9 +57,11 @@ public class Console extends AbstractConsole {
 	// NAVIGATION METHODS -------------------------------------------------
 	
 	// BUTTON MAP - ConsoleGUI
-	public void loadMapButton(String path)
+	public void loadMapButton(String path, String mode)
 	{
 		Map m = null;
+		
+		System.out.println(mode);
 			
 		List<String> data = new ArrayList<String>();						
 		try
@@ -93,7 +95,10 @@ public class Console extends AbstractConsole {
 			}
 		}
 		this.map = m;
-		((ConsoleGUI)env).setMap(m);
+		if(mode.equals("exploration"))
+			((ConsoleGUI)env).setExplorationMap(m);
+		else
+			((ConsoleGUI)env).setNavigationMap(m);
 		
 	}	
 
@@ -169,6 +174,10 @@ public class Console extends AbstractConsole {
 		String[] command = cmd.split(" ");		
 		String[] params;
 		switch (command[0]){
+		
+		case "LOADEXP":
+			platform.raiseEvent("input", "local_gui_command", "local_gui_command(loadexpmap(\""+command[1]+"\"))");
+			break;
 		
 		case "EXPLORE":
 			platform.raiseEvent("input", "local_gui_command", "local_gui_command(explore))");

@@ -21,7 +21,9 @@ public class ExplorationViewer {
 		CLEAR(Color.WHITE, Map.CLEAR),
 		OBJECT(Color.BLACK, Map.OBJ),
 		NONE(Color.GRAY, Map.NONE),
-		START(Color.GREEN, Map.CLEAR);
+		START(Color.GREEN, Map.CLEAR),
+		GOAL(Color.RED, Map.CLEAR),
+		PATH(Color.BLUE, Map.CLEAR);
 		
 		private Color color;
 		private int mapState;
@@ -30,6 +32,26 @@ public class ExplorationViewer {
 		
 		public Color getColor(){return color;}
 		public int getMapState(){return mapState;}
+
+		public static CellState fromColor(Color background) {
+			
+			if(background.equals(Color.WHITE))
+				return CLEAR;
+			
+			if(background.equals(Color.BLACK))
+				return OBJECT;
+			
+			if(background.equals(Color.GREEN))
+				return START;
+			
+			if(background.equals(Color.BLUE))
+				return GOAL;
+			
+			if(background.equals(Color.RED))
+				return PATH;
+			
+			return NONE;
+		}
 
 	}
 	
@@ -86,6 +108,9 @@ public class ExplorationViewer {
 			
 			if(e.getButton() == MouseEvent.BUTTON1)
 			{
+				if(getCellState(y, x).equals(CellState.OBJECT))
+					return;
+				
 				if(start != null)
 				{
 					setCellState(start.y, start.x, CellState.CLEAR);
@@ -135,6 +160,12 @@ public class ExplorationViewer {
         	b.addMouseListener(handler);
         return b;
     }
+    
+    public CellState getCellState(int y, int x)
+    {
+    	return CellState.fromColor(getGridButton(y, x).getBackground());
+    }
+    
     
     public void setCellState(int y, int x, CellState state)
     {
@@ -210,7 +241,7 @@ public class ExplorationViewer {
         	for(int x = 0; x < xmax; x++)
         	{
         		JButton gb = createCell(y, x);
-        		gb.setBackground(CellState.NONE.getColor());
+        		gb.setBackground(CellState.CLEAR.getColor());
         		gb.setPreferredSize(new Dimension(20,20));
                 matrix[y][x] = gb;
                 p.add(gb);

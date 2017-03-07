@@ -20,9 +20,9 @@ public class NavigationViewer {
 		CLEAR(Color.WHITE, Map.CLEAR),
 		OBJECT(Color.BLACK, Map.OBJ),
 		NONE(Color.GRAY, Map.NONE),
-		START(Color.GREEN, Map.NONE),
-		GOAL(Color.RED, Map.NONE),
-		PATH(Color.RED, Map.NONE);
+		START(Color.GREEN, Map.CLEAR),
+		GOAL(Color.RED, Map.CLEAR),
+		PATH(Color.BLUE, Map.CLEAR);
 		
 		private Color color;
 		private int mapState;
@@ -227,7 +227,7 @@ public class NavigationViewer {
         	for(int x = 0; x < xmax; x++)
         	{
         		JButton gb = createCell(y, x);
-        		gb.setBackground(CellState.NONE.getColor());
+        		gb.setBackground(CellState.CLEAR.getColor());
         		gb.setPreferredSize(new Dimension(20,20));
                 matrix[y][x] = gb;
                 p.add(gb);

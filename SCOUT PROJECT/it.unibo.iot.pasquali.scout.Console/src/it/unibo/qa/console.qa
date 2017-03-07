@@ -63,6 +63,7 @@ Event local_gui_command : local_gui_command(COMMAND)
  
 //Button --> COMMAND
 //
+//Load Exp Map --> loadexpmap(FILEPATH);
 //Explore --> explore || explore( START , BOUNDS );
 //Load Map --> loadmap ( PATH );
 //Find Path –-> findpath ( START , GOAL );
@@ -101,6 +102,7 @@ QActor console context ctxConsole -g cyan{
 		printCurrentEvent;
 		memoCurrentEvent;
 		
+		onEvent local_gui_command : local_gui_command (loadexpmap(PATH)) -> switchToPlan loadExpMap;
 		onEvent local_gui_command : local_gui_command (explore) -> switchToPlan exploration;
  		onEvent local_gui_command : local_gui_command (explore(START,BOUNDS)) -> switchToPlan explorationDebug;
  		onEvent local_gui_command : local_gui_command (loadmap(PATH)) -> switchToPlan loadMap;
@@ -109,6 +111,15 @@ QActor console context ctxConsole -g cyan{
 		
 		repeatPlan 0
 		
+	Plan loadExpMap
+		[?? msg(local_gui_command, "event", SENDER, none, local_gui_command (loadexpmap(PATH)), MSGNUM)]
+			 solve loadMap(PATH, exploration) time(210000000) onFailSwitchTo loadMapFailure;
+				
+		println("++++++++++++++++++ MAP LOADED ++++++++++++++++++");
+		
+		resumeLastPlan
+	
+	
 	Plan exploration
 		println("++++++++++++++++++ EXPLORATION ++++++++++++++++++");
 		
@@ -153,7 +164,7 @@ QActor console context ctxConsole -g cyan{
 			
 	Plan loadMap
 		[?? msg(local_gui_command, "event", SENDER, none, local_gui_command (loadmap(PATH)), MSGNUM)]
-			 solve loadMap(PATH) time(210000000) onFailSwitchTo loadMapFailure;
+			 solve loadMap(PATH, navigation) time(210000000) onFailSwitchTo loadMapFailure;
 				
 		println("++++++++++++++++++ MAP LOADED ++++++++++++++++++")
 		

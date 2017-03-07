@@ -136,6 +136,15 @@ public AbstractConsole(String actorId, ActorContext myCtx, IOutputEnvView outEnv
 	    		//onEvent
 	    		if( currentEvent.getEventId().equals("local_gui_command") ){
 	    		 		String parg = "";
+	    		 		parg = updateVars(null, Term.createTerm("local_gui_command(COMMAND)"), Term.createTerm("local_gui_command(loadexpmap(PATH))"), 
+	    		 			    		  					Term.createTerm(currentEvent.getMsg()), parg);
+	    		 			if( parg != null ){
+	    		 				 if( ! switchToPlan("loadExpMap").getGoon() ) break; 
+	    		 			}//else println("guard  fails");  //parg is null when there is no guard (onEvent)
+	    		 }
+	    		//onEvent
+	    		if( currentEvent.getEventId().equals("local_gui_command") ){
+	    		 		String parg = "";
 	    		 		parg = updateVars(null, Term.createTerm("local_gui_command(COMMAND)"), Term.createTerm("local_gui_command(explore)"), 
 	    		 			    		  					Term.createTerm(currentEvent.getMsg()), parg);
 	    		 			if( parg != null ){
@@ -179,6 +188,37 @@ public AbstractConsole(String actorId, ActorContext myCtx, IOutputEnvView outEnv
 	    		 			}//else println("guard  fails");  //parg is null when there is no guard (onEvent)
 	    		 }
 	    		if( repeatPlan(0).getGoon() ) continue;
+	    break;
+	    }//while
+	    return returnValue;
+	    }catch(Exception e){
+	    println( getName() + " ERROR " + e.getMessage() );
+	    throw e;
+	    }
+	    }
+	    public boolean loadExpMap() throws Exception{	//public to allow reflection
+	    try{
+	    	curPlanInExec =  "loadExpMap";
+	    	boolean returnValue = suspendWork;
+	    while(true){
+	    nPlanIter++;
+	    		if( (guardVars = evalTheGuard( " ??msg(local_gui_command, \"event\" ,SENDER,none,local_gui_command(loadexpmap(PATH)),MSGNUM)" )) != null ){
+	    		{ String parg = "loadMap(PATH,exploration)";
+	    		parg = substituteVars(guardVars,parg);
+	    		  aar = solveGoal( parg , 210000000, "","" , "" );
+	    		//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
+	    		if( aar.getInterrupted() ){
+	    			curPlanInExec   = "loadExpMap";
+	    			if( ! aar.getGoon() ) break;
+	    		} 			
+	    		if( aar.getResult().equals("failure")){
+	    		if( ! switchToPlan("loadMapFailure").getGoon() ) break;
+	    		}else if( ! aar.getGoon() ) break;
+	    		}
+	    		}
+	    		temporaryStr = " \"++++++++++++++++++ MAP LOADED ++++++++++++++++++\" ";
+	    		println( temporaryStr );  
+	    		returnValue = continueWork; //we must restore nPlanIter and curPlanInExec of the 'interrupted' plan
 	    break;
 	    }//while
 	    return returnValue;
@@ -337,7 +377,7 @@ public AbstractConsole(String actorId, ActorContext myCtx, IOutputEnvView outEnv
 	    while(true){
 	    nPlanIter++;
 	    		if( (guardVars = evalTheGuard( " ??msg(local_gui_command, \"event\" ,SENDER,none,local_gui_command(loadmap(PATH)),MSGNUM)" )) != null ){
-	    		{ String parg = "loadMap(PATH)";
+	    		{ String parg = "loadMap(PATH,navigation)";
 	    		parg = substituteVars(guardVars,parg);
 	    		  aar = solveGoal( parg , 210000000, "","" , "" );
 	    		//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
