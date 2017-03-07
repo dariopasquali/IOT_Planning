@@ -1,5 +1,6 @@
 package it.unibo.model.implementation;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import it.unibo.model.interfaces.IMap;
@@ -59,55 +60,56 @@ public class Map implements IMap{
 	
 	// ADD ELEMENTS ----------------------------------------------
 	
-		public void addElementFromString(String elem) {
+	@Override
+	public void addElementFromString(String elem) {
 
-			int i = 0;
-			String[] els = elem.split(",");
+		int i = 0;
+		String[] els = elem.split(",");
 			
-			try
-			{
-				while(i < els.length)
-				{
-					String[] x = els[i].split("\\(");
-					String[] y = els[i+1].split("\\)");
-					
-					intmap[Integer.parseInt(y[0])][Integer.parseInt(x[1])] = OBJ;
-					i+=2;
-				}	
-			}
-			catch(Exception e)
-			{
-				e.printStackTrace();
-			}
-			
-		}
-
-		public static Map createMapFromPrologRep(String map)
+		try
 		{
-			if(!map.contains("map"))
-				return null;
-			
-			/*
-			 * read
-			 * ---->X
-			 * |
-			 * |
-			 * Y
-			 * 
-			 * save
-			 * ----> Y
-			 * |
-			 * |
-			 * X
-			 */
-			
-			
-			String[] s = map.split(",");
-			String[] sxmax = s[0].split("\\(");
-			String[] symax = s[1].split("\\)");
-			
-			return new Map(Integer.parseInt(symax[0]), Integer.parseInt(sxmax[1]));
+			while(i < els.length)
+			{
+				String[] x = els[i].split("\\(");
+				String[] y = els[i+1].split("\\)");
+				
+				intmap[Integer.parseInt(y[0])][Integer.parseInt(x[1])] = OBJ;
+				i+=2;
+			}	
 		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+			
+	}
+
+	public static Map createMapFromPrologRep(String map)
+	{
+		if(!map.contains("map"))
+			return null;
+			
+		/*
+		 * read
+		 * ---->X
+		 * |
+		 * |
+		 * Y
+		 * 
+		 * save
+		 * ----> Y
+		 * |
+		 * |
+		 * X
+		 */
+		
+		
+		String[] s = map.split(",");
+		String[] sxmax = s[0].split("\\(");
+		String[] symax = s[1].split("\\)");
+			
+		return new Map(Integer.parseInt(symax[0]), Integer.parseInt(sxmax[1]));
+	}
 		
 	
 	// ACCESSOR ---------------------------------
@@ -271,11 +273,6 @@ public class Map implements IMap{
 		
 	}
 
-	@Override
-	public void addElementsFromString(String elem) {
-		// TODO Auto-generated method stub
-		
-	}
 
 	@Override
 	public int getWidth() {
@@ -285,6 +282,23 @@ public class Map implements IMap{
 	@Override
 	public int getHeight() {
 		return ymax;
+	}
+
+	@Override
+	public List<IMapElement> getElements() {
+
+		List<IMapElement> list = new ArrayList<IMapElement>();
+		
+		for(int y=0; y<ymax; y++)
+		{
+			for(int x=0; x<xmax; x++)
+			{
+				if(intmap[y][x] == OBJ)
+					list.add(new MapElement(y,x));
+			}
+		}
+		
+		return list;		
 	}
 	
 	

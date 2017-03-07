@@ -942,13 +942,44 @@ protected alice.tuprolog.SolveInfo sol;
     	boolean returnValue = suspendWork;
     while(true){
     nPlanIter++;
+    		temporaryStr = " \"I Received some navigation data\" ";
+    		println( temporaryStr );  
+    		if( (guardVars = evalTheGuard( " ??msg(_,_,SENDER,X,navigate(PLAN,POS),MSGNUM)" )) != null ){
+    		{ String parg = "loadNavigationData(PLAN,POS)";
+    		parg = substituteVars(guardVars,parg);
+    		  aar = solveGoal( parg , 100000, "","" , "" );
+    		//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
+    		if( aar.getInterrupted() ){
+    			curPlanInExec   = "navigation";
+    			if( ! aar.getGoon() ) break;
+    		} 			
+    		if( aar.getResult().equals("failure")){
+    		if( ! switchToPlan("loadMapFailure").getGoon() ) break;
+    		}else if( ! aar.getGoon() ) break;
+    		}
+    		}
+    		if( ! switchToPlan("startNavigation").getGoon() ) break;
+    break;
+    }//while
+    return returnValue;
+    }catch(Exception e){
+    println( getName() + " ERROR " + e.getMessage() );
+    throw e;
+    }
+    }
+    public boolean startNavigation() throws Exception{	//public to allow reflection
+    try{
+    	curPlanInExec =  "startNavigation";
+    	boolean returnValue = suspendWork;
+    while(true){
+    nPlanIter++;
     		if( (guardVars = evalTheGuard( " !?planFilename(FILENAME)" )) != null ){
     		{ String parg = "loadThePlan(FILENAME)";
     		parg = substituteVars(guardVars,parg);
     		  aar = solveGoal( parg , 300000000, "","" , "" );
     		//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
     		if( aar.getInterrupted() ){
-    			curPlanInExec   = "navigation";
+    			curPlanInExec   = "startNavigation";
     			if( ! aar.getGoon() ) break;
     		} 			
     		if( aar.getResult().equals("failure")){
@@ -968,7 +999,7 @@ protected alice.tuprolog.SolveInfo sol;
     		  aar = solveGoal( parg , 1000, "","" , "" );
     		//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
     		if( aar.getInterrupted() ){
-    			curPlanInExec   = "navigation";
+    			curPlanInExec   = "startNavigation";
     			if( ! aar.getGoon() ) break;
     		} 			
     		if( aar.getResult().equals("failure")){
@@ -986,7 +1017,7 @@ protected alice.tuprolog.SolveInfo sol;
     		  aar = solveGoal( parg , 2100000000, "","" , "" );
     		//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
     		if( aar.getInterrupted() ){
-    			curPlanInExec   = "navigation";
+    			curPlanInExec   = "startNavigation";
     			if( ! aar.getGoon() ) break;
     		} 			
     		if( aar.getResult().equals("failure")){
@@ -1030,7 +1061,7 @@ protected alice.tuprolog.SolveInfo sol;
     		aar = delayReactive(60000,"" , "");
     		if( aar.getInterrupted() ) curPlanInExec   = "waitAndEvaluate";
     		if( ! aar.getGoon() ) break;
-    		temporaryStr = " \"are you there obstalce ??\" ";
+    		temporaryStr = " \"are you there obstacle ??\" ";
     		println( temporaryStr );  
     		//senseEvent
     		timeoutval = 5000;
@@ -1112,7 +1143,7 @@ protected alice.tuprolog.SolveInfo sol;
     		if( ! switchToPlan("generalPrologFailure").getGoon() ) break;
     		}else if( ! aar.getGoon() ) break;
     		}
-    		temporaryStr = " \"ma la chiama prolog fallisce per un motivo non ben definito\" ";
+    		temporaryStr = " \"ma la chiamata prolog fallisce per un motivo non ben definito\" ";
     		println( temporaryStr );  
     break;
     }//while

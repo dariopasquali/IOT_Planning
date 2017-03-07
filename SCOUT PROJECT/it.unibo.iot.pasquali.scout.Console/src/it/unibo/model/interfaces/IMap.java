@@ -5,8 +5,9 @@ import java.util.List;
 public interface IMap {
 	
 	public String getDefaultRep();
-	void addElementsFromString(String elem);
-		
+	void addElementFromString(String elem);
+	
+	public List<IMapElement> getElements();
 	public Integer[][] getIntMap();
 	public int getWidth();
 	public int getHeight();

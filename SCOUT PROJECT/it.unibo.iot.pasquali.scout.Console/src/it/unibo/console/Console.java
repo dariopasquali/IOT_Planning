@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import it.unibo.gui.NavigationGUI;
+import it.unibo.gui.ConsoleGUI;
 import it.unibo.is.interfaces.IOutputEnvView;
 import it.unibo.model.implementation.Map;
 import it.unibo.model.interfaces.IGUI;
@@ -93,7 +93,7 @@ public class Console extends AbstractConsole {
 			}
 		}
 		this.map = m;
-		((NavigationGUI)env).setMap(m);
+		((ConsoleGUI)env).setMap(m);
 		
 	}	
 
