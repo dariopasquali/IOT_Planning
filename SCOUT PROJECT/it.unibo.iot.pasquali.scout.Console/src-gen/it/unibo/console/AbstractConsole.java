@@ -276,6 +276,8 @@ public AbstractConsole(String actorId, ActorContext myCtx, IOutputEnvView outEnv
 	    		if( ! switchToPlan("explorationFailure").getGoon() ) break;
 	    		}else if( ! aar.getGoon() ) break;
 	    		}
+	    		temporaryStr = " \"mappa pulita\" ";
+	    		println( temporaryStr );  
 	    		if( (guardVars = evalTheGuard( " ??msg(local_gui_command, \"event\" ,SENDER,none,local_gui_command(explore(START,BOUNDS)),MSGNUM)" )) != null ){
 	    		temporaryStr = unifyMsgContent("explore","explore(START,BOUNDS)", guardVars ).toString();
 	    		sendMsg("explore","robot", ActorContext.dispatch, temporaryStr ); 

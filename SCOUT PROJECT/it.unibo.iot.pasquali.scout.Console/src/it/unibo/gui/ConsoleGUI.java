@@ -17,29 +17,22 @@ import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JPanel;
-import javax.swing.border.TitledBorder;
 
-import it.unibo.gui.NavigationViewer.CellState;
 import it.unibo.is.interfaces.IActivity;
 import it.unibo.is.interfaces.IActivityBase;
 import it.unibo.is.interfaces.IBasicEnvAwt;
 import it.unibo.is.interfaces.IOutputEnvView;
 import it.unibo.is.interfaces.IOutputView;
-import it.unibo.model.implementation.Map;
 import it.unibo.model.implementation.MapElement;
 import it.unibo.model.interfaces.IGUI;
 import it.unibo.model.interfaces.IMap;
 import it.unibo.model.interfaces.IMapElement;
 
-import javax.swing.JSplitPane;
 import java.awt.Font;
 import java.awt.Frame;
 import javax.swing.JTextArea;
 import javax.swing.JScrollPane;
 import javax.swing.JScrollBar;
-import javax.swing.UIManager;
-import java.awt.Color;
-import java.awt.FlowLayout;
 
 public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt, IGUI{
 
@@ -56,10 +49,9 @@ public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt, I
 	
 	private JPanel panelMap;
 	
-	private NavigationViewer navViewer;
-	private ExplorationViewer expViewer;
+	private MapViewer mapViewer;	
+	private boolean mapLoaded = false;
 	
-	private IMap navMap, expMap;
 	private ArrayList<Point> path;
 	
 	JButton btnExplore, btnSave, btnLoad, btnSearch, btnNavigate, btnAbort;
@@ -82,6 +74,8 @@ public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt, I
 		initializeOutputFrame();
 	}
 	
+	// INITIALIZATION ------------------------------------------------------
+	
 	private void initializeFrame()
 	{
 		frame = new JFrame();
@@ -95,9 +89,6 @@ public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt, I
 		gridBagLayout.columnWeights = new double[]{1.0, Double.MIN_VALUE};
 		gridBagLayout.rowWeights = new double[]{0.0, 0.0, 0.0, 1.0, 0.0, Double.MIN_VALUE};
 		frame.getContentPane().setLayout(gridBagLayout);
-		
-		navViewer = new NavigationViewer(true);	
-		expViewer = new ExplorationViewer(true);
 		
 	}
 
@@ -239,80 +230,86 @@ public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt, I
 		this.controller = controller;		
 	}
 	
-	@Override
-	public synchronized void clear(  ){
-		txtOut.setText("");
-		txtOut.validate();
-	}//clear
+	// COMMON --------------------------------------------------------------
 	
-	
-	@Override
-	public void setPath(List<Point> list) {
+	public void setCellState(int y, int x, CellState state)
+	{
+		mapViewer.setCellState(y, x, state);
 		
-		navViewer.clearPath();		
-		this.path = (ArrayList<Point>) list;
-		
-		for(Point p : list)
-		{
-			navViewer.setCellState(p.x, p.y, CellState.PATH);			
-		}		
+		frame.revalidate();
+		frame.repaint();
 	}
 	
-	public void setExplorationMap(IMap map)
+	public void setMap(IMap map)
 	{
-		this.expMap = map;
-		expViewer.createGridPanel(map.getHeight()+1, map.getWidth()+1);
+		mapViewer.createGridPanel(map.getHeight()+1, map.getWidth()+1);
 		List<IMapElement> elements = map.getElements();
 		
 		for(IMapElement e : elements)
 		{
-			expViewer.setCellState(e.getX(), e.getY(), ExplorationViewer.CellState.OBJECT);
+			mapViewer.setCellState(e.getX(), e.getY(), CellState.OBJECT);
 		}
 		
-		panelMap = expViewer.getPanel();
+		panelMap = mapViewer.getPanel();
 		
 		GridBagConstraints gbcPanel = new GridBagConstraints();
 		gbcPanel.fill = GridBagConstraints.BOTH;
 		gbcPanel.gridheight = 5;
 		gbcPanel.gridy = 0;		
 		frame.getContentPane().add(panelMap, gbcPanel);
+		panelMap.revalidate();
 		panelMap.repaint();
+		frame.revalidate();
 		frame.repaint();
+		
+		this.mapLoaded = true;
+	}
+	
+// EXPLORATION -------------------------------------------------------	
+	
+	public void initExplorationViewer()
+	{
+		this.mapViewer = new ExplorationViewer(true);
 	}
 	
 	public void clearCurrentExplorationMap()
 	{
-		if(expMap == null)
+		if(!mapLoaded)
 		{
 			println("Prima carica una mappa!!");
 			return;
 		}
 		
-		expMap.clearAll();
+		((ExplorationViewer)mapViewer).noneAll();
+		
+		frame.revalidate();		
 		frame.repaint();		
 	}
 	
-	public void setNavigationMap(IMap map) {
 
-		this.navMap = map;
-		navViewer.createGridPanel(map.getHeight()+1, map.getWidth()+1);
-		List<IMapElement> elements = map.getElements();
-		
-		for(IMapElement e : elements)
-		{
-			navViewer.setCellState(e.getX(), e.getY(), CellState.OBJECT);
-		}
-		
-		panelMap = navViewer.getPanel();
-		
-		GridBagConstraints gbcPanel = new GridBagConstraints();
-		gbcPanel.fill = GridBagConstraints.BOTH;
-		gbcPanel.gridheight = 5;
-		gbcPanel.gridy = 0;		
-		frame.getContentPane().add(panelMap, gbcPanel);
-		panelMap.repaint();
-		frame.repaint();
+// NAVIGATION -----------------------------------------------------------------	
+	
+	public void initNavigationViewer()
+	{
+		this.mapViewer = new NavigationViewer(true);
 	}
+	
+	@Override
+	public void setPath(List<Point> list) {
+		
+		((NavigationViewer) mapViewer).clearPath();		
+		this.path = (ArrayList<Point>) list;
+		
+		for(Point p : list)
+		{
+			mapViewer.setCellState(p.x, p.y, CellState.PATH);			
+		}		
+	}
+	
+
+
+	
+// CLICK HANDLER ----------------------------------------------------------------------	
 
 	private class DefaultInputHandler implements ActionListener{
 
@@ -341,15 +338,15 @@ public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt, I
 			
 			case "Explore":
 				//TODO
-				Point expStart = expViewer.getStart();
+				MapElement expStart = mapViewer.getStart();
 				
 				if(expStart == null)
 				{
 					println("Please select start position");
 					return;
 				}
-				
-				
+				controller.execAction("EXPLOREDEBUG "+expStart.getX()+","+expStart.getY()+","
+										+mapViewer.getXMax()+","+mapViewer.getYMax());				
 				
 				btnSave.setEnabled(true);
 				break;
@@ -377,8 +374,8 @@ public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt, I
 				
 			case "Find Path":
 				
-				MapElement goal = navViewer.getGoal();
-				MapElement start = navViewer.getStart();				
+				MapElement goal = ((NavigationViewer)mapViewer).getGoal();
+				MapElement start = ((NavigationViewer)mapViewer).getStart();				
 				
 				if(goal == null)
 				{
@@ -438,11 +435,14 @@ public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt, I
 	
 	
 
-
-	/*
-	 * ROBA DELLE INTERFACCE, SERVE SOLO A FARE ANDARE IL FRAMEWORK
-	 */
-
+// OUTPUT ---------------------------------------------------------------
+	
+	@Override
+	public synchronized void clear(  ){
+		txtOut.setText("");
+		txtOut.validate();
+	}//clear
+	
 	@Override
 	public synchronized String getCurVal() {
 		return txtOut.getText();
@@ -462,6 +462,14 @@ public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt, I
 		txtOut.validate();
 		txtOut.setCaretPosition(txtOut.getDocument().getLength());
 	}
+	
+// ----------------------------------------------------------	
+
+	/*
+	 * ROBA DELLE INTERFACCE, SERVE SOLO A FARE ANDARE IL FRAMEWORK
+	 */
+
+
 
 	@Override
 	public IBasicEnvAwt getEnv() {

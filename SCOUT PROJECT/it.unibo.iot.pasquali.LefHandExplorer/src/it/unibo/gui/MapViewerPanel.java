@@ -144,6 +144,15 @@ public class MapViewerPanel {
     
     public void setCellClear(int y, int x)
     {
+    	/*
+    	try {
+			Thread.sleep(500);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    	*/
+    	
     	if(!(y>=0 &&
 				y<=ymax &&
 				x>=0 &&
@@ -158,6 +167,15 @@ public class MapViewerPanel {
     
     public void setCellObj(int y, int x)
     {
+    	/*
+    	try {
+			Thread.sleep(500);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		*/
+    	
     	if(!(y>=0 &&
 				y<=ymax &&
 				x>=0 &&

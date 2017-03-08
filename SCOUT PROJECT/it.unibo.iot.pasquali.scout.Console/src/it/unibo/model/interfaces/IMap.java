@@ -13,8 +13,12 @@ public interface IMap {
 	public int getHeight();
 	
 	void clearAll();
+	void noneAll();
+	
+	void setCell(int y, int x, int state);	
 	
 	void setCellClear(int y, int x);
 	boolean isCellClear(int y, int x);
+	
 
 }

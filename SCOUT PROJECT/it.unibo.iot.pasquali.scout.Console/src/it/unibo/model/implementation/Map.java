@@ -57,6 +57,19 @@ public class Map implements IMap{
 		this.intmap = currentMap.intmap.clone();
 	}
 
+	public static int fromStringToState(String s)
+	{
+		s = s.toUpperCase();
+		
+		switch(s)
+		{
+		case("OBJECT"): return OBJ;
+		case("OBJ"): return OBJ;
+		case("CLEAR"): return CLEAR;
+		default: return NONE;
+		}
+	}
+	
 	
 	// ADD ELEMENTS ----------------------------------------------
 	
@@ -196,8 +209,9 @@ public class Map implements IMap{
 		
 		intmap[y][x]=OBJ;
 	}
-		
-	public void setElement(int y, int x, int state) {
+	
+	@Override
+	public void setCell(int y, int x, int state) {
 		
 		if(state != Map.CLEAR || state != Map.NONE || state != Map.OBJ)
 			return;
@@ -210,7 +224,20 @@ public class Map implements IMap{
 		
 	}
 	
+	@Override
 	public void clearAll() {
+		
+		for(int y=0; y<=ymax; y++)
+		{
+			for(int x = 0; x<=xmax; x++)
+			{
+				intmap[y][x] = CLEAR;
+			}
+		}	
+	}
+	
+	@Override
+	public void noneAll() {
 		
 		for(int y=0; y<=ymax; y++)
 		{
@@ -300,6 +327,8 @@ public class Map implements IMap{
 		
 		return list;		
 	}
+
+
 	
 	
 

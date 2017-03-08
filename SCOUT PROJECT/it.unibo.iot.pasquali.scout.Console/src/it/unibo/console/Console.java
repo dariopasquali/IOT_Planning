@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import it.unibo.gui.CellState;
 import it.unibo.gui.ConsoleGUI;
 import it.unibo.is.interfaces.IOutputEnvView;
 import it.unibo.model.implementation.Map;
@@ -43,14 +44,16 @@ public class Console extends AbstractConsole {
 		
 	}
 	
-	public void showClearMap(int width, int height)
+	public void showClearMap(int xmax, int ymax)
 	{
-		
+		map = new Map(ymax, xmax);
+		((ConsoleGUI)env).clearCurrentExplorationMap();
 	}
 	
 	public void updateMap(int x, int y, String state)
 	{
-		
+		map.setCell(y, x, Map.fromStringToState(state));
+		((ConsoleGUI) env).setCellState(y, x, CellState.fromString(state));
 	}
 	
 	
@@ -96,9 +99,11 @@ public class Console extends AbstractConsole {
 		}
 		this.map = m;
 		if(mode.equals("exploration"))
-			((ConsoleGUI)env).setExplorationMap(m);
+			((ConsoleGUI)env).initExplorationViewer();
 		else
-			((ConsoleGUI)env).setNavigationMap(m);
+			((ConsoleGUI)env).initNavigationViewer();;
+		
+		((ConsoleGUI)env).setMap(m);
 		
 	}	
 
@@ -190,7 +195,7 @@ public class Console extends AbstractConsole {
 			platform.raiseEvent("input", "local_gui_command", "local_gui_command(explore("
 					+ "position(" + params[0] + "," + params[1]+")"
 							+ ","
-					+ "position(" + params[2] + "," + params[3]+")"
+					+ "map(" + params[2] + "," + params[3]+")"
 							+ "))");
 			break;
 			

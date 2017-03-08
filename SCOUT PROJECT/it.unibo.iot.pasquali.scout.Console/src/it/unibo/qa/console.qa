@@ -131,7 +131,10 @@ QActor console context ctxConsole -g cyan{
 	Plan explorationDebug
 		println("++++++++++++++++++ EXPLORATION DEBUG ++++++++++++++++++");
 			
-		solve showClearMap(BOUNDS) time(60000) onFailSwitchTo  explorationFailure;		
+		solve showClearMap(BOUNDS) time(60000) onFailSwitchTo  explorationFailure;	
+		
+		println("mappa pulita");
+			
 		[?? msg(local_gui_command, "event", SENDER, none, local_gui_command (explore(START,BOUNDS)), MSGNUM)]
 			 forward robot -m explore : explore(START,BOUNDS);
 		
@@ -245,7 +248,60 @@ QActor console context ctxConsole -g cyan{
 
 QActor robot context ctxRobot{
  	Plan init normal
-		println( "NEVER HERE. I'm just a placeholder" ) 
+		
+		println( "Exploration interactivity Test" );		
+		receiveMsg time(1000000000);
+		
+		memoCurrentMessage;
+		printCurrentMessage;
+		
+		onMsg explore : explore( START , BOUNDS ) -> switchToPlan simulateExploration;
+		
+		repeatPlan 0
+		
+		
+	Plan simulateExploration
+	
+		println("let's explore!!");		
+		delay time(500);
+		
+		emit expdata : expdata (position(0,3), clear);
+		delay time(500);
+		emit expdata : expdata (position(0,2), clear);
+		delay time(500);
+		emit expdata : expdata (position(0,1), clear);
+		delay time(500);
+		emit expdata : expdata (position(0,0), object);
+		delay time(500);
+		emit expdata : expdata (position(1,1), clear);
+		delay time(500);
+		emit expdata : expdata (position(1,0), clear);
+		delay time(500);
+		emit expdata : expdata (position(2,0), clear);
+		delay time(500);
+		emit expdata : expdata (position(3,0), clear);
+		delay time(500);
+		emit expdata : expdata (position(3,1), clear);
+		delay time(500);
+		emit expdata : expdata (position(3,2), clear);
+		delay time(500);
+		emit expdata : expdata (position(3,3), object);
+		delay time(500);
+		emit expdata : expdata (position(2,2), object);
+		delay time(500);
+		emit expdata : expdata (position(2,1), object);
+		delay time(500);
+		emit expdata : expdata (position(1,2), clear);
+		delay time(500);
+		emit expdata : expdata (position(1,3), clear);
+		delay time(500);
+		emit expdata : expdata (position(2,3), clear);
+		delay time(1000);
+		
+		emit end : end;
+		
+		resumeLastPlan
+ 		
  }
 
 
