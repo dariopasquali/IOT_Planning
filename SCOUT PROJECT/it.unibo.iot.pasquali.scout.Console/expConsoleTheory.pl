@@ -10,6 +10,8 @@ showClearMap :-
 	Actor <- showClearMap.
 	
 showClearMap( map(W,H) ) :-
+	actorPrintln(W),
+	actorPrintln(H),
 	actorobj(Actor),
 	Actor <- showClearMap(W,H).
 

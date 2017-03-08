@@ -107,9 +107,9 @@ public class NavigationViewer extends MapViewer{
     
     public void clearPath()
 	{
-		for(int y=0; y<ymax; y++)
+		for(int y=0; y<=ymax; y++)
 		{
-			for(int x=0; x<xmax; x++)
+			for(int x=0; x<=xmax; x++)
 			{
 				if(!matrix[y][x].getBackground().equals(CellState.OBJECT.getColor()))
 					setCellClear(y, x);

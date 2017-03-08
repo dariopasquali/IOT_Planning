@@ -108,12 +108,6 @@ public class Map implements IMap{
 		 * |
 		 * |
 		 * Y
-		 * 
-		 * save
-		 * ----> Y
-		 * |
-		 * |
-		 * X
 		 */
 		
 		
@@ -213,13 +207,13 @@ public class Map implements IMap{
 	@Override
 	public void setCell(int y, int x, int state) {
 		
-		if(state != Map.CLEAR || state != Map.NONE || state != Map.OBJ)
+		if(state != Map.CLEAR && state != Map.NONE && state != Map.OBJ)
 			return;
 		
 		if(y>=0 &&
-				y<ymax &&
+				y<=ymax &&
 				x >= 0 &&
-				x < xmax)
+				x <=xmax)
 			intmap[y][x] = state;
 		
 	}
@@ -280,21 +274,18 @@ public class Map implements IMap{
 	@Override
 	public String getDefaultRep() {
 		
-		String m = "map( "+xmax+" , "+ymax+" )\n";
+		String m = "map("+xmax+","+ymax+")\n";
 		
-		int i=1;
+				
+		List<IMapElement> list = getElements();
 		
-		for(int y=0; y<=ymax; y++)
+		for(int i = 0; i<list.size(); i++)
 		{
-			for(int x=0; x<=xmax; x++)
-			{
-				if(intmap[y][x] == OBJ)
-				{
-					m+="mapdata( "+i+" , element( "+x+" , "+y+" ) )";
-					i++;
-				}
-			}
+			m += "mapdata(" + (i+1) +", " + list.get(i).toString() +")";
+			if(i!=list.size()-1)
+				m+="\n";
 		}
+		
 		
 		return m;
 		

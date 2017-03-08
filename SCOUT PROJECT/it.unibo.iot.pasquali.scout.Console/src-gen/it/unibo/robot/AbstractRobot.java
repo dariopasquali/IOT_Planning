@@ -55,12 +55,11 @@ public abstract class AbstractRobot extends QActorPlanned {
 	    					addRule("tout(receive,"+getName()+")");
 	    				} 		 
 	    				//println(getName() + " received " + aar.getResult() );
-	    		memoCurrentMessage( false );
 	    		printCurrentMessage(false);
 	    		//onMsg
-	    		if( currentMessage.msgId().equals("explore") ){
+	    		if( currentMessage.msgId().equals("exploredebug") ){
 	    			String parg = "";
-	    			parg = updateVars(null, Term.createTerm("explore"), Term.createTerm("explore(START,BOUNDS)"), 
+	    			parg = updateVars(null, Term.createTerm("exploredebug(START,BOUNDS)"), Term.createTerm("exploredebug(START,BOUNDS)"), 
 	    				    		  					Term.createTerm(currentMessage.msgContent()), parg);
 	    				if( parg != null ){
 	    					 if( ! switchToPlan("simulateExploration").getGoon() ) break; 
@@ -83,97 +82,97 @@ public abstract class AbstractRobot extends QActorPlanned {
 	    		temporaryStr = " \"let's explore!!\" ";
 	    		println( temporaryStr );  
 	    		//delay
-	    		aar = delayReactive(500,"" , "");
+	    		aar = delayReactive(1000,"" , "");
 	    		if( aar.getInterrupted() ) curPlanInExec   = "simulateExploration";
 	    		if( ! aar.getGoon() ) break;
 	    		temporaryStr = unifyMsgContent("expdata(POS,STATE)","expdata(position(0,3),clear)", guardVars ).toString();
 	    		emit( "expdata", temporaryStr );
 	    		//delay
-	    		aar = delayReactive(500,"" , "");
+	    		aar = delayReactive(1000,"" , "");
 	    		if( aar.getInterrupted() ) curPlanInExec   = "simulateExploration";
 	    		if( ! aar.getGoon() ) break;
 	    		temporaryStr = unifyMsgContent("expdata(POS,STATE)","expdata(position(0,2),clear)", guardVars ).toString();
 	    		emit( "expdata", temporaryStr );
 	    		//delay
-	    		aar = delayReactive(500,"" , "");
+	    		aar = delayReactive(1000,"" , "");
 	    		if( aar.getInterrupted() ) curPlanInExec   = "simulateExploration";
 	    		if( ! aar.getGoon() ) break;
 	    		temporaryStr = unifyMsgContent("expdata(POS,STATE)","expdata(position(0,1),clear)", guardVars ).toString();
 	    		emit( "expdata", temporaryStr );
 	    		//delay
-	    		aar = delayReactive(500,"" , "");
+	    		aar = delayReactive(1000,"" , "");
 	    		if( aar.getInterrupted() ) curPlanInExec   = "simulateExploration";
 	    		if( ! aar.getGoon() ) break;
 	    		temporaryStr = unifyMsgContent("expdata(POS,STATE)","expdata(position(0,0),object)", guardVars ).toString();
 	    		emit( "expdata", temporaryStr );
 	    		//delay
-	    		aar = delayReactive(500,"" , "");
+	    		aar = delayReactive(1000,"" , "");
 	    		if( aar.getInterrupted() ) curPlanInExec   = "simulateExploration";
 	    		if( ! aar.getGoon() ) break;
 	    		temporaryStr = unifyMsgContent("expdata(POS,STATE)","expdata(position(1,1),clear)", guardVars ).toString();
 	    		emit( "expdata", temporaryStr );
 	    		//delay
-	    		aar = delayReactive(500,"" , "");
+	    		aar = delayReactive(1000,"" , "");
 	    		if( aar.getInterrupted() ) curPlanInExec   = "simulateExploration";
 	    		if( ! aar.getGoon() ) break;
 	    		temporaryStr = unifyMsgContent("expdata(POS,STATE)","expdata(position(1,0),clear)", guardVars ).toString();
 	    		emit( "expdata", temporaryStr );
 	    		//delay
-	    		aar = delayReactive(500,"" , "");
+	    		aar = delayReactive(1000,"" , "");
 	    		if( aar.getInterrupted() ) curPlanInExec   = "simulateExploration";
 	    		if( ! aar.getGoon() ) break;
 	    		temporaryStr = unifyMsgContent("expdata(POS,STATE)","expdata(position(2,0),clear)", guardVars ).toString();
 	    		emit( "expdata", temporaryStr );
 	    		//delay
-	    		aar = delayReactive(500,"" , "");
+	    		aar = delayReactive(1000,"" , "");
 	    		if( aar.getInterrupted() ) curPlanInExec   = "simulateExploration";
 	    		if( ! aar.getGoon() ) break;
 	    		temporaryStr = unifyMsgContent("expdata(POS,STATE)","expdata(position(3,0),clear)", guardVars ).toString();
 	    		emit( "expdata", temporaryStr );
 	    		//delay
-	    		aar = delayReactive(500,"" , "");
+	    		aar = delayReactive(1000,"" , "");
 	    		if( aar.getInterrupted() ) curPlanInExec   = "simulateExploration";
 	    		if( ! aar.getGoon() ) break;
 	    		temporaryStr = unifyMsgContent("expdata(POS,STATE)","expdata(position(3,1),clear)", guardVars ).toString();
 	    		emit( "expdata", temporaryStr );
 	    		//delay
-	    		aar = delayReactive(500,"" , "");
+	    		aar = delayReactive(1000,"" , "");
 	    		if( aar.getInterrupted() ) curPlanInExec   = "simulateExploration";
 	    		if( ! aar.getGoon() ) break;
 	    		temporaryStr = unifyMsgContent("expdata(POS,STATE)","expdata(position(3,2),clear)", guardVars ).toString();
 	    		emit( "expdata", temporaryStr );
 	    		//delay
-	    		aar = delayReactive(500,"" , "");
+	    		aar = delayReactive(1000,"" , "");
 	    		if( aar.getInterrupted() ) curPlanInExec   = "simulateExploration";
 	    		if( ! aar.getGoon() ) break;
 	    		temporaryStr = unifyMsgContent("expdata(POS,STATE)","expdata(position(3,3),object)", guardVars ).toString();
 	    		emit( "expdata", temporaryStr );
 	    		//delay
-	    		aar = delayReactive(500,"" , "");
+	    		aar = delayReactive(1000,"" , "");
 	    		if( aar.getInterrupted() ) curPlanInExec   = "simulateExploration";
 	    		if( ! aar.getGoon() ) break;
 	    		temporaryStr = unifyMsgContent("expdata(POS,STATE)","expdata(position(2,2),object)", guardVars ).toString();
 	    		emit( "expdata", temporaryStr );
 	    		//delay
-	    		aar = delayReactive(500,"" , "");
+	    		aar = delayReactive(1000,"" , "");
 	    		if( aar.getInterrupted() ) curPlanInExec   = "simulateExploration";
 	    		if( ! aar.getGoon() ) break;
 	    		temporaryStr = unifyMsgContent("expdata(POS,STATE)","expdata(position(2,1),object)", guardVars ).toString();
 	    		emit( "expdata", temporaryStr );
 	    		//delay
-	    		aar = delayReactive(500,"" , "");
+	    		aar = delayReactive(1000,"" , "");
 	    		if( aar.getInterrupted() ) curPlanInExec   = "simulateExploration";
 	    		if( ! aar.getGoon() ) break;
 	    		temporaryStr = unifyMsgContent("expdata(POS,STATE)","expdata(position(1,2),clear)", guardVars ).toString();
 	    		emit( "expdata", temporaryStr );
 	    		//delay
-	    		aar = delayReactive(500,"" , "");
+	    		aar = delayReactive(1000,"" , "");
 	    		if( aar.getInterrupted() ) curPlanInExec   = "simulateExploration";
 	    		if( ! aar.getGoon() ) break;
 	    		temporaryStr = unifyMsgContent("expdata(POS,STATE)","expdata(position(1,3),clear)", guardVars ).toString();
 	    		emit( "expdata", temporaryStr );
 	    		//delay
-	    		aar = delayReactive(500,"" , "");
+	    		aar = delayReactive(1000,"" , "");
 	    		if( aar.getInterrupted() ) curPlanInExec   = "simulateExploration";
 	    		if( ! aar.getGoon() ) break;
 	    		temporaryStr = unifyMsgContent("expdata(POS,STATE)","expdata(position(2,3),clear)", guardVars ).toString();

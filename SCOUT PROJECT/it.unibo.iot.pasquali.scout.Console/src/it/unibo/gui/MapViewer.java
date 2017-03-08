@@ -71,13 +71,15 @@ public abstract class MapViewer {
     	
     	this.ymax = ymax;
     	this.xmax = xmax;
-    	matrix = new JButton[ymax][xmax];
+    	matrix = new JButton[ymax+1][xmax+1];
+    	map = new Map(ymax, xmax);
+    	map.clearAll();
     	
-        p = new JPanel(new GridLayout(ymax, xmax));
+        p = new JPanel(new GridLayout(ymax+1, xmax+1));
         
-        for(int y = 0; y < ymax; y ++)
+        for(int y = 0; y <=ymax; y ++)
         {
-        	for(int x = 0; x < xmax; x++)
+        	for(int x = 0; x <=xmax; x++)
         	{
         		JButton gb = createCell(y, x);
         		gb.setBackground(CellState.CLEAR.getColor());
@@ -101,6 +103,7 @@ public abstract class MapViewer {
 	public void setCellState(int y, int x, CellState state)
     {
     	getGridButton(y, x).setBackground(state.getColor());
+    	map.setCell(y, x, state.getMapState());
     	p.revalidate();
     	p.repaint();
     }
@@ -114,6 +117,7 @@ public abstract class MapViewer {
 			return;
     	
     	getGridButton(y, x).setBackground(CellState.CLEAR.getColor());
+    	map.setCellClear(y, x);
     	p.revalidate();
     	p.repaint();
     	
@@ -129,6 +133,7 @@ public abstract class MapViewer {
     	
     	getGridButton(y, x).setBackground(CellState.OBJECT.getColor());
     	getGridButton(y, x).setEnabled(false);
+    	map.setCellObj(y, x);
     	p.revalidate();
     	p.repaint();
     	
@@ -143,14 +148,15 @@ public abstract class MapViewer {
 			return;
     	
     	getGridButton(y, x).setBackground(CellState.NONE.getColor());
+    	map.setCellNone(y, x);
     	p.repaint();
     	
     }
     
     public void clearAll() {
 		
-		for(int y = 0; y<ymax; y++)
-			for(int x = 0; x<xmax; x++)
+		for(int y = 0; y<=ymax; y++)
+			for(int x = 0; x<=xmax; x++)
 				matrix[y][x].setBackground(Color.GRAY);
 		
 		map.clearAll();		

@@ -83,9 +83,9 @@ public class ExplorationViewer extends MapViewer{
 	
 	public void noneAll()
 	{
-		for(int y=0; y<ymax; y++)
+		for(int y=0; y<=ymax; y++)
 		{
-			for(int x=0; x<xmax; x++)
+			for(int x=0; x<=xmax; x++)
 			{
 				getGridButton(y, x).setBackground(CellState.NONE.getColor());
 			}

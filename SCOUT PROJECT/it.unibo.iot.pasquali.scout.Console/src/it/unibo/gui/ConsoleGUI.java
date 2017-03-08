@@ -12,6 +12,8 @@ import java.awt.Panel;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -242,7 +244,7 @@ public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt, I
 	
 	public void setMap(IMap map)
 	{
-		mapViewer.createGridPanel(map.getHeight()+1, map.getWidth()+1);
+		mapViewer.createGridPanel(map.getHeight(), map.getWidth());
 		List<IMapElement> elements = map.getElements();
 		
 		for(IMapElement e : elements)
@@ -320,8 +322,7 @@ public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt, I
 			{
 			
 			case "Load Exploration Map": // Per la mappa di esplorazione
-				//TODO
-				
+								
 				FileDialog loadExpDialog = new FileDialog(frame, "Choose the Exploration Debug Map", FileDialog.LOAD);
 				loadExpDialog.setDirectory("C:\\");
 				loadExpDialog.setFile("*.pl");
@@ -337,7 +338,7 @@ public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt, I
 				break;
 			
 			case "Explore":
-				//TODO
+				
 				MapElement expStart = mapViewer.getStart();
 				
 				if(expStart == null)
@@ -352,7 +353,17 @@ public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt, I
 				break;
 				
 			case "Save Map":
-				//TODO
+
+				FileDialog storeDialog = new FileDialog(frame, "Create new Map", FileDialog.SAVE);
+				storeDialog.setDirectory("C:\\");
+				storeDialog.setFile(".pl");
+				storeDialog.setVisible(true);
+				String fname = storeDialog.getDirectory()+storeDialog.getFile();
+				if(fname.contains("null"))
+					break;
+				
+				storeMap(fname);
+				
 				btnLoad.setEnabled(true);
 				break;
 			
@@ -433,6 +444,20 @@ public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt, I
 		
 	}
 	
+	public void storeMap(String fname) {
+		
+		IMap map = mapViewer.getMap();
+		
+		try
+		{
+			FileOutputStream fsout = new FileOutputStream( new File(fname) );
+			fsout.write(map.getDefaultRep().getBytes());
+			fsout.close();
+		} catch (Exception e) {
+			System.out.println("QActor  ERROR " + e.getMessage());
+ 		}
+				
+	}
 	
 
 // OUTPUT ---------------------------------------------------------------
