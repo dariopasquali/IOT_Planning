@@ -61,6 +61,7 @@ public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt, I
 	private Component verticalStrut_1;
 	private JButton btnLoadExp;
 	private GridBagConstraints gbc_btnLoadExp;
+	private JButton btnClear;
 
 	public ConsoleGUI(IActivityBase controller) {
 		
@@ -103,20 +104,20 @@ public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt, I
 		
 		GridBagLayout gridBagLayout = new GridBagLayout();
 		gridBagLayout.columnWidths = new int[]{0, 123, 0, 0};
-		gridBagLayout.rowHeights = new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+		gridBagLayout.rowHeights = new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 		gridBagLayout.columnWeights = new double[]{0.0, 0.0, 0.0, Double.MIN_VALUE};
-		gridBagLayout.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
+		gridBagLayout.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
 		controlFrame.getContentPane().setLayout(gridBagLayout);
 		
 		btnExplore = new JButton("Explore");
-		GridBagConstraints gbc_btnNewButton = new GridBagConstraints();
-		gbc_btnNewButton.fill = GridBagConstraints.HORIZONTAL;
-		gbc_btnNewButton.insets = new Insets(0, 0, 5, 5);
-		gbc_btnNewButton.gridx = 1;
-		gbc_btnNewButton.gridy = 2;
+		GridBagConstraints gbc_btnExplore = new GridBagConstraints();
+		gbc_btnExplore.fill = GridBagConstraints.HORIZONTAL;
+		gbc_btnExplore.insets = new Insets(0, 0, 5, 5);
+		gbc_btnExplore.gridx = 1;
+		gbc_btnExplore.gridy = 2;
 		btnExplore.addActionListener(new DefaultInputHandler());
 		btnExplore.setEnabled(false);
-		controlFrame.getContentPane().add(btnExplore, gbc_btnNewButton);
+		controlFrame.getContentPane().add(btnExplore, gbc_btnExplore);
 		
 		btnLoadExp = new JButton("Load Exploration Map");
 		gbc_btnLoadExp = new GridBagConstraints();
@@ -166,14 +167,14 @@ public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt, I
 		controlFrame.getContentPane().add(btnSearch, gbc_btnNewButton_3);
 		
 		btnNavigate = new JButton("Navigate");
-		GridBagConstraints gbc_button = new GridBagConstraints();
-		gbc_button.fill = GridBagConstraints.HORIZONTAL;
-		gbc_button.insets = new Insets(0, 0, 5, 5);
-		gbc_button.gridx = 1;
-		gbc_button.gridy = 7;
+		GridBagConstraints gbc_btnNavigate = new GridBagConstraints();
+		gbc_btnNavigate.fill = GridBagConstraints.HORIZONTAL;
+		gbc_btnNavigate.insets = new Insets(0, 0, 5, 5);
+		gbc_btnNavigate.gridx = 1;
+		gbc_btnNavigate.gridy = 7;
 		btnNavigate.addActionListener(new DefaultInputHandler());
 		btnNavigate.setEnabled(false);
-		controlFrame.getContentPane().add(btnNavigate, gbc_button);
+		controlFrame.getContentPane().add(btnNavigate, gbc_btnNavigate);
 		
 		verticalStrut_1 = Box.createVerticalStrut(20);
 		GridBagConstraints gbc_verticalStrut_1 = new GridBagConstraints();
@@ -191,8 +192,16 @@ public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt, I
 		btnAbort.addActionListener(new DefaultInputHandler());
 		btnAbort.setEnabled(true);
 		controlFrame.getContentPane().add(btnAbort, gbc_btnNewButton_4);
-
-
+		
+		btnClear = new JButton("Clear");
+		GridBagConstraints gbc_btnClear = new GridBagConstraints();
+		gbc_btnClear.fill = GridBagConstraints.HORIZONTAL;
+		gbc_btnClear.insets = new Insets(0, 0, 5, 5);
+		gbc_btnClear.gridx = 1;
+		gbc_btnClear.gridy = 10;
+		controlFrame.getContentPane().add(btnClear, gbc_btnClear);
+		btnClear.addActionListener(new DefaultInputHandler());
+		btnClear.setEnabled(false);
 		
 	}
 	
@@ -265,6 +274,18 @@ public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt, I
 		frame.repaint();
 		
 		this.mapLoaded = true;
+	}
+	
+	public void clearGUI()
+	{
+		if(mapViewer instanceof ExplorationViewer)
+		{
+			((ExplorationViewer) mapViewer).noneAll();
+		}
+		else if(mapViewer instanceof NavigationViewer)
+		{
+			((NavigationViewer) mapViewer).clearPath();
+		}
 	}
 	
 // EXPLORATION -------------------------------------------------------	
@@ -354,6 +375,7 @@ public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt, I
 										+mapViewer.getXMax()+","+mapViewer.getYMax());				
 				
 				btnSave.setEnabled(true);
+				btnClear.setEnabled(true);
 				break;
 				
 			case "Save Map":
@@ -420,6 +442,7 @@ public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt, I
 					
 					btnNavigate.setEnabled(true);							
 					btnLoad.setEnabled(false);
+					btnClear.setEnabled(true);
 				}
 				catch(NumberFormatException e1)
 				{
@@ -438,9 +461,15 @@ public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt, I
 				btnAbort.setEnabled(false);
 				
 				btnNavigate.setEnabled(true);
+				btnExplore.setEnabled(true);
 				btnLoad.setEnabled(true);
 				
 				break;
+				
+			case "Clear":
+				controller.execAction("CLEAR ");
+				btnClear.setEnabled(false);
+				
 				
 			default:
 				addOutput("Invalid command");

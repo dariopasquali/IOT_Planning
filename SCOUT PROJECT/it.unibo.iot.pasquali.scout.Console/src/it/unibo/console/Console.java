@@ -173,6 +173,11 @@ public class Console extends AbstractConsole {
 
 	// GUI INTERACTION ---------------------------------------------------
 	
+	public void myClearGUI()
+	{
+		((ConsoleGUI)env).clearGUI();
+	}
+	
 	@Override
 	public void execAction(String cmd) {
 		
@@ -221,6 +226,10 @@ public class Console extends AbstractConsole {
 						
 		case "ABORT":
 			platform.raiseEvent("input", "local_gui_command", "local_gui_command(abort)");
+			break;
+			
+		case "CLEAR":
+			platform.raiseEvent("input", "local_gui_command", "local_gui_command(clear)");
 			break;
 		default:
 			println("Invalid command");

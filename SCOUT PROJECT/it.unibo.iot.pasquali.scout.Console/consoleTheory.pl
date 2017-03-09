@@ -91,7 +91,9 @@ loadMapImage(PATH, MODE) :-
 	Actor <- loadMapImage(PATH, MODE),
 	assert(havemap).
 	
-
+clearGUI :-
+	actorobj(Actor),
+	Actor <- myClearGUI.
 
 
 /*
