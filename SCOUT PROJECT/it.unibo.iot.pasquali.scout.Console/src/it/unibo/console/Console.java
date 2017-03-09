@@ -41,7 +41,7 @@ public class Console extends AbstractConsole {
 	
 	public void showClearMap()
 	{
-		
+		//TODO
 	}
 	
 	public void showClearMap(int xmax, int ymax)
@@ -118,7 +118,7 @@ public class Console extends AbstractConsole {
 		
 		AStarEngine engine = new AStarEngine();		
 		
-		engine.setIntMap(map.getIntMap(), map.getWidth(), map.getHeight());
+		engine.setIntMap(map.getIntMap(), map.getYmax(), map.getXmax());
 		
 		println("LET'S FIND BEST PATH");
 		
@@ -215,8 +215,7 @@ public class Console extends AbstractConsole {
 						+ "position(" + params[0] + "," + params[1]+")"
 								+ ","
 						+ "position(" + params[2] + "," + params[3]+")"
-								+ "," + params[4]
-								+ "))");
+								+ ")");
 						
 			break;
 						

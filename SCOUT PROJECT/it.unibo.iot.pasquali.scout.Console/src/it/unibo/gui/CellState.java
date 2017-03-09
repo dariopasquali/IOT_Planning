@@ -10,7 +10,7 @@ public enum CellState {
 	NONE(Color.GRAY, Map.NONE),
 	START(Color.GREEN, Map.CLEAR),
 	GOAL(Color.RED, Map.CLEAR),
-	PATH(Color.BLUE, Map.CLEAR);
+	PATH(Color.CYAN, Map.CLEAR);
 	
 	private Color color;
 	private int mapState;

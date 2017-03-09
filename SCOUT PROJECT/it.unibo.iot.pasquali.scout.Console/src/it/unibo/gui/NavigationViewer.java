@@ -1,17 +1,11 @@
 package it.unibo.gui;
 
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.GridLayout;
-import java.awt.Point;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
 import javax.swing.JButton;
-import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
-import it.unibo.model.implementation.Map;
 import it.unibo.model.implementation.MapElement;
 
 public class NavigationViewer extends MapViewer{
@@ -58,6 +52,7 @@ public class NavigationViewer extends MapViewer{
 					setCellClear(start.getY(), start.getX());
 				
 				start = new MapElement(y, x);
+				getGridButton(y, x).setBackground(CellState.START.getColor());
 			}
 			else if(SwingUtilities.isRightMouseButton(e))
 			{
@@ -65,6 +60,7 @@ public class NavigationViewer extends MapViewer{
 					setCellClear(goal.getY(), goal.getX());
 				
 				goal = new MapElement(y, x);
+				getGridButton(y, x).setBackground(CellState.GOAL.getColor());
 			}
 			else if(SwingUtilities.isMiddleMouseButton(e))
 			{
@@ -96,11 +92,9 @@ public class NavigationViewer extends MapViewer{
 	@Override
 	protected JButton createCell(final int y, final int x) {
         final JButton b = new JButton("");
-        
-        ClickHandler handler = new ClickHandler(y, x);
-        
+                
         if(enableClick)
-        	b.addMouseListener(handler);
+        	b.addMouseListener(new ClickHandler(y, x));
         return b;
     }
     
@@ -120,6 +114,14 @@ public class NavigationViewer extends MapViewer{
 	
 	public MapElement getGoal() {
 		return goal;
+	}
+
+
+	public void showStartAndGoal() {
+
+		getGridButton(start.getY(), start.getX()).setBackground(CellState.START.getColor());
+		getGridButton(goal.getY(), goal.getX()).setBackground(CellState.GOAL.getColor());
+		
 	}
 
 }

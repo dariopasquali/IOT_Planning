@@ -78,7 +78,8 @@ loadMap(PATH, MODE) :-
 
 loadMap(PATH, button, MODE) :-
 	actorobj(Actor),
-	Actor <- loadMapButton(PATH, MODE).
+	Actor <- loadMapButton(PATH, MODE),
+	assert(havemap).
 	
 loadMap(PATH, image) :-
 	loadMapImage(PATH, MODE).
@@ -90,11 +91,7 @@ loadMapImage(PATH, MODE) :-
 	Actor <- loadMapImage(PATH, MODE),
 	assert(havemap).
 	
-loadMapButton(PATH) :-
-	actorobj(Actor),
-	actorPrintln("consulted map data"),
-	Actor <- loadMapButton(PATH, MODE),
-	assert(havemap).
+
 
 
 /*

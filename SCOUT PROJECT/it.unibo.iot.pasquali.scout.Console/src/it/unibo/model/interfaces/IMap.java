@@ -9,8 +9,8 @@ public interface IMap {
 	
 	public List<IMapElement> getElements();
 	public Integer[][] getIntMap();
-	public int getWidth();
-	public int getHeight();
+	public int getXmax();
+	public int getYmax();
 	
 	void clearAll();
 	void noneAll();

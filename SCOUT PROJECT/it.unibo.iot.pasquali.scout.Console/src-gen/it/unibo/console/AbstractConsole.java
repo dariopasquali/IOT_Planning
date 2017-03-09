@@ -216,7 +216,7 @@ public AbstractConsole(String actorId, ActorContext myCtx, IOutputEnvView outEnv
 	    		}else if( ! aar.getGoon() ) break;
 	    		}
 	    		}
-	    		temporaryStr = " \"++++++++++++++++++ MAP LOADED ++++++++++++++++++\" ";
+	    		temporaryStr = " \"++++++++++++++++++ EXPLORATION MAP LOADED ++++++++++++++++++\" ";
 	    		println( temporaryStr );  
 	    		returnValue = continueWork; //we must restore nPlanIter and curPlanInExec of the 'interrupted' plan
 	    break;
@@ -397,6 +397,7 @@ public AbstractConsole(String actorId, ActorContext myCtx, IOutputEnvView outEnv
 	    		}
 	    		temporaryStr = " \"++++++++++++++++++ MAP LOADED ++++++++++++++++++\" ";
 	    		println( temporaryStr );  
+	    		returnValue = continueWork;  
 	    break;
 	    }//while
 	    return returnValue;
@@ -411,6 +412,8 @@ public AbstractConsole(String actorId, ActorContext myCtx, IOutputEnvView outEnv
 	    	boolean returnValue = suspendWork;
 	    while(true){
 	    nPlanIter++;
+	    		temporaryStr = " \"poppeeeeee\" ";
+	    		println( temporaryStr );  
 	    		if( (guardVars = evalTheGuard( " ??msg(local_gui_command, \"event\" ,SENDER,none,local_gui_command(findpath(START,GOAL)),MSGNUM)" )) != null ){
 	    		{ String parg = "searchBestPath(START,GOAL)";
 	    		parg = substituteVars(guardVars,parg);
@@ -427,6 +430,7 @@ public AbstractConsole(String actorId, ActorContext myCtx, IOutputEnvView outEnv
 	    		}
 	    		temporaryStr = " \"++++++++++++++++++ PATH FOUND ++++++++++++++++++\" ";
 	    		println( temporaryStr );  
+	    		returnValue = continueWork;  
 	    break;
 	    }//while
 	    return returnValue;

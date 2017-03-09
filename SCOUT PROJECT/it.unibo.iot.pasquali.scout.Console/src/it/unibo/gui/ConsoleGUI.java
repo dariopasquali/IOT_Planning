@@ -81,7 +81,7 @@ public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt, I
 	private void initializeFrame()
 	{
 		frame = new JFrame();
-		frame.setBounds(50, 50, 1600, 600);
+		frame.setBounds(50, 50, 800, 600);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setTitle("Map Frame");		
 		
@@ -244,12 +244,12 @@ public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt, I
 	
 	public void setMap(IMap map)
 	{
-		mapViewer.createGridPanel(map.getHeight(), map.getWidth());
+		mapViewer.createGridPanel(map.getYmax(), map.getXmax());
 		List<IMapElement> elements = map.getElements();
 		
 		for(IMapElement e : elements)
 		{
-			mapViewer.setCellState(e.getX(), e.getY(), CellState.OBJECT);
+			mapViewer.setCellState(e.getY(), e.getX(), CellState.OBJECT);
 		}
 		
 		panelMap = mapViewer.getPanel();
@@ -272,6 +272,7 @@ public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt, I
 	public void initExplorationViewer()
 	{
 		this.mapViewer = new ExplorationViewer(true);
+		frame.getContentPane().removeAll();
 	}
 	
 	public void clearCurrentExplorationMap()
@@ -294,6 +295,7 @@ public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt, I
 	public void initNavigationViewer()
 	{
 		this.mapViewer = new NavigationViewer(true);
+		frame.getContentPane().removeAll();
 	}
 	
 	@Override
@@ -304,8 +306,10 @@ public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt, I
 		
 		for(Point p : list)
 		{
-			mapViewer.setCellState(p.x, p.y, CellState.PATH);			
-		}		
+			mapViewer.setCellState(p.y, p.x, CellState.PATH);			
+		}
+		((NavigationViewer) mapViewer).showStartAndGoal();	
+		
 	}
 	
 
@@ -383,7 +387,7 @@ public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt, I
 				break;
 				
 				
-			case "Find Path":
+			case "Search Path":
 				
 				MapElement goal = ((NavigationViewer)mapViewer).getGoal();
 				MapElement start = ((NavigationViewer)mapViewer).getStart();				
@@ -411,8 +415,7 @@ public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt, I
 						+sx+","						
 						+sy+","
 						+gx+","
-						+gy+","
-						+"t"+","
+						+gy+")"
 						);
 					
 					btnNavigate.setEnabled(true);							
@@ -422,11 +425,13 @@ public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt, I
 				{
 					println(e1.getMessage());
 				}
+				break;
 			
 			case "Navigate":
 				controller.execAction("NAVIGATE ");
 				btnNavigate.setEnabled(false);
 				btnAbort.setEnabled(true);
+				break;
 				
 			case "Abort":
 				controller.execAction("ABORT ");				

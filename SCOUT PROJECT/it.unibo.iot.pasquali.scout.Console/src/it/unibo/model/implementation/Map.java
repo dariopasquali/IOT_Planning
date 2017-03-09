@@ -293,12 +293,12 @@ public class Map implements IMap{
 
 
 	@Override
-	public int getWidth() {
+	public int getXmax() {
 		return xmax;
 	}
 
 	@Override
-	public int getHeight() {
+	public int getYmax() {
 		return ymax;
 	}
 

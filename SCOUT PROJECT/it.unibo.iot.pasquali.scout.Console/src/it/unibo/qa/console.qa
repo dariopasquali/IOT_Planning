@@ -115,7 +115,7 @@ QActor console context ctxConsole -g cyan{
 		[?? msg(local_gui_command, "event", SENDER, none, local_gui_command (loadexpmap(PATH)), MSGNUM)]
 			 solve loadMap(PATH, exploration) time(210000000) onFailSwitchTo loadMapFailure;
 				
-		println("++++++++++++++++++ MAP LOADED ++++++++++++++++++");
+		println("++++++++++++++++++ EXPLORATION MAP LOADED ++++++++++++++++++");
 		
 		resumeLastPlan
 	
@@ -167,7 +167,7 @@ QActor console context ctxConsole -g cyan{
 // --------------------- NAVIGATION --------------------------------
 
 			
-	Plan loadMap
+	Plan loadMap resumeLastPlan
 		[?? msg(local_gui_command, "event", SENDER, none, local_gui_command (loadmap(PATH)), MSGNUM)]
 			 solve loadMap(PATH, navigation) time(210000000) onFailSwitchTo loadMapFailure;
 				
@@ -175,7 +175,10 @@ QActor console context ctxConsole -g cyan{
 		
 
 			
-	Plan findPath
+	Plan findPath resumeLastPlan
+	
+		println("poppeeeeee");
+		
 		[?? msg(local_gui_command, "event", SENDER, none, local_gui_command (findpath(START,GOAL)), MSGNUM)]
 		solve searchBestPath(START,GOAL) time(210000000) onFailSwitchTo  findpathFailure;
 	
