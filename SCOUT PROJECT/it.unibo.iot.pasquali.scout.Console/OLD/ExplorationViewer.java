@@ -62,6 +62,10 @@ public class ExplorationViewer extends MapViewer{
 				setCellState(y,x, CellState.START);
 				start = new MapElement(y,x);
 			}
+			else 
+			{
+				
+			}
 		}				
 	}
 	

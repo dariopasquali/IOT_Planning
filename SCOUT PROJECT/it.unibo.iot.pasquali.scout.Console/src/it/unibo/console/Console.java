@@ -98,10 +98,7 @@ public class Console extends AbstractConsole {
 			}
 		}
 		this.map = m;
-		if(mode.equals("exploration"))
-			((ConsoleGUI)env).initExplorationViewer();
-		else
-			((ConsoleGUI)env).initNavigationViewer();;
+		
 		
 		((ConsoleGUI)env).setMap(m);
 		

@@ -40,6 +40,8 @@ public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt, I
 
 	private static final long serialVersionUID = 1L;
 	
+	private MapType type;
+	
 	private JFrame frame;
 	private JFrame controlFrame;
 	private JFrame outputFrame;
@@ -75,6 +77,8 @@ public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt, I
 		initializeFrame();
 		initializeControlFrame();
 		initializeOutputFrame();
+		
+		type = null;
 	}
 	
 	// INITIALIZATION ------------------------------------------------------
@@ -253,6 +257,8 @@ public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt, I
 	
 	public void setMap(IMap map)
 	{
+		this.mapViewer = new MapViewer(true);
+		
 		mapViewer.createGridPanel(map.getYmax(), map.getXmax());
 		List<IMapElement> elements = map.getElements();
 		
@@ -278,23 +284,23 @@ public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt, I
 	
 	public void clearGUI()
 	{
-		if(mapViewer instanceof ExplorationViewer)
+		if(type.equals(MapType.EXPLORATION))
 		{
-			((ExplorationViewer) mapViewer).noneAll();
+			mapViewer.noneAll();
 		}
-		else if(mapViewer instanceof NavigationViewer)
+		else if(type.equals(MapType.NAVIGATION))
 		{
-			((NavigationViewer) mapViewer).clearPath();
+			mapViewer.clearPath();
 		}
 	}
 	
 // EXPLORATION -------------------------------------------------------	
 	
-	public void initExplorationViewer()
-	{
-		this.mapViewer = new ExplorationViewer(true);
-		frame.getContentPane().removeAll();
-	}
+//	public void initExplorationViewer()
+//	{
+//		this.mapViewer = new ExplorationViewer(true);
+//		frame.getContentPane().removeAll();
+//	}
 	
 	public void clearCurrentExplorationMap()
 	{
@@ -304,7 +310,7 @@ public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt, I
 			return;
 		}
 		
-		((ExplorationViewer)mapViewer).noneAll();
+		mapViewer.noneAll();
 		
 		frame.revalidate();		
 		frame.repaint();		
@@ -313,23 +319,23 @@ public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt, I
 
 // NAVIGATION -----------------------------------------------------------------	
 	
-	public void initNavigationViewer()
-	{
-		this.mapViewer = new NavigationViewer(true);
-		frame.getContentPane().removeAll();
-	}
+//	public void initNavigationViewer()
+//	{
+//		this.mapViewer = new NavigationViewer(true);
+//		frame.getContentPane().removeAll();
+//	}
 	
 	@Override
 	public void setPath(List<Point> list) {
 		
-		((NavigationViewer) mapViewer).clearPath();		
+		mapViewer.clearPath();		
 		this.path = (ArrayList<Point>) list;
 		
 		for(Point p : list)
 		{
 			mapViewer.setCellState(p.y, p.x, CellState.PATH);			
 		}
-		((NavigationViewer) mapViewer).showStartAndGoal();	
+		mapViewer.showStartAndGoal();	
 		
 	}
 	
@@ -360,6 +366,8 @@ public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt, I
 				
 				btnExplore.setEnabled(true);
 				
+				type = MapType.EXPLORATION;
+				
 				break;
 			
 			case "Explore":
@@ -376,6 +384,9 @@ public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt, I
 				
 				btnSave.setEnabled(true);
 				btnClear.setEnabled(true);
+				btnSearch.setEnabled(true);
+				
+				type = MapType.EXPLORATION;
 				break;
 				
 			case "Save Map":
@@ -391,6 +402,8 @@ public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt, I
 				storeMap(fname);
 				
 				btnLoad.setEnabled(true);
+				
+				type = MapType.EXPLORATION;
 				break;
 			
 			case "Load Map":	// Per la Mappa di Navigazione
@@ -406,13 +419,15 @@ public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt, I
 				btnSearch.setEnabled(true);				
 				
 				controller.execAction("LOAD "+filename);
+				
+				type = MapType.NAVIGATION;
 				break;
 				
 				
 			case "Search Path":
 				
-				MapElement goal = ((NavigationViewer)mapViewer).getGoal();
-				MapElement start = ((NavigationViewer)mapViewer).getStart();				
+				MapElement goal = mapViewer.getGoal();
+				MapElement start = mapViewer.getStart();				
 				
 				if(goal == null)
 				{
@@ -443,6 +458,8 @@ public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt, I
 					btnNavigate.setEnabled(true);							
 					btnLoad.setEnabled(false);
 					btnClear.setEnabled(true);
+					
+					type = MapType.NAVIGATION;
 				}
 				catch(NumberFormatException e1)
 				{
@@ -454,6 +471,8 @@ public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt, I
 				controller.execAction("NAVIGATE ");
 				btnNavigate.setEnabled(false);
 				btnAbort.setEnabled(true);
+				
+				type = MapType.NAVIGATION;
 				break;
 				
 			case "Abort":
@@ -495,6 +514,13 @@ public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt, I
 	
 
 // OUTPUT ---------------------------------------------------------------
+	
+	@Override
+	public void println(String msg) {
+		txtOut.append(msg+"\n");
+		txtOut.validate();
+		txtOut.setCaretPosition(txtOut.getDocument().getLength());
+	}
 	
 	@Override
 	public synchronized void clear(  ){
@@ -557,12 +583,7 @@ public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt, I
 		return this;
 	}
 
-	@Override
-	public void println(String msg) {
-		txtOut.append(msg+"\n");
-		txtOut.validate();
-		txtOut.setCaretPosition(txtOut.getDocument().getLength());
-	}
+
 
 	@Override
 	public void close() {

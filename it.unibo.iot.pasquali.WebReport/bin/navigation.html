@@ -70,7 +70,7 @@ tt{
 							<li> Design and build the Navigation Phase in both the entities of the System, assuming a complete defined map</li>
 							<li> Study Artificial Intelligence algorithms to define the best path between two given point</li>
 							<li> Create a reactive navigation plan that can be interpreted and executed by an autonomous agent</li>
-							<li> Design an build a simulated and/or concrete autonomous agent.</li>
+							<li> Design and build a simulated and/or concrete autonomous agent.</li>
 						
 						</ul>				 
 					</div>
@@ -90,6 +90,9 @@ tt{
 					</div>  
 					  
 					<br>
+
+<!-- ***************************************************************************************** -->					
+
 					
 					<div class="entity_title">Robot Analysis</div>					
 										    
@@ -104,8 +107,6 @@ tt{
 					<ul>
 						<li><i>Two DC Motors</i>, that allow the Robot to move in the environment, do strict curves and change his speed;</li>
 						<li><i>Sonar sensor</i>, allow the Robot to sense objects in front of him;</li>
-						<li><i>Gyroscope</i>, to compute the Robot orientation;</li>
-						<li><i>Two Encoders</i>, to compute the Robot move distance</li>
 					</ul>
 					
 					The Robot offers a limited set of features:
@@ -133,6 +134,8 @@ tt{
 						</li>
 						<li>When it reached GOAL communicate, it to Console.</li>
 					</ol> 
+
+<!-- ***************************************************************************************** -->					
 					
 					
 					<div class="entity_title">Console Analysis</div>
@@ -172,6 +175,9 @@ tt{
 						</li>
 					</ol> 
 					
+<!-- ***************************************************************************************** -->					
+					
+					
 					<br>
 					<div class="entity_title">Interaction</div>
 					<br>
@@ -189,6 +195,7 @@ tt{
 								<li><i>navigate</i>,<br> to start the Robot navigation;</li>
 								<li><i>abort</i>,<br> to stop the Robot Navigation.</li> 
 							</ul>
+							<br>
 						</li>
 						
 						<li>
@@ -216,24 +223,50 @@ tt{
 									So PLAN is a PROLOG-like list of that encoded moves: plan ( LIST_OF_MOVES ).									
 								</li>
 							</ul>
+							<br>
 						</li>
 						
 						<li>
-							<tt>update : update ( ELEMENT , CURRENT )</tt>, is an <b>event</b> emitted by Robot and sensed by Console. It is used to request a new plan when an unexpected obstacle is detected.
-							<br> ELEMENT and CURRENT are in the format position ( X , Y );
+							<tt>obstacle : obstacle</tt> is the <b>event</b> emitted by Sonar when it detect an obstacle in the sensing distance, the Robot may listen or not this event;
+							<br><br>
+						</li>
+						
+						<li>
+							<tt>update : update(POS, NEWELEMENT)</tt>, is an <b>event</b> emitted by Robot and sensed by Console. It is used to request a new plan when an unexpected obstacle is detected.
+							<br> NEWELEMENT and POS are in the format position ( X , Y );
+							<br><br>
 						</li>
 						
 						<li>
 							<tt>abort : abort</tt>, is an <b>event</b> emitted by Console and sensed by Robot, it's used to abort the Navigation;
+							<br><br>
 						</li>
 						
 						<li>
 							<tt>end : end</tt>, is and <b>event</b> emitted by Robot when it reach the GOAL.
+							<br><br>
 						</li>						
 					</ul> 
 					
 					For update,and end, i prefer the event form because the Console may not be the only entity concerned to listen that events.
 					<br> The same applies to abort, maybe i have multiple robots.
+					
+<!-- ***************************************************************************************** -->					
+
+					<br><br>
+					<div class="entity_title">QActor Models & Prolog Theory</div>
+					<br>
+					
+					<tt>Console Model</tt> ----> <a href="console.qa">console.qa</a>
+					<br><tt>Console Prolog Theory</tt> ----> <a href="consoleTheory.pl">consoleTheory.pl</a>
+					
+					<br><br>
+					
+					<tt>Robot Model</tt> ----> <a href="robot.ddr">robot.ddr</a>
+					<br><tt>Robot Prolog Theory</tt> ----> <a href="robotTheaory.pl">robotTheory.pl</a>
+
+<!-- ***************************************************************************************** -->					
+
 					
 					<br><br>
 					<div class="entity_title">Navigation Problem Analysis</div>
@@ -247,7 +280,8 @@ tt{
 					Anyhow, i assume that:
 					<br><br>
 					<tt>Assumption 1</tt>: The (static) map is divided in squared cells of uniform size. The size of a cell is based on robot dimensions. Consequently, the navigation is discrete.
-					<br>
+					<br>The map has a maximum width and height and can be or not bounded by obstacles borders.
+					<br> 
 					
 					<h2>Detect Obstacles</h2><br>
 					
@@ -276,6 +310,131 @@ tt{
 						
 					Since the Robot is less powerful than Console, and also it don't known the full map, I once again decide to delegate the task to compute the alternative plan to Console. 
 					
+<!-- ***************************************************************************************** -->					
+
+					
+					<br><br>
+					<div class="entity_title">Compute The best Path</div>
+					<br>
+					
+					There are a lot of way to make a Planner, but in my first implementation, I don't strictly make a Planner.
+					<br>First of all, a little summary about what a Plan is in this context:<br><br>
+					
+					Whit <tt>Plan</tt> i mean a finite sequence of action, in this case move action, to reach a defined purpose (the GOAL).
+					<br>In this domain, the Robot can:
+					<ul>
+						<li>move forward</li>
+						<li>turn right</li>
+						<li>turn left</li>
+					</ul>
+					
+					A usually known <tt>Planner</tt> is an agent that, basing on an environment description, the initial state and the objective to reach, create the Plan.<br>
+					This Plan must be the best possible, according with the environment description.
+					<br>
+					My planner is not a usually known Planner, it's nothing more than an <tt>A* search algorithm</tt>, applied on the map environment.				
+					
+					<br><h2>Search Algorithm</h2>
+					
+					A search algorithm is an artificial intelligence algorithm, used to find a precise state in a search graph.<br>
+					This graph (or sometimes tree) is usually dynamically generated during the search based on domain description.
+					More info <a href="http://www.cs.ubbcluj.ro/~csatol/log_funk/prolog/slides/7-search.pdf">here</a>. 
+					
+					<br><h2>A* Search</h2>
+					
+					The A* Search Algorithm is a basic informed algorithm that consider both distance from GOAL and the cost to reach the state.
+					<br>At each search loop it consider as the current state to explore, the state that minimize the sum of distance from GOAL and path cost.
+					<br>With this technique it can understand if a path is useless or if there is a shortest path to reach GOAL.
+					
+					<br>To implement this algorithm there are 3 things to define:
+					<ol>
+						<li>How the environment is represented? ---> Map Description;</li>
+						<li>Which moves are possible? ---> Move Description</li>
+						<li>How to Compute the Distance from Goal? ---> Heuristic</li>
+					</ol> 
+					
+					<br>More info <a href="https://en.wikipedia.org/wiki/A*_search_algorithm">here</a>.
+					
+					<br><h2>Map Description</h2>
+					
+					According with Assumption 1, the map:
+					<ul>
+						<li>is discretized in uniform size cells;</li>
+						<li>has defined width and height;</li>
+						<li>can be or not be bounded by obstacle borders.</li>						
+					</ul>
+					
+					For example, this is a valid Map.<br><br>
+					<img alt="" src="mapexample.png">
+					
+					<br><br>In my map model obstacles are the black cells, white cells are walkable areas.
+					
+					<br><br><tt>Assumption 4</tt> The Robot fits perfectly the cell.
+					
+					
+					<br><h2>Move Description and Cost</h2><br>
+					
+					In a search algorithm we can think at a cell like a node of the search graph, each cell is a different state, the purpose of the planner is to find the GOAL state.
+					<br> To change the current state it needs a way to moves between cells. The description of move is very important in order to improve the performances of agent.
+					<br> In a first implementation i used a description like this:
+					
+					<br><i>A Robot in a certain state can</i>:
+					<ol>
+						<li><i>Move forward (horizontal or vertical) in the next cell. It costs 10;</i></li>
+						<li><i>Move forward (diagonal) in the next cell. It costs 15;</i></li>
+						<li><i>Turn right or left on itself to 45°. It Costs 10;</i></li>
+						<li><i>Turn right or left on itself to 90°. It Costs 20;</i></li>
+					</ol>
+					
+					This seems a good model, The Robot never go back and I consider only 5 possible successors instead of 8.
+					<br>But there is a lot of problems.
+					
+					<ul>
+						<li>For each graph node, I have to store the Robot current direction;</li>
+						<li>Know Where i can go based on the direction is very expensive;</li>
+						<li>More important, for each map position i have 8 stacked nodes, one for each cardinal direction.
+						<br>Also that nodes have always the same distance from GOAL position, so the only way to know if the direction is wrong is to wait that the cost increases, and this is very very slow.</li> 
+					</ul>
+					
+					So I prefer to use a more classical model:
+					<ul>
+						<li>Each state is defined as only X and Y coordinates;</li>
+						<li>At each state, the Robot can move to one of the adjacent cell;</li>
+						<li>This movement is atomic, also if include rotation;</li>
+						<li>Move horizontal and vertical cost 10;</li>
+						<li>Move diagonal cost 15;</li> 
+					</ul>
+					
+					So the Search algorithm only define the sequence of states to reach the GOAL state
+					<br>then another algorithm create the sequence of moves with rotations.
+					
+					With this model, the search is faster because at each move the distance between current state and GOAL state changes, so the agent realizes earlier if the path is wrong.
+					
+					<br><h2>Heuristic</h2>
+					
+					The Heuristic is a function that compute how a node of the graph is "good".
+					<br>The heuristic function must be admissible, meaning that it never overestimates the actual cost to get to the GOAL node.
+					<br>In this domain the heuristic is the Manhattan distance between current state and GOAL state.
+					
+					<br><br><b>Distance = | goalX - currentX | + | goalY - currentY |</b>
+					
+					<br><br>More info <a href="https://en.wikipedia.org/wiki/Taxicab_geometry" >here</a>.
+					
+					<br><h2>Examples</h2>					
+					
+					As you can see in the image, the algorithm find the best path from top left corner in 3848 ms.
+					<br><br>
+					<img alt="" src="pathexample.png">
+					<br><br>
+					
+					<br><h2>Next Work</h2>
+					
+					The A* search is good but absolutely not scalable (over 200x200 maps the computation time drastically increase);
+					<br>Also I works on a very simple world, with a lots of assumptions, for example the real world is not discrete.
+					<br> So I'm moving in two different ways:
+					<ul>
+						<li>Implement a better type of A* search, called <a href="https://harablog.wordpress.com/2011/09/07/jump-point-search/" >Jump Point Search</a></li>
+						<li>Implement a usually known Planner, in particular a Conditional Planner
+					</ul>
 									
 				</div>
 			</div>    
