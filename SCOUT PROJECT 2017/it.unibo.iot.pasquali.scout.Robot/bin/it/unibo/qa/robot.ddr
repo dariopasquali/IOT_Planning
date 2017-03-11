@@ -6,7 +6,7 @@ RobotSystem scout
 
 // From Console to Robot to start Exploration
 Dispatch explore : explore
-Dispatch explore : explore ( START , BOUNDS )
+Dispatch exploredebug : exploredebug ( START , BOUNDS )
 //START = position ( X , Y )
 //BOUNDS = map ( W , H )
 //The second message is used for the debug
@@ -83,6 +83,8 @@ Robot mockScout QActor robot context ctxRobot{
 	
 	Plan init normal
 		
+		println("load theories");
+		
 		solve consult("robotTheory.pl") time(210000000) onFailSwitchTo  consultPrologFailure ;
 		solve consult("navRobotTheory.pl") time(210000000) onFailSwitchTo  consultPrologFailure ;
 		solve consult("expRobotTheory.pl") time(210000000) onFailSwitchTo  consultPrologFailure ;
@@ -100,7 +102,7 @@ Robot mockScout QActor robot context ctxRobot{
  		memoCurrentMessage;
  		
  		onMsg explore : explore -> switchToPlan exploration;
- 		onMsg explore : explore ( START , BOUNDS ) -> switchToPlan explorationDebug;
+ 		onMsg exploredebug : exploredebug ( START , BOUNDS ) -> switchToPlan explorationDebug;
  		onMsg navigate : navigate(PLAN, POS) -> switchToPlan navigation;
  		
  		repeatPlan 0		

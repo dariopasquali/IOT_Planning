@@ -78,6 +78,8 @@ protected IActorAction  action;
     	boolean returnValue = suspendWork;
     while(true){
     nPlanIter++;
+    		temporaryStr = "\"load theories\"";
+    		println( temporaryStr );  
     		parg = "consult(\"robotTheory.pl\")";
     		//REGENERATE AKKA
     		aar = solveGoalReactive(parg,210000000,"","");
@@ -153,10 +155,10 @@ protected IActorAction  action;
     					 if( ! planUtils.switchToPlan("exploration").getGoon() ) break; 
     				}//else println("guard  fails");  //parg is null when there is no guard (onEvent)
     		}//onMsg
-    		if( currentMessage.msgId().equals("explore") ){
+    		if( currentMessage.msgId().equals("exploredebug") ){
     			String parg = "";
     			/* SwitchPlan */
-    			parg =  updateVars(  Term.createTerm("explore"), Term.createTerm("explore(START,BOUNDS)"), 
+    			parg =  updateVars(  Term.createTerm("exploredebug(START,BOUNDS)"), Term.createTerm("exploredebug(START,BOUNDS)"), 
     				    		  					Term.createTerm(currentMessage.msgContent()), parg);
     				if( parg != null ){
     					 if( ! planUtils.switchToPlan("explorationDebug").getGoon() ) break; 
