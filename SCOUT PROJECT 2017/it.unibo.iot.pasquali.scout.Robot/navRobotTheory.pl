@@ -78,6 +78,9 @@ loadThePlan( FName ):-
 	actorobj(Actor),
 	Actor <-  consultFromFile(  FName  ).
 
+myRunPlan(PLANNAME) :-
+	runPlan(PLANNAME).
+
 runResumablePlan(PLAN) :-
 	actorobj(Actor),
 	myExecPlan(PLAN,Actor,PLAN,1).

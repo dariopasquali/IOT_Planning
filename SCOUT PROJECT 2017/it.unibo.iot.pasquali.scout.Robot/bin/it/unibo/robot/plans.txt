@@ -114,7 +114,7 @@ plan(5,startNavigation, sentence( planName( PLANNAME),move(solve,showPlan( PLANN
 plan(6,startNavigation, sentence(true,move(print," "),'','' ))
 plan(7,startNavigation, sentence(true,move(print," "),'','' ))
 plan(8,startNavigation, sentence(true,move(print,"++++++++++++++++++ ++++++++++++++++++ ++++++++++++++++++"),'','' ))
-plan(9,startNavigation, sentence(true,runPlan(PLANNAME),'','' ))
+plan(9,startNavigation, sentence( planName( PLANNAME),move(solve,myRunPlan( PLANNAME),1000000000,""),'','' ))
 plan(10,startNavigation, sentence(true,move(resumeplan),'','' ))
 plan(1,abort, sentence(true,move(print,"Current command aborted"),'','' ))
 plan(2,abort, sentence(true,move( switchplan(waitConsoleCommand) ),'','' ))

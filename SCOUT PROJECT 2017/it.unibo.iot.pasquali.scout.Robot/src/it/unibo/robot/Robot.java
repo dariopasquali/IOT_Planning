@@ -112,7 +112,7 @@ public class Robot extends AbstractRobot {
 		for(ISensor<?> sense : sensors)
 		{
 			DistanceSensor s = (DistanceSensor)sense;
-			s.addObserver(new SensorObserver<IDistanceSensorData>(this,outView,s.getPosition().getDefStringRep(), 5));
+			s.addObserver(new SensorObserver<IDistanceSensorData>(this,outEnvView,s.getPosition().getDefStringRep(), 5));
 		}
 		
 	}

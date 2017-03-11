@@ -11,10 +11,31 @@ import it.unibo.system.SituatedPlainObject;
 
 public class SensorObserver<T extends ISensorData> extends SituatedPlainObject implements ISensorObserver<T>{
 protected QActor actor;
-	public SensorObserver(QActor actor, IOutputView outView) { 
+
+	private String sonarPosition;
+	
+	private int sensingDistance;
+
+	public SensorObserver(QActor actor, IOutputView outView, String sonarPosition, int sensingDistance) 
+	{ 
 		super(outView);
 		this.actor = actor;
- 	}
+		
+		this.sonarPosition = sonarPosition;
+		this.sensingDistance = sensingDistance;
+		
+	}
+
+	public SensorObserver(QActor actor, IOutputView outView) 
+	{ 
+		super(outView);
+		this.actor = actor;
+		
+		this.sonarPosition = "front";
+		this.sensingDistance = 5;
+		
+	}
+
 	@Override
  	/*
   		SENSORDATA raw
@@ -28,9 +49,13 @@ protected QActor actor;
 	public void notify(T data) {
  		//println("SensorObserver: " + data.getClass().getName() );
  		//println("SensorObserver: " + data.getDefStringRep() );
-   		try {
+   		
+		try
+   		{
 			handleData(data);
-		} catch (Exception e) {
+		}
+		catch (Exception e) 
+		{
  			e.printStackTrace();
 		}
 	}
@@ -40,14 +65,19 @@ protected QActor actor;
 	* -----------------------------------------------
 	*/
 	protected void handleData(T data) throws Exception{
+		
 		//println("SensorObserver data=" + data.getDefStringRep() + " json:" + data.getJsonStringRep());
 		Struct t = (Struct) Term.createTerm(data.getDefStringRep());
  		//QActorUtils.raiseEvent(actor.getQActorContext(),"sensor", "sensordata", "sensordata("+data.getDefStringRep()+")" );
-		if( t.getName().equals("distance")){
+		
+		if( t.getName().equals("distance"))
+		{
 			int d = Integer.parseInt(t.getArg(0).toString());
-			if( d > 5 && d < 120 ) println("SensorObserver: " + data.getDefStringRep() + " json:" + data.getJsonStringRep());
-			if( d < 20 ){
-				QActorUtils.raiseEvent(actor.getQActorContext(),"sensor", "obstacle", "obstacle("+d+")" );
+			
+			//if( d > 5 && d < 120 ) println("SensorObserver: " + data.getDefStringRep() + " json:" + data.getJsonStringRep());
+			
+			if( d <= sensingDistance ){
+				QActorUtils.raiseEvent(actor.getQActorContext(),"sensor", "obstacle", "obstacle("+sonarPosition+")" );
  			}
 		}
 	}	

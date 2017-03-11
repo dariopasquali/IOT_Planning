@@ -311,7 +311,7 @@ Robot mockScout QActor robot context ctxRobot{
  		println(" ");
  		println("++++++++++++++++++ ++++++++++++++++++ ++++++++++++++++++");	
 
-		runPlan PLANNAME
+		[ !? planName(PLANNAME) ] solve myRunPlan(PLANNAME) time(1000000000)
 		// i's a big atto di fede 
  		//solve runResumablePlan(path) time(2100000000)
  	

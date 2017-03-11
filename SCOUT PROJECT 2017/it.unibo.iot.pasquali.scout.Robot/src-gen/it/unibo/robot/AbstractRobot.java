@@ -952,12 +952,17 @@ protected IActorAction  action;
     		println( temporaryStr );  
     		temporaryStr = "\"++++++++++++++++++ ++++++++++++++++++ ++++++++++++++++++\"";
     		println( temporaryStr );  
-    		alice.tuprolog.SolveInfo sss = QActorUtils.solveGoal("runPlan(guardVars.get("PLANNAME"))", pengine );
-    		if( ! sss.isSuccess()){
-    				println("run plan guardVars.get("PLANNAME") failed");
-    				 break;
+    		if( (guardVars = QActorUtils.evalTheGuard(this, " !?planName(PLANNAME)" )) != null ){
+    		parg = "myRunPlan(PLANNAME)";
+    		parg = QActorUtils.substituteVars(guardVars,parg);
+    		//REGENERATE AKKA
+    		aar = solveGoalReactive(parg,1000000000,"","");
+    		//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
+    		if( aar.getInterrupted() ){
+    			curPlanInExec   = "startNavigation";
+    			if( ! aar.getGoon() ) break;
+    		} 			
     		}
-    		
     break;
     }//while
     return returnValue;
