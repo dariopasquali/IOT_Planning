@@ -74,7 +74,7 @@ QActor console context ctxConsole{
 		println( "NEVER HERE. I'm just a placeholder" ) 
  }
 
-Robot scout QActor robot context ctxRobot{
+Robot mockScout QActor robot context ctxRobot{
 
 // ------------------------------------------------------------------
 //			NORMAL PLANS
@@ -305,13 +305,15 @@ Robot scout QActor robot context ctxRobot{
  		println(" ");
  		println(" ");
  		
- 		[ !? planName(PLANNAME) ] solve showPlan(path) time(1000);
+ 		[ !? planName(PLANNAME) ] solve showPlan(PLANNAME) time(1000);
  		
  		println(" ");
  		println(" ");
  		println("++++++++++++++++++ ++++++++++++++++++ ++++++++++++++++++");	
 
- 		solve runResumablePlan(path) time(2100000000)
+		runPlan PLANNAME
+		// i's a big atto di fede 
+ 		//solve runResumablePlan(path) time(2100000000)
  	
  	Plan abort 
  		println("Current command aborted");
@@ -342,7 +344,7 @@ Robot scout QActor robot context ctxRobot{
  	
  	Plan notifyEndOfNavigation	
  	
- 		println("è passato al piano successivo"); 	
+ 		println("passato al piano successivo"); 	
  			
  		solve notifyEnd time(10000) onFailSwitchTo generalPrologFailure;	
  		

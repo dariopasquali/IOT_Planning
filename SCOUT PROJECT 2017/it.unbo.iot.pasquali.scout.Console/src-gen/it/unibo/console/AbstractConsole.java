@@ -7,7 +7,6 @@ import it.unibo.qactors.ActorTerminationMessage;
 import it.unibo.qactors.QActorMessage;
 import it.unibo.qactors.QActorUtils;
 import it.unibo.contactEvent.interfaces.IEventItem;
-import it.unibo.gui.ConsoleGUI;
 import it.unibo.is.interfaces.IOutputEnvView;
 import it.unibo.qactors.action.ActionReceiveTimed;
 import it.unibo.qactors.action.AsynchActionResult;
@@ -33,27 +32,25 @@ public abstract class AbstractConsole extends QActor implements IActivity{
 	protected boolean bres=false;
 	protected IActorAction  action;
 	
-	protected static IOutputEnvView setTheEnv(IOutputEnvView outEnvView ){
-		//EnvFrame env = new EnvFrame( "Env_console", java.awt.Color.cyan  , java.awt.Color.black );
-		//env.init();
-		//env.setSize(800,400);
-		
-		ConsoleGUI env = new ConsoleGUI();
-		env.setEnvVisible(true);
-		
-		//IOutputEnvView newOutEnvView = ((EnvFrame) env).getOutputEnvView();
-		
-		IOutputEnvView newOutEnvView = env;
-		return newOutEnvView;
-	}
-
-
-public AbstractConsole(String actorId, QActorContext myCtx, IOutputEnvView outEnvView )  throws Exception{
-	super(actorId, myCtx, "./srcMore/it/unibo/console/WorldTheory.pl", setTheEnv( outEnvView ), "init");
-	//addInputPanel(80);
-	//addCmdPanels();
-	this.planFilePath = "./srcMore/it/unibo/console/plans.txt";	
-	}
+			protected static IOutputEnvView setTheEnv(IOutputEnvView outEnvView ){
+				EnvFrame env = new EnvFrame( "Env_console", java.awt.Color.cyan  , java.awt.Color.black );
+				env.init();
+				env.setSize(800,400);
+				IOutputEnvView newOutEnvView = ((EnvFrame) env).getOutputEnvView();
+				return newOutEnvView;
+			}
+	
+	
+		public AbstractConsole(String actorId, QActorContext myCtx, IOutputEnvView outEnvView )  throws Exception{
+			super(actorId, myCtx,  
+			"./srcMore/it/unibo/console/WorldTheory.pl",
+			setTheEnv( outEnvView )  , "init");		
+			addInputPanel(80);
+			addCmdPanels();	
+			this.planFilePath = "./srcMore/it/unibo/console/plans.txt";
+			//Plan interpretation is done in Prolog
+			//if(planFilePath != null) planUtils.buildPlanTable(planFilePath);
+	 	}
 	protected void addInputPanel(int size){
 		((EnvFrame) env).addInputPanel(size);			
 	}

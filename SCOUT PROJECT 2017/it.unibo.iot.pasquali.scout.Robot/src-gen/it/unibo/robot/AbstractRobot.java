@@ -936,7 +936,7 @@ protected IActorAction  action;
     		temporaryStr = "\" \"";
     		println( temporaryStr );  
     		if( (guardVars = QActorUtils.evalTheGuard(this, " !?planName(PLANNAME)" )) != null ){
-    		parg = "showPlan(path)";
+    		parg = "showPlan(PLANNAME)";
     		parg = QActorUtils.substituteVars(guardVars,parg);
     		//REGENERATE AKKA
     		aar = solveGoalReactive(parg,1000,"","");
@@ -952,14 +952,12 @@ protected IActorAction  action;
     		println( temporaryStr );  
     		temporaryStr = "\"++++++++++++++++++ ++++++++++++++++++ ++++++++++++++++++\"";
     		println( temporaryStr );  
-    		parg = "runResumablePlan(path)";
-    		//REGENERATE AKKA
-    		aar = solveGoalReactive(parg,2100000000,"","");
-    		//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
-    		if( aar.getInterrupted() ){
-    			curPlanInExec   = "startNavigation";
-    			if( ! aar.getGoon() ) break;
-    		} 			
+    		alice.tuprolog.SolveInfo sss = QActorUtils.solveGoal("runPlan(guardVars.get("PLANNAME"))", pengine );
+    		if( ! sss.isSuccess()){
+    				println("run plan guardVars.get("PLANNAME") failed");
+    				 break;
+    		}
+    		
     break;
     }//while
     return returnValue;
@@ -1064,7 +1062,7 @@ protected IActorAction  action;
     	boolean returnValue = suspendWork;
     while(true){
     nPlanIter++;
-    		temporaryStr = "\"� passato al piano successivo\"";
+    		temporaryStr = "\"passato al piano successivo\"";
     		println( temporaryStr );  
     		parg = "notifyEnd";
     		//REGENERATE AKKA
