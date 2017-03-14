@@ -78,6 +78,8 @@ protected IActorAction  action;
     	boolean returnValue = suspendWork;
     while(true){
     nPlanIter++;
+    		temporaryStr = "\"load theories\"";
+    		println( temporaryStr );  
     		parg = "consult(\"robotTheory.pl\")";
     		//REGENERATE AKKA
     		aar = solveGoalReactive(parg,210000000,"","");
@@ -153,10 +155,10 @@ protected IActorAction  action;
     					 if( ! planUtils.switchToPlan("exploration").getGoon() ) break; 
     				}//else println("guard  fails");  //parg is null when there is no guard (onEvent)
     		}//onMsg
-    		if( currentMessage.msgId().equals("explore") ){
+    		if( currentMessage.msgId().equals("exploredebug") ){
     			String parg = "";
     			/* SwitchPlan */
-    			parg =  updateVars(  Term.createTerm("explore"), Term.createTerm("explore(START,BOUNDS)"), 
+    			parg =  updateVars(  Term.createTerm("exploredebug(START,BOUNDS)"), Term.createTerm("exploredebug(START,BOUNDS)"), 
     				    		  					Term.createTerm(currentMessage.msgContent()), parg);
     				if( parg != null ){
     					 if( ! planUtils.switchToPlan("explorationDebug").getGoon() ) break; 
@@ -936,7 +938,7 @@ protected IActorAction  action;
     		temporaryStr = "\" \"";
     		println( temporaryStr );  
     		if( (guardVars = QActorUtils.evalTheGuard(this, " !?planName(PLANNAME)" )) != null ){
-    		parg = "showPlan(path)";
+    		parg = "showPlan(PLANNAME)";
     		parg = QActorUtils.substituteVars(guardVars,parg);
     		//REGENERATE AKKA
     		aar = solveGoalReactive(parg,1000,"","");
@@ -952,14 +954,17 @@ protected IActorAction  action;
     		println( temporaryStr );  
     		temporaryStr = "\"++++++++++++++++++ ++++++++++++++++++ ++++++++++++++++++\"";
     		println( temporaryStr );  
-    		parg = "runResumablePlan(path)";
+    		if( (guardVars = QActorUtils.evalTheGuard(this, " !?planName(PLANNAME)" )) != null ){
+    		parg = "myRunPlan(PLANNAME)";
+    		parg = QActorUtils.substituteVars(guardVars,parg);
     		//REGENERATE AKKA
-    		aar = solveGoalReactive(parg,2100000000,"","");
+    		aar = solveGoalReactive(parg,1000000000,"","");
     		//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
     		if( aar.getInterrupted() ){
     			curPlanInExec   = "startNavigation";
     			if( ! aar.getGoon() ) break;
     		} 			
+    		}
     break;
     }//while
     return returnValue;
@@ -1064,7 +1069,7 @@ protected IActorAction  action;
     	boolean returnValue = suspendWork;
     while(true){
     nPlanIter++;
-    		temporaryStr = "\"� passato al piano successivo\"";
+    		temporaryStr = "\"passato al piano successivo\"";
     		println( temporaryStr );  
     		parg = "notifyEnd";
     		//REGENERATE AKKA

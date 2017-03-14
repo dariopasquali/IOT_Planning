@@ -272,7 +272,10 @@ public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt, I
 		GridBagConstraints gbcPanel = new GridBagConstraints();
 		gbcPanel.fill = GridBagConstraints.BOTH;
 		gbcPanel.gridheight = 5;
-		gbcPanel.gridy = 0;		
+		gbcPanel.gridy = 0;	
+		
+		frame.getContentPane().removeAll();
+		
 		frame.getContentPane().add(panelMap, gbcPanel);
 		panelMap.revalidate();
 		panelMap.repaint();

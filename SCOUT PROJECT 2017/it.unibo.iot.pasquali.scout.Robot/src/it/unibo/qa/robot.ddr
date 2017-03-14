@@ -6,7 +6,7 @@ RobotSystem scout
 
 // From Console to Robot to start Exploration
 Dispatch explore : explore
-Dispatch explore : explore ( START , BOUNDS )
+Dispatch exploredebug : exploredebug ( START , BOUNDS )
 //START = position ( X , Y )
 //BOUNDS = map ( W , H )
 //The second message is used for the debug
@@ -74,7 +74,7 @@ QActor console context ctxConsole{
 		println( "NEVER HERE. I'm just a placeholder" ) 
  }
 
-Robot scout QActor robot context ctxRobot{
+Robot mockScout QActor robot context ctxRobot{
 
 // ------------------------------------------------------------------
 //			NORMAL PLANS
@@ -82,6 +82,8 @@ Robot scout QActor robot context ctxRobot{
 
 	
 	Plan init normal
+		
+		println("load theories");
 		
 		solve consult("robotTheory.pl") time(210000000) onFailSwitchTo  consultPrologFailure ;
 		solve consult("navRobotTheory.pl") time(210000000) onFailSwitchTo  consultPrologFailure ;
@@ -100,7 +102,7 @@ Robot scout QActor robot context ctxRobot{
  		memoCurrentMessage;
  		
  		onMsg explore : explore -> switchToPlan exploration;
- 		onMsg explore : explore ( START , BOUNDS ) -> switchToPlan explorationDebug;
+ 		onMsg exploredebug : exploredebug ( START , BOUNDS ) -> switchToPlan explorationDebug;
  		onMsg navigate : navigate(PLAN, POS) -> switchToPlan navigation;
  		
  		repeatPlan 0		
@@ -305,13 +307,15 @@ Robot scout QActor robot context ctxRobot{
  		println(" ");
  		println(" ");
  		
- 		[ !? planName(PLANNAME) ] solve showPlan(path) time(1000);
+ 		[ !? planName(PLANNAME) ] solve showPlan(PLANNAME) time(1000);
  		
  		println(" ");
  		println(" ");
  		println("++++++++++++++++++ ++++++++++++++++++ ++++++++++++++++++");	
 
- 		solve runResumablePlan(path) time(2100000000)
+		[ !? planName(PLANNAME) ] solve myRunPlan(PLANNAME) time(1000000000)
+		// i's a big atto di fede 
+ 		//solve runResumablePlan(path) time(2100000000)
  	
  	Plan abort 
  		println("Current command aborted");
@@ -342,7 +346,7 @@ Robot scout QActor robot context ctxRobot{
  	
  	Plan notifyEndOfNavigation	
  	
- 		println("è passato al piano successivo"); 	
+ 		println("passato al piano successivo"); 	
  			
  		solve notifyEnd time(10000) onFailSwitchTo generalPrologFailure;	
  		

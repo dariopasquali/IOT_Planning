@@ -239,6 +239,8 @@ public class AStarSearchAgent {
 		
 		PositionMove actual = PositionMove.NORTH;
 		
+		Collections.reverse(dirs);
+		
 		for(PositionMove next : dirs)
 		{
 			ArrayList<Move> toAdd = fromDirsToMoves(actual, next);

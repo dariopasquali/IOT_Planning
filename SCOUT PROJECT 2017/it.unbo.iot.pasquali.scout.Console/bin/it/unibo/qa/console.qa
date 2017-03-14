@@ -259,8 +259,8 @@ QActor console context ctxConsole -g cyan{
 QActor robot context ctxRobot{
  	Plan init normal
 		
-		println( "Exploration interactivity Test" );		
-		receiveMsg time(1000000000);
+		println( "just a placeholder" )		
+/*		receiveMsg time(1000000000);
 		
 		printCurrentMessage;
 		
@@ -310,5 +310,5 @@ QActor robot context ctxRobot{
 		emit end : end;
 		
 		resumeLastPlan
- 		
+ */		
  }
