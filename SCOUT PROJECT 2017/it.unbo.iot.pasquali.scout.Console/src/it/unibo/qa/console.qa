@@ -75,10 +75,10 @@ Event local_gui_command : local_gui_command(COMMAND)
 //			CONTEXTS
 // ------------------------------------------------------------------
 
-Context ctxRobot ip [ host="localhost" port=8020] -standalone 
+Context ctxRobot ip [ host="localhost" port=8020]
 Context ctxConsole ip [ host="localhost" port=8010]
 
-QActor console context ctxConsole -g cyan{
+QActor console context ctxConsole{
 	
 // ------------------------------------------------------------------
 //			NORMAL PLANS
@@ -259,8 +259,8 @@ QActor console context ctxConsole -g cyan{
 QActor robot context ctxRobot{
  	Plan init normal
 		
-		println( "just a placeholder" )		
-/*		receiveMsg time(1000000000);
+		println( "just a placeholder" );		
+		receiveMsg time(1000000000);
 		
 		printCurrentMessage;
 		
@@ -310,5 +310,5 @@ QActor robot context ctxRobot{
 		emit end : end;
 		
 		resumeLastPlan
- */		
+ 	
  }

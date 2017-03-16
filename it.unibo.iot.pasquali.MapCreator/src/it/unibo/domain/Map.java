@@ -10,10 +10,10 @@ import java.util.List;
 
 import javax.imageio.ImageIO;
 
-import org.opencv.core.CvType;
-import org.opencv.core.Mat;
-import org.opencv.core.MatOfByte;
-import org.opencv.highgui.Highgui;
+//import org.opencv.core.CvType;
+//import org.opencv.core.Mat;
+//import org.opencv.core.MatOfByte;
+//import org.opencv.highgui.Highgui;
 
 import it.unibo.domain.interfaces.IMapElement;
 
@@ -120,36 +120,36 @@ public class Map {
 		return intmap;
 	}
 	
-	public Mat getImage()
-	{
-		Mat image = new Mat(Xmax, Ymax, CvType.CV_8UC3);
-		
-		MatOfByte matOfByte = new MatOfByte();
-	    Highgui.imencode(".jpg", image, matOfByte);
-	    byte[] byteArray = matOfByte.toArray();
-	    BufferedImage bufImage = null;
-	    try 
-	    {
-	        InputStream in = new ByteArrayInputStream(byteArray);
-	        bufImage = ImageIO.read(in);
-	        
-	        for(int i=0; i<Xmax; i++)
-	        	for(int j=0; j<Ymax; j++)
-	        		if(intmap[i][j] == 0)
-	        			bufImage.setRGB(i, j, Color.white.getRGB());
-	        		else
-	        			bufImage.setRGB(i, j, Color.black.getRGB());	
-	        
-	        byte[] data = ((DataBufferByte) bufImage.getRaster().getDataBuffer()).getData();
-	        image.put(0, 0, data);
-	    }
-	    catch(Exception e)
-	    {
-	    	e.printStackTrace();
-	    }
-	    
-	    return image;
-	}
+//	public Mat getImage()
+//	{
+//		Mat image = new Mat(Xmax, Ymax, CvType.CV_8UC3);
+//		
+//		MatOfByte matOfByte = new MatOfByte();
+//	    Highgui.imencode(".jpg", image, matOfByte);
+//	    byte[] byteArray = matOfByte.toArray();
+//	    BufferedImage bufImage = null;
+//	    try 
+//	    {
+//	        InputStream in = new ByteArrayInputStream(byteArray);
+//	        bufImage = ImageIO.read(in);
+//	        
+//	        for(int i=0; i<Xmax; i++)
+//	        	for(int j=0; j<Ymax; j++)
+//	        		if(intmap[i][j] == 0)
+//	        			bufImage.setRGB(i, j, Color.white.getRGB());
+//	        		else
+//	        			bufImage.setRGB(i, j, Color.black.getRGB());	
+//	        
+//	        byte[] data = ((DataBufferByte) bufImage.getRaster().getDataBuffer()).getData();
+//	        image.put(0, 0, data);
+//	    }
+//	    catch(Exception e)
+//	    {
+//	    	e.printStackTrace();
+//	    }
+//	    
+//	    return image;
+//	}
 	
 	
 	public void addElementsFromString(String elem) {

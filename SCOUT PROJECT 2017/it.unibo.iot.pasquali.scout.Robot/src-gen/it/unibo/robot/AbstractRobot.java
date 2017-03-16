@@ -62,10 +62,11 @@ protected IActorAction  action;
 	@Override
 	protected void doJob() throws Exception {
 		String name  = getName().replace("_ctrl", "");
-		mysupport = (IMsgQueue) QActorUtils.getQActor( name );
+		mysupport = (IMsgQueue) QActorUtils.getQActor( name ); 
  		initSensorSystem();
 		boolean res = init();
 		//println(getName() + " doJob " + res );
+		QActorContext.terminateQActorSystem(this);
 	} 
 	/* 
 	* ------------------------------------------------------------
@@ -74,10 +75,12 @@ protected IActorAction  action;
 	*/
     public boolean init() throws Exception{	//public to allow reflection
     try{
-    	curPlanInExec =  "init";
+    	int nPlanIter = 0;
+    	//curPlanInExec =  "init";
     	boolean returnValue = suspendWork;
     while(true){
-    nPlanIter++;
+    	curPlanInExec =  "init";	//within while since it can be lost by switchlan
+    	nPlanIter++;
     		temporaryStr = "\"load theories\"";
     		println( temporaryStr );  
     		parg = "consult(\"robotTheory.pl\")";
@@ -126,23 +129,20 @@ protected IActorAction  action;
     }
     public boolean waitConsoleCommand() throws Exception{	//public to allow reflection
     try{
-    	curPlanInExec =  "waitConsoleCommand";
+    	int nPlanIter = 0;
+    	//curPlanInExec =  "waitConsoleCommand";
     	boolean returnValue = suspendWork;
     while(true){
-    nPlanIter++;
+    	curPlanInExec =  "waitConsoleCommand";	//within while since it can be lost by switchlan
+    	nPlanIter++;
     		temporaryStr = "\"++++++++++++++++++ WAIT CONSOLE COMMAND ++++++++++++++++++\"";
     		println( temporaryStr );  
     		//ReceiveMsg
-    		 		 aar = planUtils.receiveAMsg(mysupport,600000000, "" , "" ); 	//could block
-    				if( aar.getInterrupted() ){
-    					curPlanInExec   = "playTheGame";
-    					if( ! aar.getGoon() ) break;
-    				} 			
-    				//if( ! aar.getGoon() ){
-    					//System.out.println("			WARNING: receiveMsg in " + getName() + " TOUT " + aar.getTimeRemained() + "/" +  600000000);
-    					//addRule("tout(receive,"+getName()+")");
-    				//} 		 
-    				//println(getName() + " received " + aar.getResult() );
+    		 		aar = planUtils.receiveAMsg(mysupport,600000000, "" , "" ); 	//could block
+    			    if( ! aar.getGoon() || aar.getTimeRemained() <= 0 ){
+    			    	//println("	WARNING: receivemsg timeout " + aar.getTimeRemained());
+    			    	addRule("tout(receivemsg,"+getName()+")");
+    			    }
     		printCurrentMessage(false);
     		memoCurrentMessage( false );
     		//onMsg
@@ -172,7 +172,7 @@ protected IActorAction  action;
     				if( parg != null ){
     					 if( ! planUtils.switchToPlan("navigation").getGoon() ) break; 
     				}//else println("guard  fails");  //parg is null when there is no guard (onEvent)
-    		}if( planUtils.repeatPlan(0).getGoon() ) continue;
+    		}if( planUtils.repeatPlan(nPlanIter,0).getGoon() ) continue;
     break;
     }//while
     return returnValue;
@@ -184,10 +184,12 @@ protected IActorAction  action;
     }
     public boolean exploration() throws Exception{	//public to allow reflection
     try{
-    	curPlanInExec =  "exploration";
+    	int nPlanIter = 0;
+    	//curPlanInExec =  "exploration";
     	boolean returnValue = suspendWork;
     while(true){
-    nPlanIter++;
+    	curPlanInExec =  "exploration";	//within while since it can be lost by switchlan
+    	nPlanIter++;
     		temporaryStr = "\"\"";
     		println( temporaryStr );  
     break;
@@ -201,10 +203,12 @@ protected IActorAction  action;
     }
     public boolean explorationDebug() throws Exception{	//public to allow reflection
     try{
-    	curPlanInExec =  "explorationDebug";
+    	int nPlanIter = 0;
+    	//curPlanInExec =  "explorationDebug";
     	boolean returnValue = suspendWork;
     while(true){
-    nPlanIter++;
+    	curPlanInExec =  "explorationDebug";	//within while since it can be lost by switchlan
+    	nPlanIter++;
     		temporaryStr = "\"Let's explore!!\"";
     		println( temporaryStr );  
     		if( (guardVars = QActorUtils.evalTheGuard(this, " ??msg(_,_,SENDER,X,explore(START,BOUNDS),MSGNUM)" )) != null ){
@@ -239,10 +243,12 @@ protected IActorAction  action;
     }
     public boolean findLeftWall() throws Exception{	//public to allow reflection
     try{
-    	curPlanInExec =  "findLeftWall";
+    	int nPlanIter = 0;
+    	//curPlanInExec =  "findLeftWall";
     	boolean returnValue = suspendWork;
     while(true){
-    nPlanIter++;
+    	curPlanInExec =  "findLeftWall";	//within while since it can be lost by switchlan
+    	nPlanIter++;
     		temporaryStr = "\"Find Left Wall!\"";
     		println( temporaryStr );  
     		//senseEvent
@@ -252,7 +258,6 @@ protected IActorAction  action;
     		if( ! aar.getGoon() || aar.getTimeRemained() <= 0 ){
     			//println("			WARNING: sense timeout");
     			addRule("tout(senseevent,"+getName()+")");
-    			//break;
     		}
     		//onEvent
     		if( currentEvent.getEventId().equals("obstacle") ){
@@ -318,7 +323,6 @@ protected IActorAction  action;
     		if( ! aar.getGoon() || aar.getTimeRemained() <= 0 ){
     			//println("			WARNING: sense timeout");
     			addRule("tout(senseevent,"+getName()+")");
-    			//break;
     		}
     		//onEvent
     		if( currentEvent.getEventId().equals("obstacle") ){
@@ -395,7 +399,7 @@ protected IActorAction  action;
     			curPlanInExec   = "findLeftWall";
     			if( ! aar.getGoon() ) break;
     		} 			
-    		if( planUtils.repeatPlan(0).getGoon() ) continue;
+    		if( planUtils.repeatPlan(nPlanIter,0).getGoon() ) continue;
     break;
     }//while
     return returnValue;
@@ -407,10 +411,12 @@ protected IActorAction  action;
     }
     public boolean turnRightAndFollow() throws Exception{	//public to allow reflection
     try{
-    	curPlanInExec =  "turnRightAndFollow";
+    	int nPlanIter = 0;
+    	//curPlanInExec =  "turnRightAndFollow";
     	boolean returnValue = suspendWork;
     while(true){
-    nPlanIter++;
+    	curPlanInExec =  "turnRightAndFollow";	//within while since it can be lost by switchlan
+    	nPlanIter++;
     		temporaryStr = "\"turn right and follow\"";
     		println( temporaryStr );  
     		parg = "turnDoubleRight";
@@ -433,10 +439,12 @@ protected IActorAction  action;
     }
     public boolean turnLeftAndFind() throws Exception{	//public to allow reflection
     try{
-    	curPlanInExec =  "turnLeftAndFind";
+    	int nPlanIter = 0;
+    	//curPlanInExec =  "turnLeftAndFind";
     	boolean returnValue = suspendWork;
     while(true){
-    nPlanIter++;
+    	curPlanInExec =  "turnLeftAndFind";	//within while since it can be lost by switchlan
+    	nPlanIter++;
     		temporaryStr = "\"Wall Found!! - Left\"";
     		println( temporaryStr );  
     		parg = "turnDoubleLeft";
@@ -459,10 +467,12 @@ protected IActorAction  action;
     }
     public boolean turnLeft() throws Exception{	//public to allow reflection
     try{
-    	curPlanInExec =  "turnLeft";
+    	int nPlanIter = 0;
+    	//curPlanInExec =  "turnLeft";
     	boolean returnValue = suspendWork;
     while(true){
-    nPlanIter++;
+    	curPlanInExec =  "turnLeft";	//within while since it can be lost by switchlan
+    	nPlanIter++;
     		temporaryStr = "\"turn Left\"";
     		println( temporaryStr );  
     		parg = "turnDoubleLeft";
@@ -485,10 +495,12 @@ protected IActorAction  action;
     }
     public boolean turnRight() throws Exception{	//public to allow reflection
     try{
-    	curPlanInExec =  "turnRight";
+    	int nPlanIter = 0;
+    	//curPlanInExec =  "turnRight";
     	boolean returnValue = suspendWork;
     while(true){
-    nPlanIter++;
+    	curPlanInExec =  "turnRight";	//within while since it can be lost by switchlan
+    	nPlanIter++;
     		temporaryStr = "\"turn Right\"";
     		println( temporaryStr );  
     		parg = "turnDoubleLeft";
@@ -511,10 +523,12 @@ protected IActorAction  action;
     }
     public boolean followWall() throws Exception{	//public to allow reflection
     try{
-    	curPlanInExec =  "followWall";
+    	int nPlanIter = 0;
+    	//curPlanInExec =  "followWall";
     	boolean returnValue = suspendWork;
     while(true){
-    nPlanIter++;
+    	curPlanInExec =  "followWall";	//within while since it can be lost by switchlan
+    	nPlanIter++;
     		temporaryStr = "\"Follow Wall\"";
     		println( temporaryStr );  
     		//senseEvent
@@ -524,7 +538,6 @@ protected IActorAction  action;
     		if( ! aar.getGoon() || aar.getTimeRemained() <= 0 ){
     			//println("			WARNING: sense timeout");
     			addRule("tout(senseevent,"+getName()+")");
-    			//break;
     		}
     		//onEvent
     		if( currentEvent.getEventId().equals("obstacle") ){
@@ -590,7 +603,6 @@ protected IActorAction  action;
     		if( ! aar.getGoon() || aar.getTimeRemained() <= 0 ){
     			//println("			WARNING: sense timeout");
     			addRule("tout(senseevent,"+getName()+")");
-    			//break;
     		}
     		//onEvent
     		if( currentEvent.getEventId().equals("obstacle") ){
@@ -652,7 +664,7 @@ protected IActorAction  action;
     		if( (guardVars = QActorUtils.evalTheGuard(this, " ??obstacle(front,object)" )) != null ){
     		if( ! planUtils.switchToPlan("frontWallFound").getGoon() ) break;
     		}
-    		if( planUtils.repeatPlan(0).getGoon() ) continue;
+    		if( planUtils.repeatPlan(nPlanIter,0).getGoon() ) continue;
     break;
     }//while
     return returnValue;
@@ -664,10 +676,12 @@ protected IActorAction  action;
     }
     public boolean frontWallFound() throws Exception{	//public to allow reflection
     try{
-    	curPlanInExec =  "frontWallFound";
+    	int nPlanIter = 0;
+    	//curPlanInExec =  "frontWallFound";
     	boolean returnValue = suspendWork;
     while(true){
-    nPlanIter++;
+    	curPlanInExec =  "frontWallFound";	//within while since it can be lost by switchlan
+    	nPlanIter++;
     		temporaryStr = "\"I hit a wall\"";
     		println( temporaryStr );  
     		//senseEvent
@@ -677,7 +691,6 @@ protected IActorAction  action;
     		if( ! aar.getGoon() || aar.getTimeRemained() <= 0 ){
     			//println("			WARNING: sense timeout");
     			addRule("tout(senseevent,"+getName()+")");
-    			//break;
     		}
     		//onEvent
     		if( currentEvent.getEventId().equals("obstacle") ){
@@ -757,10 +770,12 @@ protected IActorAction  action;
     }
     public boolean moveAndCheckLoop() throws Exception{	//public to allow reflection
     try{
-    	curPlanInExec =  "moveAndCheckLoop";
+    	int nPlanIter = 0;
+    	//curPlanInExec =  "moveAndCheckLoop";
     	boolean returnValue = suspendWork;
     while(true){
-    nPlanIter++;
+    	curPlanInExec =  "moveAndCheckLoop";	//within while since it can be lost by switchlan
+    	nPlanIter++;
     		temporaryStr = "\"let's move\"";
     		println( temporaryStr );  
     		parg = "moveForward";
@@ -803,10 +818,12 @@ protected IActorAction  action;
     }
     public boolean loopAvoidance() throws Exception{	//public to allow reflection
     try{
-    	curPlanInExec =  "loopAvoidance";
+    	int nPlanIter = 0;
+    	//curPlanInExec =  "loopAvoidance";
     	boolean returnValue = suspendWork;
     while(true){
-    nPlanIter++;
+    	curPlanInExec =  "loopAvoidance";	//within while since it can be lost by switchlan
+    	nPlanIter++;
     		temporaryStr = "\"I'm in a looooop\"";
     		println( temporaryStr );  
     		parg = "findNearestNotExploredCell";
@@ -848,10 +865,12 @@ protected IActorAction  action;
     }
     public boolean notifyCell() throws Exception{	//public to allow reflection
     try{
-    	curPlanInExec =  "notifyCell";
+    	int nPlanIter = 0;
+    	//curPlanInExec =  "notifyCell";
     	boolean returnValue = suspendWork;
     while(true){
-    nPlanIter++;
+    	curPlanInExec =  "notifyCell";	//within while since it can be lost by switchlan
+    	nPlanIter++;
     		temporaryStr = "\"notify clear cell\"";
     		println( temporaryStr );  
     		if( (guardVars = QActorUtils.evalTheGuard(this, " ??newCell(POS,STATE)" )) != null ){
@@ -870,10 +889,12 @@ protected IActorAction  action;
     }
     public boolean endOfExploration() throws Exception{	//public to allow reflection
     try{
-    	curPlanInExec =  "endOfExploration";
+    	int nPlanIter = 0;
+    	//curPlanInExec =  "endOfExploration";
     	boolean returnValue = suspendWork;
     while(true){
-    nPlanIter++;
+    	curPlanInExec =  "endOfExploration";	//within while since it can be lost by switchlan
+    	nPlanIter++;
     		temporaryStr = "\"Exploration done\"";
     		println( temporaryStr );  
     break;
@@ -887,10 +908,12 @@ protected IActorAction  action;
     }
     public boolean navigation() throws Exception{	//public to allow reflection
     try{
-    	curPlanInExec =  "navigation";
+    	int nPlanIter = 0;
+    	//curPlanInExec =  "navigation";
     	boolean returnValue = suspendWork;
     while(true){
-    nPlanIter++;
+    	curPlanInExec =  "navigation";	//within while since it can be lost by switchlan
+    	nPlanIter++;
     		temporaryStr = "\"I Received some navigation data\"";
     		println( temporaryStr );  
     		if( (guardVars = QActorUtils.evalTheGuard(this, " ??msg(_,_,SENDER,X,navigate(PLAN,POS),MSGNUM)" )) != null ){
@@ -916,10 +939,12 @@ protected IActorAction  action;
     }
     public boolean startNavigation() throws Exception{	//public to allow reflection
     try{
-    	curPlanInExec =  "startNavigation";
+    	int nPlanIter = 0;
+    	//curPlanInExec =  "startNavigation";
     	boolean returnValue = suspendWork;
     while(true){
-    nPlanIter++;
+    	curPlanInExec =  "startNavigation";	//within while since it can be lost by switchlan
+    	nPlanIter++;
     		if( (guardVars = QActorUtils.evalTheGuard(this, " !?planFilename(FILENAME)" )) != null ){
     		parg = "loadThePlan(FILENAME)";
     		parg = QActorUtils.substituteVars(guardVars,parg);
@@ -976,10 +1001,12 @@ protected IActorAction  action;
     }
     public boolean abort() throws Exception{	//public to allow reflection
     try{
-    	curPlanInExec =  "abort";
+    	int nPlanIter = 0;
+    	//curPlanInExec =  "abort";
     	boolean returnValue = suspendWork;
     while(true){
-    nPlanIter++;
+    	curPlanInExec =  "abort";	//within while since it can be lost by switchlan
+    	nPlanIter++;
     		temporaryStr = "\"Current command aborted\"";
     		println( temporaryStr );  
     		if( ! planUtils.switchToPlan("waitConsoleCommand").getGoon() ) break;
@@ -994,10 +1021,12 @@ protected IActorAction  action;
     }
     public boolean waitAndEvaluate() throws Exception{	//public to allow reflection
     try{
-    	curPlanInExec =  "waitAndEvaluate";
+    	int nPlanIter = 0;
+    	//curPlanInExec =  "waitAndEvaluate";
     	boolean returnValue = suspendWork;
     while(true){
-    nPlanIter++;
+    	curPlanInExec =  "waitAndEvaluate";	//within while since it can be lost by switchlan
+    	nPlanIter++;
     		temporaryStr = "\"maybe there is an unexpected static obstacle\"";
     		println( temporaryStr );  
     		//delay
@@ -1013,7 +1042,6 @@ protected IActorAction  action;
     		if( ! aar.getGoon() || aar.getTimeRemained() <= 0 ){
     			//println("			WARNING: sense timeout");
     			addRule("tout(senseevent,"+getName()+")");
-    			//break;
     		}
     		returnValue = continueWork;  
     break;
@@ -1027,10 +1055,12 @@ protected IActorAction  action;
     }
     public boolean notifyUnexpectedObstacle() throws Exception{	//public to allow reflection
     try{
-    	curPlanInExec =  "notifyUnexpectedObstacle";
+    	int nPlanIter = 0;
+    	//curPlanInExec =  "notifyUnexpectedObstacle";
     	boolean returnValue = suspendWork;
     while(true){
-    nPlanIter++;
+    	curPlanInExec =  "notifyUnexpectedObstacle";	//within while since it can be lost by switchlan
+    	nPlanIter++;
     		temporaryStr = "\"I found an unexpected static obstacle\"";
     		println( temporaryStr );  
     		parg = "getCurrentPosition(CURRENT)";
@@ -1065,10 +1095,12 @@ protected IActorAction  action;
     }
     public boolean notifyEndOfNavigation() throws Exception{	//public to allow reflection
     try{
-    	curPlanInExec =  "notifyEndOfNavigation";
+    	int nPlanIter = 0;
+    	//curPlanInExec =  "notifyEndOfNavigation";
     	boolean returnValue = suspendWork;
     while(true){
-    nPlanIter++;
+    	curPlanInExec =  "notifyEndOfNavigation";	//within while since it can be lost by switchlan
+    	nPlanIter++;
     		temporaryStr = "\"passato al piano successivo\"";
     		println( temporaryStr );  
     		parg = "notifyEnd";
@@ -1092,10 +1124,12 @@ protected IActorAction  action;
     }
     public boolean handleTimeout() throws Exception{	//public to allow reflection
     try{
-    	curPlanInExec =  "handleTimeout";
+    	int nPlanIter = 0;
+    	//curPlanInExec =  "handleTimeout";
     	boolean returnValue = suspendWork;
     while(true){
-    nPlanIter++;
+    	curPlanInExec =  "handleTimeout";	//within while since it can be lost by switchlan
+    	nPlanIter++;
     		temporaryStr = "\"timeout!! GOODBYE\"";
     		println( temporaryStr );  
     break;
@@ -1109,10 +1143,12 @@ protected IActorAction  action;
     }
     public boolean explorationFailure() throws Exception{	//public to allow reflection
     try{
-    	curPlanInExec =  "explorationFailure";
+    	int nPlanIter = 0;
+    	//curPlanInExec =  "explorationFailure";
     	boolean returnValue = suspendWork;
     while(true){
-    nPlanIter++;
+    	curPlanInExec =  "explorationFailure";	//within while since it can be lost by switchlan
+    	nPlanIter++;
     		temporaryStr = "\"Explore FAILURE\"";
     		println( temporaryStr );  
     break;
@@ -1126,10 +1162,12 @@ protected IActorAction  action;
     }
     public boolean loadMapFailure() throws Exception{	//public to allow reflection
     try{
-    	curPlanInExec =  "loadMapFailure";
+    	int nPlanIter = 0;
+    	//curPlanInExec =  "loadMapFailure";
     	boolean returnValue = suspendWork;
     while(true){
-    nPlanIter++;
+    	curPlanInExec =  "loadMapFailure";	//within while since it can be lost by switchlan
+    	nPlanIter++;
     		temporaryStr = "\"Load Map FAILURE\"";
     		println( temporaryStr );  
     break;
@@ -1143,10 +1181,12 @@ protected IActorAction  action;
     }
     public boolean findpathFailure() throws Exception{	//public to allow reflection
     try{
-    	curPlanInExec =  "findpathFailure";
+    	int nPlanIter = 0;
+    	//curPlanInExec =  "findpathFailure";
     	boolean returnValue = suspendWork;
     while(true){
-    nPlanIter++;
+    	curPlanInExec =  "findpathFailure";	//within while since it can be lost by switchlan
+    	nPlanIter++;
     		temporaryStr = "\"Find Path FAILURE\"";
     		println( temporaryStr );  
     break;
@@ -1160,10 +1200,12 @@ protected IActorAction  action;
     }
     public boolean navigationFailure() throws Exception{	//public to allow reflection
     try{
-    	curPlanInExec =  "navigationFailure";
+    	int nPlanIter = 0;
+    	//curPlanInExec =  "navigationFailure";
     	boolean returnValue = suspendWork;
     while(true){
-    nPlanIter++;
+    	curPlanInExec =  "navigationFailure";	//within while since it can be lost by switchlan
+    	nPlanIter++;
     		temporaryStr = "\"Navigation FAILURE\"";
     		println( temporaryStr );  
     break;
@@ -1177,10 +1219,12 @@ protected IActorAction  action;
     }
     public boolean alternativeFindpathFailure() throws Exception{	//public to allow reflection
     try{
-    	curPlanInExec =  "alternativeFindpathFailure";
+    	int nPlanIter = 0;
+    	//curPlanInExec =  "alternativeFindpathFailure";
     	boolean returnValue = suspendWork;
     while(true){
-    nPlanIter++;
+    	curPlanInExec =  "alternativeFindpathFailure";	//within while since it can be lost by switchlan
+    	nPlanIter++;
     		temporaryStr = "\"Alternative Find Path FAILURE\"";
     		println( temporaryStr );  
     break;
@@ -1194,10 +1238,12 @@ protected IActorAction  action;
     }
     public boolean consultPrologFailure() throws Exception{	//public to allow reflection
     try{
-    	curPlanInExec =  "consultPrologFailure";
+    	int nPlanIter = 0;
+    	//curPlanInExec =  "consultPrologFailure";
     	boolean returnValue = suspendWork;
     while(true){
-    nPlanIter++;
+    	curPlanInExec =  "consultPrologFailure";	//within while since it can be lost by switchlan
+    	nPlanIter++;
     		temporaryStr = "\"The consult is gone wrong, maybe there are errors in the prolog file\"";
     		println( temporaryStr );  
     break;
@@ -1211,10 +1257,12 @@ protected IActorAction  action;
     }
     public boolean generalPrologFailure() throws Exception{	//public to allow reflection
     try{
-    	curPlanInExec =  "generalPrologFailure";
+    	int nPlanIter = 0;
+    	//curPlanInExec =  "generalPrologFailure";
     	boolean returnValue = suspendWork;
     while(true){
-    nPlanIter++;
+    	curPlanInExec =  "generalPrologFailure";	//within while since it can be lost by switchlan
+    	nPlanIter++;
     		temporaryStr = "\"Prolog goal FAILURE\"";
     		println( temporaryStr );  
     break;

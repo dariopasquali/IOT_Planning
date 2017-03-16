@@ -14,14 +14,10 @@ import it.unibo.qactors.action.IActorAction;
 import it.unibo.qactors.action.IActorAction.ActionExecMode;
 import it.unibo.qactors.action.IMsgQueue;
 import it.unibo.qactors.akka.QActor;
-import it.unibo.baseEnv.basicFrame.EnvFrame;
-import alice.tuprolog.SolveInfo;
-import it.unibo.is.interfaces.IActivity;
-import it.unibo.is.interfaces.IIntent;
 
 
 //REGENERATE AKKA: QActor instead QActorPlanned
-public abstract class AbstractConsole extends QActor implements IActivity{ 
+public abstract class AbstractConsole extends QActor { 
 	protected AsynchActionResult aar = null;
 	protected boolean actionResult = true;
 	protected alice.tuprolog.SolveInfo sol;
@@ -33,11 +29,7 @@ public abstract class AbstractConsole extends QActor implements IActivity{
 	protected IActorAction  action;
 	
 			protected static IOutputEnvView setTheEnv(IOutputEnvView outEnvView ){
-				EnvFrame env = new EnvFrame( "Env_console", java.awt.Color.cyan  , java.awt.Color.black );
-				env.init();
-				env.setSize(800,400);
-				IOutputEnvView newOutEnvView = ((EnvFrame) env).getOutputEnvView();
-				return newOutEnvView;
+				return outEnvView;
 			}
 	
 	
@@ -45,27 +37,18 @@ public abstract class AbstractConsole extends QActor implements IActivity{
 			super(actorId, myCtx,  
 			"./srcMore/it/unibo/console/WorldTheory.pl",
 			setTheEnv( outEnvView )  , "init");		
-			addInputPanel(80);
-			addCmdPanels();	
 			this.planFilePath = "./srcMore/it/unibo/console/plans.txt";
 			//Plan interpretation is done in Prolog
 			//if(planFilePath != null) planUtils.buildPlanTable(planFilePath);
 	 	}
-	protected void addInputPanel(int size){
-		((EnvFrame) env).addInputPanel(size);			
-	}
-	protected void addCmdPanels(){
-		((EnvFrame) env).addCmdPanel("input", new String[]{"INPUT"}, this);
-		((EnvFrame) env).addCmdPanel("alarm", new String[]{"FIRE"}, this);
-		((EnvFrame) env).addCmdPanel("help",  new String[]{"HELP"}, this);				
-	}
 		@Override
 		protected void doJob() throws Exception {
 			String name  = getName().replace("_ctrl", "");
-			mysupport = (IMsgQueue) QActorUtils.getQActor( name );
+			mysupport = (IMsgQueue) QActorUtils.getQActor( name ); 
 	 		initSensorSystem();
 			boolean res = init();
 			//println(getName() + " doJob " + res );
+			QActorContext.terminateQActorSystem(this);
 		} 
 		/* 
 		* ------------------------------------------------------------
@@ -74,10 +57,12 @@ public abstract class AbstractConsole extends QActor implements IActivity{
 		*/
 	    public boolean init() throws Exception{	//public to allow reflection
 	    try{
-	    	curPlanInExec =  "init";
+	    	int nPlanIter = 0;
+	    	//curPlanInExec =  "init";
 	    	boolean returnValue = suspendWork;
 	    while(true){
-	    nPlanIter++;
+	    	curPlanInExec =  "init";	//within while since it can be lost by switchlan
+	    	nPlanIter++;
 	    		parg = "consult(\"expConsoleTheory.pl\")";
 	    		//REGENERATE AKKA
 	    		aar = solveGoalReactive(parg,0,"","");
@@ -116,10 +101,12 @@ public abstract class AbstractConsole extends QActor implements IActivity{
 	    }
 	    public boolean waitGUICommand() throws Exception{	//public to allow reflection
 	    try{
-	    	curPlanInExec =  "waitGUICommand";
+	    	int nPlanIter = 0;
+	    	//curPlanInExec =  "waitGUICommand";
 	    	boolean returnValue = suspendWork;
 	    while(true){
-	    nPlanIter++;
+	    	curPlanInExec =  "waitGUICommand";	//within while since it can be lost by switchlan
+	    	nPlanIter++;
 	    		temporaryStr = "\"++++++++++++++++++ WAIT COMMAND ++++++++++++++++++\"";
 	    		println( temporaryStr );  
 	    		//senseEvent
@@ -129,7 +116,6 @@ public abstract class AbstractConsole extends QActor implements IActivity{
 	    		if( ! aar.getGoon() || aar.getTimeRemained() <= 0 ){
 	    			//println("			WARNING: sense timeout");
 	    			addRule("tout(senseevent,"+getName()+")");
-	    			//break;
 	    		}
 	    		printCurrentEvent(false);
 	    		memoCurrentEvent( false );
@@ -203,7 +189,7 @@ public abstract class AbstractConsole extends QActor implements IActivity{
 	    		 				 if( ! planUtils.switchToPlan("clearGUI").getGoon() ) break; 
 	    		 			}//else println("guard  fails");  //parg is null when there is no guard (onEvent)
 	    		 }
-	    		if( planUtils.repeatPlan(0).getGoon() ) continue;
+	    		if( planUtils.repeatPlan(nPlanIter,0).getGoon() ) continue;
 	    break;
 	    }//while
 	    return returnValue;
@@ -215,10 +201,12 @@ public abstract class AbstractConsole extends QActor implements IActivity{
 	    }
 	    public boolean loadExpMap() throws Exception{	//public to allow reflection
 	    try{
-	    	curPlanInExec =  "loadExpMap";
+	    	int nPlanIter = 0;
+	    	//curPlanInExec =  "loadExpMap";
 	    	boolean returnValue = suspendWork;
 	    while(true){
-	    nPlanIter++;
+	    	curPlanInExec =  "loadExpMap";	//within while since it can be lost by switchlan
+	    	nPlanIter++;
 	    		if( (guardVars = QActorUtils.evalTheGuard(this, " ??msg(local_gui_command,\"event\",SENDER,none,local_gui_command(loadexpmap(PATH)),MSGNUM)" )) != null ){
 	    		parg = "loadMap(PATH,exploration)";
 	    		parg = QActorUtils.substituteVars(guardVars,parg);
@@ -244,10 +232,12 @@ public abstract class AbstractConsole extends QActor implements IActivity{
 	    }
 	    public boolean exploration() throws Exception{	//public to allow reflection
 	    try{
-	    	curPlanInExec =  "exploration";
+	    	int nPlanIter = 0;
+	    	//curPlanInExec =  "exploration";
 	    	boolean returnValue = suspendWork;
 	    while(true){
-	    nPlanIter++;
+	    	curPlanInExec =  "exploration";	//within while since it can be lost by switchlan
+	    	nPlanIter++;
 	    		temporaryStr = "\"++++++++++++++++++ EXPLORATION ++++++++++++++++++\"";
 	    		println( temporaryStr );  
 	    		parg = "showClearMap";
@@ -272,10 +262,12 @@ public abstract class AbstractConsole extends QActor implements IActivity{
 	    }
 	    public boolean explorationDebug() throws Exception{	//public to allow reflection
 	    try{
-	    	curPlanInExec =  "explorationDebug";
+	    	int nPlanIter = 0;
+	    	//curPlanInExec =  "explorationDebug";
 	    	boolean returnValue = suspendWork;
 	    while(true){
-	    nPlanIter++;
+	    	curPlanInExec =  "explorationDebug";	//within while since it can be lost by switchlan
+	    	nPlanIter++;
 	    		temporaryStr = "\"++++++++++++++++++ EXPLORATION DEBUG ++++++++++++++++++\"";
 	    		println( temporaryStr );  
 	    		if( (guardVars = QActorUtils.evalTheGuard(this, " !?msg(local_gui_command,\"event\",SENDER,none,local_gui_command(explore(START,BOUNDS)),MSGNUM)" )) != null ){
@@ -307,10 +299,12 @@ public abstract class AbstractConsole extends QActor implements IActivity{
 	    }
 	    public boolean waitEndOfExploration() throws Exception{	//public to allow reflection
 	    try{
-	    	curPlanInExec =  "waitEndOfExploration";
+	    	int nPlanIter = 0;
+	    	//curPlanInExec =  "waitEndOfExploration";
 	    	boolean returnValue = suspendWork;
 	    while(true){
-	    nPlanIter++;
+	    	curPlanInExec =  "waitEndOfExploration";	//within while since it can be lost by switchlan
+	    	nPlanIter++;
 	    		//senseEvent
 	    		timeoutval = 999999999;
 	    		aar = planUtils.senseEvents( timeoutval,"local_gui_command,expdata,end","continue,continue,continue",
@@ -318,7 +312,6 @@ public abstract class AbstractConsole extends QActor implements IActivity{
 	    		if( ! aar.getGoon() || aar.getTimeRemained() <= 0 ){
 	    			//println("			WARNING: sense timeout");
 	    			addRule("tout(senseevent,"+getName()+")");
-	    			//break;
 	    		}
 	    		memoCurrentEvent( false );
 	    		printCurrentEvent(false);
@@ -360,7 +353,7 @@ public abstract class AbstractConsole extends QActor implements IActivity{
 	    		 				 if( ! planUtils.switchToPlan("endOfExploration").getGoon() ) break; 
 	    		 			}//else println("guard  fails");  //parg is null when there is no guard (onEvent)
 	    		 }
-	    		if( planUtils.repeatPlan(0).getGoon() ) continue;
+	    		if( planUtils.repeatPlan(nPlanIter,0).getGoon() ) continue;
 	    		returnValue = continueWork;  
 	    break;
 	    }//while
@@ -373,10 +366,12 @@ public abstract class AbstractConsole extends QActor implements IActivity{
 	    }
 	    public boolean endOfExploration() throws Exception{	//public to allow reflection
 	    try{
-	    	curPlanInExec =  "endOfExploration";
+	    	int nPlanIter = 0;
+	    	//curPlanInExec =  "endOfExploration";
 	    	boolean returnValue = suspendWork;
 	    while(true){
-	    nPlanIter++;
+	    	curPlanInExec =  "endOfExploration";	//within while since it can be lost by switchlan
+	    	nPlanIter++;
 	    		temporaryStr = "\"Exploration ENDED\"";
 	    		println( temporaryStr );  
 	    		temporaryStr = "\"Please Save the map, or clear and repeat\"";
@@ -393,10 +388,12 @@ public abstract class AbstractConsole extends QActor implements IActivity{
 	    }
 	    public boolean loadMap() throws Exception{	//public to allow reflection
 	    try{
-	    	curPlanInExec =  "loadMap";
+	    	int nPlanIter = 0;
+	    	//curPlanInExec =  "loadMap";
 	    	boolean returnValue = suspendWork;
 	    while(true){
-	    nPlanIter++;
+	    	curPlanInExec =  "loadMap";	//within while since it can be lost by switchlan
+	    	nPlanIter++;
 	    		if( (guardVars = QActorUtils.evalTheGuard(this, " ??msg(local_gui_command,\"event\",SENDER,none,local_gui_command(loadmap(PATH)),MSGNUM)" )) != null ){
 	    		parg = "loadMap(PATH,navigation)";
 	    		parg = QActorUtils.substituteVars(guardVars,parg);
@@ -422,10 +419,12 @@ public abstract class AbstractConsole extends QActor implements IActivity{
 	    }
 	    public boolean findPath() throws Exception{	//public to allow reflection
 	    try{
-	    	curPlanInExec =  "findPath";
+	    	int nPlanIter = 0;
+	    	//curPlanInExec =  "findPath";
 	    	boolean returnValue = suspendWork;
 	    while(true){
-	    nPlanIter++;
+	    	curPlanInExec =  "findPath";	//within while since it can be lost by switchlan
+	    	nPlanIter++;
 	    		if( (guardVars = QActorUtils.evalTheGuard(this, " ??msg(local_gui_command,\"event\",SENDER,none,local_gui_command(findpath(START,GOAL)),MSGNUM)" )) != null ){
 	    		parg = "searchBestPath(START,GOAL)";
 	    		parg = QActorUtils.substituteVars(guardVars,parg);
@@ -451,10 +450,12 @@ public abstract class AbstractConsole extends QActor implements IActivity{
 	    }
 	    public boolean navigation() throws Exception{	//public to allow reflection
 	    try{
-	    	curPlanInExec =  "navigation";
+	    	int nPlanIter = 0;
+	    	//curPlanInExec =  "navigation";
 	    	boolean returnValue = suspendWork;
 	    while(true){
-	    nPlanIter++;
+	    	curPlanInExec =  "navigation";	//within while since it can be lost by switchlan
+	    	nPlanIter++;
 	    		temporaryStr = "\"++++++++++++++++++ NAVIGATION ++++++++++++++++++\"";
 	    		println( temporaryStr );  
 	    		parg = "startNavigation";
@@ -477,10 +478,12 @@ public abstract class AbstractConsole extends QActor implements IActivity{
 	    }
 	    public boolean waitEndOfNavigation() throws Exception{	//public to allow reflection
 	    try{
-	    	curPlanInExec =  "waitEndOfNavigation";
+	    	int nPlanIter = 0;
+	    	//curPlanInExec =  "waitEndOfNavigation";
 	    	boolean returnValue = suspendWork;
 	    while(true){
-	    nPlanIter++;
+	    	curPlanInExec =  "waitEndOfNavigation";	//within while since it can be lost by switchlan
+	    	nPlanIter++;
 	    		//senseEvent
 	    		timeoutval = 999999999;
 	    		aar = planUtils.senseEvents( timeoutval,"local_gui_command,update,end","continue,continue,continue",
@@ -488,7 +491,6 @@ public abstract class AbstractConsole extends QActor implements IActivity{
 	    		if( ! aar.getGoon() || aar.getTimeRemained() <= 0 ){
 	    			//println("			WARNING: sense timeout");
 	    			addRule("tout(senseevent,"+getName()+")");
-	    			//break;
 	    		}
 	    		printCurrentEvent(false);
 	    		memoCurrentEvent( false );
@@ -530,7 +532,7 @@ public abstract class AbstractConsole extends QActor implements IActivity{
 	    		 				 if( ! planUtils.switchToPlan("endOfNavigation").getGoon() ) break; 
 	    		 			}//else println("guard  fails");  //parg is null when there is no guard (onEvent)
 	    		 }
-	    		if( planUtils.repeatPlan(0).getGoon() ) continue;
+	    		if( planUtils.repeatPlan(nPlanIter,0).getGoon() ) continue;
 	    break;
 	    }//while
 	    return returnValue;
@@ -542,10 +544,12 @@ public abstract class AbstractConsole extends QActor implements IActivity{
 	    }
 	    public boolean endOfNavigation() throws Exception{	//public to allow reflection
 	    try{
-	    	curPlanInExec =  "endOfNavigation";
+	    	int nPlanIter = 0;
+	    	//curPlanInExec =  "endOfNavigation";
 	    	boolean returnValue = suspendWork;
 	    while(true){
-	    nPlanIter++;
+	    	curPlanInExec =  "endOfNavigation";	//within while since it can be lost by switchlan
+	    	nPlanIter++;
 	    		temporaryStr = "\"++++++++++++++++++ NAVIGATION ENDED :D ++++++++++++++++++\"";
 	    		println( temporaryStr );  
 	    		if( ! planUtils.switchToPlan("waitGUICommand").getGoon() ) break;
@@ -560,10 +564,12 @@ public abstract class AbstractConsole extends QActor implements IActivity{
 	    }
 	    public boolean abortCommand() throws Exception{	//public to allow reflection
 	    try{
-	    	curPlanInExec =  "abortCommand";
+	    	int nPlanIter = 0;
+	    	//curPlanInExec =  "abortCommand";
 	    	boolean returnValue = suspendWork;
 	    while(true){
-	    nPlanIter++;
+	    	curPlanInExec =  "abortCommand";	//within while since it can be lost by switchlan
+	    	nPlanIter++;
 	    		temporaryStr = QActorUtils.unifyMsgContent(pengine, "abort","abort", guardVars ).toString();
 	    		emit( "abort", temporaryStr );
 	    		temporaryStr = "\"++++++++++++++++++ COMMAND ABORTED ++++++++++++++++++\"";
@@ -580,10 +586,12 @@ public abstract class AbstractConsole extends QActor implements IActivity{
 	    }
 	    public boolean clearGUI() throws Exception{	//public to allow reflection
 	    try{
-	    	curPlanInExec =  "clearGUI";
+	    	int nPlanIter = 0;
+	    	//curPlanInExec =  "clearGUI";
 	    	boolean returnValue = suspendWork;
 	    while(true){
-	    nPlanIter++;
+	    	curPlanInExec =  "clearGUI";	//within while since it can be lost by switchlan
+	    	nPlanIter++;
 	    		parg = "clearGUI";
 	    		//REGENERATE AKKA
 	    		aar = solveGoalReactive(parg,10000,"","");
@@ -606,10 +614,12 @@ public abstract class AbstractConsole extends QActor implements IActivity{
 	    }
 	    public boolean handleTimeout() throws Exception{	//public to allow reflection
 	    try{
-	    	curPlanInExec =  "handleTimeout";
+	    	int nPlanIter = 0;
+	    	//curPlanInExec =  "handleTimeout";
 	    	boolean returnValue = suspendWork;
 	    while(true){
-	    nPlanIter++;
+	    	curPlanInExec =  "handleTimeout";	//within while since it can be lost by switchlan
+	    	nPlanIter++;
 	    		temporaryStr = "\"timeout!! GOODBYE\"";
 	    		println( temporaryStr );  
 	    break;
@@ -623,10 +633,12 @@ public abstract class AbstractConsole extends QActor implements IActivity{
 	    }
 	    public boolean explorationFailure() throws Exception{	//public to allow reflection
 	    try{
-	    	curPlanInExec =  "explorationFailure";
+	    	int nPlanIter = 0;
+	    	//curPlanInExec =  "explorationFailure";
 	    	boolean returnValue = suspendWork;
 	    while(true){
-	    nPlanIter++;
+	    	curPlanInExec =  "explorationFailure";	//within while since it can be lost by switchlan
+	    	nPlanIter++;
 	    		temporaryStr = "\"Explore FAILURE\"";
 	    		println( temporaryStr );  
 	    break;
@@ -640,10 +652,12 @@ public abstract class AbstractConsole extends QActor implements IActivity{
 	    }
 	    public boolean loadMapFailure() throws Exception{	//public to allow reflection
 	    try{
-	    	curPlanInExec =  "loadMapFailure";
+	    	int nPlanIter = 0;
+	    	//curPlanInExec =  "loadMapFailure";
 	    	boolean returnValue = suspendWork;
 	    while(true){
-	    nPlanIter++;
+	    	curPlanInExec =  "loadMapFailure";	//within while since it can be lost by switchlan
+	    	nPlanIter++;
 	    		temporaryStr = "\"Load Map FAILURE\"";
 	    		println( temporaryStr );  
 	    break;
@@ -657,10 +671,12 @@ public abstract class AbstractConsole extends QActor implements IActivity{
 	    }
 	    public boolean findpathFailure() throws Exception{	//public to allow reflection
 	    try{
-	    	curPlanInExec =  "findpathFailure";
+	    	int nPlanIter = 0;
+	    	//curPlanInExec =  "findpathFailure";
 	    	boolean returnValue = suspendWork;
 	    while(true){
-	    nPlanIter++;
+	    	curPlanInExec =  "findpathFailure";	//within while since it can be lost by switchlan
+	    	nPlanIter++;
 	    		temporaryStr = "\"Find Path FAILURE\"";
 	    		println( temporaryStr );  
 	    break;
@@ -674,10 +690,12 @@ public abstract class AbstractConsole extends QActor implements IActivity{
 	    }
 	    public boolean navigationFailure() throws Exception{	//public to allow reflection
 	    try{
-	    	curPlanInExec =  "navigationFailure";
+	    	int nPlanIter = 0;
+	    	//curPlanInExec =  "navigationFailure";
 	    	boolean returnValue = suspendWork;
 	    while(true){
-	    nPlanIter++;
+	    	curPlanInExec =  "navigationFailure";	//within while since it can be lost by switchlan
+	    	nPlanIter++;
 	    		temporaryStr = "\"Navigation FAILURE\"";
 	    		println( temporaryStr );  
 	    break;
@@ -691,10 +709,12 @@ public abstract class AbstractConsole extends QActor implements IActivity{
 	    }
 	    public boolean alternativeFindpathFailure() throws Exception{	//public to allow reflection
 	    try{
-	    	curPlanInExec =  "alternativeFindpathFailure";
+	    	int nPlanIter = 0;
+	    	//curPlanInExec =  "alternativeFindpathFailure";
 	    	boolean returnValue = suspendWork;
 	    while(true){
-	    nPlanIter++;
+	    	curPlanInExec =  "alternativeFindpathFailure";	//within while since it can be lost by switchlan
+	    	nPlanIter++;
 	    		temporaryStr = "\"Alternative Find Path FAILURE\"";
 	    		println( temporaryStr );  
 	    break;
@@ -708,10 +728,12 @@ public abstract class AbstractConsole extends QActor implements IActivity{
 	    }
 	    public boolean consultPrologFailure() throws Exception{	//public to allow reflection
 	    try{
-	    	curPlanInExec =  "consultPrologFailure";
+	    	int nPlanIter = 0;
+	    	//curPlanInExec =  "consultPrologFailure";
 	    	boolean returnValue = suspendWork;
 	    while(true){
-	    nPlanIter++;
+	    	curPlanInExec =  "consultPrologFailure";	//within while since it can be lost by switchlan
+	    	nPlanIter++;
 	    		temporaryStr = "\"The consult is gone wrong, maybe there are errors in the prolog file\"";
 	    		println( temporaryStr );  
 	    break;
@@ -725,10 +747,12 @@ public abstract class AbstractConsole extends QActor implements IActivity{
 	    }
 	    public boolean generalPrologFailure() throws Exception{	//public to allow reflection
 	    try{
-	    	curPlanInExec =  "generalPrologFailure";
+	    	int nPlanIter = 0;
+	    	//curPlanInExec =  "generalPrologFailure";
 	    	boolean returnValue = suspendWork;
 	    while(true){
-	    nPlanIter++;
+	    	curPlanInExec =  "generalPrologFailure";	//within while since it can be lost by switchlan
+	    	nPlanIter++;
 	    		temporaryStr = "\"Prolog goal FAILURE\"";
 	    		println( temporaryStr );  
 	    break;
@@ -761,58 +785,5 @@ public abstract class AbstractConsole extends QActor implements IActivity{
 	//	    	println( " %%%% getMsgFromInputQueue continues with " + msg );
 		    	this.currentMessage = msg;
 		    }
-		/* 
-		* ------------------------------------------------------------
-		* IACTIVITY (aactor with GUI)
-		* ------------------------------------------------------------
-		*/
-		private String[] actions = new String[]{
-		    	"println( STRING | TERM )", 
-		    	"play('./audio/music_interlude20.wav'),20000,'alarm,obstacle', 'handleAlarm,handleObstacle'",
-		"emit(EVID,EVCONTENT)  ",
-		"move(MOVE,DURATION,ANGLE)  with MOVE=mf|mb|ml|mr|ms",
-		"forward( DEST, MSGID, MSGCONTENTTERM)"
-		    };
-		    protected void doHelp(){
-				println("  GOAL ");
-				println("[ GUARD ], ACTION  ");
-				println("[ GUARD ], ACTION, DURATION ");
-				println("[ GUARD ], ACTION, DURATION, ENDEVENT");
-				println("[ GUARD ], ACTION, DURATION, EVENTS, PLANS");
-				println("Actions:");
-				for( int i=0; i<actions.length; i++){
-					println(" " + actions[i] );
-				}
-		    }
-		@Override
-		public void execAction(String cmd) {
-			if( cmd.equals("HELP") ){
-				doHelp();
-				return;
-			}
-			if( cmd.equals("FIRE") ){
-				emit("alarm", "alarm(fire)");
-				return;
-			}
-			String input = env.readln();
-			//input = "\""+input+"\"";
-			input = it.unibo.qactors.web.GuiUiKb.buildCorrectPrologString(input);
-			//println("input=" + input);
-			try {
-				Term.createTerm(input);
-	 			String eventMsg=it.unibo.qactors.web.QActorHttpServer.inputToEventMsg(input);
-				//println("QActor eventMsg " + eventMsg);
-				emit("local_"+it.unibo.qactors.web.GuiUiKb.inputCmd, eventMsg);
-	  		} catch (Exception e) {
-		 		println("QActor input error " + e.getMessage());
-			}
-		}
-	 	
-		@Override
-		public void execAction() {}
-		@Override
-		public void execAction(IIntent input) {}
-		@Override
-		public String execActionWithAnswer(String cmd) {return null;}
 	  }
 	

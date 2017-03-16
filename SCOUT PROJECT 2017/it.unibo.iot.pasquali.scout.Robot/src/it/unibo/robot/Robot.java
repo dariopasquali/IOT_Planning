@@ -21,7 +21,6 @@ import it.unibo.planning.enums.Direction;
 import it.unibo.planning.enums.ForwardMoveType;
 import it.unibo.planning.enums.MoveType;
 import it.unibo.planning.enums.SpinDirection;
-import it.unibo.qactors.ActorContext;
 import it.unibo.qactors.action.AsynchActionResult;
 import it.unibo.qactors.action.IActorAction.ActionExecMode;
 import it.unibo.robot.exputils.*;
@@ -391,7 +390,7 @@ public class Robot extends AbstractRobot {
 		
 		try
 		{
-			sendMsg(msgName, destActor, ActorContext.dispatch, payload );
+			sendMsg(msgName, destActor, QActorContext.dispatch, payload );
 		} catch (Exception e)
 		{
 			e.printStackTrace();

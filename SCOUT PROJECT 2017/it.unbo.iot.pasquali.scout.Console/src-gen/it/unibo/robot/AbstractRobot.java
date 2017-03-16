@@ -44,10 +44,11 @@ public abstract class AbstractRobot extends QActor {
 		@Override
 		protected void doJob() throws Exception {
 			String name  = getName().replace("_ctrl", "");
-			mysupport = (IMsgQueue) QActorUtils.getQActor( name );
+			mysupport = (IMsgQueue) QActorUtils.getQActor( name ); 
 	 		initSensorSystem();
 			boolean res = init();
 			//println(getName() + " doJob " + res );
+			QActorContext.terminateQActorSystem(this);
 		} 
 		/* 
 		* ------------------------------------------------------------
@@ -56,17 +57,158 @@ public abstract class AbstractRobot extends QActor {
 		*/
 	    public boolean init() throws Exception{	//public to allow reflection
 	    try{
-	    	curPlanInExec =  "init";
+	    	int nPlanIter = 0;
+	    	//curPlanInExec =  "init";
 	    	boolean returnValue = suspendWork;
 	    while(true){
-	    nPlanIter++;
+	    	curPlanInExec =  "init";	//within while since it can be lost by switchlan
+	    	nPlanIter++;
 	    		temporaryStr = "\"just a placeholder\"";
 	    		println( temporaryStr );  
+	    		//ReceiveMsg
+	    		 		aar = planUtils.receiveAMsg(mysupport,1000000000, "" , "" ); 	//could block
+	    			    if( ! aar.getGoon() || aar.getTimeRemained() <= 0 ){
+	    			    	//println("	WARNING: receivemsg timeout " + aar.getTimeRemained());
+	    			    	addRule("tout(receivemsg,"+getName()+")");
+	    			    }
+	    		printCurrentMessage(false);
+	    		//onMsg
+	    		if( currentMessage.msgId().equals("exploredebug") ){
+	    			String parg = "";
+	    			/* SwitchPlan */
+	    			parg =  updateVars(  Term.createTerm("exploredebug(START,BOUNDS)"), Term.createTerm("exploredebug(START,BOUNDS)"), 
+	    				    		  					Term.createTerm(currentMessage.msgContent()), parg);
+	    				if( parg != null ){
+	    					 if( ! planUtils.switchToPlan("simulateExploration").getGoon() ) break; 
+	    				}//else println("guard  fails");  //parg is null when there is no guard (onEvent)
+	    		}if( planUtils.repeatPlan(nPlanIter,0).getGoon() ) continue;
 	    break;
 	    }//while
 	    return returnValue;
 	    }catch(Exception e){
 	       //println( getName() + " plan=init WARNING:" + e.getMessage() );
+	       QActorContext.terminateQActorSystem(this); 
+	       return false;  
+	    }
+	    }
+	    public boolean simulateExploration() throws Exception{	//public to allow reflection
+	    try{
+	    	int nPlanIter = 0;
+	    	//curPlanInExec =  "simulateExploration";
+	    	boolean returnValue = suspendWork;
+	    while(true){
+	    	curPlanInExec =  "simulateExploration";	//within while since it can be lost by switchlan
+	    	nPlanIter++;
+	    		temporaryStr = "\"let's explore!!\"";
+	    		println( temporaryStr );  
+	    		//delay
+	    		aar = delayReactive(1000,"" , "");
+	    		if( aar.getInterrupted() ) curPlanInExec   = "simulateExploration";
+	    		if( ! aar.getGoon() ) break;
+	    		temporaryStr = QActorUtils.unifyMsgContent(pengine, "expdata(POS,STATE)","expdata(position(0,3),clear)", guardVars ).toString();
+	    		emit( "expdata", temporaryStr );
+	    		//delay
+	    		aar = delayReactive(1000,"" , "");
+	    		if( aar.getInterrupted() ) curPlanInExec   = "simulateExploration";
+	    		if( ! aar.getGoon() ) break;
+	    		temporaryStr = QActorUtils.unifyMsgContent(pengine, "expdata(POS,STATE)","expdata(position(0,2),clear)", guardVars ).toString();
+	    		emit( "expdata", temporaryStr );
+	    		//delay
+	    		aar = delayReactive(1000,"" , "");
+	    		if( aar.getInterrupted() ) curPlanInExec   = "simulateExploration";
+	    		if( ! aar.getGoon() ) break;
+	    		temporaryStr = QActorUtils.unifyMsgContent(pengine, "expdata(POS,STATE)","expdata(position(0,1),clear)", guardVars ).toString();
+	    		emit( "expdata", temporaryStr );
+	    		//delay
+	    		aar = delayReactive(1000,"" , "");
+	    		if( aar.getInterrupted() ) curPlanInExec   = "simulateExploration";
+	    		if( ! aar.getGoon() ) break;
+	    		temporaryStr = QActorUtils.unifyMsgContent(pengine, "expdata(POS,STATE)","expdata(position(0,0),object)", guardVars ).toString();
+	    		emit( "expdata", temporaryStr );
+	    		//delay
+	    		aar = delayReactive(1000,"" , "");
+	    		if( aar.getInterrupted() ) curPlanInExec   = "simulateExploration";
+	    		if( ! aar.getGoon() ) break;
+	    		temporaryStr = QActorUtils.unifyMsgContent(pengine, "expdata(POS,STATE)","expdata(position(1,1),clear)", guardVars ).toString();
+	    		emit( "expdata", temporaryStr );
+	    		//delay
+	    		aar = delayReactive(1000,"" , "");
+	    		if( aar.getInterrupted() ) curPlanInExec   = "simulateExploration";
+	    		if( ! aar.getGoon() ) break;
+	    		temporaryStr = QActorUtils.unifyMsgContent(pengine, "expdata(POS,STATE)","expdata(position(1,0),clear)", guardVars ).toString();
+	    		emit( "expdata", temporaryStr );
+	    		//delay
+	    		aar = delayReactive(1000,"" , "");
+	    		if( aar.getInterrupted() ) curPlanInExec   = "simulateExploration";
+	    		if( ! aar.getGoon() ) break;
+	    		temporaryStr = QActorUtils.unifyMsgContent(pengine, "expdata(POS,STATE)","expdata(position(2,0),clear)", guardVars ).toString();
+	    		emit( "expdata", temporaryStr );
+	    		//delay
+	    		aar = delayReactive(1000,"" , "");
+	    		if( aar.getInterrupted() ) curPlanInExec   = "simulateExploration";
+	    		if( ! aar.getGoon() ) break;
+	    		temporaryStr = QActorUtils.unifyMsgContent(pengine, "expdata(POS,STATE)","expdata(position(3,0),clear)", guardVars ).toString();
+	    		emit( "expdata", temporaryStr );
+	    		//delay
+	    		aar = delayReactive(1000,"" , "");
+	    		if( aar.getInterrupted() ) curPlanInExec   = "simulateExploration";
+	    		if( ! aar.getGoon() ) break;
+	    		temporaryStr = QActorUtils.unifyMsgContent(pengine, "expdata(POS,STATE)","expdata(position(3,1),clear)", guardVars ).toString();
+	    		emit( "expdata", temporaryStr );
+	    		//delay
+	    		aar = delayReactive(1000,"" , "");
+	    		if( aar.getInterrupted() ) curPlanInExec   = "simulateExploration";
+	    		if( ! aar.getGoon() ) break;
+	    		temporaryStr = QActorUtils.unifyMsgContent(pengine, "expdata(POS,STATE)","expdata(position(3,2),clear)", guardVars ).toString();
+	    		emit( "expdata", temporaryStr );
+	    		//delay
+	    		aar = delayReactive(1000,"" , "");
+	    		if( aar.getInterrupted() ) curPlanInExec   = "simulateExploration";
+	    		if( ! aar.getGoon() ) break;
+	    		temporaryStr = QActorUtils.unifyMsgContent(pengine, "expdata(POS,STATE)","expdata(position(3,3),object)", guardVars ).toString();
+	    		emit( "expdata", temporaryStr );
+	    		//delay
+	    		aar = delayReactive(1000,"" , "");
+	    		if( aar.getInterrupted() ) curPlanInExec   = "simulateExploration";
+	    		if( ! aar.getGoon() ) break;
+	    		temporaryStr = QActorUtils.unifyMsgContent(pengine, "expdata(POS,STATE)","expdata(position(2,2),object)", guardVars ).toString();
+	    		emit( "expdata", temporaryStr );
+	    		//delay
+	    		aar = delayReactive(1000,"" , "");
+	    		if( aar.getInterrupted() ) curPlanInExec   = "simulateExploration";
+	    		if( ! aar.getGoon() ) break;
+	    		temporaryStr = QActorUtils.unifyMsgContent(pengine, "expdata(POS,STATE)","expdata(position(2,1),object)", guardVars ).toString();
+	    		emit( "expdata", temporaryStr );
+	    		//delay
+	    		aar = delayReactive(1000,"" , "");
+	    		if( aar.getInterrupted() ) curPlanInExec   = "simulateExploration";
+	    		if( ! aar.getGoon() ) break;
+	    		temporaryStr = QActorUtils.unifyMsgContent(pengine, "expdata(POS,STATE)","expdata(position(1,2),clear)", guardVars ).toString();
+	    		emit( "expdata", temporaryStr );
+	    		//delay
+	    		aar = delayReactive(1000,"" , "");
+	    		if( aar.getInterrupted() ) curPlanInExec   = "simulateExploration";
+	    		if( ! aar.getGoon() ) break;
+	    		temporaryStr = QActorUtils.unifyMsgContent(pengine, "expdata(POS,STATE)","expdata(position(1,3),clear)", guardVars ).toString();
+	    		emit( "expdata", temporaryStr );
+	    		//delay
+	    		aar = delayReactive(1000,"" , "");
+	    		if( aar.getInterrupted() ) curPlanInExec   = "simulateExploration";
+	    		if( ! aar.getGoon() ) break;
+	    		temporaryStr = QActorUtils.unifyMsgContent(pengine, "expdata(POS,STATE)","expdata(position(2,3),clear)", guardVars ).toString();
+	    		emit( "expdata", temporaryStr );
+	    		//delay
+	    		aar = delayReactive(1000,"" , "");
+	    		if( aar.getInterrupted() ) curPlanInExec   = "simulateExploration";
+	    		if( ! aar.getGoon() ) break;
+	    		temporaryStr = QActorUtils.unifyMsgContent(pengine, "end","end", guardVars ).toString();
+	    		emit( "end", temporaryStr );
+	    		returnValue = continueWork; //we must restore nPlanIter and curPlanInExec of the 'interrupted' plan
+	    break;
+	    }//while
+	    return returnValue;
+	    }catch(Exception e){
+	       //println( getName() + " plan=simulateExploration WARNING:" + e.getMessage() );
 	       QActorContext.terminateQActorSystem(this); 
 	       return false;  
 	    }

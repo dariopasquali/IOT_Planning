@@ -36,7 +36,7 @@ public class MsgHandle_Console extends QActor implements IMsgQueue{
 //				println(getName() + " WAITS "   );	
 				wait();
 			} catch (InterruptedException e) {
- 				println(getName() + " INTERRUPTED "   );	
+ 				//println(getName() + " getMsgFromQueue INTERRUPTED "   );	
  				return null;
 			}	
 //			println(getName() + " RESUMES "   );				

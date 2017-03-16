@@ -13,33 +13,50 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import akka.actor.ActorContext;
 import it.unibo.gui.CellState;
 import it.unibo.gui.ConsoleGUI;
+import it.unibo.is.interfaces.IActivity;
+import it.unibo.is.interfaces.IIntent;
 import it.unibo.is.interfaces.IOutputEnvView;
 import it.unibo.model.implementation.Map;
 import it.unibo.model.interfaces.IGUI;
 import it.unibo.model.interfaces.IMap;
 import it.unibo.planning.astar.algo.AStarSearchAgent;
 import it.unibo.planning.astar.engine.AStarEngine;
-import it.unibo.qactors.ActorContext;
 import it.unibo.qactors.QActorContext;
 import it.unibo.qactors.QActorUtils;
 
-public class Console extends AbstractConsole { 
+public class Console extends AbstractConsole implements IActivity{ 
 	
 	
 	private IMap map;
 	private it.unibo.planning.astar.algo.Path path;
-	
+	private static ConsoleGUI env = new ConsoleGUI();
 	private int sx, sy;	
 	
 	public Console(String actorId, QActorContext myCtx, IOutputEnvView outEnvView )  throws Exception
 	{
-		super(actorId, myCtx, outEnvView);
+		super(actorId, myCtx, env);
 		((IGUI) env).setController(this);
+		env.setVisible(true);
 		path = null;
 	}
 	
+	
+	protected static IOutputEnvView setTheEnv(IOutputEnvView outEnvView ){
+		//EnvFrame env = new EnvFrame( "Env_console", java.awt.Color.cyan  , java.awt.Color.black );
+		//env.init();
+		//env.setSize(800,400);
+		
+		ConsoleGUI env = new ConsoleGUI();
+		env.setEnvVisible(true);
+		
+		//IOutputEnvView newOutEnvView = ((EnvFrame) env).getOutputEnvView();
+		
+		IOutputEnvView newOutEnvView = env;
+		return newOutEnvView;
+	}
 	
 	// EXPLORATION METHODS ------------------------------------------------
 	
@@ -165,7 +182,7 @@ public class Console extends AbstractConsole {
 			println("temp string "+temporaryStr);
 			try
 			{
-				sendMsg("navigate","robot", ActorContext.dispatch, temporaryStr );
+				sendMsg("navigate","robot", QActorContext.dispatch, temporaryStr );
 			} catch (Exception e)
 			{
 				e.printStackTrace();
@@ -238,5 +255,26 @@ public class Console extends AbstractConsole {
 			default:
 				println("Invalid command");
 			}
+		}
+
+
+		@Override
+		public void execAction() {
+			// TODO Auto-generated method stub
+			
+		}
+
+
+		@Override
+		public void execAction(IIntent input) {
+			// TODO Auto-generated method stub
+			
+		}
+
+
+		@Override
+		public String execActionWithAnswer(String cmd) {
+			// TODO Auto-generated method stub
+			return null;
 		}	
 }
