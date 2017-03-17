@@ -269,8 +269,16 @@ public class AStarSearchAgent {
 		ArrayList<Move> path = new ArrayList<Move>();
 		
 		PositionMove actual = startPosition;
+		try{
+			System.out.println(dirs.size());
+			Collections.reverse(dirs);
+		}
+		catch(Exception e)
+		{
+			System.out.println(e.getMessage());
+			System.out.println("POPPE");
+		}
 		
-		Collections.reverse(dirs);
 		
 		for(PositionMove next : dirs)
 		{

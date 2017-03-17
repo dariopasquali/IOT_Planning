@@ -44,10 +44,11 @@ public abstract class AbstractConsole extends QActor {
 		@Override
 		protected void doJob() throws Exception {
 			String name  = getName().replace("_ctrl", "");
-			mysupport = (IMsgQueue) QActorUtils.getQActor( name );
+			mysupport = (IMsgQueue) QActorUtils.getQActor( name ); 
 	 		initSensorSystem();
 			boolean res = init();
 			//println(getName() + " doJob " + res );
+			QActorContext.terminateQActorSystem(this);
 		} 
 		/* 
 		* ------------------------------------------------------------
@@ -56,10 +57,12 @@ public abstract class AbstractConsole extends QActor {
 		*/
 	    public boolean init() throws Exception{	//public to allow reflection
 	    try{
-	    	curPlanInExec =  "init";
+	    	int nPlanIter = 0;
+	    	//curPlanInExec =  "init";
 	    	boolean returnValue = suspendWork;
 	    while(true){
-	    nPlanIter++;
+	    	curPlanInExec =  "init";	//within while since it can be lost by switchlan
+	    	nPlanIter++;
 	    		temporaryStr = "\"NEVER HERE. I'm just a placeholder\"";
 	    		println( temporaryStr );  
 	    break;

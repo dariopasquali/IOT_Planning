@@ -32,16 +32,6 @@ import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import org.opencv.core.Core;
-import org.opencv.core.CvType;
-import org.opencv.core.Mat;
-import org.opencv.core.MatOfByte;
-import org.opencv.core.MatOfPoint;
-import org.opencv.core.Scalar;
-import org.opencv.core.Size;
-import org.opencv.highgui.Highgui;
-import org.opencv.imgproc.Imgproc;
-
 import it.unibo.domain.Map;
 import it.unibo.domain.MapElement;
 import it.unibo.domain.interfaces.IMapElement;
@@ -80,9 +70,7 @@ public class MapCreator extends Frame{
 	private MapViewerPanel gbp;
 	
 	private Map map;
-	private Map imageMap;
-	private Mat loadedImage;
-	
+	private Map imageMap;	
 	
 	private boolean haveMap, haveImage;
 	
@@ -399,7 +387,7 @@ public class MapCreator extends Frame{
 		haveMap = false;
 		haveImage = false;
 		
-		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
+		//System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
 		
 	}
 
@@ -444,7 +432,7 @@ public class MapCreator extends Frame{
 				
 				panelMap = new JPanel();
 				
-				loadImage(filename);				
+				//loadImage(filename);				
 				
 				btnGenerate.setEnabled(true);
 				btnClear.setEnabled(true);
@@ -570,6 +558,7 @@ public class MapCreator extends Frame{
 			}
 		}
 
+		/*
 		private Integer[][] matToIntMatrix(Mat image, int range)
 		{
 			MatOfByte matOfByte = new MatOfByte();
@@ -613,19 +602,19 @@ public class MapCreator extends Frame{
 		    
 		    List<MatOfPoint> contours = new ArrayList<MatOfPoint>();
 		    
-		    /*
-		    Imgproc.findContours(tresh, contours, new Mat(), Imgproc.RETR_LIST , Imgproc.CHAIN_APPROX_SIMPLE);
-		    Mat cMat = new Mat(tresh.size(), CvType.CV_8UC3, new Scalar(255,255,255));
 		    
-		    double area = Double.MIN_VALUE;
-		    for(int i=0; i<contours.size(); i++)
-		    	if(Imgproc.contourArea(contours.get(i)) > area)
-		    		area = Imgproc.contourArea(contours.get(i));
+//		    Imgproc.findContours(tresh, contours, new Mat(), Imgproc.RETR_LIST , Imgproc.CHAIN_APPROX_SIMPLE);
+//		    Mat cMat = new Mat(tresh.size(), CvType.CV_8UC3, new Scalar(255,255,255));
+//		    
+//		    double area = Double.MIN_VALUE;
+//		    for(int i=0; i<contours.size(); i++)
+//		    	if(Imgproc.contourArea(contours.get(i)) > area)
+//		    		area = Imgproc.contourArea(contours.get(i));
+//		    
+//		    for(int i=0; i<contours.size(); i++)
+//		        if(Imgproc.contourArea(contours.get(i)) != area)
+//		        	Imgproc.drawContours(cMat, contours, i, new Scalar(0,0,0));
 		    
-		    for(int i=0; i<contours.size(); i++)
-		        if(Imgproc.contourArea(contours.get(i)) != area)
-		        	Imgproc.drawContours(cMat, contours, i, new Scalar(0,0,0));
-		    */
 		    Integer[][] pixels = matToIntMatrix(tresh, 16777215);
 		    imageMap = new Map(tresh.width(), tresh.height(), pixels);
 		    loadedImage = tresh;
@@ -684,7 +673,7 @@ public class MapCreator extends Frame{
 		        e.printStackTrace();
 		    }
 		}
-		
+		*/
 		
 		private void loadMap(String filename) {
 			
@@ -776,7 +765,7 @@ public class MapCreator extends Frame{
 	 		}
 		}		
 	}
-	
+	/*
 	public void storeImage(String fname) {
 		
 		if(haveMap)
@@ -788,6 +777,7 @@ public class MapCreator extends Frame{
 		Highgui.imwrite(fname, toWrite);
 		
 	}
+	*/
 
 	
 	

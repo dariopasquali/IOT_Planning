@@ -7,9 +7,11 @@ System scout
 // From Console to Robot to start Exploration
 Dispatch explore : explore
 Dispatch exploredebug : exploredebug ( START , BOUNDS )
+Dispatch explorefile : explorefile (START , FILENAME )
 
 //START = position ( X , Y )
 //BOUNDS = map ( W , H )
+//TYPE = java || qa
 //The second message is used for the debug
 
 // From Robot to Console to notify a new cell state
@@ -75,10 +77,10 @@ Event local_gui_command : local_gui_command(COMMAND)
 //			CONTEXTS
 // ------------------------------------------------------------------
 
-Context ctxRobot ip [ host="localhost" port=8020] -standalone 
+Context ctxRobot ip [ host="localhost" port=8020]
 Context ctxConsole ip [ host="localhost" port=8010]
 
-QActor console context ctxConsole -g cyan{
+QActor console context ctxConsole{
 	
 // ------------------------------------------------------------------
 //			NORMAL PLANS
@@ -104,7 +106,7 @@ QActor console context ctxConsole -g cyan{
 		
 		onEvent local_gui_command : local_gui_command (loadexpmap(PATH)) -> switchToPlan loadExpMap;
 		onEvent local_gui_command : local_gui_command (explore) -> switchToPlan exploration;
- 		onEvent local_gui_command : local_gui_command (explore(START,BOUNDS)) -> switchToPlan explorationDebug;
+ 		onEvent local_gui_command : local_gui_command (explore(FILENAME, START, BOUNDS)) -> switchToPlan explorationDebug;
  		onEvent local_gui_command : local_gui_command (loadmap(PATH)) -> switchToPlan loadMap;
  		onEvent local_gui_command : local_gui_command (findpath(START,GOAL)) -> switchToPlan findPath;
  		onEvent local_gui_command : local_gui_command (navigate) -> switchToPlan navigation;
@@ -138,8 +140,10 @@ QActor console context ctxConsole -g cyan{
 		
 		println("mappa pulita");
 			
-		[?? msg(local_gui_command, "event", SENDER, none, local_gui_command (explore(START,BOUNDS)), MSGNUM)]
-			 forward robot -m exploredebug : exploredebug(START,BOUNDS);
+		[?? msg(local_gui_command, "event", SENDER, none, local_gui_command (explore(FILENAME,START,BOUNDS)), MSGNUM)]
+//			 forward robot -m explorefile : explorefile(START,FILENAME);
+			 forward robot -m exploredebug : exploredebug(START,BOUNDS);				 
+		
 		
 		switchToPlan waitEndOfExploration
 			
@@ -259,8 +263,8 @@ QActor console context ctxConsole -g cyan{
 QActor robot context ctxRobot{
  	Plan init normal
 		
-		println( "just a placeholder" )		
-/*		receiveMsg time(1000000000);
+		println( "just a placeholder" );		
+		receiveMsg time(1000000000);
 		
 		printCurrentMessage;
 		
@@ -310,5 +314,5 @@ QActor robot context ctxRobot{
 		emit end : end;
 		
 		resumeLastPlan
- */		
+ 	
  }

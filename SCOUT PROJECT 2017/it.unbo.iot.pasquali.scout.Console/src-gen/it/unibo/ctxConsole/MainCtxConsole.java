@@ -14,6 +14,7 @@ public static QActorContext initTheContext() throws Exception{
 		"./srcMore/it/unibo/ctxConsole/sysRules.pl", outEnvView,webDir,false);
 }
 public static void main(String[] args) throws Exception{
-	initTheContext();
+	QActorContext ctx = initTheContext();
+   		//if( ctx.getEnv() == null){ ctx.terminateQActorSystem(); }
 } 	
 }
