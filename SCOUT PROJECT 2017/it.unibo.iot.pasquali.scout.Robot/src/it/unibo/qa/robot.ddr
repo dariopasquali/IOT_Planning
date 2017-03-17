@@ -60,7 +60,8 @@ Event end : end
 // The user can define the sensing distance in the sensorTheory.pl
 
 //FrontSonar
-Event obstacle : obstacle (DIRECTION)
+Event obstaclefront : obstaclefront
+Event obstacleleft : obstacleleft
 // DIRECTION = front || left
 
 
@@ -137,11 +138,11 @@ Robot mockScout QActor robot context ctxRobot{
  	Plan findLeftWall
  		println("Find Left Wall!");
  		 
- 		sense time(1000) obstacle -> continue;
+ 		sense time(1000) obstaclefront -> continue;
  		
  		// OBSTACLE FRONT
  		
- 		onEvent obstacle : obstacle(front) -> solve assert(obstacle(front, obstacle)) time(0) else
+ 		onEvent obstaclefront : obstaclefront -> solve assert(obstacle(front, obstacle)) time(0) else
  										solve assert(obstacle(front, clear)) time(0);
  										
  		[!? obstacle(front, clear)] solve updateModel(front, clear) time(0);
@@ -155,11 +156,11 @@ Robot mockScout QActor robot context ctxRobot{
  				
  		// ----------------------------------------------------------------------------------
  		
- 		sense time(1000) obstacle -> continue;
+ 		sense time(1000) obstacleleft -> continue;
  		
  		// OBSTACLE LEFT
  		
- 		onEvent obstacle : obstacle(left) -> solve assert(obstacle(left, obstacle)) time(0) else
+ 		onEvent obstacleleft : obstacleleft -> solve assert(obstacle(left, obstacle)) time(0) else
  										solve assert(obstacle(left, clear)) time(0);
  										
  		[!? obstacle(left, clear)] solve updateModel(left, clear) time(0);
@@ -203,11 +204,11 @@ Robot mockScout QActor robot context ctxRobot{
  	Plan followWall
  		println("Follow Wall");
  		
- 		sense time(1000) obstacle -> continue;
+ 		sense time(1000) obstacleleft -> continue;
  		
  		// OBSTACLE LEFT
  		
- 		onEvent obstacle : obstacle(left) -> solve assert(obstacle(left, object)) time(0) else
+ 		onEvent obstacleleft : obstacleleft -> solve assert(obstacle(left, object)) time(0) else
  										solve assert(obstacle(left, clear)) time(0);
  										
  		[!? obstacle(left, clear)] solve updateModel(left, clear) time(0);
@@ -218,11 +219,11 @@ Robot mockScout QActor robot context ctxRobot{
  		[?? obstacle(left, object)] switchToPlan turnLeftAndFind;									
  		 										
  					
- 		sense time(1000) obstacle -> continue;
+ 		sense time(1000) obstaclefront -> continue;
  		
  		// OBSTACLE FRONT
  		
- 		onEvent obstacle : obstacle(front) -> solve assert(obstacle(front, object)) time(0) else
+ 		onEvent obstaclefront : obstaclefront -> solve assert(obstacle(front, object)) time(0) else
  										solve assert(obstacle(front, clear)) time(0);
  										
  		[!? obstacle(front, clear)] solve updateModel(front, clear) time(0);
@@ -244,9 +245,9 @@ Robot mockScout QActor robot context ctxRobot{
  		
  		// OBSTACLE LEFT
  		
- 		sense time(1000) obstacle -> continue;
+ 		sense time(1000) obstacleleft -> continue;
  		
- 		onEvent obstacle : obstacle(left) -> solve assert(obstacle(left, object)) time(0) else
+ 		onEvent obstacleleft : obstacleleft -> solve assert(obstacle(left, object)) time(0) else
  										solve assert(obstacle(left, clear)) time(0);
  										
  		[!? obstacle(left, clear)] solve updateModel(left, clear) time(0);
@@ -336,7 +337,7 @@ Robot mockScout QActor robot context ctxRobot{
  		delay time(60000);
  		println("are you there obstacle ??");
  		
- 		sense time(5000) obstacle -> notifyUnexpectedObstacle	
+ 		sense time(5000) obstaclefront -> notifyUnexpectedObstacle	
  		
  		
  	Plan notifyUnexpectedObstacle

@@ -77,7 +77,7 @@ protected QActor actor;
 			//if( d > 5 && d < 120 ) println("SensorObserver: " + data.getDefStringRep() + " json:" + data.getJsonStringRep());
 			
 			if( d <= sensingDistance ){
-				QActorUtils.raiseEvent(actor.getQActorContext(),"sensor", "obstacle", "obstacle("+sonarPosition+")" );
+				QActorUtils.raiseEvent(actor.getQActorContext(),"sensor", "obstacle"+sonarPosition, "obstacle"+sonarPosition );
  			}
 		}
 	}	

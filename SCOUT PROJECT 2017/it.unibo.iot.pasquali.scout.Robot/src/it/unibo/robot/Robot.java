@@ -2,12 +2,18 @@
 package it.unibo.robot;
 
 
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
 import alice.tuprolog.Term;
+import it.unibo.domain.model.implementation.ExplorationMap;
 import it.unibo.domain.model.implementation.ExplorationState;
 import it.unibo.domain.model.implementation.NavigationMap;
 import it.unibo.iot.configurator.Configurator;
@@ -23,6 +29,7 @@ import it.unibo.planning.enums.MoveType;
 import it.unibo.planning.enums.SpinDirection;
 import it.unibo.qactors.action.AsynchActionResult;
 import it.unibo.qactors.action.IActorAction.ActionExecMode;
+import it.unibo.qactors.akka.QActorPlanUtils;
 import it.unibo.robot.exputils.*;
 import it.unibo.robot.planutils.*;
 import it.unibo.qactors.QActorContext;
@@ -47,6 +54,12 @@ public class Robot extends AbstractRobot {
 	public Robot(String actorId, QActorContext myCtx, IOutputEnvView outEnvView ) throws Exception
 	{
 		super(actorId,myCtx,outEnvView ,it.unibo.qactors.QActorUtils.robotBase );
+		
+		QActorPlanUtils myUtils = new QActorPlanUtilsDebug(this, actionUtils, outEnvView);
+		
+		
+		
+		this.planUtils = myUtils;
 		
 		this.moveMapping = new HashMap<String, Move>();
 		moveMapping.put("forwardN", new Move(ForwardMoveType.TILED));
@@ -131,6 +144,50 @@ public class Robot extends AbstractRobot {
 	public void initExploreMap()
 	{
 		//TODO
+	}
+	
+	public void initExploreMap(int startX, int startY, String filename)
+	{
+		// for debug use
+		// i know all the map and explore it
+		
+		ExplorationMap m = null;
+		
+		List<String> data = new ArrayList<String>();						
+		try
+		{
+			InputStream fs = new FileInputStream(filename);
+			InputStreamReader inpsr = new InputStreamReader(fs);
+			BufferedReader br       = new BufferedReader(inpsr);
+			Iterator<String> lsit   = br.lines().iterator();
+
+			while(lsit.hasNext())
+			{
+				data.add(lsit.next());
+			}
+			br.close();
+			
+		} catch (Exception e)
+		{
+			System.out.println("QActor  ERROR " + e.getMessage());
+		}
+		
+		for(int i=0; i<data.size(); i++)
+		{
+			if(i == 0)
+			{
+				m = ExplorationMap.createMapFromPrologRep(data.get(i));
+			}
+			else
+			{
+				String s[] = data.get(i).split(" ");
+				m.addElementFromString(s[1]);
+			}
+		}
+		
+		engine = new FileEngine(startX, startY, m);
+		((QActorPlanUtilsDebug)planUtils).setEngine((FileEngine) engine);
+		
 	}
 	
 	// EXPLORATION MANAGEMENT **********************************************
@@ -346,6 +403,16 @@ public class Robot extends AbstractRobot {
 	
 
 	// SYSTEM INTERACTION *****************************************************
+	
+	public void enableDebugSensing()
+	{
+		((QActorPlanUtilsDebug) planUtils).enableFileSensingMode();
+	}
+	
+	public void disableDebugSensing()
+	{
+		((QActorPlanUtilsDebug) planUtils).disableFileSensingMode();
+	}
 	
 	public void raiseEvent(String emitterName, String eventName, String payload)
 	{

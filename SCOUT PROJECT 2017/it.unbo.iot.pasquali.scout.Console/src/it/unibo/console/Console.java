@@ -220,9 +220,11 @@ public class Console extends AbstractConsole implements IActivity{
 				
 				params = command[1].split(",");
 				
+				//System.out.println(filename);
+				
 				emit( "local_gui_command", "local_gui_command(explore("
 						
-						+ filename + ","
+						+ "\""+filename+"\"" + ","
 						
 						+ "position(" + params[0] + "," + params[1]+")"
 								+ ","

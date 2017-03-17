@@ -14,12 +14,12 @@ import it.unibo.planning.enums.MoveType;
 
 public class Engine {
 	
-	private ExplorationMap map;
-	private ExplorationState state;
+	protected ExplorationMap map;
+	protected ExplorationState state;
 	
-	private Set<Point> visited;
+	protected Set<Point> visited;
 	
-	private HashMap<Direction, Direction> leftMap,rightMap;
+	protected HashMap<Direction, Direction> leftMap,rightMap;
 	
 	public Engine(int startX, int startY, int mapW, int mapH) {
 		
@@ -175,7 +175,7 @@ public class Engine {
 	
 // SAFE MOVES ------------ state doesn't change ------------------
 	
-	private ExplorationState moveForwardSafe(ExplorationState start) {
+	protected ExplorationState moveForwardSafe(ExplorationState start) {
 
 		Direction cd = start.getDirection();
 		
@@ -234,32 +234,32 @@ public class Engine {
 		return s;
 	}
 	
-	private ExplorationState moveBackwardSafe(ExplorationState start)
+	protected ExplorationState moveBackwardSafe(ExplorationState start)
 	{		
 		return moveForwardSafe(turnDoubleLeftSafe(turnDoubleLeftSafe(start)));
 	}
 	
-	private ExplorationState moveDoubleLeftSafe(ExplorationState s)
+	protected ExplorationState moveDoubleLeftSafe(ExplorationState s)
 	{
 		return moveForwardSafe(turnDoubleLeftSafe(s));
 	}
 	
-	private ExplorationState moveDoubleRightSafe(ExplorationState s)
+	protected ExplorationState moveDoubleRightSafe(ExplorationState s)
 	{
 		return moveForwardSafe(turnDoubleRightSafe(s));
 	}
 	
-	private ExplorationState turnDoubleLeftSafe(ExplorationState s)
+	protected ExplorationState turnDoubleLeftSafe(ExplorationState s)
 	{
 		return turnLeftSafe(turnLeftSafe(s));
 	}
 	
-	private ExplorationState turnDoubleRightSafe(ExplorationState s)
+	protected ExplorationState turnDoubleRightSafe(ExplorationState s)
 	{
 		return turnRightSafe(turnRightSafe(s));
 	}
 	
-	private ExplorationState turnLeftSafe(ExplorationState s) {
+	protected ExplorationState turnLeftSafe(ExplorationState s) {
 		Direction cd = s.getDirection();
 		ExplorationState ret = new ExplorationState(s.getY(), s.getX(), leftMap.get(cd));
 		ret.addCost(s.getCost()+1);
@@ -267,7 +267,7 @@ public class Engine {
 		return ret;
 	}
 	
-	private ExplorationState turnRightSafe(ExplorationState s) {
+	protected ExplorationState turnRightSafe(ExplorationState s) {
 		Direction cd = s.getDirection();
 		ExplorationState ret = new ExplorationState(s.getY(), s.getX(), rightMap.get(cd));
 		ret.addCost(s.getCost()+1);
@@ -285,7 +285,7 @@ public class Engine {
 		if(direction.equals("front"))
 			next = moveForwardSafe(state);			
 		else
-			next = moveBackwardSafe(state);
+			next = moveForwardSafe(turnDoubleLeftSafe(state));
 		
 		if(upState.equals("clear"))
 		{
@@ -293,7 +293,7 @@ public class Engine {
 		}
 		else
 		{
-			map.setCellClear(next.getY(), next.getX());
+			map.setCellObj(next.getY(), next.getX());
 		}
 		
 		return next;
@@ -309,7 +309,7 @@ public class Engine {
 		return isAlreadyVisited(leftState);
 	}
 	
-	private boolean isUnexploredState(ExplorationState next) {
+	protected boolean isUnexploredState(ExplorationState next) {
 		return (next.getX() >= 0 &&
 				next.getX() <= map.getXMax() &&
 				next.getY() >= 0 &&
@@ -317,7 +317,7 @@ public class Engine {
 						map.isCellNone(next.getY(), next.getX()));
 	}
 
-	private boolean isClearState(ExplorationState next) {
+	protected boolean isClearState(ExplorationState next) {
 		return (next.getX() >= 0 &&
 				next.getX() <= map.getXMax() &&
 				next.getY() >= 0 &&

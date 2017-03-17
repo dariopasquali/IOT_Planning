@@ -300,17 +300,17 @@ protected IActorAction  action;
     		println( temporaryStr );  
     		//senseEvent
     		timeoutval = 1000;
-    		aar = planUtils.senseEvents( timeoutval,"obstacle","continue",
+    		aar = planUtils.senseEvents( timeoutval,"obstaclefront","continue",
     		"" , "",ActionExecMode.synch );
     		if( ! aar.getGoon() || aar.getTimeRemained() <= 0 ){
     			//println("			WARNING: sense timeout");
     			addRule("tout(senseevent,"+getName()+")");
     		}
     		//onEvent
-    		if( currentEvent.getEventId().equals("obstacle") ){
+    		if( currentEvent.getEventId().equals("obstaclefront") ){
     		 		String parg="assert(obstacle(front,obstacle))";
     		 		/* PHead */
-    		 		parg =  updateVars( Term.createTerm("obstacle(DIRECTION)"), Term.createTerm("obstacle(front)"), 
+    		 		parg =  updateVars( Term.createTerm("obstaclefront"), Term.createTerm("obstaclefront"), 
     		 			    		  					Term.createTerm(currentEvent.getMsg()), parg);
     		 			if( parg != null ) {
     		 			    aar = QActorUtils.solveGoal(this,myCtx,pengine,parg,"",outEnvView,0);
@@ -365,17 +365,17 @@ protected IActorAction  action;
     		}
     		//senseEvent
     		timeoutval = 1000;
-    		aar = planUtils.senseEvents( timeoutval,"obstacle","continue",
+    		aar = planUtils.senseEvents( timeoutval,"obstacleleft","continue",
     		"" , "",ActionExecMode.synch );
     		if( ! aar.getGoon() || aar.getTimeRemained() <= 0 ){
     			//println("			WARNING: sense timeout");
     			addRule("tout(senseevent,"+getName()+")");
     		}
     		//onEvent
-    		if( currentEvent.getEventId().equals("obstacle") ){
+    		if( currentEvent.getEventId().equals("obstacleleft") ){
     		 		String parg="assert(obstacle(left,obstacle))";
     		 		/* PHead */
-    		 		parg =  updateVars( Term.createTerm("obstacle(DIRECTION)"), Term.createTerm("obstacle(left)"), 
+    		 		parg =  updateVars( Term.createTerm("obstacleleft"), Term.createTerm("obstacleleft"), 
     		 			    		  					Term.createTerm(currentEvent.getMsg()), parg);
     		 			if( parg != null ) {
     		 			    aar = QActorUtils.solveGoal(this,myCtx,pengine,parg,"",outEnvView,0);
@@ -580,17 +580,17 @@ protected IActorAction  action;
     		println( temporaryStr );  
     		//senseEvent
     		timeoutval = 1000;
-    		aar = planUtils.senseEvents( timeoutval,"obstacle","continue",
+    		aar = planUtils.senseEvents( timeoutval,"obstacleleft","continue",
     		"" , "",ActionExecMode.synch );
     		if( ! aar.getGoon() || aar.getTimeRemained() <= 0 ){
     			//println("			WARNING: sense timeout");
     			addRule("tout(senseevent,"+getName()+")");
     		}
     		//onEvent
-    		if( currentEvent.getEventId().equals("obstacle") ){
+    		if( currentEvent.getEventId().equals("obstacleleft") ){
     		 		String parg="assert(obstacle(left,object))";
     		 		/* PHead */
-    		 		parg =  updateVars( Term.createTerm("obstacle(DIRECTION)"), Term.createTerm("obstacle(left)"), 
+    		 		parg =  updateVars( Term.createTerm("obstacleleft"), Term.createTerm("obstacleleft"), 
     		 			    		  					Term.createTerm(currentEvent.getMsg()), parg);
     		 			if( parg != null ) {
     		 			    aar = QActorUtils.solveGoal(this,myCtx,pengine,parg,"",outEnvView,0);
@@ -645,17 +645,17 @@ protected IActorAction  action;
     		}
     		//senseEvent
     		timeoutval = 1000;
-    		aar = planUtils.senseEvents( timeoutval,"obstacle","continue",
+    		aar = planUtils.senseEvents( timeoutval,"obstaclefront","continue",
     		"" , "",ActionExecMode.synch );
     		if( ! aar.getGoon() || aar.getTimeRemained() <= 0 ){
     			//println("			WARNING: sense timeout");
     			addRule("tout(senseevent,"+getName()+")");
     		}
     		//onEvent
-    		if( currentEvent.getEventId().equals("obstacle") ){
+    		if( currentEvent.getEventId().equals("obstaclefront") ){
     		 		String parg="assert(obstacle(front,object))";
     		 		/* PHead */
-    		 		parg =  updateVars( Term.createTerm("obstacle(DIRECTION)"), Term.createTerm("obstacle(front)"), 
+    		 		parg =  updateVars( Term.createTerm("obstaclefront"), Term.createTerm("obstaclefront"), 
     		 			    		  					Term.createTerm(currentEvent.getMsg()), parg);
     		 			if( parg != null ) {
     		 			    aar = QActorUtils.solveGoal(this,myCtx,pengine,parg,"",outEnvView,0);
@@ -733,17 +733,17 @@ protected IActorAction  action;
     		println( temporaryStr );  
     		//senseEvent
     		timeoutval = 1000;
-    		aar = planUtils.senseEvents( timeoutval,"obstacle","continue",
+    		aar = planUtils.senseEvents( timeoutval,"obstacleleft","continue",
     		"" , "",ActionExecMode.synch );
     		if( ! aar.getGoon() || aar.getTimeRemained() <= 0 ){
     			//println("			WARNING: sense timeout");
     			addRule("tout(senseevent,"+getName()+")");
     		}
     		//onEvent
-    		if( currentEvent.getEventId().equals("obstacle") ){
+    		if( currentEvent.getEventId().equals("obstacleleft") ){
     		 		String parg="assert(obstacle(left,object))";
     		 		/* PHead */
-    		 		parg =  updateVars( Term.createTerm("obstacle(DIRECTION)"), Term.createTerm("obstacle(left)"), 
+    		 		parg =  updateVars( Term.createTerm("obstacleleft"), Term.createTerm("obstacleleft"), 
     		 			    		  					Term.createTerm(currentEvent.getMsg()), parg);
     		 			if( parg != null ) {
     		 			    aar = QActorUtils.solveGoal(this,myCtx,pengine,parg,"",outEnvView,0);
@@ -1084,7 +1084,7 @@ protected IActorAction  action;
     		println( temporaryStr );  
     		//senseEvent
     		timeoutval = 5000;
-    		aar = planUtils.senseEvents( timeoutval,"obstacle","notifyUnexpectedObstacle",
+    		aar = planUtils.senseEvents( timeoutval,"obstaclefront","notifyUnexpectedObstacle",
     		"" , "",ActionExecMode.synch );
     		if( ! aar.getGoon() || aar.getTimeRemained() <= 0 ){
     			//println("			WARNING: sense timeout");
