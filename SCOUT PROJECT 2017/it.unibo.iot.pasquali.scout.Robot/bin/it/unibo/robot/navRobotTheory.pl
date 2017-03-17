@@ -105,6 +105,6 @@ initialize
 ------------------------------------------------------------
 */
 initNavRobot  :-  
-	actorPrintln("initNavRobot").
+	actorPrintln("------------------------------------------------------------initNavRobot").
  
 :- initialization(initNavRobot).

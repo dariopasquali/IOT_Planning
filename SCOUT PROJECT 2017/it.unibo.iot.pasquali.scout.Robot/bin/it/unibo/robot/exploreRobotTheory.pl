@@ -5,8 +5,6 @@ ExpRobotTheory.pl
 */
 
 
-%% Non posso lavorare con una mappa prolog
-%% Però dovrò salvarla in quel formato
 
 %% ---------------- ASSERTIONS ---------------------
 
@@ -126,6 +124,6 @@ initialize
 ------------------------------------------------------------
 */
 initExpRobot :-  
-	actorPrintln("initExpRobot").
+	actorPrintln("-----------------------------------------------------initExpRobot").
  
 :- initialization(initExpRobot).

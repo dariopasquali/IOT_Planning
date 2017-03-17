@@ -143,7 +143,7 @@ public abstract class AbstractConsole extends QActor {
 	    		if( currentEvent.getEventId().equals("local_gui_command") ){
 	    		 		String parg = "";
 	    		 		/* SwitchPlan */
-	    		 		parg =  updateVars(  Term.createTerm("local_gui_command(COMMAND)"), Term.createTerm("local_gui_command(explore(START,BOUNDS))"), 
+	    		 		parg =  updateVars(  Term.createTerm("local_gui_command(COMMAND)"), Term.createTerm("local_gui_command(explore(FILENAME,START,BOUNDS))"), 
 	    		 			    		  					Term.createTerm(currentEvent.getMsg()), parg);
 	    		 			if( parg != null ){
 	    		 				 if( ! planUtils.switchToPlan("explorationDebug").getGoon() ) break; 
@@ -283,7 +283,7 @@ public abstract class AbstractConsole extends QActor {
 	    		}
 	    		temporaryStr = "\"mappa pulita\"";
 	    		println( temporaryStr );  
-	    		if( (guardVars = QActorUtils.evalTheGuard(this, " ??msg(local_gui_command,\"event\",SENDER,none,local_gui_command(explore(START,BOUNDS)),MSGNUM)" )) != null ){
+	    		if( (guardVars = QActorUtils.evalTheGuard(this, " ??msg(local_gui_command,\"event\",SENDER,none,local_gui_command(explore(FILENAME,START,BOUNDS)),MSGNUM)" )) != null ){
 	    		temporaryStr = QActorUtils.unifyMsgContent(pengine,"exploredebug(START,BOUNDS)","exploredebug(START,BOUNDS)", guardVars ).toString();
 	    		sendMsg("exploredebug","robot", QActorContext.dispatch, temporaryStr ); 
 	    		}

@@ -38,6 +38,6 @@ initialize
 ------------------------------------------------------------
 */
 initRobot :-  
-	actorPrintln("initRobot").
+	actorPrintln("------------------------------------------------------------------initRobot").
  
 :- initialization(initRobot).

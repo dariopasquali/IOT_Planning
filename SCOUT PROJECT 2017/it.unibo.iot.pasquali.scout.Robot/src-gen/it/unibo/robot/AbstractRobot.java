@@ -99,7 +99,15 @@ protected IActorAction  action;
     			curPlanInExec   = "init";
     			if( ! aar.getGoon() ) break;
     		} 			
-    		parg = "consult(\"expRobotTheory.pl\")";
+    		parg = "consult(\"exploreRobotTheory.pl\")";
+    		//REGENERATE AKKA
+    		aar = solveGoalReactive(parg,210000000,"","");
+    		//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
+    		if( aar.getInterrupted() ){
+    			curPlanInExec   = "init";
+    			if( ! aar.getGoon() ) break;
+    		} 			
+    		parg = "consult(\"sensorTheory.pl\")";
     		//REGENERATE AKKA
     		aar = solveGoalReactive(parg,210000000,"","");
     		//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
@@ -164,6 +172,15 @@ protected IActorAction  action;
     					 if( ! planUtils.switchToPlan("explorationDebug").getGoon() ) break; 
     				}//else println("guard  fails");  //parg is null when there is no guard (onEvent)
     		}//onMsg
+    		if( currentMessage.msgId().equals("explorefile") ){
+    			String parg = "";
+    			/* SwitchPlan */
+    			parg =  updateVars(  Term.createTerm("explorefile(START,FILENAME)"), Term.createTerm("explorefile(FILENAME)"), 
+    				    		  					Term.createTerm(currentMessage.msgContent()), parg);
+    				if( parg != null ){
+    					 if( ! planUtils.switchToPlan("exploration").getGoon() ) break; 
+    				}//else println("guard  fails");  //parg is null when there is no guard (onEvent)
+    		}//onMsg
     		if( currentMessage.msgId().equals("navigate") ){
     			String parg = "";
     			/* SwitchPlan */
@@ -197,6 +214,36 @@ protected IActorAction  action;
     return returnValue;
     }catch(Exception e){
        //println( getName() + " plan=exploration WARNING:" + e.getMessage() );
+       QActorContext.terminateQActorSystem(this); 
+       return false;  
+    }
+    }
+    public boolean fileexplorer() throws Exception{	//public to allow reflection
+    try{
+    	int nPlanIter = 0;
+    	//curPlanInExec =  "fileexplorer";
+    	boolean returnValue = suspendWork;
+    while(true){
+    	curPlanInExec =  "fileexplorer";	//within while since it can be lost by switchlan
+    	nPlanIter++;
+    		temporaryStr = "\"Let's explore by java!!\"";
+    		println( temporaryStr );  
+    		if( (guardVars = QActorUtils.evalTheGuard(this, " ??msg(_,_,SENDER,X,explorefile(START,FILENAME),MSGNUM)" )) != null ){
+    		parg = "explore(START,FILENAME)";
+    		parg = QActorUtils.substituteVars(guardVars,parg);
+    		//REGENERATE AKKA
+    		aar = solveGoalReactive(parg,0,"","");
+    		//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
+    		if( aar.getInterrupted() ){
+    			curPlanInExec   = "fileexplorer";
+    			if( ! aar.getGoon() ) break;
+    		} 			
+    		}
+    break;
+    }//while
+    return returnValue;
+    }catch(Exception e){
+       //println( getName() + " plan=fileexplorer WARNING:" + e.getMessage() );
        QActorContext.terminateQActorSystem(this); 
        return false;  
     }

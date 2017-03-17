@@ -33,7 +33,8 @@ public class Console extends AbstractConsole implements IActivity{
 	private IMap map;
 	private it.unibo.planning.astar.algo.Path path;
 	private static ConsoleGUI env = new ConsoleGUI();
-	private int sx, sy;	
+	private int sx, sy;
+	private String filename;
 	
 	public Console(String actorId, QActorContext myCtx, IOutputEnvView outEnvView )  throws Exception
 	{
@@ -122,6 +123,7 @@ public class Console extends AbstractConsole implements IActivity{
 			
 			
 			((ConsoleGUI)env).setMap(m);
+			this.filename = path; 
 			
 		}	
 
@@ -219,6 +221,9 @@ public class Console extends AbstractConsole implements IActivity{
 				params = command[1].split(",");
 				
 				emit( "local_gui_command", "local_gui_command(explore("
+						
+						+ filename + ","
+						
 						+ "position(" + params[0] + "," + params[1]+")"
 								+ ","
 						+ "map(" + params[2] + "," + params[3]+")"

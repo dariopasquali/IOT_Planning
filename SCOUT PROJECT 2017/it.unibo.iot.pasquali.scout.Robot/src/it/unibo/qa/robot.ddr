@@ -6,9 +6,11 @@ RobotSystem scout
 
 // From Console to Robot to start Exploration
 Dispatch explore : explore
-Dispatch exploredebug : exploredebug ( START , BOUNDS )
+Dispatch exploredebug : exploredebug ( START , BOUNDS)
+Dispatch explorefile : explorefile (START, FILENAME )
 //START = position ( X , Y )
 //BOUNDS = map ( W , H )
+//TYPE = java || qa
 //The second message is used for the debug
 
 // From Robot to Console to notify a new cell state
@@ -87,7 +89,8 @@ Robot mockScout QActor robot context ctxRobot{
 		
 		solve consult("robotTheory.pl") time(210000000) onFailSwitchTo  consultPrologFailure ;
 		solve consult("navRobotTheory.pl") time(210000000) onFailSwitchTo  consultPrologFailure ;
-		solve consult("expRobotTheory.pl") time(210000000) onFailSwitchTo  consultPrologFailure ;
+		solve consult("exploreRobotTheory.pl") time(210000000) onFailSwitchTo  consultPrologFailure ;
+		solve consult("sensorTheory.pl") time(210000000) onFailSwitchTo  consultPrologFailure ;
 		solve consult("talkTheory.pl") time(210000000) onFailSwitchTo  consultPrologFailure ;
 		
  		println("++++++++++++++++++ robot(starts) ++++++++++++++++++");
@@ -102,7 +105,8 @@ Robot mockScout QActor robot context ctxRobot{
  		memoCurrentMessage;
  		
  		onMsg explore : explore -> switchToPlan exploration;
- 		onMsg exploredebug : exploredebug ( START , BOUNDS ) -> switchToPlan explorationDebug;
+ 		onMsg exploredebug : exploredebug ( START , BOUNDS) -> switchToPlan explorationDebug;
+ 		onMsg explorefile : explorefile (FILENAME) -> switchToPlan exploration;
  		onMsg navigate : navigate(PLAN, POS) -> switchToPlan navigation;
  		
  		repeatPlan 0		
@@ -113,6 +117,11 @@ Robot mockScout QActor robot context ctxRobot{
  		println("")
  
  // DEBUG EXPLORATION PLANS -----------------------------------		
+ 	
+ 	Plan fileexplorer
+ 		println("Let's explore by java!!"); 		
+ 		[?? msg(_, _, SENDER, X, explorefile(START, FILENAME), MSGNUM)] solve explore(START, FILENAME) time(0)
+ 	
  	
  	 Plan explorationDebug
  		println("Let's explore!!");
