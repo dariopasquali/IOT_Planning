@@ -25,6 +25,9 @@ public class MapViewer {
     protected boolean enableClick;
     
     protected MapElement start, goal;
+    
+    protected MapElement currentPosition;
+    protected CellState lastCurrentCellState;
  /*
     private class ClickHandler implements MouseListener{
 
@@ -240,6 +243,21 @@ public class MapViewer {
 		map.clearAll();		
 	}
     
+	public void setCurrentPosition(int y, int x, String direction) {
+		
+		CellState newCellState = getCellState(y, x);
+		setCellState(y, x, CellState.START);
+		getGridButton(y, x).setText(direction);
+		
+		setCellState(currentPosition.getY(), currentPosition.getX(), lastCurrentCellState);
+		getGridButton(currentPosition.getY(), currentPosition.getX()).setText("");
+		
+		currentPosition.setX(x);
+		currentPosition.setY(y);
+		this.lastCurrentCellState = newCellState;		
+	}
+    
+    
 // EXPLORATION SPECIFIC ------------------------------------------------
     
 	public void noneAll()
@@ -279,5 +297,7 @@ public class MapViewer {
 		getGridButton(goal.getY(), goal.getX()).setBackground(CellState.GOAL.getColor());
 		
 	}
+
+
 
 }

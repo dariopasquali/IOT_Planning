@@ -3,11 +3,115 @@
 This code is generated only ONCE
 */
 package it.unibo.guimanager;
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
+import it.unibo.domain.model.map.Map;
+import it.unibo.gui.RobotGUI;
+import it.unibo.is.interfaces.IActivity;
+import it.unibo.is.interfaces.IIntent;
 import it.unibo.is.interfaces.IOutputEnvView;
 import it.unibo.qactors.QActorContext;
 
-public class Guimanager extends AbstractGuimanager { 
-	public Guimanager(String actorId, QActorContext myCtx, IOutputEnvView outEnvView )  throws Exception{
-		super(actorId, myCtx, outEnvView);
+public class Guimanager extends AbstractGuimanager implements IActivity
+{
+	private Map map;
+	
+	private static RobotGUI gui = new RobotGUI();
+	
+	public Guimanager(String actorId, QActorContext myCtx, IOutputEnvView outEnvView )
+			throws Exception
+	{
+		super(actorId, myCtx, gui);		
 	}
+	
+	
+	public void showGUI()
+	{
+		((RobotGUI) env).setController(this);
+		((RobotGUI) env).setVisible(true);
+	}
+	
+	public void showMap(int startX, int startY, String filename)
+	{
+		Map m = null;
+		
+		List<String> data = new ArrayList<String>();						
+		try
+		{
+			InputStream fs = new FileInputStream(filename);
+			InputStreamReader inpsr = new InputStreamReader(fs);
+			BufferedReader br       = new BufferedReader(inpsr);
+			Iterator<String> lsit   = br.lines().iterator();
+
+			while(lsit.hasNext())
+			{
+				data.add(lsit.next());
+			}
+			br.close();
+			
+		} catch (Exception e)
+		{
+			System.out.println("QActor  ERROR " + e.getMessage());
+		}
+			
+		for(int i=0; i<data.size(); i++)
+		{
+			if(i == 0)
+			{
+				m = Map.createMapFromPrologRep(data.get(i));
+			}
+			else
+			{
+				String s[] = data.get(i).split(" ");
+				m.addElementFromString(s[1]);
+			}
+		}
+		this.map = m;
+		
+		
+		((RobotGUI)env).setMap(m);
+		((RobotGUI)env).setCurrentPosition(startY, startX, "N");
+	}
+	
+	public void updateState(int x, int y, String direction)
+	{
+		((RobotGUI) env).setCurrentPosition(y, x, direction.toUpperCase());
+	}
+	
+	
+
+
+	@Override
+	public void execAction(String cmd) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	@Override
+	public void execAction() {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	@Override
+	public void execAction(IIntent input) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	@Override
+	public String execActionWithAnswer(String cmd) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
 }

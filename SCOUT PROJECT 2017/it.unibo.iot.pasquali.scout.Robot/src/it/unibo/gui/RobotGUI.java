@@ -171,6 +171,11 @@ public class RobotGUI extends Frame implements IOutputEnvView, IBasicEnvAwt{
 		}
 	}
 	
+	public void setCurrentPosition(int y, int x, String direction) {
+		mapViewer.setCurrentPosition(y, x, direction);		
+	}
+	
+	
 // OUTPUT ---------------------------------------------------------------
 	
 	@Override
@@ -317,6 +322,8 @@ public class RobotGUI extends Frame implements IOutputEnvView, IBasicEnvAwt{
 		// TODO Auto-generated method stub
 		
 	}
+
+
 
 
 

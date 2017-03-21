@@ -63,7 +63,7 @@ public abstract class AbstractGuimanager extends QActor {
 	    while(true){
 	    	curPlanInExec =  "init";	//within while since it can be lost by switchlan
 	    	nPlanIter++;
-	    		temporaryStr = "\"++++++++++++++++++ guiManager(starts) ++++++++++++++++++\"";
+	    		temporaryStr = "\"++++++++++++++++++++++++++ guiManager(starts) ++++++++++++++++++\"";
 	    		println( temporaryStr );  
 	    		parg = "consult(\"guiTheory.pl\")";
 	    		//REGENERATE AKKA
@@ -73,7 +73,7 @@ public abstract class AbstractGuimanager extends QActor {
 	    			curPlanInExec   = "init";
 	    			if( ! aar.getGoon() ) break;
 	    		} 			
-	    		if( ! planUtils.switchToPlan("waiEnableMessage").getGoon() ) break;
+	    		if( ! planUtils.switchToPlan("waitEnableMessage").getGoon() ) break;
 	    break;
 	    }//while
 	    return returnValue;
@@ -83,13 +83,13 @@ public abstract class AbstractGuimanager extends QActor {
 	       return false;  
 	    }
 	    }
-	    public boolean waiEnableMessage() throws Exception{	//public to allow reflection
+	    public boolean waitEnableMessage() throws Exception{	//public to allow reflection
 	    try{
 	    	int nPlanIter = 0;
-	    	//curPlanInExec =  "waiEnableMessage";
+	    	//curPlanInExec =  "waitEnableMessage";
 	    	boolean returnValue = suspendWork;
 	    while(true){
-	    	curPlanInExec =  "waiEnableMessage";	//within while since it can be lost by switchlan
+	    	curPlanInExec =  "waitEnableMessage";	//within while since it can be lost by switchlan
 	    	nPlanIter++;
 	    		//ReceiveMsg
 	    		 		aar = planUtils.receiveAMsg(mysupport,100000000, "" , "" ); 	//could block
@@ -107,7 +107,7 @@ public abstract class AbstractGuimanager extends QActor {
 	    				    aar = QActorUtils.solveGoal(this,myCtx,pengine,parg,"",outEnvView,0);
 	    					//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
 	    					if( aar.getInterrupted() ){
-	    						curPlanInExec   = "waiEnableMessage";
+	    						curPlanInExec   = "waitEnableMessage";
 	    						if( ! aar.getGoon() ) break;
 	    					} 			
 	    					if( aar.getResult().equals("failure")){
@@ -124,7 +124,7 @@ public abstract class AbstractGuimanager extends QActor {
 	    }//while
 	    return returnValue;
 	    }catch(Exception e){
-	       //println( getName() + " plan=waiEnableMessage WARNING:" + e.getMessage() );
+	       //println( getName() + " plan=waitEnableMessage WARNING:" + e.getMessage() );
 	       QActorContext.terminateQActorSystem(this); 
 	       return false;  
 	    }
@@ -232,7 +232,7 @@ public abstract class AbstractGuimanager extends QActor {
 	    while(true){
 	    	curPlanInExec =  "consultPrologFailure";	//within while since it can be lost by switchlan
 	    	nPlanIter++;
-	    		temporaryStr = "\"The consult is gone wrong, maybe there are errors in the prolog file\"";
+	    		temporaryStr = "\"GUI ----------------------------- consult gone wrong\"";
 	    		println( temporaryStr );  
 	    break;
 	    }//while

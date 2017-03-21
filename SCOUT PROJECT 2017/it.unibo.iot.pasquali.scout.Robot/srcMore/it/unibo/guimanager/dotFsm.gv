@@ -16,9 +16,9 @@ digraph finite_state_machine {
   	iniziale -> init [label = ""];
   	
   	
-  	init -> waiEnableMessage [ label = ""];
+  	init -> waitEnableMessage [ label = ""];
   	
-  	waiEnableMessage -> waitMap [ label = "enableGUI(STATE)/"];
+  	waitEnableMessage -> waitMap [ label = "enableGUI(STATE)/"];
   	
   	waitMap -> waitUpdates [ label = "explorefile(START,FILENAME)/"];
   	

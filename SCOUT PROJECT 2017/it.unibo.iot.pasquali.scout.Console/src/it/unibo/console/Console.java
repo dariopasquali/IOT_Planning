@@ -45,19 +45,19 @@ public class Console extends AbstractConsole implements IActivity{
 	}
 	
 	
-	protected static IOutputEnvView setTheEnv(IOutputEnvView outEnvView ){
-		//EnvFrame env = new EnvFrame( "Env_console", java.awt.Color.cyan  , java.awt.Color.black );
-		//env.init();
-		//env.setSize(800,400);
-		
-		ConsoleGUI env = new ConsoleGUI();
-		env.setEnvVisible(true);
-		
-		//IOutputEnvView newOutEnvView = ((EnvFrame) env).getOutputEnvView();
-		
-		IOutputEnvView newOutEnvView = env;
-		return newOutEnvView;
-	}
+//	protected static IOutputEnvView setTheEnv(IOutputEnvView outEnvView ){
+//		//EnvFrame env = new EnvFrame( "Env_console", java.awt.Color.cyan  , java.awt.Color.black );
+//		//env.init();
+//		//env.setSize(800,400);
+//		
+//		ConsoleGUI env = new ConsoleGUI();
+//		env.setEnvVisible(true);
+//		
+//		//IOutputEnvView newOutEnvView = ((EnvFrame) env).getOutputEnvView();
+//		
+//		IOutputEnvView newOutEnvView = env;
+//		return newOutEnvView;
+//	}
 	
 	// EXPLORATION METHODS ------------------------------------------------
 	

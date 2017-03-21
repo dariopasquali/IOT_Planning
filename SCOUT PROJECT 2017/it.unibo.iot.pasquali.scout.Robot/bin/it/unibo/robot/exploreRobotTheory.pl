@@ -7,7 +7,6 @@ ExpRobotTheory.pl
 
 
 %% ---------------- ASSERTIONS ---------------------
-
 explore(true).
 obstacle(none).
 notLeftObjectAndNotExplored(false).
@@ -26,17 +25,17 @@ defaultExpSpinDuration(1000).
 initExploreMap :-
 	actorobj(Actor),
 	Actor <- initExploreMap,
-	assert ( newCell ( position (0,0) , clear ) ).
+	assert( newCell( position(0,0) , clear ) ).
 	
-initExploreMap( position( SX , SY ), FILENAME :-
+initExploreMap( position( SX , SY ), FILENAME ):-
 	actorobj(Actor),
 	Actor <- initExploreMap(SX , SY , FILENAME),	
-	assert ( newCell ( position ( SX , SY ) , clear ) ).
+	assert( newCell( position( SX , SY ) , clear ) ).
 	
-initExploreMap( position( SX , SY ), map ( W , H ) ):-
+initExploreMap( position( SX , SY ), map( W , H ) ):-
 	actorobj(Actor),
 	Actor <- initExplorerMap(SX, SY, W, H),
-	assert ( newCell ( position ( SX , SY ) , clear ) ).
+	assert( newCell( position( SX , SY ) , clear ) ).
 	
 %% -------- SENSE/CHECK STATE -----------------------
 
@@ -50,16 +49,16 @@ senseAndCheckLeft :-
 	Actor <- checkLeftVisited returns VISITED,
 	not VISITED, !,
 	assert(notLeftObjectAndNotExplored(true)).
-	
+
 senseAndCheckLeft :-
-	obstalce(left, obstacle), !,
-	retract( obstacle( _ , _ ),
+	obstacle(left, obstacle), !,
+	retract( obstacle( _ , _ ) ),
 	assert(notLeftObjectAndNotExplored(false)).
 	
 senseAndCheckLeft :-
 	actorobj(Actor),
-	obstalce(left, clear),
-	retract( obstacle( _ , _ ),
+	obstacle(left, clear),
+	retract( obstacle( _ , _ ) ),
 	Actor <- checkLeftVisited returns VISITED,
 	VISITED,
 	assert( notLeftObjectAndNotExplored(false) ).
@@ -72,9 +71,9 @@ checkCurrentAlreadyVisited :-
 updateModel( DIR , STATE ) :-
 	actorobj(Actor),
 	Actor <- updateModel( DIR , STATE ) returns POSITION,
-	assert( newCell( POSITION , STATE ).
+	assert( newCell( POSITION , STATE ) ).
 	
-	
+
 %%---------------- MOVE -----------------------
 
 
@@ -101,14 +100,14 @@ turnDoubleLeft :-
 	myExecuteCmd(_, Actor, move(robotmove,left,SPEED,TIME,0), "", "", RES ),
 	Actor <- turn(doubleLeft).
 	
-	
+
 %% ----------------- LOOP AVOIDANCE ------------------------
 
 findNearestNotExploredCell :-
 	actorobj(Actor),
 	Actor <- findNearestNotExploredCell returns EXPLORE,
 	assert ( explore(EXPLORE) ).
-	
+/*	
 computeBestPath :-
 	actorobj(Actor),
 	Actor <- computeBestPath.
@@ -117,8 +116,7 @@ travel :-
 	actorobj(Actor),
 	Actor <- travel.
 
-
-
+*/
 
 
 

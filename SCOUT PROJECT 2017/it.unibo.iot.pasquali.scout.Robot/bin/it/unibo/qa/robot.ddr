@@ -92,11 +92,11 @@ QActor console context ctxConsole{
 QActor guimanager context ctxRobot{
 	
 	Plan init normal
-		println("++++++++++++++++++ guiManager(starts) ++++++++++++++++++");
+		println("++++++++++++++++++++++++++ guiManager(starts) ++++++++++++++++++");
 		solve consult("guiTheory.pl") time(210000000) onFailSwitchTo  consultPrologFailure ;
-		switchToPlan waiEnableMessage
+		switchToPlan waitEnableMessage
 		
-	Plan waiEnableMessage
+	Plan waitEnableMessage
 	
 		receiveMsg time(100000000);
 		onMsg enableGUI : enableGUI(on) -> solve showGUI time(0);
@@ -121,7 +121,7 @@ QActor guimanager context ctxRobot{
 		
 		
 	Plan consultPrologFailure            
-		println("The consult is gone wrong, maybe there are errors in the prolog file" )
+		println("GUI ----------------------------- consult gone wrong" )
 }
 
 Robot mockScout QActor robot context ctxRobot{
@@ -135,11 +135,11 @@ Robot mockScout QActor robot context ctxRobot{
 		
 		println("load theories");
 		
-		solve consult("robotTheory.pl") time(210000000) onFailSwitchTo  consultPrologFailure ;
-		solve consult("navRobotTheory.pl") time(210000000) onFailSwitchTo  consultPrologFailure ;
+		//solve consult("robotTheory.pl") time(210000000) onFailSwitchTo  consultPrologFailure ;
+		//solve consult("navRobotTheory.pl") time(210000000) onFailSwitchTo  consultPrologFailure ;
 		solve consult("exploreRobotTheory.pl") time(210000000) onFailSwitchTo  consultPrologFailure ;
-		solve consult("sensorTheory.pl") time(210000000) onFailSwitchTo  consultPrologFailure ;
-		solve consult("talkTheory.pl") time(210000000) onFailSwitchTo  consultPrologFailure ;
+		//solve consult("sensorTheory.pl") time(210000000) onFailSwitchTo  consultPrologFailure ;
+		//solve consult("talkTheory.pl") time(210000000) onFailSwitchTo  consultPrologFailure ;
 		
  		println("++++++++++++++++++ robot(starts) ++++++++++++++++++");
  		
