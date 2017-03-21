@@ -4,14 +4,20 @@ import java.util.List;
 
 public interface IMap {
 	
-	public void addElement(IMapElement newElement);
-	public List<IMapElement> getElements();
-	
 	public String getDefaultRep();
-	public String getJSONRep();
+	void addElementFromString(String elem);
+	
+	public List<IMapElement> getElements();
+	public Integer[][] getIntMap();
+	public int getXmax();
+	public int getYmax();
+	
 	void clearAll();
-	void addElementsFromString(String elem);
-	void addElementsFromList(List<String> els);
-	void removeElement(int c, int r);
+	void noneAll();
+	
+	void setCell(int y, int x, int state);	
+	
+	void setCellClear(int y, int x);
+	boolean isCellClear(int y, int x);
 
 }

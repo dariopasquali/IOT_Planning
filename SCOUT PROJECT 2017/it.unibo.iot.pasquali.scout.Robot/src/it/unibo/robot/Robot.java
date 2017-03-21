@@ -13,9 +13,8 @@ import java.util.List;
 import java.util.Set;
 
 import alice.tuprolog.Term;
-import it.unibo.domain.model.implementation.ExplorationMap;
-import it.unibo.domain.model.implementation.ExplorationState;
-import it.unibo.domain.model.implementation.NavigationMap;
+import it.unibo.domain.model.implementation.State;
+import it.unibo.domain.model.map.Map;
 import it.unibo.iot.configurator.Configurator;
 import it.unibo.iot.models.sensorData.SensorType;
 import it.unibo.iot.models.sensorData.distance.IDistanceSensorData;
@@ -37,10 +36,10 @@ import it.unibo.qactors.QActorContext;
 //
 public class Robot extends AbstractRobot { 
 	
-	private NavigationMap navMap;
-	private ArrayList<it.unibo.domain.model.State> path;
+	private Map map;
+	private ArrayList<State> path;
 	
-	private it.unibo.domain.model.State position, goal;
+	private State position, goal;
 	private Direction direction;
 	int spinFactor = 1;
 	
@@ -103,17 +102,17 @@ public class Robot extends AbstractRobot {
 	
 	public void createMap(int x, int y)
 	{
-		navMap = new NavigationMap(x,y);
+		map = new Map(x,y);
 	}
 		
-	public void setMapElements(List<String> elements)
-	{
-		navMap.addElementsFromList(elements);
-	}
+//	public void setMapElements(List<String> elements)
+//	{
+//		map.addElementsFromList(elements);
+//	}
 	
 	public void setMapElements(String elements)
 	{
-		navMap.addElementsFromString(elements);
+		map.addElementFromString(elements);
 	}
 	
 	@Override
@@ -151,7 +150,7 @@ public class Robot extends AbstractRobot {
 		// for debug use
 		// i know all the map and explore it
 		
-		ExplorationMap m = null;
+		Map m = null;
 		
 		List<String> data = new ArrayList<String>();						
 		try
@@ -176,7 +175,7 @@ public class Robot extends AbstractRobot {
 		{
 			if(i == 0)
 			{
-				m = ExplorationMap.createMapFromPrologRep(data.get(i));
+				m = Map.createMapFromPrologRep(data.get(i));
 			}
 			else
 			{
@@ -200,7 +199,7 @@ public class Robot extends AbstractRobot {
 		else
 			engine.moveBackward();
 		
-		ExplorationState s = engine.getState();
+		State s = engine.getState();
 		
 		String payload = "position("+s.getX() + "," + s.getY() + ")," +
 				s.getDirection().toString().toLowerCase();
@@ -215,7 +214,7 @@ public class Robot extends AbstractRobot {
 		else
 			engine.turnDoubleLeft();
 		
-		ExplorationState s = engine.getState();
+		State s = engine.getState();
 		
 		String payload = "position("+s.getX() + "," + s.getY() + ")," +
 				s.getDirection().toString().toLowerCase();
@@ -240,7 +239,7 @@ public class Robot extends AbstractRobot {
 	
 	public String updateModel(String dir, String state)
 	{
-		ExplorationState next = engine.checkAndUpdate(dir, state);
+		State next = engine.checkAndUpdate(dir, state);
 		
 		return "position( "+next.getX()+" , "+next.getY()+" )";
 	}
@@ -250,7 +249,7 @@ public class Robot extends AbstractRobot {
 	
 	public void showPathOnGui()
 	{
-		for(it.unibo.domain.model.State s : path)
+		for(State s : path)
 		{
 			System.out.println(s.toString());
 		}
@@ -329,7 +328,7 @@ public class Robot extends AbstractRobot {
 	
 	public void setPosition(int sx, int sy)
 	{
-		this.position =	new it.unibo.domain.model.State(sx, sy);		
+		this.position =	new State(sx, sy);		
 		this.direction = Direction.NORTH;
 		
 		println(position.toString());
@@ -350,9 +349,9 @@ public class Robot extends AbstractRobot {
 	}
 	
 	
-	private it.unibo.domain.model.State makeMove(it.unibo.domain.model.State state, Move move)
+	private State makeMove(State state, Move move)
 	{
-		it.unibo.domain.model.State result = new it.unibo.domain.model.State();
+		State result = new State();
 		
 		
 		if(move.getType().equals(MoveType.SPIN))

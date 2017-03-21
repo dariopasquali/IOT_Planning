@@ -10,8 +10,8 @@ import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
-import it.unibo.model.implementation.Map;
-import it.unibo.model.implementation.MapElement;
+import it.unibo.domain.model.map.Map;
+import it.unibo.domain.model.map.MapElement;
 
 public class MapViewer {
 	
@@ -96,12 +96,12 @@ public class MapViewer {
 			}
 		}				
 	}
-    
+*/    
     public MapViewer(boolean enableClick)
     {
     	this.enableClick = enableClick;
     }
-*/ 
+ 
 // ACCESSOR --------------------------------------------------------    
     
     public void setMap(Map m){

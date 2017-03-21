@@ -2,10 +2,8 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="src-gen"/>
-	<classpathentry kind="con" path="org.eclipse.buildship.core.gradleclasspathcontainer"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8/"/>
 	<classpathentry kind="lib" path="C:/Users/Portatile/.gradle/caches/modules-2/files-2.1/org.json/json/20160810/aca5eb39e2a12fddd6c472b240afe9ebea3a6733/json-20160810.jar" sourcepath="C:/Users/Portatile/.gradle/caches/modules-2/files-2.1/org.json/json/20160810/92f4b89bc0bb4c7c3f7b52724568a901b7e0195b/json-20160810-sources.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Portatile/.gradle/caches/modules-2/files-2.1/com.pi4j/pi4j-core/1.1/a9d5bdad79287c6e91d49ccbbc388141ad3b6b4e/pi4j-core-1.1.jar" sourcepath="C:/Users/Portatile/.gradle/caches/modules-2/files-2.1/com.pi4j/pi4j-core/1.1/a0d03930cc29bc66a5807f9cf68536b9a8feb81a/pi4j-core-1.1-sources.jar"/>
 	<classpathentry kind="lib" path="C:/Users/Portatile/.gradle/caches/modules-2/files-2.1/com.typesafe.akka/akka-remote_2.11/2.4.9-RC2/cec983b74bf67ead6af63822e21f6ac9c47ffc22/akka-remote_2.11-2.4.9-RC2.jar" sourcepath="C:/Users/Portatile/.gradle/caches/modules-2/files-2.1/com.typesafe.akka/akka-remote_2.11/2.4.9-RC2/3c419cfeb1bf01493e56ded83a21751937a215fb/akka-remote_2.11-2.4.9-RC2-sources.jar"/>
 	<classpathentry kind="lib" path="C:/Users/Portatile/.gradle/caches/modules-2/files-2.1/org.eclipse.paho/org.eclipse.paho.client.mqttv3/1.1.0/89d827ffa47c241f2627421ef1d6c7a8c207a341/org.eclipse.paho.client.mqttv3-1.1.0.jar" sourcepath="C:/Users/Portatile/.gradle/caches/modules-2/files-2.1/org.eclipse.paho/org.eclipse.paho.client.mqttv3/1.1.0/c4e2860ca315d2f24287112093c7e58305b30a30/org.eclipse.paho.client.mqttv3-1.1.0-sources.jar"/>
 	<classpathentry kind="lib" path="C:/Users/Portatile/.gradle/caches/modules-2/files-2.1/junit/junit/4.12/2973d150c0dc1fefe998f834810d68f278ea58ec/junit-4.12.jar" sourcepath="C:/Users/Portatile/.gradle/caches/modules-2/files-2.1/junit/junit/4.12/a6c32b40bf3d76eca54e3c601e5d1470c86fcdfa/junit-4.12-sources.jar"/>
@@ -23,9 +21,6 @@
 	<classpathentry kind="lib" path="D:/Desktop/PLANNING/GIT/IOT_Planning/SCOUT PROJECT 2017/it.unibo.iss.libs/libs/unibo/2p301.jar"/>
 	<classpathentry kind="lib" path="D:/Desktop/PLANNING/GIT/IOT_Planning/SCOUT PROJECT 2017/it.unibo.iss.libs/libs/unibo/qa18Akka.jar"/>
 	<classpathentry kind="lib" path="D:/Desktop/PLANNING/GIT/IOT_Planning/SCOUT PROJECT 2017/it.unibo.iss.libs/libs/http/nanoHTTPD.jar"/>
-	<classpathentry kind="lib" path="D:/Desktop/PLANNING/GIT/IOT_Planning/SCOUT PROJECT 2017/it.unibo.iss.libs/libs/pi4j/pi4j-core-1.1.jar"/>
-	<classpathentry kind="lib" path="D:/Desktop/PLANNING/GIT/IOT_Planning/SCOUT PROJECT 2017/it.unibo.iss.libs/libs/unibo/labbaseRobotSam.jar"/>
-	<classpathentry kind="lib" path="D:/Desktop/PLANNING/GIT/IOT_Planning/SCOUT PROJECT 2017/it.unibo.iss.libs/libs/unibo/uniboQactorRobot.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/it.unibo.iot.pasquali.Common"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/it.unibo.iot.pasquali.SearchAlgorithm"/>
 	<classpathentry kind="output" path="bin"/>

@@ -1,4 +1,4 @@
-package it.unibo.domain.model.implementation;
+package it.unibo.domain.model.map;
 
 import it.unibo.domain.model.interfaces.IMapElement;
 

@@ -15,4 +15,6 @@ include 'api'
 include 'services:webservice'
 */
 
+include '../it.unibo.iot.pasquali.Common'
+include '../it.unibo.iot.pasquali.SearchAlgorithm'
 rootProject.name = 'it.unibo.iot.pasquali.scout.Robot'

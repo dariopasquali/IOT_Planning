@@ -12,13 +12,13 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JPanel;
 
+import it.unibo.domain.model.interfaces.IMap;
+import it.unibo.domain.model.interfaces.IMapElement;
 import it.unibo.is.interfaces.IActivity;
 import it.unibo.is.interfaces.IActivityBase;
 import it.unibo.is.interfaces.IBasicEnvAwt;
 import it.unibo.is.interfaces.IOutputEnvView;
 import it.unibo.is.interfaces.IOutputView;
-import it.unibo.model.interfaces.IMap;
-import it.unibo.model.interfaces.IMapElement;
 
 import java.awt.Font;
 import java.awt.Frame;
@@ -131,9 +131,9 @@ public class RobotGUI extends Frame implements IOutputEnvView, IBasicEnvAwt{
 	
 	public void setMap(IMap map)
 	{
-		this.mapViewer = new MapViewer(true);
+		this.mapViewer = new MapViewer(false);
 		
-		mapViewer.createGridPanel(map.getYmax(), map.getXmax());
+		mapViewer.createGridPanel(map.getXmax(), map.getXmax());
 		List<IMapElement> elements = map.getElements();
 		
 		for(IMapElement e : elements)

@@ -1,8 +1,12 @@
-package it.unibo.domain.model.implementation;
+package it.unibo.domain.model.map;
 
+import java.util.ArrayList;
+import java.util.List;
 
+import it.unibo.domain.model.interfaces.IMap;
+import it.unibo.domain.model.interfaces.IMapElement;
 
-public class ExplorationMap{
+public class Map implements IMap{
 
 	public static final int NONE = -1,
 							CLEAR = 0,
@@ -24,7 +28,7 @@ public class ExplorationMap{
 	 */
 	
 	
-	public ExplorationMap(int ymax, int xmax, Integer[][] intmap)
+	public Map(int ymax, int xmax, Integer[][] intmap)
 	{
 		this.xmax = xmax;
 		this.ymax = ymax;
@@ -38,7 +42,7 @@ public class ExplorationMap{
 		
 	}
 	
-	public ExplorationMap(int ymax, int xmax) {
+	public Map(int ymax, int xmax) {
 
 		this.ymax = ymax;
 		this.xmax = xmax;
@@ -47,21 +51,23 @@ public class ExplorationMap{
 		clearAll();
 	}
 	
-	public ExplorationMap(ExplorationMap currentMap) {
+	public Map(Map currentMap) {
 		this.ymax = currentMap.ymax;
 		this.xmax = currentMap.xmax;
 		this.intmap = currentMap.intmap.clone();
 	}
 
-	
-	public int getYMax() {
+	@Override
+	public int getYmax() {
 		return ymax;
 	}
 	
-	public int getXMax() {
+	@Override
+	public int getXmax() {
 		return xmax;
 	}
 
+	@Override
 	public Integer[][] getIntMap()
 	{
 		return intmap;
@@ -104,6 +110,16 @@ public class ExplorationMap{
 				x>=0 &&
 				x<=xmax &&
 				(intmap[y][x]==OBJ);
+	}
+	
+	public void setCell(int y, int x, int state) {
+		
+		switch(state)
+		{
+		case CLEAR: setCellClear(y,x); break;
+		case NONE: setCellNone(y,x); break;
+		case OBJ: setCellObj(y, x); break;
+		}
 	}
 	
 	public void setCellClear(int y, int x) {
@@ -162,7 +178,7 @@ public class ExplorationMap{
 		
 	}
 
-	public static ExplorationMap createMapFromPrologRep(String map) {
+	public static Map createMapFromPrologRep(String map) {
 		if(!map.contains("map"))
 			return null;
 		
@@ -185,7 +201,7 @@ public class ExplorationMap{
 		String[] sxmax = s[0].split("\\(");
 		String[] symax = s[1].split("\\)");
 		
-		return new ExplorationMap(Integer.parseInt(symax[0]), Integer.parseInt(sxmax[1]));
+		return new Map(Integer.parseInt(symax[0]), Integer.parseInt(sxmax[1]));
 	}
 		
 	public void fillUnexploredCell()
@@ -202,7 +218,7 @@ public class ExplorationMap{
 
 	public void setElement(int y, int x, int state) {
 		
-		if(state != ExplorationMap.CLEAR || state != ExplorationMap.NONE || state != ExplorationMap.OBJ)
+		if(state != Map.CLEAR || state != Map.NONE || state != Map.OBJ)
 			return;
 		
 		if(y>=0 &&
@@ -262,6 +278,57 @@ public class ExplorationMap{
 		this.xmax = ymax;
 		this.ymax = tempXmax;
 		this.intmap = temp;
+	}
+
+	@Override
+	public String getDefaultRep() {
+		
+		String m = "map("+xmax+","+ymax+")\n";
+		
+				
+		List<IMapElement> list = getElements();
+		
+		for(int i = 0; i<list.size(); i++)
+		{
+			m += "mapdata(" + (i+1) +", " + list.get(i).toString() +")";
+			if(i!=list.size()-1)
+				m+="\n";
+		}
+		
+		
+		return m;
+		
+	}
+
+	@Override
+	public List<IMapElement> getElements() {
+
+		List<IMapElement> list = new ArrayList<IMapElement>();
+		
+		for(int y=0; y<=ymax; y++)
+		{
+			for(int x=0; x<=xmax; x++)
+			{
+				if(intmap[y][x] == OBJ)
+					list.add(new MapElement(y,x));
+			}
+		}
+		
+		return list;		
+	}
+
+
+
+	@Override
+	public void noneAll() {
+		
+		for(int y=0; y<=ymax; y++)
+		{
+			for(int x = 0; x<=xmax; x++)
+			{
+				intmap[y][x] = NONE;
+			}
+		}	
 	}
 	
 

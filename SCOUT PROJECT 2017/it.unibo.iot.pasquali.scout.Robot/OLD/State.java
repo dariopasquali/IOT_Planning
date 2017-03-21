@@ -1,4 +1,4 @@
-package it.unibo.domain.model;
+package it.unibo.domain.model.implementation;
 
 import it.unibo.planning.enums.Direction;
 

@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import it.unibo.domain.model.implementation.*;
+import it.unibo.domain.model.map.Map;
 import it.unibo.planning.astar.algo.Path;
 import it.unibo.planning.astar.domain.Move;
 import it.unibo.planning.enums.Direction;
@@ -14,8 +15,8 @@ import it.unibo.planning.enums.MoveType;
 
 public class Engine {
 	
-	protected ExplorationMap map;
-	protected ExplorationState state;
+	protected Map map;
+	protected State state;
 	
 	protected Set<Point> visited;
 	
@@ -23,8 +24,8 @@ public class Engine {
 	
 	public Engine(int startX, int startY, int mapW, int mapH) {
 		
-		state = new ExplorationState(startY, startX, Direction.NORTH);
-		map = new ExplorationMap(mapH, mapW);
+		state = new State(startY, startX, Direction.NORTH);
+		map = new Map(mapH, mapW);
 		
 		visited = new HashSet<Point>();
 		
@@ -52,11 +53,11 @@ public class Engine {
 	
 	// GETTERS ---------------------------------
 	
-	public ExplorationState getState() {
+	public State getState() {
 		return state;
 	}
 		
-	public ExplorationMap getMap() {
+	public Map getMap() {
 		return map;
 	}
 		
@@ -133,7 +134,7 @@ public class Engine {
 			break;
 		}
 		
-		state = new ExplorationState(y, x, cd);
+		state = new State(y, x, cd);
 		state.addCost(1);
 		
 		map.setCellClear(y, x);
@@ -175,7 +176,7 @@ public class Engine {
 	
 // SAFE MOVES ------------ state doesn't change ------------------
 	
-	protected ExplorationState moveForwardSafe(ExplorationState start) {
+	protected State moveForwardSafe(State start) {
 
 		Direction cd = start.getDirection();
 		
@@ -228,48 +229,48 @@ public class Engine {
 		//if(!map.isValidCell(y, x)) //nosense se non ho i bordi
 		//	return null;
 		
-		ExplorationState s = new ExplorationState(y, x, cd);
+		State s = new State(y, x, cd);
 		s.addCost(start.getCost()+1);
 		
 		return s;
 	}
 	
-	protected ExplorationState moveBackwardSafe(ExplorationState start)
+	protected State moveBackwardSafe(State start)
 	{		
 		return moveForwardSafe(turnDoubleLeftSafe(turnDoubleLeftSafe(start)));
 	}
 	
-	protected ExplorationState moveDoubleLeftSafe(ExplorationState s)
+	protected State moveDoubleLeftSafe(State s)
 	{
 		return moveForwardSafe(turnDoubleLeftSafe(s));
 	}
 	
-	protected ExplorationState moveDoubleRightSafe(ExplorationState s)
+	protected State moveDoubleRightSafe(State s)
 	{
 		return moveForwardSafe(turnDoubleRightSafe(s));
 	}
 	
-	protected ExplorationState turnDoubleLeftSafe(ExplorationState s)
+	protected State turnDoubleLeftSafe(State s)
 	{
 		return turnLeftSafe(turnLeftSafe(s));
 	}
 	
-	protected ExplorationState turnDoubleRightSafe(ExplorationState s)
+	protected State turnDoubleRightSafe(State s)
 	{
 		return turnRightSafe(turnRightSafe(s));
 	}
 	
-	protected ExplorationState turnLeftSafe(ExplorationState s) {
+	protected State turnLeftSafe(State s) {
 		Direction cd = s.getDirection();
-		ExplorationState ret = new ExplorationState(s.getY(), s.getX(), leftMap.get(cd));
+		State ret = new State(s.getY(), s.getX(), leftMap.get(cd));
 		ret.addCost(s.getCost()+1);
 		
 		return ret;
 	}
 	
-	protected ExplorationState turnRightSafe(ExplorationState s) {
+	protected State turnRightSafe(State s) {
 		Direction cd = s.getDirection();
-		ExplorationState ret = new ExplorationState(s.getY(), s.getX(), rightMap.get(cd));
+		State ret = new State(s.getY(), s.getX(), rightMap.get(cd));
 		ret.addCost(s.getCost()+1);
 		
 		return ret;
@@ -278,9 +279,9 @@ public class Engine {
 	
 // STATE CHECKS ----------------------------------------------------
 	
-	public ExplorationState checkAndUpdate(String direction, String upState)
+	public State checkAndUpdate(String direction, String upState)
 	{
-		ExplorationState next = null;
+		State next = null;
 		
 		if(direction.equals("front"))
 			next = moveForwardSafe(state);			
@@ -304,28 +305,28 @@ public class Engine {
 	
 	public boolean checkExploredLeft() {
 		
-		ExplorationState leftState = moveForwardSafe(turnDoubleLeftSafe(state));
+		State leftState = moveForwardSafe(turnDoubleLeftSafe(state));
 		
 		return isAlreadyVisited(leftState);
 	}
 	
-	protected boolean isUnexploredState(ExplorationState next) {
+	protected boolean isUnexploredState(State next) {
 		return (next.getX() >= 0 &&
-				next.getX() <= map.getXMax() &&
+				next.getX() <= map.getXmax() &&
 				next.getY() >= 0 &&
-				next.getY() <= map.getYMax() &&
+				next.getY() <= map.getYmax() &&
 						map.isCellNone(next.getY(), next.getX()));
 	}
 
-	protected boolean isClearState(ExplorationState next) {
+	protected boolean isClearState(State next) {
 		return (next.getX() >= 0 &&
-				next.getX() <= map.getXMax() &&
+				next.getX() <= map.getXmax() &&
 				next.getY() >= 0 &&
-				next.getY() <= map.getYMax() &&
+				next.getY() <= map.getYmax() &&
 						map.isCellClear(next.getY(), next.getX()));
 	}
 		
-	public boolean isAlreadyVisited(ExplorationState s) {
+	public boolean isAlreadyVisited(State s) {
 		
 		boolean visit = visited.contains(s.getCoordinates());		
 		return visit;
@@ -373,15 +374,15 @@ public class Engine {
 	}	
 	
 	
-	public ArrayList<ExplorationState> getUnexploredNeighbors()
+	public ArrayList<State> getUnexploredNeighbors()
 	{
 		//search only top left and right neighbor 
 		
-		ArrayList<ExplorationState> neighList = new ArrayList<ExplorationState>();
-		ArrayList<ExplorationState> closedList = new ArrayList<ExplorationState>();
-		ArrayList<ExplorationState> unexpList = new ArrayList<ExplorationState>();
+		ArrayList<State> neighList = new ArrayList<State>();
+		ArrayList<State> closedList = new ArrayList<State>();
+		ArrayList<State> unexpList = new ArrayList<State>();
 		
-		ExplorationState actual = state;
+		State actual = state;
 		neighList.add(actual);
 		
 		while(unexpList.isEmpty() && !neighList.isEmpty())
@@ -393,7 +394,7 @@ public class Engine {
 			
 			for(int i=0; i<4; i++)
 			{
-				ExplorationState next = null;
+				State next = null;
 				switch(i)
 				{
 				case 0:

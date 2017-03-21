@@ -2,7 +2,7 @@ package it.unibo.gui;
 
 import java.awt.Color;
 
-import it.unibo.model.implementation.Map;
+import it.unibo.domain.model.map.Map;
 
 public enum CellState {
 	CLEAR(Color.WHITE, Map.CLEAR),

@@ -4,7 +4,7 @@ import java.awt.Point;
 
 import it.unibo.planning.enums.Direction;
 
-public class ExplorationState implements Comparable<ExplorationState>{
+public class State implements Comparable<State>{
 
 	private int x;
 	private int y;
@@ -12,17 +12,24 @@ public class ExplorationState implements Comparable<ExplorationState>{
 	
 	private double cost;
 	
-	public ExplorationState() {
+	public State() {
 		this.x = -1;
 		this.y = -1;
-		this.dir = Direction.NONE;
+		this.dir = Direction.NORTH;
 		cost = 0;
 	}
 	
-	public ExplorationState(int y, int x, Direction dir) {
+	public State(int y, int x, Direction dir) {
 		this.y = y;
 		this.x = x;
 		this.dir = dir;
+		cost = 0;
+	}
+	
+	public State(int y, int x) {
+		this.y = y;
+		this.x = x;
+		this.dir = Direction.NORTH;
 		cost = 0;
 	}
 	
@@ -71,17 +78,17 @@ public class ExplorationState implements Comparable<ExplorationState>{
 	@Override
 	public boolean equals(Object s)
 	{
-		if(!(s instanceof ExplorationState))
+		if(!(s instanceof State))
 			return false;
 		
-		ExplorationState ss = (ExplorationState) s;
+		State ss = (State) s;
 		
 		return y == ss.getY() &&
 				x == ss.getX();		
 	}
 	
 	@Override
-	public int compareTo(ExplorationState s) {
+	public int compareTo(State s) {
 		
 		if(cost > s.getCost())
 			return 1;
