@@ -199,6 +199,13 @@ public class Robot extends AbstractRobot {
 			engine.moveForward();
 		else
 			engine.moveBackward();
+		
+		ExplorationState s = engine.getState();
+		
+		String payload = "position("+s.getX() + "," + s.getY() + ")," +
+				s.getDirection().toString().toLowerCase();
+		
+		emit("show", "show(" + payload + ")");
 	}
 	
 	public void turn(String spinDir)
@@ -207,6 +214,13 @@ public class Robot extends AbstractRobot {
 			engine.turnDoubleRight();
 		else
 			engine.turnDoubleLeft();
+		
+		ExplorationState s = engine.getState();
+		
+		String payload = "position("+s.getX() + "," + s.getY() + ")," +
+				s.getDirection().toString().toLowerCase();
+		
+		emit("show", "show(" + payload + ")");
 	}
 	
 	public void addCurrentToVisited()
@@ -327,6 +341,14 @@ public class Robot extends AbstractRobot {
 		System.out.println(position);
 	}
 	
+	public void notifyMyPosition()
+	{
+		String payload = "position("+position.getX() + "," + position.getY() + ")," +
+						position.getDirection().toString().toLowerCase();
+		
+		emit("show", "show(" + payload + ")");
+	}
+	
 	
 	private it.unibo.domain.model.State makeMove(it.unibo.domain.model.State state, Move move)
 	{
@@ -414,7 +436,7 @@ public class Robot extends AbstractRobot {
 		((QActorPlanUtilsDebug) planUtils).disableFileSensingMode();
 	}
 	
-	public void raiseEvent(String emitterName, String eventName, String payload)
+	public void raiseEvent(String eventName, String payload)
 	{
 		emit(eventName, payload);
 	}

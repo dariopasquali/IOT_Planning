@@ -1,6 +1,5 @@
 package it.unibo.robot.exputils;
 
-import it.unibo.domain.State;
 import it.unibo.domain.model.implementation.ExplorationMap;
 import it.unibo.domain.model.implementation.ExplorationState;
 

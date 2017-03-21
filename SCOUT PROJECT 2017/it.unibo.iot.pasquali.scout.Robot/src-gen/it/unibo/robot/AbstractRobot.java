@@ -125,7 +125,13 @@ protected IActorAction  action;
     		} 			
     		temporaryStr = "\"++++++++++++++++++ robot(starts) ++++++++++++++++++\"";
     		println( temporaryStr );  
-    		if( ! planUtils.switchToPlan("waitConsoleCommand").getGoon() ) break;
+    		if( (guardVars = QActorUtils.evalTheGuard(this, " !?robotMode(gui)" )) != null ){
+    		temporaryStr = QActorUtils.unifyMsgContent(pengine,"enableGUI(STATE)","enableGUI(on)", guardVars ).toString();
+    		sendMsg("enableGUI","guimanager", QActorContext.dispatch, temporaryStr ); 
+    		}
+    		else{ temporaryStr = QActorUtils.unifyMsgContent(pengine,"enableGUI(STATE)","enableGUI(off)", guardVars ).toString();
+    		sendMsg("enableGUI","guimanager", QActorContext.dispatch, temporaryStr ); 
+    		}if( ! planUtils.switchToPlan("waitConsoleCommand").getGoon() ) break;
     break;
     }//while
     return returnValue;
@@ -229,7 +235,7 @@ protected IActorAction  action;
     		temporaryStr = "\"Let's explore by java!!\"";
     		println( temporaryStr );  
     		if( (guardVars = QActorUtils.evalTheGuard(this, " ??msg(_,_,SENDER,X,explorefile(START,FILENAME),MSGNUM)" )) != null ){
-    		parg = "explore(START,FILENAME)";
+    		parg = "initExploreMap(START,FILENAME)";
     		parg = QActorUtils.substituteVars(guardVars,parg);
     		//REGENERATE AKKA
     		aar = solveGoalReactive(parg,0,"","");

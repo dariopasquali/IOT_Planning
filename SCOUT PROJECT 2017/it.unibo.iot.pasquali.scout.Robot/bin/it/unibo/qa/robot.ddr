@@ -66,6 +66,18 @@ Event obstacleleft : obstacleleft
 
 
 // ------------------------------------------------------------------
+//		ROBOT GUI - INTERACTION
+// ------------------------------------------------------------------
+
+Dispatch enableGUI : enableGUI(STATE)
+// STATE = on || off
+
+Event show : show(POS, DIR)
+// POS = position(X,Y)
+// DIR = n || e || w || s || ne || nw || se || sw
+
+
+// ------------------------------------------------------------------
 //			CONTEXTS
 // ------------------------------------------------------------------
 
@@ -76,6 +88,41 @@ QActor console context ctxConsole{
  	Plan init normal
 		println( "NEVER HERE. I'm just a placeholder" ) 
  }
+
+QActor guimanager context ctxRobot{
+	
+	Plan init normal
+		println("++++++++++++++++++ guiManager(starts) ++++++++++++++++++");
+		solve consult("guiTheory.pl") time(210000000) onFailSwitchTo  consultPrologFailure ;
+		switchToPlan waiEnableMessage
+		
+	Plan waiEnableMessage
+	
+		receiveMsg time(100000000);
+		onMsg enableGUI : enableGUI(on) -> solve showGUI time(0);
+		onMsg enableGUI : enableGUI(off) -> endQActor "GUI disabled";		
+		switchToPlan waitMap
+	
+	Plan waitMap		
+		receiveMsg time(1000000000);
+		onMsg explorefile : explorefile(START, FILENAME) -> solve showMap(START, FILENAME) time(0);
+		
+		switchToPlan waitUpdates	
+		
+	Plan waitUpdates
+		sense time(1000000000) show, end, abort -> continue, continue, continue;
+		
+		onEvent show : show(POS,DIR) -> solve updateState(POS,DIR) time(0);
+		onEvent end : end -> resumeLastPlan;
+		onEvent abort : abort -> resumeLastPlan;
+		
+		repeatPlan 0 
+		
+		
+		
+	Plan consultPrologFailure            
+		println("The consult is gone wrong, maybe there are errors in the prolog file" )
+}
 
 Robot mockScout QActor robot context ctxRobot{
 
@@ -95,6 +142,10 @@ Robot mockScout QActor robot context ctxRobot{
 		solve consult("talkTheory.pl") time(210000000) onFailSwitchTo  consultPrologFailure ;
 		
  		println("++++++++++++++++++ robot(starts) ++++++++++++++++++");
+ 		
+ 		[!? robotMode(gui)] forward guimanager -m enableGUI : enableGUI(on) else
+ 						 forward guimanager -m enableGUI : enableGUI(off);
+ 		
  		switchToPlan waitConsoleCommand
  		
  	Plan waitConsoleCommand
@@ -121,7 +172,7 @@ Robot mockScout QActor robot context ctxRobot{
  	
  	Plan fileexplorer
  		println("Let's explore by java!!"); 		
- 		[?? msg(_, _, SENDER, X, explorefile(START, FILENAME), MSGNUM)] solve explore(START, FILENAME) time(0)
+ 		[?? msg(_, _, SENDER, X, explorefile(START, FILENAME), MSGNUM)] solve initExploreMap(START, FILENAME) time(0)
  	
  	
  	 Plan explorationDebug
