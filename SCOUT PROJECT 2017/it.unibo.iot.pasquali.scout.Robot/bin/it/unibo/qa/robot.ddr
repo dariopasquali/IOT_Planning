@@ -136,7 +136,6 @@ Robot mockScout QActor robot context ctxRobot{
 		solve consult("robotTheory.pl") time(210000000) onFailSwitchTo  consultPrologFailure ;
 		solve consult("navRobotTheory.pl") time(210000000) onFailSwitchTo  consultPrologFailure ;
 		solve consult("exploreRobotTheory.pl") time(210000000) onFailSwitchTo  consultPrologFailure ;
-		//solve consult("sensorTheory.pl") time(210000000) onFailSwitchTo  consultPrologFailure ;
 		solve consult("talkTheory.pl") time(210000000) onFailSwitchTo  consultPrologFailure ;
 		
  		println("++++++++++++++++++ robot(starts) ++++++++++++++++++");
@@ -153,7 +152,7 @@ Robot mockScout QActor robot context ctxRobot{
  		
  		onMsg explore : explore -> switchToPlan exploration;
  		onMsg exploredebug : exploredebug ( START , BOUNDS) -> switchToPlan explorationDebug;
- 		onMsg explorefile : explorefile (START, FILENAME) -> switchToPlan exploration;
+ 		onMsg explorefile : explorefile (START, FILENAME) -> switchToPlan explorationFile;
  		onMsg navigate : navigate(PLAN, POS) -> switchToPlan navigation;
  		
  		repeatPlan 0		
@@ -161,234 +160,47 @@ Robot mockScout QActor robot context ctxRobot{
  // EXPLORATION PLANS----------------------------------------------
  		
  	Plan exploration
- 		println("Let's explore a file!!"); 		
- 		[!? msg(_, _, SENDER, X, explorefile(START, FILENAME), MSGNUM)]
+ 		println("")
+ 		
+ 
+ // DEBUG EXPLORATION PLANS -----------------------------------		
+ 	
+ 	Plan explorationFile
+ 		println("Let's explore a file!!"); 	
+ 		
+ 		solve initialConfigExpRobot time(0);
+ 		
+ 		[?? msg(_, _, SENDER, X, explorefile(START, FILENAME), MSGNUM)]
+ 								emit enableGUI : enableGUI(START, FILENAME);
+ 			
+ 		[?? msg(_, _, SENDER, X, explorefile(START, FILENAME), MSGNUM)]
  								 solve javaExplorer(START, FILENAME) time(0)
  								 react event abort -> abort;
  								 
  		emit end : end;
  		println("Exploration Done ****************************");
  		resumeLastPlan
- 		
- 
- // DEBUG EXPLORATION PLANS -----------------------------------		
  	
- 	Plan fileExplorer
- 		println("Let's explore a file!!"); 		
- 		[!? msg(_, _, SENDER, X, explorefile(START, FILENAME), MSGNUM)]
- 								 solve initExploreMap(START, FILENAME) time(0);
- 		
- 		[?? msg(_, _, SENDER, X, explorefile(START, FILENAME), MSGNUM)]
- 								emit enableGUI : enableGUI(START, FILENAME);						 
- 		
- 		switchToPlan notifyCell;
- 		
- 		solve assert(explore(true)) time(0);
- 		
- 		solve assert(fileExploration) time(0);
- 		
- 		switchToPlan findLeftWall
- 	
- 	
- 	 Plan explorationDebug
+ 	Plan explorationDebug
  		println("Let's explore!!");
- 		[?? msg(_, _, SENDER, X, explore(START,BOUNDS), MSGNUM)] solve 	initExploreMap(START, BOUNDS) time(0);
+ 		[?? msg(_, _, SENDER, X, explore(START,BOUNDS), MSGNUM)]
+ 			 					 solve initExploreMap(START, BOUNDS) time(0)
+ 			 					 react event abort -> abort;
  		
- 		switchToPlan notifyCell;
- 		
- 		solve assert(explore(true)) time(0);
- 		
- 		switchToPlan findLeftWall
- 		
- 		
- 	Plan findLeftWall
- 		println("Find Left Wall!");
- 		
- 		[!? fileExploration] solve enableDebugSensing time(0);
- 		 
- 		sense time(1000) obstaclefront -> continue;
- 		
- 		// OBSTACLE FRONT
- 		
- 		onEvent obstaclefront : obstaclefront -> solve assert(obstacle(front, object)) time(0) else
- 										solve assert(obstacle(front, clear)) time(0);
- 										
- 		[!? obstacle(front, clear)] solve updateModel(front, clear) time(0);
-		[?? obstacle(front, clear)] switchToPlan notifyCell;
-		// [?? obstacle(front, clear)] continue	
- 		
- 		[!? obstacle(front, object)] solve updateModel(front, object) time(0);
- 		[!? obstacle(front, object)] switchToPlan notifyCell;								
- 		[?? obstacle(front, object)] switchToPlan turnRightAndFollow; 
- 		 		
- 				
- 		// ----------------------------------------------------------------------------------
- 		
- 		sense time(1000) obstacleleft -> continue;
- 		
- 		// OBSTACLE LEFT
- 		
- 		onEvent obstacleleft : obstacleleft -> solve assert(obstacle(left, object)) time(0) else
- 										solve assert(obstacle(left, clear)) time(0);
- 										
- 		[!? obstacle(left, clear)] solve updateModel(left, clear) time(0);
-		[?? obstacle(left, clear)] switchToPlan notifyCell;
-		// [?? obstacle(left, clear)] continue			
- 		
- 		[!? obstacle(left, object)] solve updateModel(left, object) time(0);
- 		[!? obstacle(left, object)] switchToPlan notifyCell;								
- 		[?? obstacle(left, object)] switchToPlan followWall;
- 		
- 		[!? fileExploration] solve disableDebugSensing time(0);
- 		
- 		// -----------------------------------------------------------------------------------
- 		
- 		println("Find Left Wall - Forward Step");	
- 		
- 		solve moveForward time (10000000);
- 		solve addCurrentToVisited time (10000000);
- 		delay time(1000);
- 		
- 		repeatPlan 0
- 		
- 		
- 		
- 	Plan turnRightAndFollow
- 		println("turn right and follow"); 		
- 		solve turnDoubleRight time(0);
- 		delay time(1000);
- 		switchToPlan followWall
- 		
- 	Plan turnLeftAndFind
- 		println("Wall Found!! - Left"); 		
- 		solve turnDoubleLeft time(0);
- 		delay time(1000);
- 		switchToPlan findLeftWall
- 		
- 	Plan turnLeft resumeLastPlan
- 		println("turn Left"); 		
- 		solve turnDoubleLeft time(0);
- 		delay time(1000)
- 		
- 	Plan turnRight resumeLastPlan
- 		println("turn Right"); 		
- 		solve turnDoubleLeft time(0);
- 		delay time(1000)
-
- 		
- 	Plan followWall
- 		println("Follow Wall");
- 		
- 		[!? fileExploration] solve enableDebugSensing time(0);
- 		
- 		sense time(1000) obstacleleft -> continue;
- 		
- 		// OBSTACLE LEFT
- 		
- 		onEvent obstacleleft : obstacleleft -> solve assert(obstacle(left, object)) time(0) else
- 										solve assert(obstacle(left, clear)) time(0);
- 										
- 		[!? obstacle(left, clear)] solve updateModel(left, clear) time(0);
-		[?? obstacle(left, clear)] switchToPlan notifyCell;										
- 		[?? obstacle(left, clear)] switchToPlan turnLeftAndFind;		
- 		
- 		[!? obstacle(left, object)] solve updateModel(left, object) time(0);
- 		[!? obstacle(left, object)] switchToPlan notifyCell;									
- 		 										
- 					
- 		sense time(1000) obstaclefront -> continue;
- 		
- 		// OBSTACLE FRONT
- 		
- 		onEvent obstaclefront : obstaclefront -> solve assert(obstacle(front, object)) time(0) else
- 										solve assert(obstacle(front, clear)) time(0);
- 										
- 		[!? obstacle(front, clear)] solve updateModel(front, clear) time(0);
-		[!? obstacle(front, clear)] switchToPlan notifyCell;									
- 		[?? obstacle(front, clear)] switchToPlan moveAndCheckLoop;		
- 		
- 		[!? obstacle(front, object)] solve updateModel(front, object) time(0);
- 		[!? obstacle(front, object)] switchToPlan notifyCell;								
- 		[?? obstacle(front, object)] switchToPlan frontWallFound;
- 		
- 		[!? fileExploration] solve disableDebugSensing time(0);
- 		
- 		repeatPlan 0 		
- 		 		
- 		 		
- 		 		
- 		 		
- 		 		
- 	Plan frontWallFound
- 		println("I hit a wall"); 		
- 		
- 		// OBSTACLE LEFT
- 		
- 		[!? fileExploration] solve enableDebugSensing time(0);
- 		
- 		sense time(1000) obstacleleft -> continue;
- 		
- 		onEvent obstacleleft : obstacleleft -> solve assert(obstacle(left, object)) time(0) else
- 										solve assert(obstacle(left, clear)) time(0);
- 										
- 		[!? obstacle(left, clear)] solve updateModel(left, clear) time(0);
-		[!? obstacle(left, clear)] switchToPlan notifyCell;		
- 		
- 		[!? obstacle(left, object)] solve updateModel(left, object) time(0);
- 		[!? obstacle(left, object)] switchToPlan notifyCell;
- 		
- 		solve senseAndCheckLeft time (1000000);
- 		
- 		[!? fileExploration] solve disableDebugSensing time(0);
- 		
- 		[!? notLeftObjectAndNotExplored(true)] switchToPlan turnLeft
- 		 else switchToPlan turnRight;
- 		 
- 		resumeLastPlan // return to followWall
- 		 
- 	Plan moveAndCheckLoop
- 		println("let's move");
- 		
- 		solve moveForward time(100000); 		
- 		delay time(1000);
- 		
- 		solve checkCurrentAlreadyVisited time(100000);
- 		
- 		[!? currentAlreadyVisited(false)] switchToPlan loopAvoidance
- 		 else solve addCurrentToVisited time (10000000);
- 		
+ 		emit end : end;
+ 		println("Exploration Done ****************************");
  		resumeLastPlan
  		
- 	 	
- 	
- 	Plan loopAvoidance	
- 		println("I'm in a looooop");
- 		
- 		solve findNearestNotExploredCell time(1000000);
- 		
- 		[!? explore(false)] switchToPlan endOfExploration;
- 		
- 		solve computeBestPath time(1000000000);
- 		
- 		solve travel time(1000000000);
- 		
- 		switchToPlan findLeftWall
- 		
- 	
- 	Plan notifyCell resumeLastPlan
- 		println("notify cell");
- 		[?? newCell(POS, STATE) ] emit expdata : expdata( POS , STATE )
- 		//[?? newCell(POS, STATE) ] println(POS);
- 		//delay time(1000)
  		
  		
- 	Plan endOfExploration
- 		println("Exploration done")	
  
  // *********** NAVIGATION PLANS **********************
  		
  	Plan navigation
  		println("I Received some navigation data");
+ 		
+ 		solve initialConfigNavRobot time(0);
+ 		
  		[?? msg(_, _, SENDER, X, navigate(PLAN, POS), MSGNUM)] 
  			solve loadNavigationData(PLAN, POS) time (100000) onFailSwitchTo loadMapFailure;
  		

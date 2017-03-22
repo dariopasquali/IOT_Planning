@@ -38,6 +38,9 @@ import it.unibo.qactors.QActorContext;
 //
 public class Robot extends AbstractRobot { 
 	
+	private int defaultSpeed, defaultTime;
+	private int defaultTurnSpeed, defaultTurnTime;
+	
 	private Map map;
 	private ArrayList<State> path;
 	
@@ -50,8 +53,6 @@ public class Robot extends AbstractRobot {
 	
 	private HashMap<String, Move> moveMapping;
 	private HashMap<Integer, Direction> spinMap;
-	
-	private int newCellX = 0, newCellY = 0;
 	
 	
 	public Robot(String actorId, QActorContext myCtx, IOutputEnvView outEnvView ) throws Exception
@@ -99,6 +100,17 @@ public class Robot extends AbstractRobot {
 		spinMap.put(7, Direction.NORTH_WEST);
 		
 	}
+	
+	// INITIALIZATION - COMMON ******************************************************
+	
+	public void initialConfigRobot(int defSpeed, int defTime, int defTurnSpeed, int defTurnTime)
+	{
+		this.defaultSpeed = defSpeed;
+		this.defaultTime = defTime;
+		this.defaultTurnSpeed = defTurnSpeed;
+		this.defaultTurnTime = defTurnTime;
+	}
+	
 	
 	// INITIALIZATION - NAVIGATION **************************************************
 	
@@ -582,6 +594,56 @@ public class Robot extends AbstractRobot {
 	
 	// REAL ROBOT CONTROLS *****************************************************
 	
+	public void moveForward()
+	{
+		try
+		{
+			execute("forward", defaultSpeed, 0, defaultTime, "", "");
+		}
+		catch (Exception e) 
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 	
+	public void moveBackward()
+	{
+		try
+		{
+			execute("backward", defaultSpeed, 0, defaultTime, "", "");
+		}
+		catch (Exception e) 
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	public void turnLeft()
+	{
+		try
+		{
+			execute("left", defaultTurnSpeed, 0, defaultTurnTime, "", "");
+		}
+		catch (Exception e) 
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	public void turnRight()
+	{
+		try
+		{
+			execute("right", defaultTurnSpeed, 0, defaultTurnTime, "", "");
+		}
+		catch (Exception e) 
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 
 }

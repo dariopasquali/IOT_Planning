@@ -106,7 +106,10 @@ QActor console context ctxConsole{
 		
 		onEvent local_gui_command : local_gui_command (loadexpmap(PATH)) -> switchToPlan loadExpMap;
 		onEvent local_gui_command : local_gui_command (explore) -> switchToPlan exploration;
- 		onEvent local_gui_command : local_gui_command (explore(FILENAME, START, BOUNDS)) -> switchToPlan explorationDebug;
+		
+ 		onEvent local_gui_command : local_gui_command (explore(FILENAME, START, BOUNDS, MODE)) ->
+ 																		 switchToPlan explorationDebug;
+ 																		 
  		onEvent local_gui_command : local_gui_command (loadmap(PATH)) -> switchToPlan loadMap;
  		onEvent local_gui_command : local_gui_command (findpath(START,GOAL)) -> switchToPlan findPath;
  		onEvent local_gui_command : local_gui_command (navigate) -> switchToPlan navigation;
@@ -133,19 +136,21 @@ QActor console context ctxConsole{
 			
 	Plan explorationDebug
 		println("++++++++++++++++++ EXPLORATION DEBUG ++++++++++++++++++");
-		
-			
-		[!? msg(local_gui_command, "event", SENDER, none, local_gui_command (explore(FILENAME,START,BOUNDS)), MSGNUM)]
+					
+		[!? msg(local_gui_command, "event", SENDER, none, local_gui_command (explore(FILENAME,START,BOUNDS,MODE)), MSGNUM)]
 			solve showClearMap(BOUNDS) time(60000) onFailSwitchTo  explorationFailure;	
 		
 		println("mappa pulita");
 			
-		[?? msg(local_gui_command, "event", SENDER, none, local_gui_command (explore(FILENAME,START,BOUNDS)), MSGNUM)]
-			 forward robot -m explorefile : explorefile(START,FILENAME);
-//			 forward robot -m exploredebug : exploredebug(START,BOUNDS);				 
+		[!? msg(local_gui_command, "event", SENDER, none, local_gui_command (explore(FILENAME,START,BOUNDS, debug)), MSGNUM)]
+			 forward robot -m exploredebug : exploredebug(START,BOUNDS);		
 		
-		
+		[?? msg(local_gui_command, "event", SENDER, none, local_gui_command (explore(FILENAME,START,BOUNDS, simulated)), MSGNUM)]
+			 forward robot -m explorefile : explorefile(START,FILENAME);		 
+				
 		switchToPlan waitEndOfExploration
+
+	
 			
 	Plan waitEndOfExploration resumeLastPlan
 		sense time(999999999) local_gui_command, expdata, end -> continue, continue, continue;

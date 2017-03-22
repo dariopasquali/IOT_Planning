@@ -20,6 +20,12 @@ planName(scout).
 defaultSpeed(60).
 defaultDuration(500).
 
+initialConfigNavRobot :-
+	defaultSpeed(S),
+	defaultDuration(T),
+	actorobj(Actor),
+	Actor <- initialConfigRobot(S,T,S,S).
+
 %% LIST OF ELEMENT MANAGEMENT -----------------------------------------------
 
 add_tail([],X,[X]).

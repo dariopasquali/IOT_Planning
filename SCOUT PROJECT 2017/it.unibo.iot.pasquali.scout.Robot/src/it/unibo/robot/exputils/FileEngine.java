@@ -9,7 +9,7 @@ import it.unibo.robot.Robot;
 
 public class FileEngine extends Engine {
 
-	// the map on superclass mantain the current explored map
+	// the map on superclass maintain the current explored map
 	// this world map is used for the sensing
 	
 	Map worldMap = null;

@@ -4,8 +4,6 @@ robotTheory.pl
 ===============================================================
 */
 
-
-
 %% SENTENCES EXECUTION ------------------------------------------------------
 
 myRunTheSentence(CURPLAN, Actor, sentence( GUARD, MOVE, EVENTS, PLANS ) ):-

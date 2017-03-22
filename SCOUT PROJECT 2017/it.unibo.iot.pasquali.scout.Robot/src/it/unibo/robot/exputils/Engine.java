@@ -153,6 +153,9 @@ public class Engine {
 		
 		map.setCellClear(y, x);
 		
+		if(!(this instanceof FileEngine))
+			actor.moveForward();
+		
 		//System.out.println(currentMap.toString());
 	}
 	
@@ -179,12 +182,18 @@ public class Engine {
 		Direction cd = state.getDirection();
 		state.setDirection(leftMap.get(cd));
 		state.addCost(1);
+		
+		if(!(this instanceof FileEngine))
+			actor.turnLeft();
 	}
 	
 	public void turnRight() {
 		Direction cd = state.getDirection();
 		state.setDirection(rightMap.get(cd));
 		state.addCost(1);
+		
+		if(!(this instanceof FileEngine))
+			actor.turnRight();
 	}
 	
 	

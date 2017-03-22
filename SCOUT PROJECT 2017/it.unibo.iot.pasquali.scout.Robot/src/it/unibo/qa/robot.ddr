@@ -151,8 +151,8 @@ Robot mockScout QActor robot context ctxRobot{
  		memoCurrentMessage;
  		
  		onMsg explore : explore -> switchToPlan exploration;
- 		onMsg exploredebug : exploredebug ( START , BOUNDS) -> switchToPlan exploration;
- 		onMsg explorefile : explorefile (START, FILENAME) -> switchToPlan explorationDebug;
+ 		onMsg exploredebug : exploredebug ( START , BOUNDS) -> switchToPlan explorationDebug;
+ 		onMsg explorefile : explorefile (START, FILENAME) -> switchToPlan explorationFile;
  		onMsg navigate : navigate(PLAN, POS) -> switchToPlan navigation;
  		
  		repeatPlan 0		
@@ -165,8 +165,10 @@ Robot mockScout QActor robot context ctxRobot{
  
  // DEBUG EXPLORATION PLANS -----------------------------------		
  	
- 	Plan explorationDebug
+ 	Plan explorationFile
  		println("Let's explore a file!!"); 	
+ 		
+ 		solve initialConfigExpRobot time(0);
  		
  		[?? msg(_, _, SENDER, X, explorefile(START, FILENAME), MSGNUM)]
  								emit enableGUI : enableGUI(START, FILENAME);
@@ -196,6 +198,9 @@ Robot mockScout QActor robot context ctxRobot{
  		
  	Plan navigation
  		println("I Received some navigation data");
+ 		
+ 		solve initialConfigNavRobot time(0);
+ 		
  		[?? msg(_, _, SENDER, X, navigate(PLAN, POS), MSGNUM)] 
  			solve loadNavigationData(PLAN, POS) time (100000) onFailSwitchTo loadMapFailure;
  		

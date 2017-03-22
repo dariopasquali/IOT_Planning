@@ -22,6 +22,14 @@ defaultExpSpinDuration(1000).
 
 %% --------------- INIT -----------------------------
 
+initialConfigExpRobot :-
+	defaultExpSpeed(S),
+	defaultExpDuration(T),
+	defaultExpSpinSpeed(SS),
+	defaultExpSpinDuration(ST),
+	actorobj(Actor),
+	Actor <- initialConfigRobot(S,T,SS,ST).
+
 initExploreMap( position( SX , SY ), map( W , H ) ):-
 	actorobj(Actor),
 	Actor <- initExploreMap(SX, SY, W, H).
