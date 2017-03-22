@@ -37,6 +37,10 @@ initExploreMap( position( SX , SY ), map( W , H ) ):-
 	Actor <- initExplorerMap(SX, SY, W, H),
 	assert( newCell( position( SX , SY ) , clear ) ).
 	
+javaExplorer( position( SX , SY ), FILENAME ):-
+	actorobj(Actor),
+	Actor <- javaExplorer(SX , SY , FILENAME).
+	
 %% -------- SENSE/CHECK STATE -----------------------
 
 addCurrentToVisited :-
@@ -70,34 +74,39 @@ checkCurrentAlreadyVisited :-
 	
 updateModel( DIR , STATE ) :-
 	actorobj(Actor),
-	Actor <- updateModel( DIR , STATE ) returns POSITION,
-	assert( newCell( POSITION , STATE ) ).
+	actorPrintln(STATE),
+	Actor <- updateModel( DIR , STATE ),
+	Actor <- getNewCellX returns X,
+	Actor <- getNewCellY returns Y,
+	%%actorPrintln(position(X,Y)),
+	assert( newCell( position( X , Y) , STATE ) ).
 	
 
 %%---------------- MOVE -----------------------
 
 
-moveforward :-
+moveForward :-
+	actorPrintln("mossa avanti!!!!!"),
 	actorobj(Actor),
-	defaulExpSpeed(SPEED),
+	defaultExpSpeed(SPEED),
 	defaultExpDuration(TIME),	
-	myExecuteCmd(_, Actor, move(robotmove,forward,SPEED,TIME,0), "", "", RES ),
+	%%executeCmd(Actor, move(robotmove,forward,SPEED,TIME,0), "", "", RES ),
 	Actor <- makeMove(forward),
 	Actor <- addCurrentToVisited.
 	
 turnDoubleRight :-
 	actorobj(Actor),
-	defaulExpSpinSpeed(SPEED),
+	defaultExpSpinSpeed(SPEED),
 	defaultExpSpinDuration(TIME),	
-	myExecuteCmd(_, Actor, move(robotmove,right,SPEED,TIME,0), "", "", RES ),
+	%%executeCmd(Actor, move(robotmove,right,SPEED,TIME,0), "", "", RES ),
 	Actor <- turn(doubleRight).
 	
 
 turnDoubleLeft :-
 	actorobj(Actor),
-	defaulExpSpinSpeed(SPEED),
+	defaultExpSpinSpeed(SPEED),
 	defaultExpSpinDuration(TIME),	
-	myExecuteCmd(_, Actor, move(robotmove,left,SPEED,TIME,0), "", "", RES ),
+	%%executeCmd(Actor, move(robotmove,left,SPEED,TIME,0), "", "", RES ),
 	Actor <- turn(doubleLeft).
 	
 
@@ -105,9 +114,10 @@ turnDoubleLeft :-
 
 findNearestNotExploredCell :-
 	actorobj(Actor),
-	Actor <- findNearestNotExploredCell returns EXPLORE,
-	assert ( explore(EXPLORE) ).
-/*	
+	Actor <- findNearestNotExploredCell returns E,
+	retract(explore(_)),
+	assert( explore(E) ).
+	
 computeBestPath :-
 	actorobj(Actor),
 	Actor <- computeBestPath.
@@ -116,7 +126,7 @@ travel :-
 	actorobj(Actor),
 	Actor <- travel.
 
-*/
+
 
 
 

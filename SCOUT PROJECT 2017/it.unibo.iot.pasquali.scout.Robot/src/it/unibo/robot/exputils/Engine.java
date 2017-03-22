@@ -6,26 +6,38 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
+import it.unibo.contactEvent.interfaces.IEventItem;
 import it.unibo.domain.model.implementation.*;
 import it.unibo.domain.model.map.Map;
 import it.unibo.planning.astar.algo.Path;
 import it.unibo.planning.astar.domain.Move;
 import it.unibo.planning.enums.Direction;
 import it.unibo.planning.enums.MoveType;
+import it.unibo.qactors.action.AsynchActionResult;
+import it.unibo.qactors.action.IActorAction.ActionExecMode;
+import it.unibo.robot.Robot;
 
 public class Engine {
+	
+	protected final static int SLEEP_TIME = 300;
 	
 	protected Map map;
 	protected State state;
 	
 	protected Set<Point> visited;
 	
+	protected Robot actor;
+	
+	protected boolean checkModifyState;
+	
 	protected HashMap<Direction, Direction> leftMap,rightMap;
 	
-	public Engine(int startX, int startY, int mapW, int mapH) {
+	public Engine(int startX, int startY, int mapW, int mapH, Robot actor, boolean checkModifyState) {
 		
 		state = new State(startY, startX, Direction.NORTH);
 		map = new Map(mapH, mapW);
+		this.actor = actor;
+		this.checkModifyState = checkModifyState;
 		
 		visited = new HashSet<Point>();
 		
@@ -81,7 +93,9 @@ public class Engine {
 		}
 		else
 		{
-			moveForward();		
+			
+			if(!checkObjFront())
+				moveForward();		
 		}
 	}	
 	
@@ -300,8 +314,67 @@ public class Engine {
 		return next;
 	}
 	
+	protected void updateModelAndNotify(State position, String state)
+	{
+		if(state.equals("clear"))
+			map.setCellClear(position.getY(), position.getX());
+		else
+			map.setCellObj(position.getY(), position.getX());
+		
+		//expdata : expdata( POS , STATE )	
+		if(checkModifyState)
+		{	actor.emit("expdata", "expdata(position("+ position.getX() +
+					"," + position.getY()+"), "+state+")");
+			try {
+				Thread.sleep(SLEEP_TIME);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+	}
 	
-	
+	public boolean checkObjFront() {
+
+		State frontState = moveForwardSafe(state);
+		
+		IEventItem ev = actor.senseEvent(1000, "obstaclefront", "continue");
+		
+		if(ev != null && 
+				ev.getEventId().equals("obstaclefront") &&
+				ev.getMsg().equals("obstaclefront"))
+		{
+			
+			updateModelAndNotify(frontState, "object");			
+			return true;
+		}
+		else
+		{
+			updateModelAndNotify(frontState, "clear");			
+			return false;
+		}
+	}
+
+	public boolean checkObjLeft() {
+		
+		State leftState = moveForwardSafe(turnDoubleLeftSafe(state));
+
+		IEventItem ev = actor.senseEvent(1000, "obstacleleft", "continue");
+		
+		if(ev != null && 
+				ev.getEventId().equals("obstacleleft") &&
+				ev.getMsg().equals("obstacleleft"))
+		{
+			
+			updateModelAndNotify(leftState, "object");			
+			return true;
+		}
+		else
+		{
+			updateModelAndNotify(leftState, "clear");			
+			return false;
+		}	
+	}
 	
 	public boolean checkExploredLeft() {
 		
@@ -343,6 +416,19 @@ public class Engine {
 
 	public void setCurrentClear() {
 		map.setCellClear(state.getY(), state.getX());
+		
+		if(checkModifyState)
+		{
+			actor.emit("expdata", "expdata(position("+ state.getX() +		
+					"," + state.getY()+"), clear)");
+			
+			try {
+				Thread.sleep(SLEEP_TIME);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 	}
 
 	

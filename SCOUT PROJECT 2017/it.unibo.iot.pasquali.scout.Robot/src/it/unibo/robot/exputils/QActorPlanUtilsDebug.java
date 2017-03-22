@@ -76,7 +76,7 @@ public class QActorPlanUtilsDebug extends QActorPlanUtils{
 			
 			if(!obj)
 			{
-				events = "";
+				events = "noev";
 			}			
 			
 			IEventItem ev = new EventItem(events, events, new LocalTime(tout-1), "sensor");

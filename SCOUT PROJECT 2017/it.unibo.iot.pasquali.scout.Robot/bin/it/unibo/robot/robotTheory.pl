@@ -4,11 +4,6 @@ robotTheory.pl
 ===============================================================
 */
 
-%% robotMode(MODE).
-%% MODE = gui -> the guimanager is enable and show the gui (for simulation use)
-%% MODE = robot -> the guimanager is disabled (for physical robot use)
-
-robotMode(gui).
 
 
 %% SENTENCES EXECUTION ------------------------------------------------------
@@ -37,7 +32,16 @@ myExecuteCmd(CURPLAN, Actor,  move(print,ARG), Events, Plans, done(print) ):-
 myExecuteCmd(CURPLAN, Actor, move(solve,GOAL,DURATION), Events, Plans, RES ):-
 	Actor <- solveSentence(sentence(true, GOAL, 0, '', '', '')) returns AAR,
 	AAR <- getResult returns RES.
+
+%% DEBUG CONTROL -----------------------------------------------
+
+enableDebugSensing :-
+	actorobj(Actor),
+	Actor <- enableDebugSensing.
 	
+disableDebugSensing :-
+	actorobj(Actor),
+	Actor <- disableDebugSensing.	
 
 /*
 ------------------------------------------------------------

@@ -270,7 +270,7 @@ public abstract class AbstractConsole extends QActor {
 	    	nPlanIter++;
 	    		temporaryStr = "\"++++++++++++++++++ EXPLORATION DEBUG ++++++++++++++++++\"";
 	    		println( temporaryStr );  
-	    		if( (guardVars = QActorUtils.evalTheGuard(this, " !?msg(local_gui_command,\"event\",SENDER,none,local_gui_command(explore(START,BOUNDS)),MSGNUM)" )) != null ){
+	    		if( (guardVars = QActorUtils.evalTheGuard(this, " !?msg(local_gui_command,\"event\",SENDER,none,local_gui_command(explore(FILENAME,START,BOUNDS)),MSGNUM)" )) != null ){
 	    		parg = "showClearMap(BOUNDS)";
 	    		parg = QActorUtils.substituteVars(guardVars,parg);
 	    		//REGENERATE AKKA
@@ -284,8 +284,8 @@ public abstract class AbstractConsole extends QActor {
 	    		temporaryStr = "\"mappa pulita\"";
 	    		println( temporaryStr );  
 	    		if( (guardVars = QActorUtils.evalTheGuard(this, " ??msg(local_gui_command,\"event\",SENDER,none,local_gui_command(explore(FILENAME,START,BOUNDS)),MSGNUM)" )) != null ){
-	    		temporaryStr = QActorUtils.unifyMsgContent(pengine,"exploredebug(START,BOUNDS)","exploredebug(START,BOUNDS)", guardVars ).toString();
-	    		sendMsg("exploredebug","robot", QActorContext.dispatch, temporaryStr ); 
+	    		temporaryStr = QActorUtils.unifyMsgContent(pengine,"explorefile(START,FILENAME)","explorefile(START,FILENAME)", guardVars ).toString();
+	    		sendMsg("explorefile","robot", QActorContext.dispatch, temporaryStr ); 
 	    		}
 	    		if( ! planUtils.switchToPlan("waitEndOfExploration").getGoon() ) break;
 	    break;
@@ -313,7 +313,6 @@ public abstract class AbstractConsole extends QActor {
 	    			//println("			WARNING: sense timeout");
 	    			addRule("tout(senseevent,"+getName()+")");
 	    		}
-	    		memoCurrentEvent( false );
 	    		printCurrentEvent(false);
 	    		//onEvent
 	    		if( currentEvent.getEventId().equals("expdata") ){

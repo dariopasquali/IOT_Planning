@@ -16,11 +16,11 @@ digraph finite_state_machine {
   	iniziale -> init [label = ""];
   	
   	
-  	init -> waitEnableMessage [ label = ""];
+  	init -> enableOrDie [ label = ""];
   	
-  	waitEnableMessage -> waitMap [ label = "enableGUI(STATE)/"];
+  	enableOrDie -> waitMap [ label = ""];
   	
-  	waitMap -> waitUpdates [ label = "explorefile(START,FILENAME)/"];
+  	waitMap -> waitUpdates [ label = "enableGUI(START,FILENAME)/"];
   	
   	waitUpdates -> waitUpdates [ label = "show(POS,DIR)/end/abort/"];
 }

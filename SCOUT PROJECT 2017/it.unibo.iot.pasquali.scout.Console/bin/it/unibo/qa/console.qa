@@ -135,14 +135,14 @@ QActor console context ctxConsole{
 		println("++++++++++++++++++ EXPLORATION DEBUG ++++++++++++++++++");
 		
 			
-		[!? msg(local_gui_command, "event", SENDER, none, local_gui_command (explore(START,BOUNDS)), MSGNUM)]
+		[!? msg(local_gui_command, "event", SENDER, none, local_gui_command (explore(FILENAME,START,BOUNDS)), MSGNUM)]
 			solve showClearMap(BOUNDS) time(60000) onFailSwitchTo  explorationFailure;	
 		
 		println("mappa pulita");
 			
 		[?? msg(local_gui_command, "event", SENDER, none, local_gui_command (explore(FILENAME,START,BOUNDS)), MSGNUM)]
-//			 forward robot -m explorefile : explorefile(START,FILENAME);
-			 forward robot -m exploredebug : exploredebug(START,BOUNDS);				 
+			 forward robot -m explorefile : explorefile(START,FILENAME);
+//			 forward robot -m exploredebug : exploredebug(START,BOUNDS);				 
 		
 		
 		switchToPlan waitEndOfExploration
@@ -150,7 +150,6 @@ QActor console context ctxConsole{
 	Plan waitEndOfExploration resumeLastPlan
 		sense time(999999999) local_gui_command, expdata, end -> continue, continue, continue;
 		
-		memoCurrentEvent;
 		printCurrentEvent;
 		
 		onEvent expdata : expdata(POS , STATE) ->

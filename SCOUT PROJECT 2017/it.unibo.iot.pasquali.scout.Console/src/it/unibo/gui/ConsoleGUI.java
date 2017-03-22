@@ -523,6 +523,7 @@ public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt, I
 		txtOut.append(msg+"\n");
 		txtOut.validate();
 		txtOut.setCaretPosition(txtOut.getDocument().getLength());
+//		System.out.println(msg);
 	}
 	
 	@Override
@@ -541,6 +542,7 @@ public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt, I
 		txtOut.append(msg+"\n");
 		txtOut.validate();
 		txtOut.setCaretPosition(txtOut.getDocument().getLength());
+//		System.out.println(msg);
 	}
 
 	@Override

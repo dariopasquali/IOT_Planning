@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Set;
 
 import alice.tuprolog.Term;
+import it.unibo.contactEvent.interfaces.IEventItem;
 import it.unibo.domain.model.implementation.State;
 import it.unibo.domain.model.map.Map;
 import it.unibo.iot.configurator.Configurator;
@@ -30,6 +31,7 @@ import it.unibo.qactors.action.AsynchActionResult;
 import it.unibo.qactors.action.IActorAction.ActionExecMode;
 import it.unibo.qactors.akka.QActorPlanUtils;
 import it.unibo.robot.exputils.*;
+import it.unibo.robot.exputils.algo.Explorer;
 import it.unibo.robot.planutils.*;
 import it.unibo.qactors.QActorContext;
 
@@ -49,14 +51,14 @@ public class Robot extends AbstractRobot {
 	private HashMap<String, Move> moveMapping;
 	private HashMap<Integer, Direction> spinMap;
 	
+	private int newCellX = 0, newCellY = 0;
+	
 	
 	public Robot(String actorId, QActorContext myCtx, IOutputEnvView outEnvView ) throws Exception
 	{
 		super(actorId,myCtx,outEnvView ,it.unibo.qactors.QActorUtils.robotBase );
 		
 		QActorPlanUtils myUtils = new QActorPlanUtilsDebug(this, actionUtils, outEnvView);
-		
-		
 		
 		this.planUtils = myUtils;
 		
@@ -105,11 +107,6 @@ public class Robot extends AbstractRobot {
 		map = new Map(x,y);
 	}
 		
-//	public void setMapElements(List<String> elements)
-//	{
-//		map.addElementsFromList(elements);
-//	}
-	
 	public void setMapElements(String elements)
 	{
 		map.addElementFromString(elements);
@@ -135,20 +132,27 @@ public class Robot extends AbstractRobot {
 		// for debug use
 		// i know the initial position referred to a well defined map
 		
-		engine = new Engine(startX, startY, mapWidth, mapHeight);		
-		engine.setCurrentClear();
+		// Sensing & Movements on the real world
+		
+		engine = new Engine(startX, startY, mapWidth, mapHeight, this, true);
+		
+		Explorer explorer = new Explorer(this, engine);
+		explorer.startExploration();
+		
+		System.out.println("EXPLORATION DONE");	
 	}
 	
-
 	public void initExploreMap()
 	{
 		//TODO
 	}
 	
-	public void initExploreMap(int startX, int startY, String filename)
+	public void javaExplorer(int startX, int startY, String filename)
 	{
 		// for debug use
 		// i know all the map and explore it
+		
+		// Sensing on the virtual map
 		
 		Map m = null;
 		
@@ -184,14 +188,19 @@ public class Robot extends AbstractRobot {
 			}
 		}
 		
-		engine = new FileEngine(startX, startY, m);
+		engine = new FileEngine(startX, startY, m, this, true);
 		((QActorPlanUtilsDebug)planUtils).setEngine((FileEngine) engine);
 		
+		Explorer explorer = new Explorer(this, engine);
+		explorer.startExploration();
+		
+		System.out.println("EXPLORATION DONE");		
 	}
+	
 	
 	// EXPLORATION MANAGEMENT **********************************************
 	
-	
+/*	
 	public void makeMove(String direction)
 	{
 		if(direction.equals("forward"))
@@ -200,6 +209,8 @@ public class Robot extends AbstractRobot {
 			engine.moveBackward();
 		
 		State s = engine.getState();
+		
+		System.out.println(s.toString());
 		
 		String payload = "position("+s.getX() + "," + s.getY() + ")," +
 				s.getDirection().toString().toLowerCase();
@@ -215,6 +226,8 @@ public class Robot extends AbstractRobot {
 			engine.turnDoubleLeft();
 		
 		State s = engine.getState();
+		
+		System.out.println(s.toString());
 		
 		String payload = "position("+s.getX() + "," + s.getY() + ")," +
 				s.getDirection().toString().toLowerCase();
@@ -237,14 +250,28 @@ public class Robot extends AbstractRobot {
 		return engine.checkExploredLeft();
 	}	
 	
-	public String updateModel(String dir, String state)
+	public void updateModel(String dir, String state)
 	{
 		State next = engine.checkAndUpdate(dir, state);
 		
-		return "position( "+next.getX()+" , "+next.getY()+" )";
+		this.newCellX = next.getX();
+		this.newCellY = next.getY();
+		
+		//return "position("+next.getX()+","+next.getY()+")";
 	}
 	
+	public int getNewCellX()
+	{
+		return newCellX;
+	}
 	
+	public int getNewCellY()
+	{
+		return newCellY;
+	}
+	
+*/	
+
 	//GUI INTERACTION **************************************************
 	
 	public void showPathOnGui()
@@ -440,29 +467,28 @@ public class Robot extends AbstractRobot {
 		emit(eventName, payload);
 	}
 
-	public void mySenseEvent(int timeout, String eventsList, String plansList)
+	public IEventItem senseEvent(int timeout, String event, String plan)
 	{
-		eventsList = eventsList.replace("[","");
-		eventsList = eventsList.replace("]","");
-		plansList = plansList.replace("[","");
-		plansList = plansList.replace("]","");
-		
+		setCurrentEvent(null);
 		try
-		{
-			
+		{			
 			AsynchActionResult aar1 =
-					planUtils.senseEvents( timeout,eventsList, plansList,	"" , "",ActionExecMode.synch );
+					planUtils.senseEvents( timeout , event, plan, "" , "",ActionExecMode.synch );
 			
 			if( ! aar.getGoon() || aar.getTimeRemained() <= 0 )
 			{
     			println("WARNING: sense timeout");
     			addRule("tout(senseevent,"+getName()+")");
-    		}			
+    		}	
+			
+			return currentEvent;
 		}
 		catch (Exception e) {
 			
 			e.printStackTrace();
 		}
+		
+		return null;
 	    		
 	}
 	
@@ -553,6 +579,9 @@ public class Robot extends AbstractRobot {
 		
 		
 	}
+	
+	// REAL ROBOT CONTROLS *****************************************************
+	
 	
 
 }

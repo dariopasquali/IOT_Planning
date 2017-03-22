@@ -227,8 +227,11 @@ public class RobotGUI extends Frame implements IOutputEnvView, IBasicEnvAwt{
 	public void setVisible(boolean state)
 	{
 		frame.setVisible(state);
-		controlFrame.setVisible(state);
-		outputFrame.setVisible(state);
+	}
+	
+	public void setOutputVisible(boolean state) {
+		
+		outputFrame.setVisible(state);		
 	}
 
 	@Override
@@ -322,6 +325,8 @@ public class RobotGUI extends Frame implements IOutputEnvView, IBasicEnvAwt{
 		// TODO Auto-generated method stub
 		
 	}
+
+
 
 
 

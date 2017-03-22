@@ -83,7 +83,31 @@ protected IActorAction  action;
     	nPlanIter++;
     		temporaryStr = "\"load theories\"";
     		println( temporaryStr );  
+    		parg = "consult(\"robotTheory.pl\")";
+    		//REGENERATE AKKA
+    		aar = solveGoalReactive(parg,210000000,"","");
+    		//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
+    		if( aar.getInterrupted() ){
+    			curPlanInExec   = "init";
+    			if( ! aar.getGoon() ) break;
+    		} 			
+    		parg = "consult(\"navRobotTheory.pl\")";
+    		//REGENERATE AKKA
+    		aar = solveGoalReactive(parg,210000000,"","");
+    		//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
+    		if( aar.getInterrupted() ){
+    			curPlanInExec   = "init";
+    			if( ! aar.getGoon() ) break;
+    		} 			
     		parg = "consult(\"exploreRobotTheory.pl\")";
+    		//REGENERATE AKKA
+    		aar = solveGoalReactive(parg,210000000,"","");
+    		//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
+    		if( aar.getInterrupted() ){
+    			curPlanInExec   = "init";
+    			if( ! aar.getGoon() ) break;
+    		} 			
+    		parg = "consult(\"talkTheory.pl\")";
     		//REGENERATE AKKA
     		aar = solveGoalReactive(parg,210000000,"","");
     		//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
@@ -93,13 +117,7 @@ protected IActorAction  action;
     		} 			
     		temporaryStr = "\"++++++++++++++++++ robot(starts) ++++++++++++++++++\"";
     		println( temporaryStr );  
-    		if( (guardVars = QActorUtils.evalTheGuard(this, " !?robotMode(gui)" )) != null ){
-    		temporaryStr = QActorUtils.unifyMsgContent(pengine,"enableGUI(STATE)","enableGUI(on)", guardVars ).toString();
-    		sendMsg("enableGUI","guimanager", QActorContext.dispatch, temporaryStr ); 
-    		}
-    		else{ temporaryStr = QActorUtils.unifyMsgContent(pengine,"enableGUI(STATE)","enableGUI(off)", guardVars ).toString();
-    		sendMsg("enableGUI","guimanager", QActorContext.dispatch, temporaryStr ); 
-    		}if( ! planUtils.switchToPlan("waitConsoleCommand").getGoon() ) break;
+    		if( ! planUtils.switchToPlan("waitConsoleCommand").getGoon() ) break;
     break;
     }//while
     return returnValue;
@@ -149,7 +167,7 @@ protected IActorAction  action;
     		if( currentMessage.msgId().equals("explorefile") ){
     			String parg = "";
     			/* SwitchPlan */
-    			parg =  updateVars(  Term.createTerm("explorefile(START,FILENAME)"), Term.createTerm("explorefile(FILENAME)"), 
+    			parg =  updateVars(  Term.createTerm("explorefile(START,FILENAME)"), Term.createTerm("explorefile(START,FILENAME)"), 
     				    		  					Term.createTerm(currentMessage.msgContent()), parg);
     				if( parg != null ){
     					 if( ! planUtils.switchToPlan("exploration").getGoon() ) break; 
@@ -181,8 +199,24 @@ protected IActorAction  action;
     while(true){
     	curPlanInExec =  "exploration";	//within while since it can be lost by switchlan
     	nPlanIter++;
-    		temporaryStr = "\"\"";
+    		temporaryStr = "\"Let's explore a file!!\"";
     		println( temporaryStr );  
+    		if( (guardVars = QActorUtils.evalTheGuard(this, " !?msg(_,_,SENDER,X,explorefile(START,FILENAME),MSGNUM)" )) != null ){
+    		parg = "javaExplorer(START,FILENAME)";
+    		parg = QActorUtils.substituteVars(guardVars,parg);
+    		//REGENERATE AKKA
+    		aar = solveGoalReactive(parg,0,"abort","abort");
+    		//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
+    		if( aar.getInterrupted() ){
+    			curPlanInExec   = "exploration";
+    			if( ! aar.getGoon() ) break;
+    		} 			
+    		}
+    		temporaryStr = QActorUtils.unifyMsgContent(pengine, "end","end", guardVars ).toString();
+    		emit( "end", temporaryStr );
+    		temporaryStr = "\"Exploration Done ****************************\"";
+    		println( temporaryStr );  
+    		returnValue = continueWork; //we must restore nPlanIter and curPlanInExec of the 'interrupted' plan
     break;
     }//while
     return returnValue;
@@ -192,32 +226,54 @@ protected IActorAction  action;
        return false;  
     }
     }
-    public boolean fileexplorer() throws Exception{	//public to allow reflection
+    public boolean fileExplorer() throws Exception{	//public to allow reflection
     try{
     	int nPlanIter = 0;
-    	//curPlanInExec =  "fileexplorer";
+    	//curPlanInExec =  "fileExplorer";
     	boolean returnValue = suspendWork;
     while(true){
-    	curPlanInExec =  "fileexplorer";	//within while since it can be lost by switchlan
+    	curPlanInExec =  "fileExplorer";	//within while since it can be lost by switchlan
     	nPlanIter++;
-    		temporaryStr = "\"Let's explore by java!!\"";
+    		temporaryStr = "\"Let's explore a file!!\"";
     		println( temporaryStr );  
-    		if( (guardVars = QActorUtils.evalTheGuard(this, " ??msg(_,_,SENDER,X,explorefile(START,FILENAME),MSGNUM)" )) != null ){
+    		if( (guardVars = QActorUtils.evalTheGuard(this, " !?msg(_,_,SENDER,X,explorefile(START,FILENAME),MSGNUM)" )) != null ){
     		parg = "initExploreMap(START,FILENAME)";
     		parg = QActorUtils.substituteVars(guardVars,parg);
     		//REGENERATE AKKA
     		aar = solveGoalReactive(parg,0,"","");
     		//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
     		if( aar.getInterrupted() ){
-    			curPlanInExec   = "fileexplorer";
+    			curPlanInExec   = "fileExplorer";
     			if( ! aar.getGoon() ) break;
     		} 			
     		}
+    		if( (guardVars = QActorUtils.evalTheGuard(this, " ??msg(_,_,SENDER,X,explorefile(START,FILENAME),MSGNUM)" )) != null ){
+    		temporaryStr = QActorUtils.unifyMsgContent(pengine, "enableGUI(START,FILENAME)","enableGUI(START,FILENAME)", guardVars ).toString();
+    		emit( "enableGUI", temporaryStr );
+    		}
+    		if( ! planUtils.switchToPlan("notifyCell").getGoon() ) break;
+    		parg = "assert(explore(true))";
+    		//REGENERATE AKKA
+    		aar = solveGoalReactive(parg,0,"","");
+    		//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
+    		if( aar.getInterrupted() ){
+    			curPlanInExec   = "fileExplorer";
+    			if( ! aar.getGoon() ) break;
+    		} 			
+    		parg = "assert(fileExploration)";
+    		//REGENERATE AKKA
+    		aar = solveGoalReactive(parg,0,"","");
+    		//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
+    		if( aar.getInterrupted() ){
+    			curPlanInExec   = "fileExplorer";
+    			if( ! aar.getGoon() ) break;
+    		} 			
+    		if( ! planUtils.switchToPlan("findLeftWall").getGoon() ) break;
     break;
     }//while
     return returnValue;
     }catch(Exception e){
-       //println( getName() + " plan=fileexplorer WARNING:" + e.getMessage() );
+       //println( getName() + " plan=fileExplorer WARNING:" + e.getMessage() );
        QActorContext.terminateQActorSystem(this); 
        return false;  
     }
@@ -272,6 +328,17 @@ protected IActorAction  action;
     	nPlanIter++;
     		temporaryStr = "\"Find Left Wall!\"";
     		println( temporaryStr );  
+    		if( (guardVars = QActorUtils.evalTheGuard(this, " !?fileExploration" )) != null ){
+    		parg = "enableDebugSensing";
+    		parg = QActorUtils.substituteVars(guardVars,parg);
+    		//REGENERATE AKKA
+    		aar = solveGoalReactive(parg,0,"","");
+    		//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
+    		if( aar.getInterrupted() ){
+    			curPlanInExec   = "findLeftWall";
+    			if( ! aar.getGoon() ) break;
+    		} 			
+    		}
     		//senseEvent
     		timeoutval = 1000;
     		aar = planUtils.senseEvents( timeoutval,"obstaclefront","continue",
@@ -282,7 +349,7 @@ protected IActorAction  action;
     		}
     		//onEvent
     		if( currentEvent.getEventId().equals("obstaclefront") ){
-    		 		String parg="assert(obstacle(front,obstacle))";
+    		 		String parg="assert(obstacle(front,object))";
     		 		/* PHead */
     		 		parg =  updateVars( Term.createTerm("obstaclefront"), Term.createTerm("obstaclefront"), 
     		 			    		  					Term.createTerm(currentEvent.getMsg()), parg);
@@ -320,8 +387,8 @@ protected IActorAction  action;
     		if( (guardVars = QActorUtils.evalTheGuard(this, " ??obstacle(front,clear)" )) != null ){
     		if( ! planUtils.switchToPlan("notifyCell").getGoon() ) break;
     		}
-    		if( (guardVars = QActorUtils.evalTheGuard(this, " !?obstacle(front,obstacle)" )) != null ){
-    		parg = "updateModel(front,obstacle)";
+    		if( (guardVars = QActorUtils.evalTheGuard(this, " !?obstacle(front,object)" )) != null ){
+    		parg = "updateModel(front,object)";
     		parg = QActorUtils.substituteVars(guardVars,parg);
     		//REGENERATE AKKA
     		aar = solveGoalReactive(parg,0,"","");
@@ -331,10 +398,10 @@ protected IActorAction  action;
     			if( ! aar.getGoon() ) break;
     		} 			
     		}
-    		if( (guardVars = QActorUtils.evalTheGuard(this, " !?obstacle(front,obstacle)" )) != null ){
+    		if( (guardVars = QActorUtils.evalTheGuard(this, " !?obstacle(front,object)" )) != null ){
     		if( ! planUtils.switchToPlan("notifyCell").getGoon() ) break;
     		}
-    		if( (guardVars = QActorUtils.evalTheGuard(this, " ??obstacle(front,obstacle)" )) != null ){
+    		if( (guardVars = QActorUtils.evalTheGuard(this, " ??obstacle(front,object)" )) != null ){
     		if( ! planUtils.switchToPlan("turnRightAndFollow").getGoon() ) break;
     		}
     		//senseEvent
@@ -347,7 +414,7 @@ protected IActorAction  action;
     		}
     		//onEvent
     		if( currentEvent.getEventId().equals("obstacleleft") ){
-    		 		String parg="assert(obstacle(left,obstacle))";
+    		 		String parg="assert(obstacle(left,object))";
     		 		/* PHead */
     		 		parg =  updateVars( Term.createTerm("obstacleleft"), Term.createTerm("obstacleleft"), 
     		 			    		  					Term.createTerm(currentEvent.getMsg()), parg);
@@ -385,8 +452,8 @@ protected IActorAction  action;
     		if( (guardVars = QActorUtils.evalTheGuard(this, " ??obstacle(left,clear)" )) != null ){
     		if( ! planUtils.switchToPlan("notifyCell").getGoon() ) break;
     		}
-    		if( (guardVars = QActorUtils.evalTheGuard(this, " !?obstacle(left,obstacle)" )) != null ){
-    		parg = "updateModel(left,obstacle)";
+    		if( (guardVars = QActorUtils.evalTheGuard(this, " !?obstacle(left,object)" )) != null ){
+    		parg = "updateModel(left,object)";
     		parg = QActorUtils.substituteVars(guardVars,parg);
     		//REGENERATE AKKA
     		aar = solveGoalReactive(parg,0,"","");
@@ -396,13 +463,24 @@ protected IActorAction  action;
     			if( ! aar.getGoon() ) break;
     		} 			
     		}
-    		if( (guardVars = QActorUtils.evalTheGuard(this, " !?obstacle(left,obstacle)" )) != null ){
+    		if( (guardVars = QActorUtils.evalTheGuard(this, " !?obstacle(left,object)" )) != null ){
     		if( ! planUtils.switchToPlan("notifyCell").getGoon() ) break;
     		}
-    		if( (guardVars = QActorUtils.evalTheGuard(this, " ??obstacle(left,obstacle)" )) != null ){
+    		if( (guardVars = QActorUtils.evalTheGuard(this, " ??obstacle(left,object)" )) != null ){
     		if( ! planUtils.switchToPlan("followWall").getGoon() ) break;
     		}
-    		temporaryStr = "\"Forward Step\"";
+    		if( (guardVars = QActorUtils.evalTheGuard(this, " !?fileExploration" )) != null ){
+    		parg = "disableDebugSensing";
+    		parg = QActorUtils.substituteVars(guardVars,parg);
+    		//REGENERATE AKKA
+    		aar = solveGoalReactive(parg,0,"","");
+    		//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
+    		if( aar.getInterrupted() ){
+    			curPlanInExec   = "findLeftWall";
+    			if( ! aar.getGoon() ) break;
+    		} 			
+    		}
+    		temporaryStr = "\"Find Left Wall - Forward Step\"";
     		println( temporaryStr );  
     		parg = "moveForward";
     		//REGENERATE AKKA
@@ -420,6 +498,10 @@ protected IActorAction  action;
     			curPlanInExec   = "findLeftWall";
     			if( ! aar.getGoon() ) break;
     		} 			
+    		//delay
+    		aar = delayReactive(1000,"" , "");
+    		if( aar.getInterrupted() ) curPlanInExec   = "findLeftWall";
+    		if( ! aar.getGoon() ) break;
     		if( planUtils.repeatPlan(nPlanIter,0).getGoon() ) continue;
     break;
     }//while
@@ -448,6 +530,10 @@ protected IActorAction  action;
     			curPlanInExec   = "turnRightAndFollow";
     			if( ! aar.getGoon() ) break;
     		} 			
+    		//delay
+    		aar = delayReactive(1000,"" , "");
+    		if( aar.getInterrupted() ) curPlanInExec   = "turnRightAndFollow";
+    		if( ! aar.getGoon() ) break;
     		if( ! planUtils.switchToPlan("followWall").getGoon() ) break;
     break;
     }//while
@@ -476,6 +562,10 @@ protected IActorAction  action;
     			curPlanInExec   = "turnLeftAndFind";
     			if( ! aar.getGoon() ) break;
     		} 			
+    		//delay
+    		aar = delayReactive(1000,"" , "");
+    		if( aar.getInterrupted() ) curPlanInExec   = "turnLeftAndFind";
+    		if( ! aar.getGoon() ) break;
     		if( ! planUtils.switchToPlan("findLeftWall").getGoon() ) break;
     break;
     }//while
@@ -504,6 +594,10 @@ protected IActorAction  action;
     			curPlanInExec   = "turnLeft";
     			if( ! aar.getGoon() ) break;
     		} 			
+    		//delay
+    		aar = delayReactive(1000,"" , "");
+    		if( aar.getInterrupted() ) curPlanInExec   = "turnLeft";
+    		if( ! aar.getGoon() ) break;
     		returnValue = continueWork;  
     break;
     }//while
@@ -532,6 +626,10 @@ protected IActorAction  action;
     			curPlanInExec   = "turnRight";
     			if( ! aar.getGoon() ) break;
     		} 			
+    		//delay
+    		aar = delayReactive(1000,"" , "");
+    		if( aar.getInterrupted() ) curPlanInExec   = "turnRight";
+    		if( ! aar.getGoon() ) break;
     		returnValue = continueWork;  
     break;
     }//while
@@ -552,6 +650,17 @@ protected IActorAction  action;
     	nPlanIter++;
     		temporaryStr = "\"Follow Wall\"";
     		println( temporaryStr );  
+    		if( (guardVars = QActorUtils.evalTheGuard(this, " !?fileExploration" )) != null ){
+    		parg = "enableDebugSensing";
+    		parg = QActorUtils.substituteVars(guardVars,parg);
+    		//REGENERATE AKKA
+    		aar = solveGoalReactive(parg,0,"","");
+    		//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
+    		if( aar.getInterrupted() ){
+    			curPlanInExec   = "followWall";
+    			if( ! aar.getGoon() ) break;
+    		} 			
+    		}
     		//senseEvent
     		timeoutval = 1000;
     		aar = planUtils.senseEvents( timeoutval,"obstacleleft","continue",
@@ -600,6 +709,9 @@ protected IActorAction  action;
     		if( (guardVars = QActorUtils.evalTheGuard(this, " ??obstacle(left,clear)" )) != null ){
     		if( ! planUtils.switchToPlan("notifyCell").getGoon() ) break;
     		}
+    		if( (guardVars = QActorUtils.evalTheGuard(this, " ??obstacle(left,clear)" )) != null ){
+    		if( ! planUtils.switchToPlan("turnLeftAndFind").getGoon() ) break;
+    		}
     		if( (guardVars = QActorUtils.evalTheGuard(this, " !?obstacle(left,object)" )) != null ){
     		parg = "updateModel(left,object)";
     		parg = QActorUtils.substituteVars(guardVars,parg);
@@ -613,9 +725,6 @@ protected IActorAction  action;
     		}
     		if( (guardVars = QActorUtils.evalTheGuard(this, " !?obstacle(left,object)" )) != null ){
     		if( ! planUtils.switchToPlan("notifyCell").getGoon() ) break;
-    		}
-    		if( (guardVars = QActorUtils.evalTheGuard(this, " ??obstacle(left,object)" )) != null ){
-    		if( ! planUtils.switchToPlan("turnLeftAndFind").getGoon() ) break;
     		}
     		//senseEvent
     		timeoutval = 1000;
@@ -685,6 +794,17 @@ protected IActorAction  action;
     		if( (guardVars = QActorUtils.evalTheGuard(this, " ??obstacle(front,object)" )) != null ){
     		if( ! planUtils.switchToPlan("frontWallFound").getGoon() ) break;
     		}
+    		if( (guardVars = QActorUtils.evalTheGuard(this, " !?fileExploration" )) != null ){
+    		parg = "disableDebugSensing";
+    		parg = QActorUtils.substituteVars(guardVars,parg);
+    		//REGENERATE AKKA
+    		aar = solveGoalReactive(parg,0,"","");
+    		//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
+    		if( aar.getInterrupted() ){
+    			curPlanInExec   = "followWall";
+    			if( ! aar.getGoon() ) break;
+    		} 			
+    		}
     		if( planUtils.repeatPlan(nPlanIter,0).getGoon() ) continue;
     break;
     }//while
@@ -705,6 +825,17 @@ protected IActorAction  action;
     	nPlanIter++;
     		temporaryStr = "\"I hit a wall\"";
     		println( temporaryStr );  
+    		if( (guardVars = QActorUtils.evalTheGuard(this, " !?fileExploration" )) != null ){
+    		parg = "enableDebugSensing";
+    		parg = QActorUtils.substituteVars(guardVars,parg);
+    		//REGENERATE AKKA
+    		aar = solveGoalReactive(parg,0,"","");
+    		//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
+    		if( aar.getInterrupted() ){
+    			curPlanInExec   = "frontWallFound";
+    			if( ! aar.getGoon() ) break;
+    		} 			
+    		}
     		//senseEvent
     		timeoutval = 1000;
     		aar = planUtils.senseEvents( timeoutval,"obstacleleft","continue",
@@ -775,6 +906,17 @@ protected IActorAction  action;
     			curPlanInExec   = "frontWallFound";
     			if( ! aar.getGoon() ) break;
     		} 			
+    		if( (guardVars = QActorUtils.evalTheGuard(this, " !?fileExploration" )) != null ){
+    		parg = "disableDebugSensing";
+    		parg = QActorUtils.substituteVars(guardVars,parg);
+    		//REGENERATE AKKA
+    		aar = solveGoalReactive(parg,0,"","");
+    		//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
+    		if( aar.getInterrupted() ){
+    			curPlanInExec   = "frontWallFound";
+    			if( ! aar.getGoon() ) break;
+    		} 			
+    		}
     		if( (guardVars = QActorUtils.evalTheGuard(this, " !?notLeftObjectAndNotExplored(true)" )) != null ){
     		if( ! planUtils.switchToPlan("turnLeft").getGoon() ) break;
     		}
@@ -807,6 +949,10 @@ protected IActorAction  action;
     			curPlanInExec   = "moveAndCheckLoop";
     			if( ! aar.getGoon() ) break;
     		} 			
+    		//delay
+    		aar = delayReactive(1000,"" , "");
+    		if( aar.getInterrupted() ) curPlanInExec   = "moveAndCheckLoop";
+    		if( ! aar.getGoon() ) break;
     		parg = "checkCurrentAlreadyVisited";
     		//REGENERATE AKKA
     		aar = solveGoalReactive(parg,100000,"","");
@@ -892,7 +1038,7 @@ protected IActorAction  action;
     while(true){
     	curPlanInExec =  "notifyCell";	//within while since it can be lost by switchlan
     	nPlanIter++;
-    		temporaryStr = "\"notify clear cell\"";
+    		temporaryStr = "\"notify cell\"";
     		println( temporaryStr );  
     		if( (guardVars = QActorUtils.evalTheGuard(this, " ??newCell(POS,STATE)" )) != null ){
     		temporaryStr = QActorUtils.unifyMsgContent(pengine, "expdata(POS,STATE)","expdata(POS,STATE)", guardVars ).toString();
