@@ -40,7 +40,7 @@ public class Console extends AbstractConsole implements IActivity{
 	{
 		super(actorId, myCtx, env);
 		((IGUI) env).setController(this);
-		env.setVisible(true);
+		((ConsoleGUI) env).setVisible(true);
 		path = null;
 	}
 	

@@ -79,9 +79,9 @@ public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt, I
 	}
 	
 	public ConsoleGUI() {
-		//initializeFrame();
+		initializeFrame();
 		initializeControlFrame();
-		//initializeOutputFrame();
+		initializeOutputFrame();
 		
 		type = null;
 	}
@@ -589,6 +589,7 @@ public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt, I
 	
 // ----------------------------------------------------------	
 
+	@Override
 	public void setVisible(boolean state)
 	{
 		frame.setVisible(state);

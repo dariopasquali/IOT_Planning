@@ -171,7 +171,7 @@ Robot mockScout QActor robot context ctxRobot{
  		
  		solve initialConfigExpRobot time(0);
  		
- 		[?? msg(_, _, SENDER, X, explorefile(START, FILENAME), MSGNUM)]
+ 		[!? msg(_, _, SENDER, X, explorefile(START, FILENAME), MSGNUM)]
  								emit enableGUI : enableGUI(START, FILENAME);
  			
  		[?? msg(_, _, SENDER, X, explorefile(START, FILENAME), MSGNUM)]

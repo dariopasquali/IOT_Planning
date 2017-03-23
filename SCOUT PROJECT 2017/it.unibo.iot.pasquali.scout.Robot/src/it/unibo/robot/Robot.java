@@ -312,7 +312,7 @@ public class Robot extends AbstractRobot {
 		println(speed);
 		println(time);
 		
-		Plan pathPlan = new Plan("path");
+		Plan pathPlan = new Plan(planName);
 		
 		pathPlan.addPrint("Inizio Navigazione");
 		

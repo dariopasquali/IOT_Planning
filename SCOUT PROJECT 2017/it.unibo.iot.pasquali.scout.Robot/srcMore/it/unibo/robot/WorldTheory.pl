@@ -221,8 +221,11 @@ executeCmd( Actor, move(showplan,P), Events, Plans ):-
 	%% actorPrintln( showPlan(P) ),
 	showPlan(P ).
 showPlan( P ):-
+	actorPrintln("showPlan"),
+	actorPrintln(P),
 	showPlan( P,1 ).
 showPlan( P, PC ):-
+	actorPrintln(PC),
 	plan(PC, P, S) ,!,
 	actorPrintln(  plan(PC, P, S )  ),
 	PC1 is PC + 1,

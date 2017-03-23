@@ -228,7 +228,7 @@ protected IActorAction  action;
     			curPlanInExec   = "explorationFile";
     			if( ! aar.getGoon() ) break;
     		} 			
-    		if( (guardVars = QActorUtils.evalTheGuard(this, " ??msg(_,_,SENDER,X,explorefile(START,FILENAME),MSGNUM)" )) != null ){
+    		if( (guardVars = QActorUtils.evalTheGuard(this, " !?msg(_,_,SENDER,X,explorefile(START,FILENAME),MSGNUM)" )) != null ){
     		temporaryStr = QActorUtils.unifyMsgContent(pengine, "enableGUI(START,FILENAME)","enableGUI(START,FILENAME)", guardVars ).toString();
     		emit( "enableGUI", temporaryStr );
     		}
