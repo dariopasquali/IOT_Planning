@@ -74,6 +74,9 @@ public class Console extends AbstractConsole implements IActivity{
 		
 		public void updateMap(int x, int y, String state)
 		{
+			if(x<0 || y<0)
+				return;
+			
 			map.setCell(y, x, Map.fromStringToState(state));
 			((ConsoleGUI) env).setCellState(y, x, CellState.fromString(state));
 		}

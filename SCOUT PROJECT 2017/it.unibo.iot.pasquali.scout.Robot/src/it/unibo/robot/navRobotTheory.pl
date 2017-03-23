@@ -18,7 +18,7 @@ planFilename("scout.txt").
 planName(scout).
 
 defaultSpeed(60).
-defaultDuration(500).
+defaultDuration(1000).
 
 initialConfigNavRobot :-
 	defaultSpeed(S),
@@ -81,7 +81,8 @@ loadNavigationData(PLAN, POS, MODE) :-
 
 loadThePlan( FName ):-
 	actorobj(Actor),
-	Actor <-  consultFromFile(  FName  ).
+	actorPrintln(FName),
+	Actor <- consultFromFile(  FName  ).
 
 myRunPlan(PLANNAME) :-
 	runPlan(PLANNAME).
@@ -97,10 +98,10 @@ myExecPlan(CURPLAN,Actor,P,PC) :-
 	PC1 is PC + 1,
 	myExecPlan(CURPLAN,Actor,P,PC1).
 
-continueProgram :-
-	actorobj(Actor),
-	Actor <- switchToPlan('notifyEndOfNavigation').
-	
+executeCmd( Actor,  move(switchplan,PNAME), Events, Plans, done(switchplan) ):-
+	actorPrintln(  PNAME ),
+	Actor <- switchPlan(PNAME).
+
 notifyEnd :-
 	actorPrintln("CRISTO DIO").
 

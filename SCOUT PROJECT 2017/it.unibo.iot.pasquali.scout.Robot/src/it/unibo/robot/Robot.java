@@ -28,6 +28,7 @@ import it.unibo.robot.exploration.algo.Explorer;
 import it.unibo.robot.planutils.*;
 import it.unibo.robot.utility.*;
 import it.unibo.qactors.QActorContext;
+import it.unibo.qactors.QActorUtils;
 
 //
 /**
@@ -72,7 +73,6 @@ public class Robot extends AbstractRobot {
 		spinMap.put(6, Direction.WEST);
 		spinMap.put(7, Direction.NORTH_WEST);
 		*/
-
 	}
 
 //}}
@@ -353,7 +353,7 @@ public class Robot extends AbstractRobot {
 		}
 		
 		pathPlan.addPrint("fine Navigazione");
-		pathPlan.addSolve("continueProgram", ""+0);
+		pathPlan.addSwitchPlan("notifyEndOfNavigation");
 		
 		PlanSaver planSaver = new PlanSaver(planName, PlanExtension.PLAIN_TEXT);
 		planSaver.addPlan(pathPlan);
@@ -416,7 +416,18 @@ public class Robot extends AbstractRobot {
 		emit("show", "show(" + payload + ")");
 	}
 	
+	public void consultFromFile(String filename)
+	{
+		System.out.println("loading...");
+		QActorUtils.consultFromFile(pengine, filename);
+	}		
 	
+//	@Override
+//	public AsynchActionResult solveGoalReactive(String goal, int time, String evList, String planList){
+//		
+//		
+//		return new AsynchActionResult(null, time+1, true, true, "", null);		
+//	}
 	
 	
 	/*
@@ -577,10 +588,20 @@ public class Robot extends AbstractRobot {
 		catch(Exception e)
 		{
 			e.printStackTrace();
+		}		
+	}
+	
+	public void switchPlan(String plan)
+	{		
+		try 
+		{
+			planUtils.switchToPlan(plan);
 		}
-		
-		
-		
+		catch (Exception e) 
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 //}}

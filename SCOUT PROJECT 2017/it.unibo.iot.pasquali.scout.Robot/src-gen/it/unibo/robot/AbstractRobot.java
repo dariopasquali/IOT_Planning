@@ -393,26 +393,6 @@ protected IActorAction  action;
        return false;  
     }
     }
-    public boolean abort() throws Exception{	//public to allow reflection
-    try{
-    	int nPlanIter = 0;
-    	//curPlanInExec =  "abort";
-    	boolean returnValue = suspendWork;
-    while(true){
-    	curPlanInExec =  "abort";	//within while since it can be lost by switchlan
-    	nPlanIter++;
-    		temporaryStr = "\"Current command aborted\"";
-    		println( temporaryStr );  
-    		if( ! planUtils.switchToPlan("waitConsoleCommand").getGoon() ) break;
-    break;
-    }//while
-    return returnValue;
-    }catch(Exception e){
-       //println( getName() + " plan=abort WARNING:" + e.getMessage() );
-       QActorContext.terminateQActorSystem(this); 
-       return false;  
-    }
-    }
     public boolean waitAndEvaluate() throws Exception{	//public to allow reflection
     try{
     	int nPlanIter = 0;
@@ -497,21 +477,36 @@ protected IActorAction  action;
     	nPlanIter++;
     		temporaryStr = "\"passato al piano successivo\"";
     		println( temporaryStr );  
-    		parg = "notifyEnd";
-    		//REGENERATE AKKA
-    		aar = solveGoalReactive(parg,10000,"","");
-    		//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
-    		if( aar.getInterrupted() ){
-    			curPlanInExec   = "notifyEndOfNavigation";
-    			if( ! aar.getGoon() ) break;
-    		} 			
-    		temporaryStr = "\"ma la chiamata prolog fallisce per un motivo non ben definito\"";
+    		temporaryStr = QActorUtils.unifyMsgContent(pengine, "end","end", guardVars ).toString();
+    		emit( "end", temporaryStr );
+    		temporaryStr = "\"Da questo momento le chiamate prolog non funzionano più\"";
     		println( temporaryStr );  
+    		if( ! planUtils.switchToPlan("waitConsoleCommand").getGoon() ) break;
     break;
     }//while
     return returnValue;
     }catch(Exception e){
        //println( getName() + " plan=notifyEndOfNavigation WARNING:" + e.getMessage() );
+       QActorContext.terminateQActorSystem(this); 
+       return false;  
+    }
+    }
+    public boolean abort() throws Exception{	//public to allow reflection
+    try{
+    	int nPlanIter = 0;
+    	//curPlanInExec =  "abort";
+    	boolean returnValue = suspendWork;
+    while(true){
+    	curPlanInExec =  "abort";	//within while since it can be lost by switchlan
+    	nPlanIter++;
+    		temporaryStr = "\"Current command aborted\"";
+    		println( temporaryStr );  
+    		if( ! planUtils.switchToPlan("waitConsoleCommand").getGoon() ) break;
+    break;
+    }//while
+    return returnValue;
+    }catch(Exception e){
+       //println( getName() + " plan=abort WARNING:" + e.getMessage() );
        QActorContext.terminateQActorSystem(this); 
        return false;  
     }

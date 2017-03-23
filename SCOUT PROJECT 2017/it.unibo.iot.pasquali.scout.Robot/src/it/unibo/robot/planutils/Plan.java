@@ -150,7 +150,7 @@ public class Plan {
 	public void addSwitchPlan(String planname)
 	{
 		
-		plan += "plan("+moveCounter+","+planName+", sentence(true,move(switchplan("+planname+")),'', '' ))\n";
+		plan += "plan("+moveCounter+","+planName+", sentence(true,move(switchplan , "+planname+"),'', '' ))\n";
 		moveCounter++;
 	}
 	

@@ -226,10 +226,6 @@ Robot mockScout QActor robot context ctxRobot{
 		// i's a big atto di fede 
  		//solve runResumablePlan(path) time(2100000000)
  	
- 	Plan abort 
- 		println("Current command aborted");
- 		switchToPlan waitConsoleCommand
- 		
  	Plan waitAndEvaluate resumeLastPlan
  		
  		println("maybe there is an unexpected static obstacle");
@@ -257,10 +253,15 @@ Robot mockScout QActor robot context ctxRobot{
  	
  		println("passato al piano successivo"); 	
  			
- 		solve notifyEnd time(10000) onFailSwitchTo generalPrologFailure;	
+ 		emit end : end;	
  		
- 		println("ma la chiamata prolog fallisce per un motivo non ben definito")
-		//TODO	
+ 		println("Da questo momento le chiamate prolog non funzionano più");
+ 		
+ 		switchToPlan waitConsoleCommand	
+ 		
+ 	Plan abort 
+ 		println("Current command aborted");
+ 		switchToPlan waitConsoleCommand
 	
 // ------------------------------------------------------------------
 //	PROLOG FAILURE ERROR HANDLERS

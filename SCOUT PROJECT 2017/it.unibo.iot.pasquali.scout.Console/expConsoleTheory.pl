@@ -16,8 +16,6 @@ showClearMap( map(W,H) ) :-
 	Actor <- showClearMap(W,H).
 
 updateMap( position( X , Y ) , STATE) :-
-	X>=0,
-	Y>=0,
 	actorobj(Actor),
 	actorPrintln(STATE),
 	Actor <- updateMap( X , Y , STATE).
