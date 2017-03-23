@@ -1,4 +1,4 @@
-package it.unibo.robot.exputils.algo;
+package it.unibo.robot.exploration.algo;
 
 import java.awt.Point;
 import java.util.ArrayList;
@@ -11,7 +11,7 @@ import it.unibo.planning.astar.algo.Path;
 import it.unibo.planning.astar.engine.AStarEngine;
 import it.unibo.planning.enums.PositionMove;
 import it.unibo.robot.Robot;
-import it.unibo.robot.exputils.Engine;
+import it.unibo.robot.utility.Engine;
 
 public class Explorer {
 

@@ -101,7 +101,7 @@ public class State implements Comparable<State>{
 	@Override
 	public String toString()
 	{
-		return "state("+y+","+x+","+dir.toString()+","+getCost()+")";
+		return "state("+x+","+y+","+dir.toString()+")";
 	}
 
 	public Point getCoordinates() {

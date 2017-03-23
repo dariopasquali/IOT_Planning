@@ -147,6 +147,13 @@ public class Plan {
 		moveCounter++;
 	}
 	
+	public void addSwitchPlan(String planname)
+	{
+		
+		plan += "plan("+moveCounter+","+planName+", sentence(true,move(switchplan("+planname+")),'', '' ))\n";
+		moveCounter++;
+	}
+	
 	public String getPlan()
 	{
 		return plan;

@@ -7,7 +7,6 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -22,38 +21,38 @@ import it.unibo.iot.models.sensorData.distance.IDistanceSensorData;
 import it.unibo.iot.sensors.ISensor;
 import it.unibo.iot.sensors.distanceSensor.DistanceSensor;
 import it.unibo.is.interfaces.IOutputEnvView;
-import it.unibo.planning.astar.domain.Move;
-import it.unibo.planning.enums.Direction;
-import it.unibo.planning.enums.ForwardMoveType;
-import it.unibo.planning.enums.MoveType;
-import it.unibo.planning.enums.SpinDirection;
 import it.unibo.qactors.action.AsynchActionResult;
 import it.unibo.qactors.action.IActorAction.ActionExecMode;
 import it.unibo.qactors.akka.QActorPlanUtils;
-import it.unibo.robot.exputils.*;
-import it.unibo.robot.exputils.algo.Explorer;
+import it.unibo.robot.exploration.algo.Explorer;
 import it.unibo.robot.planutils.*;
+import it.unibo.robot.utility.*;
 import it.unibo.qactors.QActorContext;
 
 //
+/**
+ * @author Dario
+ *
+ */
+/**
+ * @author Dario
+ *
+ */
 public class Robot extends AbstractRobot { 
+	
+	private final static String MODE_SIMULATED = "simulated";
+	private final static String MODE_REAL_ROBOT = "robot";
 	
 	private int defaultSpeed, defaultTime;
 	private int defaultTurnSpeed, defaultTurnTime;
 	
-	private Map map;
 	private ArrayList<State> path;
-	
-	private State position, goal;
-	private Direction direction;
-	int spinFactor = 1;
 	
 	private Engine engine = null;	
 	
+	//private HashMap<Integer, Direction> spinMap;
 	
-	private HashMap<String, Move> moveMapping;
-	private HashMap<Integer, Direction> spinMap;
-	
+//{{ CONSTRUCTOR
 	
 	public Robot(String actorId, QActorContext myCtx, IOutputEnvView outEnvView ) throws Exception
 	{
@@ -61,34 +60,8 @@ public class Robot extends AbstractRobot {
 		
 		QActorPlanUtils myUtils = new QActorPlanUtilsDebug(this, actionUtils, outEnvView);
 		
-		this.planUtils = myUtils;
-		
-		this.moveMapping = new HashMap<String, Move>();
-		moveMapping.put("forwardN", new Move(ForwardMoveType.TILED));
-		moveMapping.put("forwardE", new Move(ForwardMoveType.TILED));
-		moveMapping.put("forwardW", new Move(ForwardMoveType.TILED));
-		moveMapping.put("forwardS", new Move(ForwardMoveType.TILED));
-		moveMapping.put("forwardNE", new Move(ForwardMoveType.DIAGONAL));
-		moveMapping.put("forwardNW", new Move(ForwardMoveType.DIAGONAL));
-		moveMapping.put("forwardSE", new Move(ForwardMoveType.DIAGONAL));
-		moveMapping.put("forwardSW", new Move(ForwardMoveType.DIAGONAL));
-		moveMapping.put("leftN", new Move(SpinDirection.LEFT));
-		moveMapping.put("leftNE", new Move(SpinDirection.LEFT));
-		moveMapping.put("leftE", new Move(SpinDirection.LEFT));
-		moveMapping.put("leftSE", new Move(SpinDirection.LEFT));
-		moveMapping.put("leftS", new Move(SpinDirection.LEFT));
-		moveMapping.put("leftSW", new Move(SpinDirection.LEFT));
-		moveMapping.put("leftW", new Move(SpinDirection.LEFT));
-		moveMapping.put("leftNW", new Move(SpinDirection.LEFT));
-		moveMapping.put("rightN", new Move(SpinDirection.RIGHT));
-		moveMapping.put("rightNE", new Move(SpinDirection.RIGHT));
-		moveMapping.put("rightE", new Move(SpinDirection.RIGHT));
-		moveMapping.put("rightSE", new Move(SpinDirection.RIGHT));
-		moveMapping.put("rightS", new Move(SpinDirection.RIGHT));
-		moveMapping.put("rightSW", new Move(SpinDirection.RIGHT));
-		moveMapping.put("rightW", new Move(SpinDirection.RIGHT));
-		moveMapping.put("rightNW", new Move(SpinDirection.RIGHT));
-		
+		this.planUtils = myUtils;		
+		/*
 		spinMap = new HashMap<Integer, Direction>();
 		spinMap.put(0, Direction.NORTH);
 		spinMap.put(1, Direction.NORTH_EAST);
@@ -98,11 +71,25 @@ public class Robot extends AbstractRobot {
 		spinMap.put(5, Direction.SOUTH_WEST);
 		spinMap.put(6, Direction.WEST);
 		spinMap.put(7, Direction.NORTH_WEST);
-		
+		*/
+
 	}
+
+//}}
+
 	
-	// INITIALIZATION - COMMON ******************************************************
+//{{ INITIALIZATION - COMMON ******************************************************
 	
+	/**
+	 * To config the speed and duration of the movements.
+	 * Those params are defined in the prolog files navRobotTheory.pl and expRobotTheory.pl.
+	 * You can change that without recompiling all the project. 
+	 * 
+	 * @param defSpeed		default forward/backward speed
+	 * @param defTime		default forward/backward time
+	 * @param defTurnSpeed	default rotate speed (different between exp and nav)
+	 * @param defTurnTime	default rotate time (different between exp and nav)
+	 */
 	public void initialConfigRobot(int defSpeed, int defTime, int defTurnSpeed, int defTurnTime)
 	{
 		this.defaultSpeed = defSpeed;
@@ -110,22 +97,18 @@ public class Robot extends AbstractRobot {
 		this.defaultTurnSpeed = defTurnSpeed;
 		this.defaultTurnTime = defTurnTime;
 	}
+//}}
 	
 	
-	// INITIALIZATION - NAVIGATION **************************************************
-	
-	public void createMap(int x, int y)
-	{
-		map = new Map(x,y);
-	}
+//{{ INITIALIZATION - NAVIGATION **************************************************
 		
-	public void setMapElements(String elements)
-	{
-		map.addElementFromString(elements);
-	}
-	
+	/** 
+	 * Redefined in order to add my personal events
+	 * 
+	 * @see it.unibo.robot.AbstractRobot#addSensorObservers()
+	 */
 	@Override
-	protected void addSensorObservers(){ //TODO
+	protected void addSensorObservers(){
 		
 		Set<ISensor<?>> sensors = Configurator.getInstance().getSensors(SensorType.DISTANCE);
 		
@@ -136,16 +119,24 @@ public class Robot extends AbstractRobot {
 		}
 		
 	}
+//}}	
+
 	
-	// INITIALIZATION - EXPLORATION *************************************************
+//{{ INITIALIZATION - EXPLORATION *************************************************
 	
-	public void initExploreMap(int startX, int startY, int mapWidth, int mapHeight)
-	{
-		// for debug use
-		// i know the initial position referred to a well defined map
-		
-		// Sensing & Movements on the real world
-		
+	/**
+	 * Debug exploration, i know the initial position referred to a well defined map.</br>
+	 * Sensing and Movements are on the real world.</br>
+	 * This is the method used with the raspberry Pi.<br>
+	 * 
+	 * It use the java Explorer.
+	 * 
+	 * @param startX		initial X position
+	 * @param startY		initial Y position
+	 * @param mapWidth		map width (X)
+	 * @param mapHeight		map height (Y)
+	 */
+	public void initExploreMap(int startX, int startY, int mapWidth, int mapHeight){
 		engine = new Engine(startX, startY, mapWidth, mapHeight, this, true);
 		
 		Explorer explorer = new Explorer(this, engine);
@@ -154,18 +145,23 @@ public class Robot extends AbstractRobot {
 		System.out.println("EXPLORATION DONE");	
 	}
 	
-	public void initExploreMap()
-	{
+	/**
+	 * Normal Exploration Method, without any information
+	 */
+	public void initExploreMap(){
 		//TODO
 	}
 	
-	public void javaExplorer(int startX, int startY, String filename)
-	{
-		// for debug use
-		// i know all the map and explore it
-		
-		// Sensing on the virtual map
-		
+	/**
+	 * Debug exploration, i know the initial position referred to a well defined map.
+	 * Sensing and Movements are on a simulated prolog Map.
+	 * This is the method used for debug simulation
+	 *  
+	 * @param startX		initial X position
+	 * @param startY		initial Y position
+	 * @param filename		absolute path of the map file, received from the Console
+	 */
+	public void initExploreFile(int startX, int startY, String filename){
 		Map m = null;
 		
 		List<String> data = new ArrayList<String>();						
@@ -209,10 +205,12 @@ public class Robot extends AbstractRobot {
 		System.out.println("EXPLORATION DONE");		
 	}
 	
+//}}
 	
-	// EXPLORATION MANAGEMENT **********************************************
 	
-/*	
+//{{ EXPLORATION MANAGEMENT **********************************************
+	
+/*
 	public void makeMove(String direction)
 	{
 		if(direction.equals("forward"))
@@ -283,27 +281,28 @@ public class Robot extends AbstractRobot {
 	}
 	
 */	
+//}}
 
-	//GUI INTERACTION **************************************************
+
+//{{ NAVIGATION MANAGEMENT ****************************************************
 	
-	public void showPathOnGui()
-	{
-		for(State s : path)
-		{
-			System.out.println(s.toString());
-		}
-	}
-	
-	
-	// NAVIGATION MANAGEMENT ****************************************************
-	
-	public void setNavigationPlan(String planName, String algo, String plan, int s, int t)
-	{
-		//NB: rotation step is 45 degrees
+	/**
+	 * Create a runnable Plan from the representation received from the Console,
+	 * then store it in a proper file that can be loaded and executed in every moment.</br>
+	 * 
+	 * It uses the default speed and duration, defined in the initial config method.</br>
+	 * 
+	 * <b>WARNING</b>: the default rotation angle is 45°;</br>
+	 * <b>WARNING</b>: The diagonal moments require more time then the tiled moments.
+	 * 
+	 * @param planName	The name of the executable plan and the relative file
+	 * @param plan		prolog list [m1, m2, ...] of movements
+	 */
+	public void setNavigationPlan(String planName, String plan)	{
 		
-		String speed = ""+s;
-		String time = ""+t;
-		String diagoTime = ""+(Math.round(t*1.414));
+		String speed = ""+defaultSpeed;
+		String time = ""+defaultTime;
+		String diagoTime = ""+(Math.round(defaultTime*1.414));
 		
 		plan = plan.split("\\[")[1];
 		plan = plan.split("\\]")[0];
@@ -324,12 +323,12 @@ public class Robot extends AbstractRobot {
 			switch(m)
 			{
 			case "t":
-				pathPlan.addSenseEvent(1000, "obstacle", "waitAndEvaluate");
+				pathPlan.addSenseEvent(1000, "obstaclefront", "waitAndEvaluate");
 				pathPlan.addForwardMove(speed, time);
 				break;
 				
 			case "d":
-				pathPlan.addSenseEvent(1000, "obstacle", "waitAndEvaluate");
+				pathPlan.addSenseEvent(1000, "obstaclefront", "waitAndEvaluate");
 				pathPlan.addForwardMove(speed, diagoTime);
 				break;
 				
@@ -365,105 +364,73 @@ public class Robot extends AbstractRobot {
 		println("PLAN SAVED IN "+planSaver.getFileName());		
 	}
 	
-	public void setPosition(int sx, int sy)
-	{
-		this.position =	new State(sx, sy);		
-		this.direction = Direction.NORTH;
+	
+	/**
+	 * Configure the Engine that manage the dynamically update of the robot position</br>
+	 * Robot doesn't need to know the map, it's a stupid executor that simply move on it.
+	 * 
+	 * @param sx	start X position
+	 * @param sy	start Y position
+	 * @param mode	<i>"robot"</i> for a real robot or <i>"simulated"</i> for a file simulation
+	 */
+	public void configNavigationEngine(int sx, int sy, String mode)	{
 		
-		println(position.toString());
+		if(mode.equals(MODE_SIMULATED))
+		{
+			engine = new FileEngine(sx, sy, this);
+			enableDebugSensing();
+		}
+		else if(mode.equals(MODE_REAL_ROBOT))
+		{
+			engine = new Engine(sx, sy, this);
+			disableDebugSensing();
+		}
+		
+		println(engine.getState().toString());
 	}
 	
-	public void updateMyPosition(String move)
-	{
-		this.position = this.makeMove(position, moveMapping.get(move+direction.toString()));
-		System.out.println(position);
+	
+	/**
+	 * Dynamically Update the Robot position during the Navigation
+	 * 
+	 * @param move	the Move applied to the current position
+	 */
+	public void updateMyPosition(String move){
+		
+		engine.makeMove(move);
+		System.out.println(engine.getState().toString());
+		notifyMyPosition();
 	}
 	
-	public void notifyMyPosition()
-	{
-		String payload = "position("+position.getX() + "," + position.getY() + ")," +
-						position.getDirection().toString().toLowerCase();
+	
+	/**
+	 * Sends an event to the RobotGUIManager to update the position during the navigation
+	 */
+	public void notifyMyPosition(){
+		
+		State s = engine.getState();
+		
+		String payload = "position("+s.getX() + "," + s.getY() + ")," +
+						s.getDirection().toString().toLowerCase();
 		
 		emit("show", "show(" + payload + ")");
 	}
 	
 	
-	private State makeMove(State state, Move move)
-	{
-		State result = new State();
-		
-		
-		if(move.getType().equals(MoveType.SPIN))
-		{
-			result.setX(state.getX());
-			result.setY(state.getY());
-			
-			result.setDirection(makeSpin(state.getDirection(), move.getSpin()));
-		}
-		else
-		{
-			int x = state.getX();
-			int y = state.getY();
-			
-			switch(state.getDirection())
-			{
-			case NORTH:
-				result.setX(x);
-				result.setY(y-1);
-				break;
-			
-			case NORTH_EAST:
-				result.setX(x+1);
-				result.setY(y-1);
-				break;
-				
-			case EAST:
-				result.setX(x+1);
-				result.setY(y);
-				break;
-				
-			case SOUTH_EAST:
-				result.setX(x+1);
-				result.setY(y+1);
-				break;
-				
-			case SOUTH:
-				result.setX(x);
-				result.setY(y+1);
-				break;
-				
-			case SOUTH_WEST:
-				result.setX(x-1);
-				result.setY(y+1);
-				break;
-				
-			case WEST:
-				result.setX(x-1);
-				result.setY(y);
-				break;
-				
-			case NORTH_WEST:
-				result.setX(x-1);
-				result.setY(y-1);
-				break;
-				
-			default:
-				break;
-			}
-			
-			result.setDirection(state.getDirection());
-		}
-		return result;
-	}
 	
-	public Direction makeSpin(Direction start, SpinDirection spin) {
+	
+	/*
+	public Direction makeSpin(Direction start, SpinDirection spin) { //TODO use the Engine
 		int newID = (start.getValue() + (8+spinFactor*spin.getRotation()))%8;
 		return spinMap.get(newID);
 	}
-	
+	*/
+//}}	
 
-	// SYSTEM INTERACTION *****************************************************
 	
+//{{ SYSTEM INTERACTION *****************************************************
+
+
 	public void enableDebugSensing()
 	{
 		((QActorPlanUtilsDebug) planUtils).enableFileSensingMode();
@@ -473,14 +440,20 @@ public class Robot extends AbstractRobot {
 	{
 		((QActorPlanUtilsDebug) planUtils).disableFileSensingMode();
 	}
-	
-	public void raiseEvent(String eventName, String payload)
-	{
-		emit(eventName, payload);
-	}
 
-	public IEventItem senseEvent(int timeout, String event, String plan)
-	{
+	
+	
+	/**
+	 * Sense events
+	 * 
+	 * @param timeout	Sensing timeout
+	 * @param event		Event name
+	 * @param plan		What to do when the event come
+	 * 
+	 * @return			The first Event that is detected or null
+	 */
+	public IEventItem senseEvent(int timeout, String event, String plan){
+		
 		setCurrentEvent(null);
 		try
 		{			
@@ -504,8 +477,15 @@ public class Robot extends AbstractRobot {
 	    		
 	}
 	
-	public void sendDispatch(String msgName, String paramsList, String destActor)
-	{
+	
+	/**
+	 * Send a Message to a well defined actor
+	 * 
+	 * @param msgName		the message ID
+	 * @param paramsList	prolog params list
+	 * @param destActor		destination
+	 */
+	public void sendDispatch(String msgName, String paramsList, String destActor){
 		String payload = msgName+"(";
 		
 		paramsList = paramsList.replace("[", "");
@@ -525,12 +505,23 @@ public class Robot extends AbstractRobot {
 		
 	}
 	
+	
+	/**
+	 * Implements a Message switch.</br>
+	 * Messages are in the format <i>msgID : msgID(Payload)</i><br>
+	 * When a defined combo of msgID - msgPayload is received, the relative PrologGoal is solved in the defined time.
+	 * 
+	 * @param timeout			receive Message timeout
+	 * @param msgList			list of msg IDs
+	 * @param msgPayloadList	list of msg Payloads
+	 * @param goalList			list of goals to solve when the relative message is received
+	 * @param solveTime			prolog solve timeout
+	 */
 	public void receiveMessageAndSolve(int timeout,
 										String msgList,
 										String msgPayloadList,
 										String goalList,
-										int solveTime)
-	{
+										int solveTime){
 		
 		try
 		{
@@ -592,8 +583,26 @@ public class Robot extends AbstractRobot {
 		
 	}
 	
-	// REAL ROBOT CONTROLS *****************************************************
+//}}
 	
+	
+//{{ GUI INTERACTION **************************************************
+	
+		public void showPathOnGui()
+		{
+			for(State s : path)
+			{
+				System.out.println(s.toString());
+			}
+		}
+	//}}
+	
+	
+//{{ REAL ROBOT CONTROLS *****************************************************
+	
+	/**
+	 * Move Real robot forward at default speed and for default duration
+	 */
 	public void moveForward()
 	{
 		try
@@ -607,6 +616,9 @@ public class Robot extends AbstractRobot {
 		}
 	}
 	
+	/**
+	 * Move Real robot backward at default speed and for default duration
+	 */
 	public void moveBackward()
 	{
 		try
@@ -620,6 +632,9 @@ public class Robot extends AbstractRobot {
 		}
 	}
 	
+	/**
+	 * Turn Real robot left at default speed and for default duration
+	 */
 	public void turnLeft()
 	{
 		try
@@ -633,6 +648,9 @@ public class Robot extends AbstractRobot {
 		}
 	}
 	
+	/**
+	 * Turn Real robot right at default speed and for default duration
+	 */
 	public void turnRight()
 	{
 		try
@@ -645,5 +663,5 @@ public class Robot extends AbstractRobot {
 			e.printStackTrace();
 		}
 	}
-
+//}}
 }

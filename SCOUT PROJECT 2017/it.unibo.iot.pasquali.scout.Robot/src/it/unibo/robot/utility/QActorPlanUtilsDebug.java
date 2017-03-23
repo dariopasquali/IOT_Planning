@@ -1,4 +1,4 @@
-package it.unibo.robot.exputils;
+package it.unibo.robot.utility;
 
 import it.unibo.contactEvent.interfaces.IEventItem;
 import it.unibo.is.interfaces.IOutputEnvView;

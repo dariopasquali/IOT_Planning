@@ -35,6 +35,7 @@ import java.awt.Frame;
 import javax.swing.JTextArea;
 import javax.swing.JScrollPane;
 import javax.swing.JScrollBar;
+import javax.swing.JCheckBox;
 
 public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt, IGUI{
 
@@ -56,6 +57,9 @@ public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt, I
 	private MapViewer mapViewer;	
 	private boolean mapLoaded = false;
 	
+	private boolean realRobot = false;
+	private String robotMode = "simulated";
+	
 	private ArrayList<Point> path;
 	
 	JButton btnExplore, btnSave, btnLoad, btnSearch, btnNavigate, btnAbort;
@@ -64,6 +68,7 @@ public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt, I
 	private JButton btnLoadExp;
 	private GridBagConstraints gbc_btnLoadExp;
 	private JButton btnClear;
+	private JCheckBox checkRealOrNot;
 
 	public ConsoleGUI(IActivityBase controller) {
 		
@@ -74,14 +79,14 @@ public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt, I
 	}
 	
 	public ConsoleGUI() {
-		initializeFrame();
+		//initializeFrame();
 		initializeControlFrame();
-		initializeOutputFrame();
+		//initializeOutputFrame();
 		
 		type = null;
 	}
 	
-	// INITIALIZATION ------------------------------------------------------
+//{{ INITIALIZATION ------------------------------------------------------
 	
 	private void initializeFrame()
 	{
@@ -102,15 +107,15 @@ public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt, I
 	private void initializeControlFrame()
 	{
 		controlFrame = new JFrame();
-		controlFrame.setBounds(100, 100, 172, 333);
+		controlFrame.setBounds(100, 100, 172, 356);
 		controlFrame.setTitle("Control Frame");		
 		controlFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
 		GridBagLayout gridBagLayout = new GridBagLayout();
 		gridBagLayout.columnWidths = new int[]{0, 123, 0, 0};
-		gridBagLayout.rowHeights = new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+		gridBagLayout.rowHeights = new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 		gridBagLayout.columnWeights = new double[]{0.0, 0.0, 0.0, Double.MIN_VALUE};
-		gridBagLayout.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
+		gridBagLayout.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
 		controlFrame.getContentPane().setLayout(gridBagLayout);
 		
 		btnExplore = new JButton("Explore");
@@ -207,6 +212,16 @@ public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt, I
 		btnClear.addActionListener(new DefaultInputHandler());
 		btnClear.setEnabled(false);
 		
+		checkRealOrNot = new JCheckBox("Raspberry Pi Robot");
+		GridBagConstraints gbc_checkRealOrNot = new GridBagConstraints();
+		gbc_checkRealOrNot.insets = new Insets(0, 0, 5, 5);
+		gbc_checkRealOrNot.gridx = 1;
+		gbc_checkRealOrNot.gridy = 11;
+		controlFrame.getContentPane().add(checkRealOrNot, gbc_checkRealOrNot);
+		
+		checkRealOrNot.setSelected(false);
+		checkRealOrNot.addActionListener(new DefaultInputHandler());
+		
 	}
 	
 	private void initializeOutputFrame()
@@ -245,7 +260,10 @@ public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt, I
 		this.controller = controller;		
 	}
 	
-	// COMMON --------------------------------------------------------------
+//}}	
+
+
+//{{ COMMON --------------------------------------------------------------
 	
 	public void setCellState(int y, int x, CellState state)
 	{
@@ -296,8 +314,11 @@ public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt, I
 			mapViewer.clearPath();
 		}
 	}
+
+//}}	
+
 	
-// EXPLORATION -------------------------------------------------------	
+//{{ EXPLORATION -------------------------------------------------------	
 	
 //	public void initExplorationViewer()
 //	{
@@ -318,9 +339,11 @@ public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt, I
 		frame.revalidate();		
 		frame.repaint();		
 	}
-	
 
-// NAVIGATION -----------------------------------------------------------------	
+//}}	
+
+	
+//{{ NAVIGATION -----------------------------------------------------------------	
 	
 //	public void initNavigationViewer()
 //	{
@@ -342,10 +365,10 @@ public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt, I
 		
 	}
 	
-
+//}}
 
 	
-// CLICK HANDLER ----------------------------------------------------------------------	
+//{{ CLICK HANDLER ----------------------------------------------------------------------	
 
 	private class DefaultInputHandler implements ActionListener{
 
@@ -354,6 +377,14 @@ public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt, I
 			
 			switch(e.getActionCommand())
 			{
+			
+			case "Raspberry Pi Robot":
+				
+				realRobot = checkRealOrNot.isSelected();				
+				robotMode = (realRobot) ? "simulated" : "robot";				
+				String s = (!realRobot) ? "Simulation" : "Real Robot";
+				println("I'm working with a "+s);				
+				break;
 			
 			case "Load Exploration Map": // Per la mappa di esplorazione
 								
@@ -383,7 +414,7 @@ public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt, I
 					return;
 				}
 				controller.execAction("EXPLOREDEBUG "+expStart.getX()+","+expStart.getY()+","
-										+mapViewer.getXMax()+","+mapViewer.getYMax());				
+										+mapViewer.getXMax()+","+mapViewer.getYMax()+","+robotMode);				
 				
 				btnSave.setEnabled(true);
 				btnClear.setEnabled(true);
@@ -471,7 +502,8 @@ public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt, I
 				break;
 			
 			case "Navigate":
-				controller.execAction("NAVIGATE ");
+								
+				controller.execAction("NAVIGATE "+robotMode);
 				btnNavigate.setEnabled(false);
 				btnAbort.setEnabled(true);
 				
@@ -514,9 +546,10 @@ public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt, I
  		}
 				
 	}
-	
+//}}	
 
-// OUTPUT ---------------------------------------------------------------
+	
+//{{ OUTPUT ---------------------------------------------------------------
 	
 	@Override
 	public void println(String msg) {
@@ -552,25 +585,27 @@ public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt, I
 		txtOut.validate();
 		txtOut.setCaretPosition(txtOut.getDocument().getLength());
 	}
+//}}
 	
 // ----------------------------------------------------------	
 
-	/*
-	 * ROBA DELLE INTERFACCE, SERVE SOLO A FARE ANDARE IL FRAMEWORK
-	 */
-
-
-
-	@Override
-	public IBasicEnvAwt getEnv() {
-		return this;
-	}
-	
 	public void setVisible(boolean state)
 	{
 		frame.setVisible(state);
 		controlFrame.setVisible(state);
 		outputFrame.setVisible(state);
+	}
+	
+	@Override
+	public void close() {
+		frame.setVisible(false);		
+	}
+	
+//{{  ROBA DELLE INTERFACCE, SERVE SOLO A FARE ANDARE IL FRAMEWORK
+	
+	@Override
+	public IBasicEnvAwt getEnv() {
+		return this;
 	}
 
 	@Override
@@ -588,12 +623,6 @@ public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt, I
 		return this;
 	}
 
-
-
-	@Override
-	public void close() {
-		frame.setVisible(false);		
-	}
 
 	@Override
 	public void initNoFrame() {
@@ -665,7 +694,7 @@ public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt, I
 		
 	}
 
-	
+//}}	
 
 	
 	

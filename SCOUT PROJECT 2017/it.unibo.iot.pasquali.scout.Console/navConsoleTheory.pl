@@ -23,13 +23,13 @@ searchBestPath(position(Sx,Sy) , position(Gx,Gy)) :-
 	Actor <- showPathOnGui,
 	assert(haveplan).
 
-startNavigation :-
+startNavigation(MODE) :-
 	havemap,
 	actorPrintln(havemap),
 	haveplan,
 	actorPrintln(haveplan),
 	actorobj(Actor),
-	Actor <-  sendNavigationData.
+	Actor <-  sendNavigationData(MODE).
 
 
 updateMapAndReplan(position(ELx , ELy), position(CURx, CURy)) :-

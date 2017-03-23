@@ -1,4 +1,4 @@
-package it.unibo.robot.exputils;
+package it.unibo.robot.utility;
 
 import java.awt.Point;
 import java.util.ArrayList;
@@ -12,7 +12,9 @@ import it.unibo.domain.model.map.Map;
 import it.unibo.planning.astar.algo.Path;
 import it.unibo.planning.astar.domain.Move;
 import it.unibo.planning.enums.Direction;
+import it.unibo.planning.enums.ForwardMoveType;
 import it.unibo.planning.enums.MoveType;
+import it.unibo.planning.enums.SpinDirection;
 import it.unibo.qactors.action.AsynchActionResult;
 import it.unibo.qactors.action.IActorAction.ActionExecMode;
 import it.unibo.robot.Robot;
@@ -31,6 +33,7 @@ public class Engine {
 	protected boolean checkModifyState;
 	
 	protected HashMap<Direction, Direction> leftMap,rightMap;
+	private HashMap<String, Move> moveMapping;
 	
 	public Engine(int startX, int startY, int mapW, int mapH, Robot actor, boolean checkModifyState) {
 		
@@ -39,6 +42,19 @@ public class Engine {
 		this.actor = actor;
 		this.checkModifyState = checkModifyState;
 		
+		init();
+	}
+	
+	public Engine(int sx, int sy, Robot actor) {
+		state = new State(sy, sx, Direction.NORTH);
+		map = null;
+		this.actor = actor;
+		this.checkModifyState = false;
+		
+		init();
+	}
+	
+	private void init(){
 		visited = new HashSet<Point>();
 		
 		leftMap = new HashMap<Direction,Direction>();
@@ -60,6 +76,32 @@ public class Engine {
 		rightMap.put(Direction.SOUTH_WEST, Direction.WEST);
 		rightMap.put(Direction.WEST, Direction.NORTH_WEST);
 		rightMap.put(Direction.NORTH_WEST, Direction.NORTH);
+		
+		this.moveMapping = new HashMap<String, Move>();
+		moveMapping.put("forwardN", new Move(ForwardMoveType.TILED));
+		moveMapping.put("forwardE", new Move(ForwardMoveType.TILED));
+		moveMapping.put("forwardW", new Move(ForwardMoveType.TILED));
+		moveMapping.put("forwardS", new Move(ForwardMoveType.TILED));
+		moveMapping.put("forwardNE", new Move(ForwardMoveType.DIAGONAL));
+		moveMapping.put("forwardNW", new Move(ForwardMoveType.DIAGONAL));
+		moveMapping.put("forwardSE", new Move(ForwardMoveType.DIAGONAL));
+		moveMapping.put("forwardSW", new Move(ForwardMoveType.DIAGONAL));
+		moveMapping.put("leftN", new Move(SpinDirection.LEFT));
+		moveMapping.put("leftNE", new Move(SpinDirection.LEFT));
+		moveMapping.put("leftE", new Move(SpinDirection.LEFT));
+		moveMapping.put("leftSE", new Move(SpinDirection.LEFT));
+		moveMapping.put("leftS", new Move(SpinDirection.LEFT));
+		moveMapping.put("leftSW", new Move(SpinDirection.LEFT));
+		moveMapping.put("leftW", new Move(SpinDirection.LEFT));
+		moveMapping.put("leftNW", new Move(SpinDirection.LEFT));
+		moveMapping.put("rightN", new Move(SpinDirection.RIGHT));
+		moveMapping.put("rightNE", new Move(SpinDirection.RIGHT));
+		moveMapping.put("rightE", new Move(SpinDirection.RIGHT));
+		moveMapping.put("rightSE", new Move(SpinDirection.RIGHT));
+		moveMapping.put("rightS", new Move(SpinDirection.RIGHT));
+		moveMapping.put("rightSW", new Move(SpinDirection.RIGHT));
+		moveMapping.put("rightW", new Move(SpinDirection.RIGHT));
+		moveMapping.put("rightNW", new Move(SpinDirection.RIGHT));
 	}
 	
 	
@@ -75,6 +117,11 @@ public class Engine {
 		
 	// MOVES -----------------------------------
 		
+	public void makeMove(String move)
+	{
+		makeMove(moveMapping.get(move+state.getDirection().toString()));
+	}
+	
 	public void makeMove(Move m) {
 			
 		if(m.getType().equals(MoveType.SPIN))
@@ -92,8 +139,7 @@ public class Engine {
 			}
 		}
 		else
-		{
-			
+		{			
 			if(!checkObjFront())
 				moveForward();		
 		}
@@ -332,7 +378,8 @@ public class Engine {
 		
 		//expdata : expdata( POS , STATE )	
 		if(checkModifyState)
-		{	actor.emit("expdata", "expdata(position("+ position.getX() +
+		{
+			actor.emit("expdata", "expdata(position("+ position.getX() +
 					"," + position.getY()+"), "+state+")");
 			try {
 				Thread.sleep(SLEEP_TIME);

@@ -26,10 +26,10 @@ Event expdata : expdata ( POS , STATE )
 // ------------------------------------------------------------------
 
 // From Console to Robot to start the Navigation
-Dispatch navigate : navigate ( PLAN , POS )
-
+Dispatch navigate : navigate ( PLAN , POS , MODE)
 //PLAN = plan ( [ t || d || l || r ] )
-//POS = position ( Xs , Ys ) 
+//POS = position ( Xs , Ys )
+//MODE = robot || simulated 
 // 
 //t = forward tiled
 //d = forward diagonal
@@ -66,10 +66,10 @@ Event local_gui_command : local_gui_command(COMMAND)
 //Button --> COMMAND
 //
 //Load Exp Map --> loadexpmap(FILEPATH);
-//Explore --> explore || explore( START , BOUNDS );
+//Explore --> explore || explore(FILENAME, START, BOUNDS, MODE); MODE = simulated || robot
 //Load Map --> loadmap ( PATH );
 //Find Path –-> findpath ( START , GOAL );
-//Start Navigation --> navigate;
+//Start Navigation --> navigate(MODE); MODE = simulated || robot
 //Abort --> abort;
 
 
@@ -106,10 +106,13 @@ QActor console context ctxConsole{
 		
 		onEvent local_gui_command : local_gui_command (loadexpmap(PATH)) -> switchToPlan loadExpMap;
 		onEvent local_gui_command : local_gui_command (explore) -> switchToPlan exploration;
- 		onEvent local_gui_command : local_gui_command (explore(FILENAME, START, BOUNDS)) -> switchToPlan explorationDebug;
+		
+ 		onEvent local_gui_command : local_gui_command (explore(FILENAME, START, BOUNDS, MODE)) ->
+ 																		 switchToPlan explorationDebug;
+ 																		 
  		onEvent local_gui_command : local_gui_command (loadmap(PATH)) -> switchToPlan loadMap;
  		onEvent local_gui_command : local_gui_command (findpath(START,GOAL)) -> switchToPlan findPath;
- 		onEvent local_gui_command : local_gui_command (navigate) -> switchToPlan navigation;
+ 		onEvent local_gui_command : local_gui_command (navigate(MODE)) -> switchToPlan navigation;
  		onEvent local_gui_command : local_gui_command (clear) -> switchToPlan clearGUI;
 		
 		repeatPlan 0
@@ -133,19 +136,21 @@ QActor console context ctxConsole{
 			
 	Plan explorationDebug
 		println("++++++++++++++++++ EXPLORATION DEBUG ++++++++++++++++++");
-		
-			
-		[!? msg(local_gui_command, "event", SENDER, none, local_gui_command (explore(FILENAME,START,BOUNDS)), MSGNUM)]
+					
+		[!? msg(local_gui_command, "event", SENDER, none, local_gui_command (explore(FILENAME,START,BOUNDS,MODE)), MSGNUM)]
 			solve showClearMap(BOUNDS) time(60000) onFailSwitchTo  explorationFailure;	
 		
 		println("mappa pulita");
 			
-		[?? msg(local_gui_command, "event", SENDER, none, local_gui_command (explore(FILENAME,START,BOUNDS)), MSGNUM)]
-			 forward robot -m explorefile : explorefile(START,FILENAME);
-//			 forward robot -m exploredebug : exploredebug(START,BOUNDS);				 
+		[!? msg(local_gui_command, "event", SENDER, none, local_gui_command (explore(FILENAME,START,BOUNDS, debug)), MSGNUM)]
+			 forward robot -m exploredebug : exploredebug(START,BOUNDS);		
 		
-		
+		[?? msg(local_gui_command, "event", SENDER, none, local_gui_command (explore(FILENAME,START,BOUNDS, simulated)), MSGNUM)]
+			 forward robot -m explorefile : explorefile(START,FILENAME);		 
+				
 		switchToPlan waitEndOfExploration
+
+	
 			
 	Plan waitEndOfExploration resumeLastPlan
 		sense time(999999999) local_gui_command, expdata, end -> continue, continue, continue;
@@ -182,7 +187,7 @@ QActor console context ctxConsole{
 	Plan findPath resumeLastPlan
 	
 		[?? msg(local_gui_command, "event", SENDER, none, local_gui_command (findpath(START,GOAL)), MSGNUM)]
-		solve searchBestPath(START,GOAL) time(210000000) onFailSwitchTo  findpathFailure;
+			solve searchBestPath(START,GOAL) time(210000000) onFailSwitchTo  findpathFailure;
 	
 		println("++++++++++++++++++ PATH FOUND ++++++++++++++++++")
 	
@@ -190,7 +195,8 @@ QActor console context ctxConsole{
 	Plan navigation
 		println("++++++++++++++++++ NAVIGATION ++++++++++++++++++");
 		
-		solve startNavigation time(60000) onFailSwitchTo  navigationFailure;
+		[?? msg(local_gui_command, "event", SENDER, none, local_gui_command (navigate(MODE)), MSGNUM)]
+			solve startNavigation(MODE) time(60000) onFailSwitchTo  navigationFailure;
 		
 		switchToPlan waitEndOfNavigation
 		

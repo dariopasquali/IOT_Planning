@@ -1,4 +1,4 @@
-package it.unibo.robot.exputils;
+package it.unibo.robot.utility;
 
 public enum SensingMode {
 	

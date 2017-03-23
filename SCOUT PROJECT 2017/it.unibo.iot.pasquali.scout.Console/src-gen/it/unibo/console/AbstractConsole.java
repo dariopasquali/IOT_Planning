@@ -143,7 +143,7 @@ public abstract class AbstractConsole extends QActor {
 	    		if( currentEvent.getEventId().equals("local_gui_command") ){
 	    		 		String parg = "";
 	    		 		/* SwitchPlan */
-	    		 		parg =  updateVars(  Term.createTerm("local_gui_command(COMMAND)"), Term.createTerm("local_gui_command(explore(FILENAME,START,BOUNDS))"), 
+	    		 		parg =  updateVars(  Term.createTerm("local_gui_command(COMMAND)"), Term.createTerm("local_gui_command(explore(FILENAME,START,BOUNDS,MODE))"), 
 	    		 			    		  					Term.createTerm(currentEvent.getMsg()), parg);
 	    		 			if( parg != null ){
 	    		 				 if( ! planUtils.switchToPlan("explorationDebug").getGoon() ) break; 
@@ -173,7 +173,7 @@ public abstract class AbstractConsole extends QActor {
 	    		if( currentEvent.getEventId().equals("local_gui_command") ){
 	    		 		String parg = "";
 	    		 		/* SwitchPlan */
-	    		 		parg =  updateVars(  Term.createTerm("local_gui_command(COMMAND)"), Term.createTerm("local_gui_command(navigate)"), 
+	    		 		parg =  updateVars(  Term.createTerm("local_gui_command(COMMAND)"), Term.createTerm("local_gui_command(navigate(MODE))"), 
 	    		 			    		  					Term.createTerm(currentEvent.getMsg()), parg);
 	    		 			if( parg != null ){
 	    		 				 if( ! planUtils.switchToPlan("navigation").getGoon() ) break; 
@@ -270,7 +270,7 @@ public abstract class AbstractConsole extends QActor {
 	    	nPlanIter++;
 	    		temporaryStr = "\"++++++++++++++++++ EXPLORATION DEBUG ++++++++++++++++++\"";
 	    		println( temporaryStr );  
-	    		if( (guardVars = QActorUtils.evalTheGuard(this, " !?msg(local_gui_command,\"event\",SENDER,none,local_gui_command(explore(FILENAME,START,BOUNDS)),MSGNUM)" )) != null ){
+	    		if( (guardVars = QActorUtils.evalTheGuard(this, " !?msg(local_gui_command,\"event\",SENDER,none,local_gui_command(explore(FILENAME,START,BOUNDS,MODE)),MSGNUM)" )) != null ){
 	    		parg = "showClearMap(BOUNDS)";
 	    		parg = QActorUtils.substituteVars(guardVars,parg);
 	    		//REGENERATE AKKA
@@ -283,7 +283,11 @@ public abstract class AbstractConsole extends QActor {
 	    		}
 	    		temporaryStr = "\"mappa pulita\"";
 	    		println( temporaryStr );  
-	    		if( (guardVars = QActorUtils.evalTheGuard(this, " ??msg(local_gui_command,\"event\",SENDER,none,local_gui_command(explore(FILENAME,START,BOUNDS)),MSGNUM)" )) != null ){
+	    		if( (guardVars = QActorUtils.evalTheGuard(this, " !?msg(local_gui_command,\"event\",SENDER,none,local_gui_command(explore(FILENAME,START,BOUNDS,debug)),MSGNUM)" )) != null ){
+	    		temporaryStr = QActorUtils.unifyMsgContent(pengine,"exploredebug(START,BOUNDS)","exploredebug(START,BOUNDS)", guardVars ).toString();
+	    		sendMsg("exploredebug","robot", QActorContext.dispatch, temporaryStr ); 
+	    		}
+	    		if( (guardVars = QActorUtils.evalTheGuard(this, " ??msg(local_gui_command,\"event\",SENDER,none,local_gui_command(explore(FILENAME,START,BOUNDS,simulated)),MSGNUM)" )) != null ){
 	    		temporaryStr = QActorUtils.unifyMsgContent(pengine,"explorefile(START,FILENAME)","explorefile(START,FILENAME)", guardVars ).toString();
 	    		sendMsg("explorefile","robot", QActorContext.dispatch, temporaryStr ); 
 	    		}
@@ -457,7 +461,9 @@ public abstract class AbstractConsole extends QActor {
 	    	nPlanIter++;
 	    		temporaryStr = "\"++++++++++++++++++ NAVIGATION ++++++++++++++++++\"";
 	    		println( temporaryStr );  
-	    		parg = "startNavigation";
+	    		if( (guardVars = QActorUtils.evalTheGuard(this, " ??msg(local_gui_command,\"event\",SENDER,none,local_gui_command(navigate(MODE)),MSGNUM)" )) != null ){
+	    		parg = "startNavigation(MODE)";
+	    		parg = QActorUtils.substituteVars(guardVars,parg);
 	    		//REGENERATE AKKA
 	    		aar = solveGoalReactive(parg,60000,"","");
 	    		//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
@@ -465,6 +471,7 @@ public abstract class AbstractConsole extends QActor {
 	    			curPlanInExec   = "navigation";
 	    			if( ! aar.getGoon() ) break;
 	    		} 			
+	    		}
 	    		if( ! planUtils.switchToPlan("waitEndOfNavigation").getGoon() ) break;
 	    break;
 	    }//while

@@ -176,7 +176,7 @@ protected IActorAction  action;
     		if( currentMessage.msgId().equals("navigate") ){
     			String parg = "";
     			/* SwitchPlan */
-    			parg =  updateVars(  Term.createTerm("navigate(PLAN,POS)"), Term.createTerm("navigate(PLAN,POS)"), 
+    			parg =  updateVars(  Term.createTerm("navigate(PLAN,POS,MODE)"), Term.createTerm("navigate(PLAN,POS,MODE)"), 
     				    		  					Term.createTerm(currentMessage.msgContent()), parg);
     				if( parg != null ){
     					 if( ! planUtils.switchToPlan("navigation").getGoon() ) break; 
@@ -233,7 +233,7 @@ protected IActorAction  action;
     		emit( "enableGUI", temporaryStr );
     		}
     		if( (guardVars = QActorUtils.evalTheGuard(this, " ??msg(_,_,SENDER,X,explorefile(START,FILENAME),MSGNUM)" )) != null ){
-    		parg = "javaExplorer(START,FILENAME)";
+    		parg = "initExploreFile(START,FILENAME)";
     		parg = QActorUtils.substituteVars(guardVars,parg);
     		//REGENERATE AKKA
     		aar = solveGoalReactive(parg,0,"abort","abort");
@@ -310,8 +310,8 @@ protected IActorAction  action;
     			curPlanInExec   = "navigation";
     			if( ! aar.getGoon() ) break;
     		} 			
-    		if( (guardVars = QActorUtils.evalTheGuard(this, " ??msg(_,_,SENDER,X,navigate(PLAN,POS),MSGNUM)" )) != null ){
-    		parg = "loadNavigationData(PLAN,POS)";
+    		if( (guardVars = QActorUtils.evalTheGuard(this, " ??msg(_,_,SENDER,X,navigate(PLAN,POS,MODE),MSGNUM)" )) != null ){
+    		parg = "loadNavigationData(PLAN,POS,MODE)";
     		parg = QActorUtils.substituteVars(guardVars,parg);
     		//REGENERATE AKKA
     		aar = solveGoalReactive(parg,100000,"","");

@@ -1,4 +1,4 @@
-package it.unibo.robot.exputils;
+package it.unibo.robot.utility;
 
 import it.unibo.domain.model.implementation.State;
 import it.unibo.domain.model.map.Map;
@@ -21,8 +21,15 @@ public class FileEngine extends Engine {
 		
 	}
 	
+	public FileEngine(int sx, int sy, Robot robot) {
+		super(sx, sy, robot);
+		this.worldMap = null;
+	}
+	
 	// SONAR LIKE CHECKS ---------------------------------
 	
+
+
 	protected boolean checkObject(State state)
 	{
 		if( worldMap.isCellObj(state.getY(), state.getX()))

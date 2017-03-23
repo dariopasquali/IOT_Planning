@@ -51,19 +51,17 @@ notContainsElement(E, [H|T]) :-
 
 %% NAVIGATION PLAN MANAGEMENT ----------------------------------------
 
-setNavPlan(plan(ALGO,PLAN)) :-
+setNavPlan(plan(PLAN)) :-
 	actorobj(Actor),
-	defaultSpeed(SPEED),
-	defaultDuration(DUR),
 	planName(NAME),
 	actorPrintln(NAME),
 	actorPrintln("setNavigationPlan!!!!"),
-	Actor <- setNavigationPlan(NAME, ALGO, PLAN, SPEED, DUR).
+	Actor <- setNavigationPlan(NAME, PLAN).
 	
-setPosition(position(SX, SY)) :-
+setStateManager(position(SX, SY), MODE) :-
 	actorobj(Actor),
-	Actor <- setPosition(SX, SY).
-
+	Actor <- configNavigationEngine(SX, SY, MODE).
+/*
 loadNavigationData(MAP, PLAN, POS) :-
 	actorPrintln(MAP),
 	actorPrintln(PLAN),
@@ -71,14 +69,15 @@ loadNavigationData(MAP, PLAN, POS) :-
 	actorPrintln("caricamento dati in corso...."),	
 	loadMapFromData(MAP),
 	setNavPlan(PLAN),
-	setPositions(POS).
+	setPosition(POS).
+*/
 	
-loadNavigationData(PLAN, POS) :-
+loadNavigationData(PLAN, POS, MODE) :-
 	actorPrintln(PLAN),
 	actorPrintln(POS),
 	actorPrintln("caricamento dati in corso...."),
 	setNavPlan(PLAN),
-	setPosition(POS).
+	setStateManager(POS, MODE).
 
 loadThePlan( FName ):-
 	actorobj(Actor),

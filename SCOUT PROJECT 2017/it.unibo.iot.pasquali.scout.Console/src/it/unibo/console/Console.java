@@ -172,15 +172,16 @@ public class Console extends AbstractConsole implements IActivity{
 			
 		}
 
-		public void sendNavigationData()
+		public void sendNavigationData(String mode)
 		{	
 			String pp = getPrologPlan();
 			String po = getPrologPosition();
 			
 			println(pp);
 			println(po);
+			println(mode);
 			
-			temporaryStr = QActorUtils.unifyMsgContent(pengine, "navigate(PLAN,POS)","navigate("+pp+","+po+")", guardVars ).toString();
+			temporaryStr = QActorUtils.unifyMsgContent(pengine, "navigate(PLAN,POS,MODE)","navigate("+pp+","+po+","+mode+")", guardVars ).toString();
 			println("temp string "+temporaryStr);
 			try
 			{
@@ -229,7 +230,8 @@ public class Console extends AbstractConsole implements IActivity{
 						+ "position(" + params[0] + "," + params[1]+")"
 								+ ","
 						+ "map(" + params[2] + "," + params[3]+")"
-								+ "))");
+								+ ","
+						+ params[4] + "))");
 				break;
 				
 			case "LOAD":
@@ -238,7 +240,7 @@ public class Console extends AbstractConsole implements IActivity{
 			
 				
 			case "NAVIGATE":
-				emit( "local_gui_command", "local_gui_command(navigate)");
+				emit( "local_gui_command", "local_gui_command(navigate("+command[1]+"))");
 				break;
 				
 			case "FIND":

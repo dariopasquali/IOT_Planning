@@ -36,7 +36,7 @@ initExploreMap( position( SX , SY ), map( W , H ) ):-
 	
 initExploreMap( position( SX , SY ), FILENAME ):-
 	actorobj(Actor),
-	Actor <- javaExplorer(SX , SY , FILENAME).
+	Actor <- initExploreFile(SX , SY , FILENAME).
 	
 /*
 ------------------------------------------------------------
