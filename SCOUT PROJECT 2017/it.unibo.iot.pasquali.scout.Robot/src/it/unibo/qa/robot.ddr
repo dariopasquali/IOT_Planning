@@ -24,7 +24,8 @@ Event expdata : expdata ( POS , STATE )
 // ------------------------------------------------------------------
 
 // From Console to Robot to start the Navigation
-Dispatch navigate : navigate ( PLAN , POS , MODE)
+Dispatch navigate : navigate ( PLAN , POS )
+Dispatch navigatefile : navigatefile( PLAN , POS , FILENAME)
 //PLAN = plan ( [ t || d || l || r ] )
 //POS = position ( Xs , Ys ) 
 //MODE = robot || simulated
@@ -89,7 +90,7 @@ QActor console context ctxConsole{
  	Plan init normal
 		println( "NEVER HERE. I'm just a placeholder" ) 
  }
-/*
+
 QActor guimanager context ctxRobot{
 	
 	Plan init normal
@@ -122,7 +123,7 @@ QActor guimanager context ctxRobot{
 	Plan consultPrologFailure            
 		println("GUI ----------------------------- consult gone wrong" )
 }
-*/
+
 Robot mockScout QActor robot context ctxRobot{
 
 // ------------------------------------------------------------------
@@ -154,7 +155,8 @@ Robot mockScout QActor robot context ctxRobot{
  		onMsg explore : explore -> switchToPlan exploration;
  		onMsg exploredebug : exploredebug ( START , BOUNDS) -> switchToPlan explorationDebug;
  		onMsg explorefile : explorefile (START, FILENAME) -> switchToPlan explorationFile;
- 		onMsg navigate : navigate(PLAN, POS, MODE) -> switchToPlan navigation;
+ 		onMsg navigate : navigate(PLAN, POS) -> switchToPlan navigation;
+ 		onMsg navigatefile : navigatefile( PLAN , POS , FILENAME) -> switchToPlan navigationFile;
  		
  		repeatPlan 0		
  
@@ -202,11 +204,23 @@ Robot mockScout QActor robot context ctxRobot{
  		
  		solve initialConfigNavRobot time(0);
  		
- 		[?? msg(_, _, SENDER, X, navigate(PLAN, POS, MODE), MSGNUM)] 
- 			solve loadNavigationData(PLAN, POS, MODE) time (100000) onFailSwitchTo loadMapFailure;
+ 		[?? msg(_, _, SENDER, X, navigate(PLAN, POS), MSGNUM)] 
+ 			solve loadNavigationData(PLAN, POS) time (100000) onFailSwitchTo loadMapFailure;
  		
  		switchToPlan startNavigation 	
+ 	
+ 	Plan navigationFile
+ 		println("I Received some navigation data and a filename");
  		
+ 		solve initialConfigNavRobot time(0);
+ 		
+ 		[!? msg(_, _, SENDER, X, navigatefile( PLAN , POS , FILENAME), MSGNUM)]
+ 								emit enableGUI : enableGUI(POS, FILENAME);
+ 		
+ 		[?? msg(_, _, SENDER, X, navigatefile( PLAN , POS , FILENAME), MSGNUM)] 
+ 			solve loadNavigationData(PLAN, POS, FILENAME) time (100000) onFailSwitchTo loadMapFailure;
+ 		
+ 		switchToPlan startNavigation 	
  		
  	Plan startNavigation
  	

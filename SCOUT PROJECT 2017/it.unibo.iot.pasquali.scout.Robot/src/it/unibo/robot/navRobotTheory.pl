@@ -70,26 +70,28 @@ setNavPlan(plan(PLAN)) :-
 	actorPrintln("setNavigationPlan!!!!"),
 	Actor <- setNavigationPlan(NAME, PLAN).
 	
-setStateManager(position(SX, SY), MODE) :-
+configEngine(position(SX, SY)) :-
 	actorobj(Actor),
-	Actor <- configNavigationEngine(SX, SY, MODE).
-/*
-loadNavigationData(MAP, PLAN, POS) :-
-	actorPrintln(MAP),
-	actorPrintln(PLAN),
-	actorPrintln(POS),
-	actorPrintln("caricamento dati in corso...."),	
-	loadMapFromData(MAP),
-	setNavPlan(PLAN),
-	setPosition(POS).
-*/
+	Actor <- configEngine(SX, SY).
 	
-loadNavigationData(PLAN, POS, MODE) :-
+configFileEngine(position(SX, SY), FILENAME) :-
+	actorobj(Actor),
+	Actor <- configFileEngine(SX, SY, FILENAME).
+	
+loadNavigationData(PLAN, POS) :-
 	actorPrintln(PLAN),
 	actorPrintln(POS),
 	actorPrintln("caricamento dati in corso...."),
 	setNavPlan(PLAN),
-	setStateManager(POS, MODE).
+	configEngine(POS).
+	
+loadNavigationData(PLAN, POS, FILENAME) :-
+	actorPrintln(PLAN),
+	actorPrintln(POS),
+	actorPrintln(FILENAME),
+	actorPrintln("caricamento dati in corso...."),
+	setNavPlan(PLAN),
+	configFileEngine(POS, FILENAME).
 
 loadThePlan( FName ):-
 	actorobj(Actor),

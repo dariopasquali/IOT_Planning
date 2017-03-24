@@ -26,6 +26,7 @@ digraph finite_state_machine {
   	waitGUICommand -> loadMap [ label = "local_gui_command(COMMAND)/"];
   	waitGUICommand -> explorationDebug [ label = "local_gui_command(COMMAND)/"];
   	waitGUICommand -> findPath [ label = "local_gui_command(COMMAND)/"];
+  	waitGUICommand -> navigationFile [ label = "local_gui_command(COMMAND)/"];
   	
   	exploration -> waitEndOfExploration [ label = ""];
   	
@@ -38,6 +39,8 @@ digraph finite_state_machine {
   	endOfExploration -> waitGUICommand [ label = ""];
   	
   	navigation -> waitEndOfNavigation [ label = ""];
+  	
+  	navigationFile -> waitEndOfNavigation [ label = ""];
   	
   	waitEndOfNavigation -> waitEndOfNavigation [ label = "update(OBJECT,CURRENT)/"];
   	waitEndOfNavigation -> endOfNavigation [ label = "end/"];

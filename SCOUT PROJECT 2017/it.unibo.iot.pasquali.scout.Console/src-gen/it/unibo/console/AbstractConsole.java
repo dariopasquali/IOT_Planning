@@ -173,10 +173,20 @@ public abstract class AbstractConsole extends QActor {
 	    		if( currentEvent.getEventId().equals("local_gui_command") ){
 	    		 		String parg = "";
 	    		 		/* SwitchPlan */
-	    		 		parg =  updateVars(  Term.createTerm("local_gui_command(COMMAND)"), Term.createTerm("local_gui_command(navigate(MODE))"), 
+	    		 		parg =  updateVars(  Term.createTerm("local_gui_command(COMMAND)"), Term.createTerm("local_gui_command(navigate(robot))"), 
 	    		 			    		  					Term.createTerm(currentEvent.getMsg()), parg);
 	    		 			if( parg != null ){
 	    		 				 if( ! planUtils.switchToPlan("navigation").getGoon() ) break; 
+	    		 			}//else println("guard  fails");  //parg is null when there is no guard (onEvent)
+	    		 }
+	    		//onEvent
+	    		if( currentEvent.getEventId().equals("local_gui_command") ){
+	    		 		String parg = "";
+	    		 		/* SwitchPlan */
+	    		 		parg =  updateVars(  Term.createTerm("local_gui_command(COMMAND)"), Term.createTerm("local_gui_command(navigate(simulated))"), 
+	    		 			    		  					Term.createTerm(currentEvent.getMsg()), parg);
+	    		 			if( parg != null ){
+	    		 				 if( ! planUtils.switchToPlan("navigationFile").getGoon() ) break; 
 	    		 			}//else println("guard  fails");  //parg is null when there is no guard (onEvent)
 	    		 }
 	    		//onEvent
@@ -461,9 +471,7 @@ public abstract class AbstractConsole extends QActor {
 	    	nPlanIter++;
 	    		temporaryStr = "\"++++++++++++++++++ NAVIGATION ++++++++++++++++++\"";
 	    		println( temporaryStr );  
-	    		if( (guardVars = QActorUtils.evalTheGuard(this, " ??msg(local_gui_command,\"event\",SENDER,none,local_gui_command(navigate(MODE)),MSGNUM)" )) != null ){
-	    		parg = "startNavigation(MODE)";
-	    		parg = QActorUtils.substituteVars(guardVars,parg);
+	    		parg = "startNavigation";
 	    		//REGENERATE AKKA
 	    		aar = solveGoalReactive(parg,60000,"","");
 	    		//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
@@ -471,13 +479,40 @@ public abstract class AbstractConsole extends QActor {
 	    			curPlanInExec   = "navigation";
 	    			if( ! aar.getGoon() ) break;
 	    		} 			
-	    		}
 	    		if( ! planUtils.switchToPlan("waitEndOfNavigation").getGoon() ) break;
 	    break;
 	    }//while
 	    return returnValue;
 	    }catch(Exception e){
 	       //println( getName() + " plan=navigation WARNING:" + e.getMessage() );
+	       QActorContext.terminateQActorSystem(this); 
+	       return false;  
+	    }
+	    }
+	    public boolean navigationFile() throws Exception{	//public to allow reflection
+	    try{
+	    	int nPlanIter = 0;
+	    	//curPlanInExec =  "navigationFile";
+	    	boolean returnValue = suspendWork;
+	    while(true){
+	    	curPlanInExec =  "navigationFile";	//within while since it can be lost by switchlan
+	    	nPlanIter++;
+	    		temporaryStr = "\"++++++++++++++++++ NAVIGATION FILE ++++++++++++++++++\"";
+	    		println( temporaryStr );  
+	    		parg = "startNavigationFile";
+	    		//REGENERATE AKKA
+	    		aar = solveGoalReactive(parg,60000,"","");
+	    		//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
+	    		if( aar.getInterrupted() ){
+	    			curPlanInExec   = "navigationFile";
+	    			if( ! aar.getGoon() ) break;
+	    		} 			
+	    		if( ! planUtils.switchToPlan("waitEndOfNavigation").getGoon() ) break;
+	    break;
+	    }//while
+	    return returnValue;
+	    }catch(Exception e){
+	       //println( getName() + " plan=navigationFile WARNING:" + e.getMessage() );
 	       QActorContext.terminateQActorSystem(this); 
 	       return false;  
 	    }

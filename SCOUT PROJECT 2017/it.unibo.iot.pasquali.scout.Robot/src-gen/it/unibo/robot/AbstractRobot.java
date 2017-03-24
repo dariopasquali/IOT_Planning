@@ -176,10 +176,19 @@ protected IActorAction  action;
     		if( currentMessage.msgId().equals("navigate") ){
     			String parg = "";
     			/* SwitchPlan */
-    			parg =  updateVars(  Term.createTerm("navigate(PLAN,POS,MODE)"), Term.createTerm("navigate(PLAN,POS,MODE)"), 
+    			parg =  updateVars(  Term.createTerm("navigate(PLAN,POS)"), Term.createTerm("navigate(PLAN,POS)"), 
     				    		  					Term.createTerm(currentMessage.msgContent()), parg);
     				if( parg != null ){
     					 if( ! planUtils.switchToPlan("navigation").getGoon() ) break; 
+    				}//else println("guard  fails");  //parg is null when there is no guard (onEvent)
+    		}//onMsg
+    		if( currentMessage.msgId().equals("navigatefile") ){
+    			String parg = "";
+    			/* SwitchPlan */
+    			parg =  updateVars(  Term.createTerm("navigatefile(PLAN,POS,FILENAME)"), Term.createTerm("navigatefile(PLAN,POS,FILENAME)"), 
+    				    		  					Term.createTerm(currentMessage.msgContent()), parg);
+    				if( parg != null ){
+    					 if( ! planUtils.switchToPlan("navigationFile").getGoon() ) break; 
     				}//else println("guard  fails");  //parg is null when there is no guard (onEvent)
     		}if( planUtils.repeatPlan(nPlanIter,0).getGoon() ) continue;
     break;
@@ -310,8 +319,8 @@ protected IActorAction  action;
     			curPlanInExec   = "navigation";
     			if( ! aar.getGoon() ) break;
     		} 			
-    		if( (guardVars = QActorUtils.evalTheGuard(this, " ??msg(_,_,SENDER,X,navigate(PLAN,POS,MODE),MSGNUM)" )) != null ){
-    		parg = "loadNavigationData(PLAN,POS,MODE)";
+    		if( (guardVars = QActorUtils.evalTheGuard(this, " ??msg(_,_,SENDER,X,navigate(PLAN,POS),MSGNUM)" )) != null ){
+    		parg = "loadNavigationData(PLAN,POS)";
     		parg = QActorUtils.substituteVars(guardVars,parg);
     		//REGENERATE AKKA
     		aar = solveGoalReactive(parg,100000,"","");
@@ -327,6 +336,49 @@ protected IActorAction  action;
     return returnValue;
     }catch(Exception e){
        //println( getName() + " plan=navigation WARNING:" + e.getMessage() );
+       QActorContext.terminateQActorSystem(this); 
+       return false;  
+    }
+    }
+    public boolean navigationFile() throws Exception{	//public to allow reflection
+    try{
+    	int nPlanIter = 0;
+    	//curPlanInExec =  "navigationFile";
+    	boolean returnValue = suspendWork;
+    while(true){
+    	curPlanInExec =  "navigationFile";	//within while since it can be lost by switchlan
+    	nPlanIter++;
+    		temporaryStr = "\"I Received some navigation data and a filename\"";
+    		println( temporaryStr );  
+    		parg = "initialConfigNavRobot";
+    		//REGENERATE AKKA
+    		aar = solveGoalReactive(parg,0,"","");
+    		//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
+    		if( aar.getInterrupted() ){
+    			curPlanInExec   = "navigationFile";
+    			if( ! aar.getGoon() ) break;
+    		} 			
+    		if( (guardVars = QActorUtils.evalTheGuard(this, " !?msg(_,_,SENDER,X,navigatefile(PLAN,POS,FILENAME),MSGNUM)" )) != null ){
+    		temporaryStr = QActorUtils.unifyMsgContent(pengine, "enableGUI(START,FILENAME)","enableGUI(POS,FILENAME)", guardVars ).toString();
+    		emit( "enableGUI", temporaryStr );
+    		}
+    		if( (guardVars = QActorUtils.evalTheGuard(this, " ??msg(_,_,SENDER,X,navigatefile(PLAN,POS,FILENAME),MSGNUM)" )) != null ){
+    		parg = "loadNavigationData(PLAN,POS,FILENAME)";
+    		parg = QActorUtils.substituteVars(guardVars,parg);
+    		//REGENERATE AKKA
+    		aar = solveGoalReactive(parg,100000,"","");
+    		//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
+    		if( aar.getInterrupted() ){
+    			curPlanInExec   = "navigationFile";
+    			if( ! aar.getGoon() ) break;
+    		} 			
+    		}
+    		if( ! planUtils.switchToPlan("startNavigation").getGoon() ) break;
+    break;
+    }//while
+    return returnValue;
+    }catch(Exception e){
+       //println( getName() + " plan=navigationFile WARNING:" + e.getMessage() );
        QActorContext.terminateQActorSystem(this); 
        return false;  
     }

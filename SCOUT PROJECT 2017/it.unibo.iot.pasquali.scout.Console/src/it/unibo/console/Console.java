@@ -198,15 +198,32 @@ public class Console extends AbstractConsole implements IActivity{
 			println(po);
 			println(mode);
 			
-			temporaryStr = QActorUtils.unifyMsgContent(pengine, "navigate(PLAN,POS,MODE)","navigate("+pp+","+po+","+mode+")", guardVars ).toString();
-			println("temp string "+temporaryStr);
-			try
+			if(mode.equals("robot"))
 			{
-				sendMsg("navigate","robot", QActorContext.dispatch, temporaryStr );
-			} catch (Exception e)
+				temporaryStr = QActorUtils.unifyMsgContent(pengine, "navigate(PLAN,POS)","navigate("+pp+","+po+")", guardVars ).toString();
+				println("temp string "+temporaryStr);
+				try
+				{
+					sendMsg("navigate","robot", QActorContext.dispatch, temporaryStr );
+				} catch (Exception e)
+				{
+					e.printStackTrace();
+				}
+			}
+			else
 			{
-				e.printStackTrace();
-			}		
+				temporaryStr = QActorUtils.unifyMsgContent(pengine, "navigatefile(PLAN,POS,FILENAME)","navigatefile("+pp+","+po+","+filename+")", guardVars ).toString();
+				println("temp string "+temporaryStr);
+				try
+				{
+					sendMsg("navigatefile","robot", QActorContext.dispatch, temporaryStr );
+				} catch (Exception e)
+				{
+					e.printStackTrace();
+				}
+			}
+			
+					
 		}
 
 		// GUI INTERACTION ---------------------------------------------------

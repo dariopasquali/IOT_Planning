@@ -3,6 +3,8 @@ package it.unibo.gui;
 import java.awt.FileDialog;
 
 import javax.swing.JFrame;
+
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
@@ -33,35 +35,22 @@ public class RobotGUI extends Frame implements IOutputEnvView, IBasicEnvAwt{
 	private MapType type;
 	
 	private JFrame frame;
-	private JFrame controlFrame;
-	private JFrame outputFrame;
 	
 	private IActivityBase controller;
 	
-	private JTextArea txtOut;
-	private JScrollBar scrollBar;
-	
 	private JPanel panelMap;
 	
-	private MapViewer mapViewer;	
-	private boolean mapLoaded = false;
+	private MapViewer mapViewer;
 	
-	private ArrayList<Point> path;
-	
-	private Component verticalStrut;
-	private Component verticalStrut_1;
-	private GridBagConstraints gbc_btnLoadExp;
+
 	public RobotGUI(IActivityBase controller) {
 		
 		initializeFrame();
-		initializeOutputFrame();
 		this.controller = controller;
 	}
 	
 	public RobotGUI() {
-		initializeFrame();
-		initializeOutputFrame();
-		
+		initializeFrame();		
 		type = null;
 	}
 	
@@ -72,7 +61,8 @@ public class RobotGUI extends Frame implements IOutputEnvView, IBasicEnvAwt{
 		frame = new JFrame();
 		frame.setBounds(50, 50, 800, 600);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.setTitle("Map Frame");		
+		frame.setTitle("WORLD MAP FRAME");
+		frame.setBackground(Color.GREEN);
 		
 		GridBagLayout gridBagLayout = new GridBagLayout();
 		gridBagLayout.columnWidths = new int[]{1056, 0};
@@ -83,38 +73,6 @@ public class RobotGUI extends Frame implements IOutputEnvView, IBasicEnvAwt{
 		
 	}
 
-	private void initializeOutputFrame()
-	{
-		outputFrame = new JFrame();
-		outputFrame.setBounds(300, 300, 700, 300);
-		outputFrame.setTitle("Output Frame");		
-		outputFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		
-		GridBagLayout gridBagOutput = new GridBagLayout();
-		gridBagOutput.columnWidths = new int[]{1056, 0};
-		gridBagOutput.rowHeights = new int[]{20, 0, 0, 0, 0, 0};
-		gridBagOutput.columnWeights = new double[]{1.0, Double.MIN_VALUE};
-		gridBagOutput.rowWeights = new double[]{0.0, 0.0, 0.0, 1.0, 0.0, Double.MIN_VALUE};
-		outputFrame.getContentPane().setLayout(gridBagOutput);
-		
-		JScrollPane panelOutput = new JScrollPane((Component) null);
-		GridBagConstraints gbc_panelOutput = new GridBagConstraints();
-		gbc_panelOutput.fill = GridBagConstraints.BOTH;
-		gbc_panelOutput.gridheight = 5;
-		gbc_panelOutput.gridy = 0;
-		outputFrame.getContentPane().add(panelOutput, gbc_panelOutput);
-		
-		txtOut = new JTextArea();
-		txtOut.setEditable(false);
-		txtOut.setFont(new Font("Monospaced", Font.PLAIN, 14));
-		panelOutput.setViewportView(txtOut);
-		
-		scrollBar = new JScrollBar();
-		panelOutput.setRowHeaderView(scrollBar);
-		panelOutput.add(scrollBar);		
-	}
-
-	
 	public void setController(IActivityBase controller) {
 		this.controller = controller;		
 	}
@@ -155,8 +113,6 @@ public class RobotGUI extends Frame implements IOutputEnvView, IBasicEnvAwt{
 		panelMap.repaint();
 		frame.revalidate();
 		frame.repaint();
-		
-		this.mapLoaded = true;
 	}
 	
 	public void clearGUI()
@@ -180,35 +136,27 @@ public class RobotGUI extends Frame implements IOutputEnvView, IBasicEnvAwt{
 	
 	@Override
 	public void println(String msg) {
-		txtOut.append(msg+"\n");
-		txtOut.validate();
-		txtOut.setCaretPosition(txtOut.getDocument().getLength());
+		System.out.println(msg);
 	}
 	
 	
 	public synchronized void clear(  ){
-		txtOut.setText("");
-		txtOut.validate();
+
 	}//clear
 	
 	@Override
 	public synchronized String getCurVal() {
-		return txtOut.getText();
+		return "";
 	}
 
 	@Override
 	public void addOutput(String msg) {
-		txtOut.append(msg+"\n");
-		txtOut.validate();
-		txtOut.setCaretPosition(txtOut.getDocument().getLength());
+
 	}
 
 	@Override
 	public void setOutput(String msg) {
-		
-		txtOut.setText(msg);
-		txtOut.validate();
-		txtOut.setCaretPosition(txtOut.getDocument().getLength());
+
 	}
 	
 // ----------------------------------------------------------	
@@ -227,11 +175,6 @@ public class RobotGUI extends Frame implements IOutputEnvView, IBasicEnvAwt{
 	public void setVisible(boolean state)
 	{
 		frame.setVisible(state);
-	}
-	
-	public void setOutputVisible(boolean state) {
-		
-		outputFrame.setVisible(state);		
 	}
 
 	@Override

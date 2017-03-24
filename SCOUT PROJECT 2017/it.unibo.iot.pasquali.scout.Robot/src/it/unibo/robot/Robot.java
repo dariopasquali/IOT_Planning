@@ -163,41 +163,8 @@ public class Robot extends AbstractRobot {
 	 * @param filename		absolute path of the map file, received from the Console
 	 */
 	public void initExploreFile(int startX, int startY, String filename){
-		Map m = null;
-		
-		List<String> data = new ArrayList<String>();						
-		try
-		{
-			InputStream fs = new FileInputStream(filename);
-			InputStreamReader inpsr = new InputStreamReader(fs);
-			BufferedReader br       = new BufferedReader(inpsr);
-			Iterator<String> lsit   = br.lines().iterator();
-
-			while(lsit.hasNext())
-			{
-				data.add(lsit.next());
-			}
-			br.close();
-			
-		} catch (Exception e)
-		{
-			System.out.println("QActor  ERROR " + e.getMessage());
-		}
-		
-		for(int i=0; i<data.size(); i++)
-		{
-			if(i == 0)
-			{
-				m = Map.createMapFromPrologRep(data.get(i));
-			}
-			else
-			{
-				String s[] = data.get(i).split(" ");
-				m.addElementFromString(s[1]);
-			}
-		}
-		
-		engine = new FileEngine(startX, startY, m, this, true);
+				
+		engine = new FileEngine(startX, startY, loadMap(filename), this, true);
 		((QActorPlanUtilsDebug)planUtils).setEngine((FileEngine) engine);
 		
 		Explorer explorer = new Explorer(this, engine);
@@ -372,27 +339,13 @@ public class Robot extends AbstractRobot {
 	 * 
 	 * @param sx	start X position
 	 * @param sy	start Y position
-	 * @param mode	<i>"robot"</i> for a real robot or <i>"simulated"</i> for a file simulation
 	 */
-	public void configNavigationEngine(int sx, int sy, String mode)	{
+	public void configEngine(int sx, int sy)	{
 		
-		System.out.println("Navigation Mode --> " + mode);
+		System.out.println("Navigation Mode --> ROBOT");
 		
-		if(mode.equals(MODE_SIMULATED))
-		{
-			engine.setCurrentState(sx, sy);
-			((FileEngine)engine).setObject(new State(2,2));
-			((QActorPlanUtilsDebug)planUtils).setEngine(((FileEngine)engine));
-			
-			System.out.println(((FileEngine)engine).getWorldMap().toString());
-			
-			enableDebugSensing();
-		}
-		else if(mode.equals(MODE_REAL_ROBOT))
-		{
-			if(engine == null) engine = new Engine(sx, sy, this);
-			disableDebugSensing();
-		}
+		if(engine == null) engine = new Engine(sx, sy, this);
+		disableDebugSensing();
 		
 		if(!engine.getState().getDirection().equals(Direction.NORTH))
 		{
@@ -401,6 +354,29 @@ public class Robot extends AbstractRobot {
 		
 		println(engine.getState().toString());
 	}
+	
+	
+	public void configFileEngine(int sx, int sy, String filename)
+	{
+		System.out.println("Navigation Mode --> SIMULATED");
+		
+		Map m = loadMap(filename);
+		this.engine = new FileEngine(sx, sy, m, this, false);
+		//((FileEngine)engine).setObject(new State(2,2));
+		((QActorPlanUtilsDebug)planUtils).setEngine(((FileEngine)engine));
+		
+		System.out.println(((FileEngine)engine).getWorldMap().toString());
+		
+		enableDebugSensing();
+		
+		if(!engine.getState().getDirection().equals(Direction.NORTH))
+		{
+			engine.setNorthDirection();
+		}
+		
+		println(engine.getState().toString());
+	}
+	
 	
 	public void notifyObstacle()
 	{
@@ -416,6 +392,7 @@ public class Robot extends AbstractRobot {
 				"position("+current.getX()+","+current.getY()+"))");
 	}
 	
+	
 	/**
 	 * Dynamically Update the Robot position during the Navigation
 	 * 
@@ -424,8 +401,17 @@ public class Robot extends AbstractRobot {
 	public void updateMyPosition(String move){
 		
 		engine.makeMove(move);
-		System.out.println(engine.getState().toString());
+		System.out.println("New Position "+engine.getState().toString());
 		notifyMyPosition();
+	}
+	
+	
+	@Override
+	public AsynchActionResult execute(String command, int speed, int angle, int moveTime, 
+			String  events, String plans) throws Exception
+	{		
+		updateMyPosition(command);
+		return super.execute(command, speed, angle, moveTime, events, plans);		
 	}
 	
 	
@@ -442,11 +428,13 @@ public class Robot extends AbstractRobot {
 		emit("show", "show(" + payload + ")");
 	}
 	
+	
 	public void consultFromFile(String filename)
 	{
 		System.out.println("loading...");
 		QActorUtils.consultFromFile(pengine, filename);
 	}		
+	
 	
 	@Override
 	public AsynchActionResult solveGoalReactive(String goal, int time, String evList, String planList){
@@ -466,6 +454,48 @@ public class Robot extends AbstractRobot {
 	*/
 //}}	
 
+//{{ UTILITIES ---------------------------------------------------------------
+	
+	private Map loadMap(String filename){
+		Map m = null;
+		
+		List<String> data = new ArrayList<String>();						
+		try
+		{
+			InputStream fs = new FileInputStream(filename);
+			InputStreamReader inpsr = new InputStreamReader(fs);
+			BufferedReader br       = new BufferedReader(inpsr);
+			Iterator<String> lsit   = br.lines().iterator();
+
+			while(lsit.hasNext())
+			{
+				data.add(lsit.next());
+			}
+			br.close();
+			
+		} catch (Exception e)
+		{
+			System.out.println("QActor  ERROR " + e.getMessage());
+		}
+		
+		for(int i=0; i<data.size(); i++)
+		{
+			if(i == 0)
+			{
+				m = Map.createMapFromPrologRep(data.get(i));
+			}
+			else
+			{
+				String s[] = data.get(i).split(" ");
+				m.addElementFromString(s[1]);
+			}
+		}
+		
+		return m;
+	}
+	
+//}}	
+	
 	
 //{{ SYSTEM INTERACTION *****************************************************
 
