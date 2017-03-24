@@ -9,6 +9,7 @@ import it.unibo.qactors.akka.QActorActionUtils;
 import it.unibo.qactors.akka.QActorPlanUtils;
 import it.unibo.qactors.platform.EventItem;
 import it.unibo.qactors.platform.LocalTime;
+import it.unibo.robot.Robot;
 
 public class QActorPlanUtilsDebug extends QActorPlanUtils{
 
@@ -65,7 +66,7 @@ public class QActorPlanUtilsDebug extends QActorPlanUtils{
 			 */
 			boolean obj = false;
 			
-			if(events.equals("obstaclefront"))
+			if(events.contains("obstaclefront"))
 			{
 				obj = engine.checkObjFront();
 			}
@@ -77,7 +78,12 @@ public class QActorPlanUtilsDebug extends QActorPlanUtils{
 			if(!obj)
 			{
 				events = "noev";
-			}			
+			}
+			else
+			{
+				System.out.println("Event "+events+" received!!!!");
+				((Robot)actor).switchPlan(plans);
+			}
 			
 			IEventItem ev = new EventItem(events, events, new LocalTime(tout-1), "sensor");
 						

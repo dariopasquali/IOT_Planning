@@ -339,6 +339,17 @@ protected IActorAction  action;
     while(true){
     	curPlanInExec =  "startNavigation";	//within while since it can be lost by switchlan
     	nPlanIter++;
+    		if( (guardVars = QActorUtils.evalTheGuard(this, " !?planName(PLANNAME)" )) != null ){
+    		parg = "myClearPlan(PLANNAME)";
+    		parg = QActorUtils.substituteVars(guardVars,parg);
+    		//REGENERATE AKKA
+    		aar = solveGoalReactive(parg,0,"","");
+    		//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
+    		if( aar.getInterrupted() ){
+    			curPlanInExec   = "startNavigation";
+    			if( ! aar.getGoon() ) break;
+    		} 			
+    		}
     		if( (guardVars = QActorUtils.evalTheGuard(this, " !?planFilename(FILENAME)" )) != null ){
     		parg = "loadThePlan(FILENAME)";
     		parg = QActorUtils.substituteVars(guardVars,parg);
@@ -404,7 +415,7 @@ protected IActorAction  action;
     		temporaryStr = "\"maybe there is an unexpected static obstacle\"";
     		println( temporaryStr );  
     		//delay
-    		aar = delayReactive(60000,"" , "");
+    		aar = delayReactive(6000,"" , "");
     		if( aar.getInterrupted() ) curPlanInExec   = "waitAndEvaluate";
     		if( ! aar.getGoon() ) break;
     		temporaryStr = "\"are you there obstacle ??\"";
@@ -437,24 +448,14 @@ protected IActorAction  action;
     	nPlanIter++;
     		temporaryStr = "\"I found an unexpected static obstacle\"";
     		println( temporaryStr );  
-    		parg = "getCurrentPosition(CURRENT)";
+    		parg = "notifyUnexpectedObstacle";
     		//REGENERATE AKKA
-    		aar = solveGoalReactive(parg,2100000000,"","");
+    		aar = solveGoalReactive(parg,0,"","");
     		//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
     		if( aar.getInterrupted() ){
     			curPlanInExec   = "notifyUnexpectedObstacle";
     			if( ! aar.getGoon() ) break;
     		} 			
-    		parg = "getObstaclePosition(OBJECT)";
-    		//REGENERATE AKKA
-    		aar = solveGoalReactive(parg,2100000000,"","");
-    		//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
-    		if( aar.getInterrupted() ){
-    			curPlanInExec   = "notifyUnexpectedObstacle";
-    			if( ! aar.getGoon() ) break;
-    		} 			
-    		temporaryStr = QActorUtils.unifyMsgContent(pengine, "update(OBJECT,CURRENT)","update(OBJECT,CURRENT)", guardVars ).toString();
-    		emit( "update", temporaryStr );
     		temporaryStr = "\"Unexpected Obstacle notified, I wait the new plan\"";
     		println( temporaryStr );  
     		if( ! planUtils.switchToPlan("waitConsoleCommand").getGoon() ) break;

@@ -2,6 +2,7 @@ package it.unibo.robot.utility;
 
 import it.unibo.domain.model.implementation.State;
 import it.unibo.domain.model.map.Map;
+import it.unibo.gui.CellState;
 import it.unibo.planning.astar.domain.Move;
 import it.unibo.planning.enums.Direction;
 import it.unibo.planning.enums.MoveType;
@@ -28,7 +29,10 @@ public class FileEngine extends Engine {
 	
 	// SONAR LIKE CHECKS ---------------------------------
 	
-
+	public void setObject(State s)
+	{
+		worldMap.setCellObj(s.getY(), s.getX());
+	}
 
 	protected boolean checkObject(State state)
 	{
@@ -60,6 +64,10 @@ public class FileEngine extends Engine {
 		State leftState = moveForwardSafe(turnDoubleLeftSafe(state));
 
 		return checkObject(leftState);	
+	}
+
+	public Object getWorldMap() {
+		return worldMap;
 	}	
 }
 

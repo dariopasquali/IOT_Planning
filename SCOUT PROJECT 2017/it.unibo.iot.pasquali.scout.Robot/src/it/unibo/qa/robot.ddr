@@ -38,7 +38,7 @@ Dispatch navigate : navigate ( PLAN , POS , MODE)
 // Raised by Robot when find an unexpected
 // obstacle during the navigation
 Event update : update ( OBJECT , CURRENT )
-//ELEMENT = potition ( X , Y )
+//ELEMENT = position ( X , Y )
 //CURRENT = position ( X , Y )
 
 
@@ -210,6 +210,7 @@ Robot mockScout QActor robot context ctxRobot{
  		
  	Plan startNavigation
  	
+ 		[ !? planName(PLANNAME) ] solve myClearPlan(PLANNAME) time(0);
  		[ !? planFilename(FILENAME) ]  solve loadThePlan(FILENAME) time(300000000);
   		
  		println("++++++++++++++++++ Plan Loaded ++++++++++++++++++");	
@@ -223,13 +224,12 @@ Robot mockScout QActor robot context ctxRobot{
  		println("++++++++++++++++++ ++++++++++++++++++ ++++++++++++++++++");	
 
 		[ !? planName(PLANNAME) ] solve myRunPlan(PLANNAME) time(1000000000)
-		// i's a big atto di fede 
- 		//solve runResumablePlan(path) time(2100000000)
+
  	
  	Plan waitAndEvaluate resumeLastPlan
  		
  		println("maybe there is an unexpected static obstacle");
- 		delay time(60000);
+ 		delay time(6000);
  		println("are you there obstacle ??");
  		
  		sense time(5000) obstaclefront -> notifyUnexpectedObstacle	
@@ -239,10 +239,7 @@ Robot mockScout QActor robot context ctxRobot{
  		
  		println("I found an unexpected static obstacle");
  		
- 		solve getCurrentPosition(CURRENT) time(2100000000) onFailSwitchTo navigationFailure;
- 		solve getObstaclePosition(OBJECT) time(2100000000) onFailSwitchTo navigationFailure;
- 	
- 		emit update : update(OBJECT , CURRENT);
+ 		solve notifyUnexpectedObstacle time(0);
  		
  		println("Unexpected Obstacle notified, I wait the new plan");
  		

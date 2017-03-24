@@ -33,10 +33,14 @@ startNavigation(MODE) :-
 
 
 updateMapAndReplan(position(ELx , ELy), position(CURx, CURy)) :-
+	actorPrintln(object(ELx , ELy)),
+	actorPrintln(current(CURx, CURy)),
 	actorobj(Actor),
-	Actor <- updateMap(ELx , ELy),	
-	assert(element(ELx , ELy)),
-	Actor <- searchNewBestPath(CURx, CURy),
+	Actor <- updateMap(ELx , ELy, object),
+	actorPrintln(update),
+	Actor <- searchNewBestPath(CURx, CURy),	
+	Actor <- showPathOnGui,
+	actorPrintln(search),
 	Actor <- sendNavigationData.
 
 /*

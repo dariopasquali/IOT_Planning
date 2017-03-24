@@ -13,7 +13,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import akka.actor.ActorContext;
 import it.unibo.gui.CellState;
 import it.unibo.gui.ConsoleGUI;
 import it.unibo.is.interfaces.IActivity;
@@ -33,8 +32,9 @@ public class Console extends AbstractConsole implements IActivity{
 	private IMap map;
 	private it.unibo.planning.astar.algo.Path path;
 	private static ConsoleGUI env = new ConsoleGUI();
-	private int sx, sy;
+	private int sx, sy, gx, gy;
 	private String filename;
+	private String robotMode;
 	
 	public Console(String actorId, QActorContext myCtx, IOutputEnvView outEnvView )  throws Exception
 	{
@@ -130,10 +130,19 @@ public class Console extends AbstractConsole implements IActivity{
 			
 		}	
 
+		public void searchNewBestPath(int cx, int cy)
+		{
+			println("search another path");
+			
+			searchBestPath(cx, cy, gx, gy);
+		}
+		
 		public void searchBestPath(int sx, int sy, int gx, int gy)
 		{		
 			this.sx = sx;
 			this.sy = sy;
+			this.gx = gx;
+			this.gy = gy;
 			
 			AStarSearchAgent agent = new AStarSearchAgent();
 			
@@ -175,10 +184,15 @@ public class Console extends AbstractConsole implements IActivity{
 			
 		}
 
+		public void sendNavigationData(){
+			sendNavigationData(robotMode);
+		}
+		
 		public void sendNavigationData(String mode)
 		{	
 			String pp = getPrologPlan();
 			String po = getPrologPosition();
+			this.robotMode = mode;
 			
 			println(pp);
 			println(po);

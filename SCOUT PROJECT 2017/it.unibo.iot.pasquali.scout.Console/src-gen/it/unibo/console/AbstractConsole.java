@@ -517,7 +517,7 @@ public abstract class AbstractConsole extends QActor {
 	    		 		parg =  updateVars( Term.createTerm("update(OBJECT,CURRENT)"), Term.createTerm("update(OBJECT,CURRENT)"), 
 	    		 			    		  					Term.createTerm(currentEvent.getMsg()), parg);
 	    		 			if( parg != null ) {
-	    		 			    aar = QActorUtils.solveGoal(this,myCtx,pengine,parg,"",outEnvView,600000);
+	    		 			    aar = QActorUtils.solveGoal(this,myCtx,pengine,parg,"",outEnvView,0);
 	    		 				//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
 	    		 				if( aar.getInterrupted() ){
 	    		 					curPlanInExec   = "waitEndOfNavigation";

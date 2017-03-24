@@ -211,7 +211,7 @@ QActor console context ctxConsole{
  		onEvent local_gui_command : local_gui_command(abort) -> switchToPlan abortCommand; 
  						
 		onEvent update : update (OBJECT, CURRENT) ->
-			 solve updateMapAndReplan(OBJECT , CURRENT) time(600000)
+			 solve updateMapAndReplan(OBJECT , CURRENT) time(0)
 			 onFailSwitchTo  alternativeFindpathFailure;	
 			 	
 		onEvent end : end -> switchToPlan endOfNavigation;

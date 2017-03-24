@@ -107,6 +107,16 @@ public class Engine {
 	
 	// GETTERS ---------------------------------
 	
+	public void setCurrentState(int sx, int sy) {
+		state.setX(sx);
+		state.setY(sy);		
+	}
+
+	
+	public State getForwardState() {
+		return moveForwardSafe(state);
+	}
+	
 	public State getState() {
 		return state;
 	}
@@ -240,6 +250,23 @@ public class Engine {
 		
 		if(!(this instanceof FileEngine))
 			actor.turnRight();
+	}
+	
+	public void setNorthDirection() {
+		
+		int val = state.getDirection().getValue();
+		
+		if(val<=4)
+		{
+			for(int i=0; i<val; i++)
+				turnLeft();
+		}
+		else
+		{			
+			for(int i=0; i<(8-val); i++)
+				turnRight();
+		}
+		
 	}
 	
 	
@@ -571,5 +598,10 @@ public class Engine {
 	
 		return unexpList;
 	}
+
+
+
+
+
 	
 }

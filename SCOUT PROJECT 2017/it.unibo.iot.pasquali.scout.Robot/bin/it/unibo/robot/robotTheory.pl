@@ -35,10 +35,12 @@ myExecuteCmd(CURPLAN, Actor, move(solve,GOAL,DURATION), Events, Plans, RES ):-
 
 enableDebugSensing :-
 	actorobj(Actor),
+	actorPrintln("enable debug sensing"),
 	Actor <- enableDebugSensing.
 	
 disableDebugSensing :-
 	actorobj(Actor),
+	actorPrintln("disable debug sensing"),
 	Actor <- disableDebugSensing.	
 
 /*

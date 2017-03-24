@@ -21,6 +21,7 @@ import it.unibo.iot.models.sensorData.distance.IDistanceSensorData;
 import it.unibo.iot.sensors.ISensor;
 import it.unibo.iot.sensors.distanceSensor.DistanceSensor;
 import it.unibo.is.interfaces.IOutputEnvView;
+import it.unibo.planning.enums.Direction;
 import it.unibo.qactors.action.AsynchActionResult;
 import it.unibo.qactors.action.IActorAction.ActionExecMode;
 import it.unibo.qactors.akka.QActorPlanUtils;
@@ -375,20 +376,45 @@ public class Robot extends AbstractRobot {
 	 */
 	public void configNavigationEngine(int sx, int sy, String mode)	{
 		
+		System.out.println("Navigation Mode --> " + mode);
+		
 		if(mode.equals(MODE_SIMULATED))
 		{
-			engine = new FileEngine(sx, sy, this);
+			engine.setCurrentState(sx, sy);
+			((FileEngine)engine).setObject(new State(2,2));
+			((QActorPlanUtilsDebug)planUtils).setEngine(((FileEngine)engine));
+			
+			System.out.println(((FileEngine)engine).getWorldMap().toString());
+			
 			enableDebugSensing();
 		}
 		else if(mode.equals(MODE_REAL_ROBOT))
 		{
-			engine = new Engine(sx, sy, this);
+			if(engine == null) engine = new Engine(sx, sy, this);
 			disableDebugSensing();
+		}
+		
+		if(!engine.getState().getDirection().equals(Direction.NORTH))
+		{
+			engine.setNorthDirection();
 		}
 		
 		println(engine.getState().toString());
 	}
 	
+	public void notifyObstacle()
+	{
+		State current = engine.getState();
+		State obj = engine.getForwardState();
+		
+		System.out.println("current state --> "+current.toString());
+		System.out.println("detected obstacle --> "+obj.toString());
+		
+		//update : update ( OBJECT , CURRENT )
+		
+		this.emit("update", "update(position("+obj.getX()+","+obj.getY()+"),"+
+				"position("+current.getX()+","+current.getY()+"))");
+	}
 	
 	/**
 	 * Dynamically Update the Robot position during the Navigation
@@ -422,12 +448,14 @@ public class Robot extends AbstractRobot {
 		QActorUtils.consultFromFile(pengine, filename);
 	}		
 	
-//	@Override
-//	public AsynchActionResult solveGoalReactive(String goal, int time, String evList, String planList){
-//		
-//		
-//		return new AsynchActionResult(null, time+1, true, true, "", null);		
-//	}
+	@Override
+	public AsynchActionResult solveGoalReactive(String goal, int time, String evList, String planList){
+		
+		System.out.println("solve ---> "+goal);
+		
+		super.solveGoal(goal);
+		return new AsynchActionResult(null, time+1, true, true, "", null);		
+	}
 	
 	
 	/*
@@ -465,6 +493,13 @@ public class Robot extends AbstractRobot {
 	 */
 	public IEventItem senseEvent(int timeout, String event, String plan){
 		
+		event = event.replace('[', ' ');
+		event = event.replace(']', ' ');
+		plan = plan.replace('[', ' ');
+		plan = plan.replace(']', ' ');
+		event = event.trim();
+		plan = plan.trim();
+		
 		setCurrentEvent(null);
 		try
 		{			
@@ -475,7 +510,7 @@ public class Robot extends AbstractRobot {
 			{
     			println("WARNING: sense timeout");
     			addRule("tout(senseevent,"+getName()+")");
-    		}	
+    		}
 			
 			return currentEvent;
 		}

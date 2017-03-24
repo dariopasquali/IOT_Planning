@@ -16,6 +16,18 @@ navRobotTheory.pl
 
 planFilename("scout.txt").
 planName(scout).
+/*
+planBaseID(1).
+
+planName(NAME):-
+	planBaseName(BASE),
+	planBaseID(ID),
+	atom_concat(BASE,ID,NAME),
+	actorPrintln(NAME),
+	ID1 is ID + 1,
+	retract(planBaseID(_)),
+	assert(planBaseID(ID1)).
+*/
 
 defaultSpeed(60).
 defaultDuration(1000).
@@ -101,9 +113,29 @@ myExecPlan(CURPLAN,Actor,P,PC) :-
 executeCmd( Actor,  move(switchplan,PNAME), Events, Plans, done(switchplan) ):-
 	actorPrintln(  PNAME ),
 	Actor <- switchPlan(PNAME).
+	
+executeCmd(Actor, move(senseEvent,TIMEOUT,EVENTSLIST, PLANSLIST), Events, Plans, RES ):-
+	actorPrintln(sense(EVENTLIST)),
+	Actor <- senseEvent(TIMEOUT, EVENTSLIST, PLANSLIST).
 
-notifyEnd :-
-	actorPrintln("CRISTO DIO").
+notifyUnexpectedObstacle :-
+	actorobj(Actor),
+	Actor <- notifyObstacle.
+
+myClearPlan(P) :-
+	actorPrintln(clear),
+	%%retractall( plan(_, P, _) ),
+	myClearPlan(1,P),
+	actorPrintln( clearPlan( P,done ) ).
+
+myClearPlan(PC,P):-
+	plan(PC,P,S),
+	actorPrintln(PC),
+	retract(plan(PC,P,S)),
+	PC1 is PC + 1,
+	myClearPlan(PC1,P).
+
+myClearPlan(_,_).
 
 /*
 ------------------------------------------------------------

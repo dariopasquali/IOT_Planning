@@ -57,7 +57,7 @@ plan(1,waitEndOfNavigation, sentence(true,senseEvent([local_gui_command,update,e
 plan(2,waitEndOfNavigation, sentence(true,printCurrentEvent(''),'','' ))
 plan(3,waitEndOfNavigation, sentence(true,memoCurrentEvent ,'','' ))
 plan(4,waitEndOfNavigation, sentence(true,eventswitch(local_gui_command, Â»local_gui_command( abort), move( switchplan(abortCommand) ) ),'','' ))
-plan(5,waitEndOfNavigation, sentence(true,eventswitch(update, Â»update( OBJECT,CURRENT), move(solve,updateMapAndReplan( OBJECT,CURRENT),600000,"alternativeFindpathFailure") ),'','' ))
+plan(5,waitEndOfNavigation, sentence(true,eventswitch(update, Â»update( OBJECT,CURRENT), move(solve,updateMapAndReplan( OBJECT,CURRENT),0,"alternativeFindpathFailure") ),'','' ))
 plan(6,waitEndOfNavigation, sentence(true,eventswitch(end, Â»end, move( switchplan(endOfNavigation) ) ),'','' ))
 plan(7,waitEndOfNavigation, sentence(true,move(repeatplan) ,'','' ))
 plan(8,waitEndOfNavigation, sentence(true,move(resumeplan),'','' ))
