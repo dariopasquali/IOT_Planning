@@ -31,6 +31,7 @@ public class FileEngine extends Engine {
 	
 	public void setObject(State s)
 	{
+		System.out.println("World Changed --> " + s.getCoordinates().toString());
 		worldMap.setCellObj(s.getY(), s.getX());
 	}
 

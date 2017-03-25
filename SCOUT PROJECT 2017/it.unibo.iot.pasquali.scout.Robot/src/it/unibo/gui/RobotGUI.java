@@ -89,7 +89,7 @@ public class RobotGUI extends Frame implements IOutputEnvView, IBasicEnvAwt{
 	
 	public void setMap(IMap map)
 	{
-		this.mapViewer = new MapViewer(false);
+		this.mapViewer = new MapViewer(true, controller);
 		
 		mapViewer.createGridPanel(map.getYmax(), map.getXmax());
 		List<IMapElement> elements = map.getElements();

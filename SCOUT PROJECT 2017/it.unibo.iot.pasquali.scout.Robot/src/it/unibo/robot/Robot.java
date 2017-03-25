@@ -120,6 +120,50 @@ public class Robot extends AbstractRobot {
 		}
 		
 	}
+	
+	/**
+	 * Configure the Engine that manage the dynamically update of the robot position</br>
+	 * Robot doesn't need to know the map, it's a stupid executor that simply move on it.
+	 * 
+	 * @param sx	start X position
+	 * @param sy	start Y position
+	 */
+	public void configEngine(int sx, int sy)	{
+		
+		System.out.println("Navigation Mode --> ROBOT");
+		
+		if(engine == null) engine = new Engine(sx, sy, this);
+		disableDebugSensing();
+		
+		if(!engine.getState().getDirection().equals(Direction.NORTH))
+		{
+			engine.setNorthDirection();
+		}
+		
+		println(engine.getState().toString());
+	}
+	
+	
+	public void configFileEngine(int sx, int sy, String filename)
+	{
+		System.out.println("Navigation Mode --> SIMULATED");
+		
+		Map m = loadMap(filename);
+		this.engine = new FileEngine(sx, sy, m, this, false);
+		//((FileEngine)engine).setObject(new State(2,2));
+		((QActorPlanUtilsDebug)planUtils).setEngine(((FileEngine)engine));
+		
+		System.out.println(((FileEngine)engine).getWorldMap().toString());
+		
+		enableDebugSensing();
+		
+		if(!engine.getState().getDirection().equals(Direction.NORTH))
+		{
+			engine.setNorthDirection();
+		}
+		
+		println(engine.getState().toString());
+	}
 //}}	
 
 	
@@ -268,6 +312,8 @@ public class Robot extends AbstractRobot {
 	 */
 	public void setNavigationPlan(String planName, String plan)	{
 		
+		boolean simulated = (engine instanceof FileEngine);
+		
 		String speed = ""+defaultSpeed;
 		String time = ""+defaultTime;
 		String diagoTime = ""+(Math.round(defaultTime*1.414));
@@ -288,6 +334,9 @@ public class Robot extends AbstractRobot {
 		
 		for(String m : moves)
 		{
+			if(simulated)
+				pathPlan.addSenseEvent(1000, "updateSimulation", "simulatedWorldChanged");
+			
 			switch(m)
 			{
 			case "t":
@@ -333,49 +382,7 @@ public class Robot extends AbstractRobot {
 	}
 	
 	
-	/**
-	 * Configure the Engine that manage the dynamically update of the robot position</br>
-	 * Robot doesn't need to know the map, it's a stupid executor that simply move on it.
-	 * 
-	 * @param sx	start X position
-	 * @param sy	start Y position
-	 */
-	public void configEngine(int sx, int sy)	{
-		
-		System.out.println("Navigation Mode --> ROBOT");
-		
-		if(engine == null) engine = new Engine(sx, sy, this);
-		disableDebugSensing();
-		
-		if(!engine.getState().getDirection().equals(Direction.NORTH))
-		{
-			engine.setNorthDirection();
-		}
-		
-		println(engine.getState().toString());
-	}
-	
-	
-	public void configFileEngine(int sx, int sy, String filename)
-	{
-		System.out.println("Navigation Mode --> SIMULATED");
-		
-		Map m = loadMap(filename);
-		this.engine = new FileEngine(sx, sy, m, this, false);
-		//((FileEngine)engine).setObject(new State(2,2));
-		((QActorPlanUtilsDebug)planUtils).setEngine(((FileEngine)engine));
-		
-		System.out.println(((FileEngine)engine).getWorldMap().toString());
-		
-		enableDebugSensing();
-		
-		if(!engine.getState().getDirection().equals(Direction.NORTH))
-		{
-			engine.setNorthDirection();
-		}
-		
-		println(engine.getState().toString());
-	}
+
 	
 	
 	public void notifyObstacle()
@@ -446,6 +453,11 @@ public class Robot extends AbstractRobot {
 	}
 	
 	
+	public void updateSimulationWorld(int x, int y){
+		
+		System.out.println("Update the World Map");
+		((FileEngine)engine).setObject(new State(y,x));
+	}
 	/*
 	public Direction makeSpin(Direction start, SpinDirection spin) { //TODO use the Engine
 		int newID = (start.getValue() + (8+spinFactor*spin.getRotation()))%8;

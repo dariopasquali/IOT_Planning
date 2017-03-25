@@ -12,6 +12,7 @@ import javax.swing.SwingUtilities;
 
 import it.unibo.domain.model.map.Map;
 import it.unibo.domain.model.map.MapElement;
+import it.unibo.is.interfaces.IActivityBase;
 
 public class MapViewer {
 	
@@ -28,7 +29,8 @@ public class MapViewer {
     
     protected MapElement currentPosition;
     protected CellState lastCurrentCellState;
- /*
+	private IActivityBase controller;
+ 
     private class ClickHandler implements MouseListener{
 
 		private int y;
@@ -69,40 +71,16 @@ public class MapViewer {
 			if(!map.isCellClear(y,x))
 				return;
 			
-			if(SwingUtilities.isLeftMouseButton(e))
-			{
-				if(start != null)
-					setCellClear(start.getY(), start.getX());
-				
-				start = new MapElement(y, x);
-				getGridButton(y, x).setBackground(CellState.START.getColor());
-			}
-			else if(SwingUtilities.isRightMouseButton(e))
-			{
-				if(goal != null)
-					setCellClear(goal.getY(), goal.getX());
-				
-				goal = new MapElement(y, x);
-				getGridButton(y, x).setBackground(CellState.GOAL.getColor());
-			}
-			else if(SwingUtilities.isMiddleMouseButton(e))
-			{
-				if(getGridButton(y, x).getBackground().equals(CellState.START.getColor()))
-				{
-					start = null;
-				}
-				else if(getGridButton(y, x).getBackground().equals(CellState.GOAL.getColor()))
-				{
-					goal = null;
-				}
-				setCellClear(y, x);				
-			}
+			getGridButton(y, x).setBackground(CellState.OBJECT.getColor());
+			map.setCellObj(y, x);
+			controller.execAction("WORLDCHANGED "+x+","+y);			
 		}				
 	}
-*/    
-    public MapViewer(boolean enableClick)
+    
+    public MapViewer(boolean enableClick, IActivityBase controller)
     {
     	this.enableClick = enableClick;
+    	this.controller = controller;
     }
  
 // ACCESSOR --------------------------------------------------------    
@@ -142,9 +120,9 @@ public class MapViewer {
 
 	protected JButton createCell(final int y, final int x) {
         final JButton b = new JButton("");
-                
-//        if(enableClick)
-//        	b.addMouseListener(new ClickHandler(y, x));
+        b.setEnabled(true);        
+        if(enableClick)
+        	b.addMouseListener(new ClickHandler(y, x));
         return b;
     }
 
@@ -184,6 +162,7 @@ public class MapViewer {
 	public void setCellState(int y, int x, CellState state)
     {
     	getGridButton(y, x).setBackground(state.getColor());
+    	getGridButton(y, x).setEnabled(true);;
     	map.setCell(y, x, state.getMapState());
     	p.revalidate();
     	p.repaint();

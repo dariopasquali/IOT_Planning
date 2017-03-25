@@ -66,6 +66,7 @@ Event obstaclefront : obstaclefront
 Event obstacleleft : obstacleleft
 // DIRECTION = front || left
 
+Event updateSimulation : updateSimulation(POSITION)
 
 // ------------------------------------------------------------------
 //		ROBOT GUI - INTERACTION
@@ -78,12 +79,15 @@ Event show : show(POS, DIR)
 // POS = position(X,Y)
 // DIR = n || e || w || s || ne || nw || se || sw
 
+Event local_robot_gui : local_robot_gui(COMMAND)
 
 // ------------------------------------------------------------------
 //			CONTEXTS
 // ------------------------------------------------------------------
 
 Context ctxRobot ip [ host="localhost" port=8020]
+//EventHandler evh for updateSimulation -print;
+
 Context ctxConsole ip [ host="localhost" port=8010]
 
 QActor console context ctxConsole{
@@ -113,7 +117,7 @@ QActor guimanager context ctxRobot{
 		switchToPlan waitUpdates	
 		
 	Plan waitUpdates
-		sense time(1000000000) show, end, abort -> continue, continue, continue;
+		sense time(1000000000) show, end, abort ->  continue, continue, continue;
 			
 		onEvent show : show(POS,DIR) -> solve updateState(POS,DIR) time(0);
 		onEvent end : end -> switchToPlan waitMap;
@@ -220,10 +224,6 @@ Robot mockScout QActor robot context ctxRobot{
  		[!? msg(_, _, SENDER, X, navigatefile( PLAN_MOVES , POS , FILENAME), MSGNUM)]
  								emit enableGUI : enableGUI(POS, FILENAME);
  		
- 		println("-----------------------------");
- 		[!? msg(_, _, SENDER, X, navigatefile( PLAN_MOVES , POS , FILENAME), MSGNUM)] println(FILENAME);
- 		println("-----------------------------");
- 		
  		[?? msg(_, _, SENDER, X, navigatefile( PLAN_MOVES , POS , FILENAME), MSGNUM)] 
  			solve loadNavigationData(PLAN_MOVES, POS, FILENAME) time (100000) onFailSwitchTo loadMapFailure;
  		
@@ -275,6 +275,9 @@ Robot mockScout QActor robot context ctxRobot{
  		
  		switchToPlan waitConsoleCommand	
  		
+ 	Plan simulatedWorldChanged resumeLastPlan
+ 		println("******************** Simulated World Changed ****************************")
+ 	
  	Plan abort 
  		println("Current command aborted");
  		switchToPlan waitConsoleCommand

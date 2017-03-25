@@ -84,16 +84,18 @@ loadNavigationData(PLAN, POS) :-
 	actorPrintln(PLAN),
 	actorPrintln(POS),
 	actorPrintln("caricamento dati in corso...."),
-	setNavPlan(PLAN),
-	configEngine(POS).
+	configEngine(POS),
+	setNavPlan(PLAN).
+	
 	
 loadNavigationData(PLAN, POS, FILENAME) :-
 	actorPrintln(PLAN),
 	actorPrintln(POS),
 	actorPrintln(FILENAME),
 	actorPrintln("caricamento dati in corso...."),
-	setNavPlan(PLAN),
-	configFileEngine(POS, FILENAME).
+	configFileEngine(POS, FILENAME),
+	setNavPlan(PLAN).
+	
 
 loadThePlan( FName ):-
 	actorobj(Actor),
@@ -140,6 +142,12 @@ myClearPlan(PC,P):-
 	myClearPlan(PC1,P).
 
 myClearPlan(_,_).
+
+updateSimulationWorld(position(X,Y)) :-
+	actorobj(Actor),
+	actorPrintln(X),
+	actorPrintln(Y),
+	Actor <- updateSimulationWorld(X,Y).
 
 /*
 ------------------------------------------------------------

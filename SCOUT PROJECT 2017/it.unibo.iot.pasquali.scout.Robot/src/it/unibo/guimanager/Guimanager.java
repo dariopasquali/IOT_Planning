@@ -87,7 +87,17 @@ public class Guimanager extends AbstractGuimanager implements IActivity
 
 	@Override
 	public void execAction(String cmd) {
-		// TODO Auto-generated method stub
+		
+		String[] command = cmd.split(" ");		
+		String[] params;
+		switch (command[0]){
+		
+		case "WORLDCHANGED":
+			
+			params = command[1].split(",");
+			emit( "updateSimulation", "updateSimulation(position("+params[0]+","+params[1]+"))");
+			break;
+		}
 		
 	}
 

@@ -79,7 +79,7 @@ public class Map implements IMap{
 		{
 			for(int x = 0; x<=xmax; x++)
 			{
-				intmap[y][x] = NONE;
+				intmap[y][x] = CLEAR;	;
 			}
 		}	
 	}

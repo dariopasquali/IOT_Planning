@@ -1,6 +1,8 @@
 package it.unibo.robot.utility;
 
+import akka.dispatch.sysmsg.Supervise;
 import it.unibo.contactEvent.interfaces.IEventItem;
+import it.unibo.domain.model.implementation.State;
 import it.unibo.is.interfaces.IOutputEnvView;
 import it.unibo.qactors.action.AsynchActionResult;
 import it.unibo.qactors.action.IActorAction.ActionExecMode;
@@ -48,11 +50,28 @@ public class QActorPlanUtilsDebug extends QActorPlanUtils{
 		}
 		else
 		{
-			//sensing with engine
-			//config aar
-			//set curevent
-			
-			
+			// Not to sense the world but the system
+			if(!events.contains("obstaclefront") && !events.contains("obstacleleft"))
+			{
+				AsynchActionResult ares = super.senseEvents(tout, events, plans, alarmEvents, recoveryPlans, mode);
+				
+				String msg = actor.getCurrentEvent().getMsg();
+				
+				if(!msg.contains("updateSimulation"))
+					return ares;
+				
+				msg = msg.replace('(', ' ');
+				msg = msg.replace(')', ' ');
+				msg = msg.replace(',', ' ');
+				msg = msg.trim();
+				
+				String[] params = msg.split(" ");
+				
+				((FileEngine)engine).setObject(
+						new State(Integer.parseInt(params[3]), Integer.parseInt(params[2])));
+				
+				return ares;
+			}
 			
 			/*
 			 * if(engine trova cella object)

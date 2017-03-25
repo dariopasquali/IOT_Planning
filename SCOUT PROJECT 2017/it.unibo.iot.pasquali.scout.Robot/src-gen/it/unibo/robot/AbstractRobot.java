@@ -362,15 +362,6 @@ protected IActorAction  action;
     		temporaryStr = QActorUtils.unifyMsgContent(pengine, "enableGUI(START,FILENAME)","enableGUI(POS,FILENAME)", guardVars ).toString();
     		emit( "enableGUI", temporaryStr );
     		}
-    		temporaryStr = "\"-----------------------------\"";
-    		println( temporaryStr );  
-    		if( (guardVars = QActorUtils.evalTheGuard(this, " !?msg(_,_,SENDER,X,navigatefile(PLAN_MOVES,POS,FILENAME),MSGNUM)" )) != null ){
-    		temporaryStr = "FILENAME";
-    		temporaryStr = QActorUtils.substituteVars(guardVars,temporaryStr);
-    		println( temporaryStr );  
-    		}
-    		temporaryStr = "\"-----------------------------\"";
-    		println( temporaryStr );  
     		if( (guardVars = QActorUtils.evalTheGuard(this, " ??msg(_,_,SENDER,X,navigatefile(PLAN_MOVES,POS,FILENAME),MSGNUM)" )) != null ){
     		parg = "loadNavigationData(PLAN_MOVES,POS,FILENAME)";
     		parg = QActorUtils.substituteVars(guardVars,parg);
@@ -547,6 +538,26 @@ protected IActorAction  action;
     return returnValue;
     }catch(Exception e){
        //println( getName() + " plan=notifyEndOfNavigation WARNING:" + e.getMessage() );
+       QActorContext.terminateQActorSystem(this); 
+       return false;  
+    }
+    }
+    public boolean simulatedWorldChanged() throws Exception{	//public to allow reflection
+    try{
+    	int nPlanIter = 0;
+    	//curPlanInExec =  "simulatedWorldChanged";
+    	boolean returnValue = suspendWork;
+    while(true){
+    	curPlanInExec =  "simulatedWorldChanged";	//within while since it can be lost by switchlan
+    	nPlanIter++;
+    		temporaryStr = "\"******************** Simulated World Changed ****************************\"";
+    		println( temporaryStr );  
+    		returnValue = continueWork;  
+    break;
+    }//while
+    return returnValue;
+    }catch(Exception e){
+       //println( getName() + " plan=simulatedWorldChanged WARNING:" + e.getMessage() );
        QActorContext.terminateQActorSystem(this); 
        return false;  
     }
