@@ -310,7 +310,7 @@ public class Map implements IMap{
 			for(int x=0; x<=xmax; x++)
 			{
 				if(intmap[y][x] == OBJ)
-					list.add(new MapElement(y,x));
+					list.add(new MapElement(x,y));
 			}
 		}
 		

@@ -32,13 +32,10 @@ public class Guimanager extends AbstractGuimanager implements IActivity
 	}
 	
 	
-	public void showGUI()
-	{
-		((RobotGUI) env).setVisible(true);
-	}
-	
 	public void showMap(int startX, int startY, String filename)
 	{
+		((RobotGUI) env).setVisible(true);
+		
 		Map m = null;
 		
 		List<String> data = new ArrayList<String>();						
@@ -74,6 +71,7 @@ public class Guimanager extends AbstractGuimanager implements IActivity
 		}
 		this.map = m;
 		
+		println(map.toString());
 		
 		((RobotGUI)env).setMap(m);
 		((RobotGUI)env).setCurrentPosition(startY, startX, "N");

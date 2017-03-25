@@ -71,10 +71,12 @@ setNavPlan(plan(PLAN)) :-
 	Actor <- setNavigationPlan(NAME, PLAN).
 	
 configEngine(position(SX, SY)) :-
+	actorPrintln("confingEngine!!!!"),
 	actorobj(Actor),
 	Actor <- configEngine(SX, SY).
 	
 configFileEngine(position(SX, SY), FILENAME) :-
+	actorPrintln("configFileEngine!!!!"),
 	actorobj(Actor),
 	Actor <- configFileEngine(SX, SY, FILENAME).
 	

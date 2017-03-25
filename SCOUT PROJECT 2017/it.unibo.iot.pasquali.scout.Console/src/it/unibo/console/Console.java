@@ -85,11 +85,9 @@ public class Console extends AbstractConsole implements IActivity{
 		// NAVIGATION METHODS -------------------------------------------------
 		
 		// BUTTON MAP - ConsoleGUI
-		public void loadMapButton(String path, String mode)
+		public void loadMapButton(String path)
 		{
 			Map m = null;
-			
-			System.out.println(mode);
 				
 			List<String> data = new ArrayList<String>();						
 			try
@@ -212,7 +210,7 @@ public class Console extends AbstractConsole implements IActivity{
 			}
 			else
 			{
-				temporaryStr = QActorUtils.unifyMsgContent(pengine, "navigatefile(PLAN,POS,FILENAME)","navigatefile("+pp+","+po+","+filename+")", guardVars ).toString();
+				temporaryStr = QActorUtils.unifyMsgContent(pengine, "navigatefile(PLAN,POS,FILENAME)","navigatefile("+pp+","+po+",\""+filename+"\")", guardVars ).toString();
 				println("temp string "+temporaryStr);
 				try
 				{
@@ -233,19 +231,17 @@ public class Console extends AbstractConsole implements IActivity{
 			((ConsoleGUI)env).clearGUI();
 		}
 		
+		public void myClearPath()
+		{
+			((ConsoleGUI)env).clearPath();
+		}
+		
 		@Override
 		public void execAction(String cmd) {
 			
 			String[] command = cmd.split(" ");		
 			String[] params;
 			switch (command[0]){
-			
-			case "LOADEXP":
-				
-				//temporaryStr = QActorUtils.unifyMsgContent(pengine, "local_gui_command(COMMAND)","local_gui_command(loadexpmap(\""+command[1]+"\")", guardVars ).toString();
-				
-				emit("local_gui_command", "local_gui_command(loadexpmap(\""+command[1]+"\"))");
-				break;
 			
 			case "EXPLORE":
 				emit( "local_gui_command", "local_gui_command(explore))");
@@ -295,6 +291,11 @@ public class Console extends AbstractConsole implements IActivity{
 			case "CLEAR":
 				emit( "local_gui_command", "local_gui_command(clear)");
 				break;
+			
+			case "CLEARPATH":
+				emit( "local_gui_command", "local_gui_command(clearpath)");
+				break;
+				
 			default:
 				println("Invalid command");
 			}

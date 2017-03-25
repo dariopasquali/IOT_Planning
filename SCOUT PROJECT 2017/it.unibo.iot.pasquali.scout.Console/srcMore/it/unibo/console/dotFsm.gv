@@ -20,13 +20,13 @@ digraph finite_state_machine {
   	
   	waitGUICommand -> waitGUICommand [ label = ""];
   	waitGUICommand -> navigation [ label = "local_gui_command(COMMAND)/"];
-  	waitGUICommand -> loadExpMap [ label = "local_gui_command(COMMAND)/"];
   	waitGUICommand -> exploration [ label = "local_gui_command(COMMAND)/"];
   	waitGUICommand -> clearGUI [ label = "local_gui_command(COMMAND)/"];
   	waitGUICommand -> loadMap [ label = "local_gui_command(COMMAND)/"];
   	waitGUICommand -> explorationDebug [ label = "local_gui_command(COMMAND)/"];
   	waitGUICommand -> findPath [ label = "local_gui_command(COMMAND)/"];
   	waitGUICommand -> navigationFile [ label = "local_gui_command(COMMAND)/"];
+  	waitGUICommand -> clearPath [ label = "local_gui_command(COMMAND)/"];
   	
   	exploration -> waitEndOfExploration [ label = ""];
   	

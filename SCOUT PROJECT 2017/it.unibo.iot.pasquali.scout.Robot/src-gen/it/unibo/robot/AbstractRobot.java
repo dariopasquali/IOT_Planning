@@ -176,7 +176,7 @@ protected IActorAction  action;
     		if( currentMessage.msgId().equals("navigate") ){
     			String parg = "";
     			/* SwitchPlan */
-    			parg =  updateVars(  Term.createTerm("navigate(PLAN,POS)"), Term.createTerm("navigate(PLAN,POS)"), 
+    			parg =  updateVars(  Term.createTerm("navigate(PLAN_MOVES,POS)"), Term.createTerm("navigate(PLAN_MOVES,POS)"), 
     				    		  					Term.createTerm(currentMessage.msgContent()), parg);
     				if( parg != null ){
     					 if( ! planUtils.switchToPlan("navigation").getGoon() ) break; 
@@ -185,7 +185,7 @@ protected IActorAction  action;
     		if( currentMessage.msgId().equals("navigatefile") ){
     			String parg = "";
     			/* SwitchPlan */
-    			parg =  updateVars(  Term.createTerm("navigatefile(PLAN,POS,FILENAME)"), Term.createTerm("navigatefile(PLAN,POS,FILENAME)"), 
+    			parg =  updateVars(  Term.createTerm("navigatefile(PLAN_MOVES,POS,FILENAME)"), Term.createTerm("navigatefile(PLAN_MOVES,POS,FILENAME)"), 
     				    		  					Term.createTerm(currentMessage.msgContent()), parg);
     				if( parg != null ){
     					 if( ! planUtils.switchToPlan("navigationFile").getGoon() ) break; 
@@ -237,11 +237,11 @@ protected IActorAction  action;
     			curPlanInExec   = "explorationFile";
     			if( ! aar.getGoon() ) break;
     		} 			
-    		if( (guardVars = QActorUtils.evalTheGuard(this, " !?msg(_,_,SENDER,X,explorefile(START,FILENAME),MSGNUM)" )) != null ){
+    		if( (guardVars = QActorUtils.evalTheGuard(this, " !?msg(_,_,SENDER,X,explorefile(START,FILENAME),_)" )) != null ){
     		temporaryStr = QActorUtils.unifyMsgContent(pengine, "enableGUI(START,FILENAME)","enableGUI(START,FILENAME)", guardVars ).toString();
     		emit( "enableGUI", temporaryStr );
     		}
-    		if( (guardVars = QActorUtils.evalTheGuard(this, " ??msg(_,_,SENDER,X,explorefile(START,FILENAME),MSGNUM)" )) != null ){
+    		if( (guardVars = QActorUtils.evalTheGuard(this, " ??msg(_,_,SENDER,X,explorefile(START,FILENAME),_)" )) != null ){
     		parg = "initExploreFile(START,FILENAME)";
     		parg = QActorUtils.substituteVars(guardVars,parg);
     		//REGENERATE AKKA
@@ -276,7 +276,7 @@ protected IActorAction  action;
     	nPlanIter++;
     		temporaryStr = "\"Let's explore!!\"";
     		println( temporaryStr );  
-    		if( (guardVars = QActorUtils.evalTheGuard(this, " ??msg(_,_,SENDER,X,explore(START,BOUNDS),MSGNUM)" )) != null ){
+    		if( (guardVars = QActorUtils.evalTheGuard(this, " ??msg(_,_,SENDER,X,explore(START,BOUNDS),_)" )) != null ){
     		parg = "initExploreMap(START,BOUNDS)";
     		parg = QActorUtils.substituteVars(guardVars,parg);
     		//REGENERATE AKKA
@@ -319,8 +319,8 @@ protected IActorAction  action;
     			curPlanInExec   = "navigation";
     			if( ! aar.getGoon() ) break;
     		} 			
-    		if( (guardVars = QActorUtils.evalTheGuard(this, " ??msg(_,_,SENDER,X,navigate(PLAN,POS),MSGNUM)" )) != null ){
-    		parg = "loadNavigationData(PLAN,POS)";
+    		if( (guardVars = QActorUtils.evalTheGuard(this, " ??msg(_,_,SENDER,X,navigate(PLAN_MOVES,POS),MSGNUM)" )) != null ){
+    		parg = "loadNavigationData(PLAN_MOVES,POS)";
     		parg = QActorUtils.substituteVars(guardVars,parg);
     		//REGENERATE AKKA
     		aar = solveGoalReactive(parg,100000,"","");
@@ -358,12 +358,21 @@ protected IActorAction  action;
     			curPlanInExec   = "navigationFile";
     			if( ! aar.getGoon() ) break;
     		} 			
-    		if( (guardVars = QActorUtils.evalTheGuard(this, " !?msg(_,_,SENDER,X,navigatefile(PLAN,POS,FILENAME),MSGNUM)" )) != null ){
+    		if( (guardVars = QActorUtils.evalTheGuard(this, " !?msg(_,_,SENDER,X,navigatefile(PLAN_MOVES,POS,FILENAME),MSGNUM)" )) != null ){
     		temporaryStr = QActorUtils.unifyMsgContent(pengine, "enableGUI(START,FILENAME)","enableGUI(POS,FILENAME)", guardVars ).toString();
     		emit( "enableGUI", temporaryStr );
     		}
-    		if( (guardVars = QActorUtils.evalTheGuard(this, " ??msg(_,_,SENDER,X,navigatefile(PLAN,POS,FILENAME),MSGNUM)" )) != null ){
-    		parg = "loadNavigationData(PLAN,POS,FILENAME)";
+    		temporaryStr = "\"-----------------------------\"";
+    		println( temporaryStr );  
+    		if( (guardVars = QActorUtils.evalTheGuard(this, " !?msg(_,_,SENDER,X,navigatefile(PLAN_MOVES,POS,FILENAME),MSGNUM)" )) != null ){
+    		temporaryStr = "FILENAME";
+    		temporaryStr = QActorUtils.substituteVars(guardVars,temporaryStr);
+    		println( temporaryStr );  
+    		}
+    		temporaryStr = "\"-----------------------------\"";
+    		println( temporaryStr );  
+    		if( (guardVars = QActorUtils.evalTheGuard(this, " ??msg(_,_,SENDER,X,navigatefile(PLAN_MOVES,POS,FILENAME),MSGNUM)" )) != null ){
+    		parg = "loadNavigationData(PLAN_MOVES,POS,FILENAME)";
     		parg = QActorUtils.substituteVars(guardVars,parg);
     		//REGENERATE AKKA
     		aar = solveGoalReactive(parg,100000,"","");
@@ -528,12 +537,10 @@ protected IActorAction  action;
     while(true){
     	curPlanInExec =  "notifyEndOfNavigation";	//within while since it can be lost by switchlan
     	nPlanIter++;
-    		temporaryStr = "\"passato al piano successivo\"";
+    		temporaryStr = "\"notify End\"";
     		println( temporaryStr );  
     		temporaryStr = QActorUtils.unifyMsgContent(pengine, "end","end", guardVars ).toString();
     		emit( "end", temporaryStr );
-    		temporaryStr = "\"Da questo momento le chiamate prolog non funzionano più\"";
-    		println( temporaryStr );  
     		if( ! planUtils.switchToPlan("waitConsoleCommand").getGoon() ) break;
     break;
     }//while

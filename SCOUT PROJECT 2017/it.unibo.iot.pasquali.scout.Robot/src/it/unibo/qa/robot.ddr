@@ -24,8 +24,8 @@ Event expdata : expdata ( POS , STATE )
 // ------------------------------------------------------------------
 
 // From Console to Robot to start the Navigation
-Dispatch navigate : navigate ( PLAN , POS )
-Dispatch navigatefile : navigatefile( PLAN , POS , FILENAME)
+Dispatch navigate : navigate ( PLAN_MOVES , POS )
+Dispatch navigatefile : navigatefile( PLAN_MOVES , POS , FILENAME)
 //PLAN = plan ( [ t || d || l || r ] )
 //POS = position ( Xs , Ys ) 
 //MODE = robot || simulated
@@ -100,21 +100,24 @@ QActor guimanager context ctxRobot{
 		
 	Plan enableOrDie
 	
-		[!? robotMode(gui)] solve showGUI time(0) else endQActor "robot mode = robot";	
-		switchToPlan waitMap
+		[!? robotMode(gui)] switchToPlan waitMap else endQActor "TERMINATE because robot mode = robot"	
+		
 	
-	Plan waitMap		
+	Plan waitMap
+	
+		println("++++++++++++++++++++++++++ ROBOT GUI WAIT MAP ++++++++++++++++++");		
 		sense time(1000000000) enableGUI -> continue;
+		printCurrentEvent;
 		onEvent enableGUI : enableGUI(START, FILENAME) -> solve showMap(START, FILENAME) time(0);
 		
 		switchToPlan waitUpdates	
 		
 	Plan waitUpdates
 		sense time(1000000000) show, end, abort -> continue, continue, continue;
-		
+			
 		onEvent show : show(POS,DIR) -> solve updateState(POS,DIR) time(0);
-		onEvent end : end -> resumeLastPlan;
-		onEvent abort : abort -> resumeLastPlan;
+		onEvent end : end -> switchToPlan waitMap;
+		onEvent abort : abort -> switchToPlan waitMap;
 		
 		repeatPlan 0 
 		
@@ -155,8 +158,8 @@ Robot mockScout QActor robot context ctxRobot{
  		onMsg explore : explore -> switchToPlan exploration;
  		onMsg exploredebug : exploredebug ( START , BOUNDS) -> switchToPlan explorationDebug;
  		onMsg explorefile : explorefile (START, FILENAME) -> switchToPlan explorationFile;
- 		onMsg navigate : navigate(PLAN, POS) -> switchToPlan navigation;
- 		onMsg navigatefile : navigatefile( PLAN , POS , FILENAME) -> switchToPlan navigationFile;
+ 		onMsg navigate : navigate(PLAN_MOVES, POS) -> switchToPlan navigation;
+ 		onMsg navigatefile : navigatefile( PLAN_MOVES , POS , FILENAME) -> switchToPlan navigationFile;
  		
  		repeatPlan 0		
  
@@ -173,10 +176,10 @@ Robot mockScout QActor robot context ctxRobot{
  		
  		solve initialConfigExpRobot time(0);
  		
- 		[!? msg(_, _, SENDER, X, explorefile(START, FILENAME), MSGNUM)]
+ 		[!? msg(_, _, SENDER, X, explorefile(START, FILENAME), _)]
  								emit enableGUI : enableGUI(START, FILENAME);
  			
- 		[?? msg(_, _, SENDER, X, explorefile(START, FILENAME), MSGNUM)]
+ 		[?? msg(_, _, SENDER, X, explorefile(START, FILENAME), _)]
  								 solve initExploreFile(START, FILENAME) time(0)
  								 react event abort -> abort;
  								 
@@ -186,7 +189,7 @@ Robot mockScout QActor robot context ctxRobot{
  	
  	Plan explorationDebug
  		println("Let's explore!!");
- 		[?? msg(_, _, SENDER, X, explore(START,BOUNDS), MSGNUM)]
+ 		[?? msg(_, _, SENDER, X, explore(START,BOUNDS), _)]
  			 					 solve initExploreMap(START, BOUNDS) time(0)
  			 					 react event abort -> abort;
  		
@@ -204,8 +207,8 @@ Robot mockScout QActor robot context ctxRobot{
  		
  		solve initialConfigNavRobot time(0);
  		
- 		[?? msg(_, _, SENDER, X, navigate(PLAN, POS), MSGNUM)] 
- 			solve loadNavigationData(PLAN, POS) time (100000) onFailSwitchTo loadMapFailure;
+ 		[?? msg(_, _, SENDER, X, navigate(PLAN_MOVES, POS), MSGNUM)] 
+ 			solve loadNavigationData(PLAN_MOVES, POS) time (100000) onFailSwitchTo loadMapFailure;
  		
  		switchToPlan startNavigation 	
  	
@@ -214,11 +217,15 @@ Robot mockScout QActor robot context ctxRobot{
  		
  		solve initialConfigNavRobot time(0);
  		
- 		[!? msg(_, _, SENDER, X, navigatefile( PLAN , POS , FILENAME), MSGNUM)]
+ 		[!? msg(_, _, SENDER, X, navigatefile( PLAN_MOVES , POS , FILENAME), MSGNUM)]
  								emit enableGUI : enableGUI(POS, FILENAME);
  		
- 		[?? msg(_, _, SENDER, X, navigatefile( PLAN , POS , FILENAME), MSGNUM)] 
- 			solve loadNavigationData(PLAN, POS, FILENAME) time (100000) onFailSwitchTo loadMapFailure;
+ 		println("-----------------------------");
+ 		[!? msg(_, _, SENDER, X, navigatefile( PLAN_MOVES , POS , FILENAME), MSGNUM)] println(FILENAME);
+ 		println("-----------------------------");
+ 		
+ 		[?? msg(_, _, SENDER, X, navigatefile( PLAN_MOVES , POS , FILENAME), MSGNUM)] 
+ 			solve loadNavigationData(PLAN_MOVES, POS, FILENAME) time (100000) onFailSwitchTo loadMapFailure;
  		
  		switchToPlan startNavigation 	
  		
@@ -262,11 +269,9 @@ Robot mockScout QActor robot context ctxRobot{
  	
  	Plan notifyEndOfNavigation	
  	
- 		println("passato al piano successivo"); 	
+ 		println("notify End"); 	
  			
- 		emit end : end;	
- 		
- 		println("Da questo momento le chiamate prolog non funzionano più");
+ 		emit end : end;
  		
  		switchToPlan waitConsoleCommand	
  		

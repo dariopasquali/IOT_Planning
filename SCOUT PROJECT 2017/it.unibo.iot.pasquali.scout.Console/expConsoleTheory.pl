@@ -19,6 +19,10 @@ updateMap( position( X , Y ) , STATE) :-
 	actorobj(Actor),
 	actorPrintln(STATE),
 	Actor <- updateMap( X , Y , STATE).
+	
+clearGUI :-
+	actorobj(Actor),
+	Actor <- myClearGUI.
 
 /*
 ------------------------------------------------------------

@@ -245,16 +245,18 @@ public class MapViewer {
     
 	public void setCurrentPosition(int y, int x, String direction) {
 		
-		CellState newCellState = getCellState(y, x);
+		//CellState newCellState = getCellState(y, x);
 		setCellState(y, x, CellState.START);
 		getGridButton(y, x).setText(direction);
 		
-		setCellState(currentPosition.getY(), currentPosition.getX(), lastCurrentCellState);
-		getGridButton(currentPosition.getY(), currentPosition.getX()).setText("");
-		
-		currentPosition.setX(x);
-		currentPosition.setY(y);
-		this.lastCurrentCellState = newCellState;		
+		if(currentPosition != null && !(currentPosition.getX() == x && currentPosition.getY() == y))
+		{			
+			setCellState(currentPosition.getY(), currentPosition.getX(), lastCurrentCellState);
+			getGridButton(currentPosition.getY(), currentPosition.getX()).setText("");
+		}
+				
+		currentPosition = new MapElement(x, y);
+		this.lastCurrentCellState = CellState.CLEAR;		
 	}
     
     

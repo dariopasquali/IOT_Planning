@@ -1,14 +1,10 @@
 %% robotMode(MODE).
 %% MODE = gui -> the guimanager is enable and show the gui (for simulation use)
 %% MODE = robot -> the guimanager is disabled (for physical robot use)
-robotMode(robot).
+robotMode(gui).
 
-showGUI :-
-	actorPrintln("show GUI"),
-	actorobj(Actor),
-	Actor <- showGUI.
 
-showmap( position( SX , SY ), FILENAME ):-
+showMap( position( SX , SY ), FILENAME ):-
 	actorPrintln("show Map"),
 	actorobj(Actor),
 	Actor <- showMap(SX , SY , FILENAME).

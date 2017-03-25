@@ -41,8 +41,6 @@ public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt, I
 
 	private static final long serialVersionUID = 1L;
 	
-	private MapType type;
-	
 	private JFrame frame;
 	private JFrame controlFrame;
 	private JFrame outputFrame;
@@ -64,11 +62,9 @@ public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt, I
 	
 	JButton btnExplore, btnSave, btnLoad, btnSearch, btnNavigate, btnAbort;
 	private Component verticalStrut;
-	private Component verticalStrut_1;
-	private JButton btnLoadExp;
-	private GridBagConstraints gbc_btnLoadExp;
 	private JButton btnClear;
 	private JCheckBox checkRealOrNot;
+	private JButton btnClearPath;
 
 	public ConsoleGUI(IActivityBase controller) {
 		
@@ -82,8 +78,6 @@ public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt, I
 		initializeFrame();
 		initializeControlFrame();
 		initializeOutputFrame();
-		
-		type = null;
 	}
 	
 //{{ INITIALIZATION ------------------------------------------------------
@@ -107,7 +101,7 @@ public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt, I
 	private void initializeControlFrame()
 	{
 		controlFrame = new JFrame();
-		controlFrame.setBounds(100, 100, 172, 356);
+		controlFrame.setBounds(100, 100, 148, 356);
 		controlFrame.setTitle("Control Frame");		
 		controlFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
@@ -125,17 +119,18 @@ public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt, I
 		gbc_btnExplore.gridx = 1;
 		gbc_btnExplore.gridy = 2;
 		btnExplore.addActionListener(new DefaultInputHandler());
+		
+		btnLoad = new JButton("Load Map");
+		GridBagConstraints gbc_btnNewButton_2 = new GridBagConstraints();
+		gbc_btnNewButton_2.fill = GridBagConstraints.HORIZONTAL;
+		gbc_btnNewButton_2.insets = new Insets(0, 0, 5, 5);
+		gbc_btnNewButton_2.gridx = 1;
+		gbc_btnNewButton_2.gridy = 1;
+		btnLoad.addActionListener(new DefaultInputHandler());
+		btnLoad.setEnabled(true);
+		controlFrame.getContentPane().add(btnLoad, gbc_btnNewButton_2);
 		btnExplore.setEnabled(false);
 		controlFrame.getContentPane().add(btnExplore, gbc_btnExplore);
-		
-		btnLoadExp = new JButton("Load Exploration Map");
-		gbc_btnLoadExp = new GridBagConstraints();
-		gbc_btnLoadExp.fill = GridBagConstraints.HORIZONTAL;
-		gbc_btnLoadExp.insets = new Insets(0, 0, 5, 5);
-		gbc_btnLoadExp.gridx = 1;
-		gbc_btnLoadExp.gridy = 1;
-		controlFrame.getContentPane().add(btnLoadExp, gbc_btnLoadExp);
-		btnLoadExp.addActionListener(new DefaultInputHandler());
 		
 		
 		btnSave = new JButton("Save Map");
@@ -155,22 +150,12 @@ public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt, I
 		gbc_verticalStrut.gridy = 4;
 		controlFrame.getContentPane().add(verticalStrut, gbc_verticalStrut);
 		
-		btnLoad = new JButton("Load Map");
-		GridBagConstraints gbc_btnNewButton_2 = new GridBagConstraints();
-		gbc_btnNewButton_2.fill = GridBagConstraints.HORIZONTAL;
-		gbc_btnNewButton_2.insets = new Insets(0, 0, 5, 5);
-		gbc_btnNewButton_2.gridx = 1;
-		gbc_btnNewButton_2.gridy = 5;
-		btnLoad.addActionListener(new DefaultInputHandler());
-		btnLoad.setEnabled(true);
-		controlFrame.getContentPane().add(btnLoad, gbc_btnNewButton_2);
-		
 		btnSearch = new JButton("Search Path");
 		GridBagConstraints gbc_btnNewButton_3 = new GridBagConstraints();
 		gbc_btnNewButton_3.fill = GridBagConstraints.HORIZONTAL;
 		gbc_btnNewButton_3.insets = new Insets(0, 0, 5, 5);
 		gbc_btnNewButton_3.gridx = 1;
-		gbc_btnNewButton_3.gridy = 6;
+		gbc_btnNewButton_3.gridy = 5;
 		btnSearch.addActionListener(new DefaultInputHandler());
 		btnSearch.setEnabled(false);
 		controlFrame.getContentPane().add(btnSearch, gbc_btnNewButton_3);
@@ -180,37 +165,39 @@ public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt, I
 		gbc_btnNavigate.fill = GridBagConstraints.HORIZONTAL;
 		gbc_btnNavigate.insets = new Insets(0, 0, 5, 5);
 		gbc_btnNavigate.gridx = 1;
-		gbc_btnNavigate.gridy = 7;
+		gbc_btnNavigate.gridy = 6;
 		btnNavigate.addActionListener(new DefaultInputHandler());
 		btnNavigate.setEnabled(false);
 		controlFrame.getContentPane().add(btnNavigate, gbc_btnNavigate);
-		
-		verticalStrut_1 = Box.createVerticalStrut(20);
-		GridBagConstraints gbc_verticalStrut_1 = new GridBagConstraints();
-		gbc_verticalStrut_1.insets = new Insets(0, 0, 5, 5);
-		gbc_verticalStrut_1.gridx = 1;
-		gbc_verticalStrut_1.gridy = 8;
-		controlFrame.getContentPane().add(verticalStrut_1, gbc_verticalStrut_1);
 		
 		btnAbort = new JButton("Abort");
 		GridBagConstraints gbc_btnNewButton_4 = new GridBagConstraints();
 		gbc_btnNewButton_4.fill = GridBagConstraints.HORIZONTAL;
 		gbc_btnNewButton_4.insets = new Insets(0, 0, 5, 5);
 		gbc_btnNewButton_4.gridx = 1;
-		gbc_btnNewButton_4.gridy = 9;
+		gbc_btnNewButton_4.gridy = 8;
 		btnAbort.addActionListener(new DefaultInputHandler());
 		btnAbort.setEnabled(true);
 		controlFrame.getContentPane().add(btnAbort, gbc_btnNewButton_4);
 		
-		btnClear = new JButton("Clear");
+		btnClear = new JButton("Clear Exploration");
 		GridBagConstraints gbc_btnClear = new GridBagConstraints();
 		gbc_btnClear.fill = GridBagConstraints.HORIZONTAL;
 		gbc_btnClear.insets = new Insets(0, 0, 5, 5);
 		gbc_btnClear.gridx = 1;
-		gbc_btnClear.gridy = 10;
+		gbc_btnClear.gridy = 9;
 		controlFrame.getContentPane().add(btnClear, gbc_btnClear);
 		btnClear.addActionListener(new DefaultInputHandler());
 		btnClear.setEnabled(false);
+		
+		btnClearPath = new JButton("Clear Path");
+		btnClearPath.setEnabled(false);
+		GridBagConstraints gbc_btnClearPath = new GridBagConstraints();
+		gbc_btnClearPath.fill = GridBagConstraints.HORIZONTAL;
+		gbc_btnClearPath.insets = new Insets(0, 0, 5, 5);
+		gbc_btnClearPath.gridx = 1;
+		gbc_btnClearPath.gridy = 10;
+		controlFrame.getContentPane().add(btnClearPath, gbc_btnClearPath);
 		
 		checkRealOrNot = new JCheckBox("Raspberry Pi Robot");
 		GridBagConstraints gbc_checkRealOrNot = new GridBagConstraints();
@@ -305,14 +292,12 @@ public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt, I
 	
 	public void clearGUI()
 	{
-		if(type.equals(MapType.EXPLORATION))
-		{
-			mapViewer.noneAll();
-		}
-		else if(type.equals(MapType.NAVIGATION))
-		{
-			mapViewer.clearPath();
-		}
+		mapViewer.noneAll();
+	}
+	
+	public void clearPath()
+	{
+		mapViewer.clearPath();
 	}
 
 //}}	
@@ -386,24 +371,22 @@ public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt, I
 				println("I'm working with a "+s);				
 				break;
 			
-			case "Load Exploration Map": // Per la mappa di esplorazione
-								
-				FileDialog loadExpDialog = new FileDialog(frame, "Choose the Exploration Debug Map", FileDialog.LOAD);
-				loadExpDialog.setDirectory("C:\\");
-				loadExpDialog.setFile("*.pl");
-				loadExpDialog.setVisible(true);
-				String filename = loadExpDialog.getDirectory()+loadExpDialog.getFile();
+			case "Load Map":
+				
+				FileDialog loadDialog = new FileDialog(frame, "Choose the Navigation Map", FileDialog.LOAD);
+				loadDialog.setDirectory("C:\\");
+				loadDialog.setFile("*.pl");
+				loadDialog.setVisible(true);
+				String filename = loadDialog.getDirectory()+loadDialog.getFile();
 				if(filename.contains("null"))
 					break;
 				
-				controller.execAction("LOADEXP "+filename);
-				
+				btnSearch.setEnabled(true);
 				btnExplore.setEnabled(true);
 				
-				type = MapType.EXPLORATION;
+				controller.execAction("LOAD "+filename);
+				break;	
 				
-				break;
-			
 			case "Explore":
 				
 				MapElement expStart = mapViewer.getStart();
@@ -419,8 +402,6 @@ public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt, I
 				btnSave.setEnabled(true);
 				btnClear.setEnabled(true);
 				btnSearch.setEnabled(true);
-				
-				type = MapType.EXPLORATION;
 				break;
 				
 			case "Save Map":
@@ -436,28 +417,8 @@ public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt, I
 				storeMap(fname);
 				
 				btnLoad.setEnabled(true);
-				
-				type = MapType.EXPLORATION;
 				break;
 			
-			case "Load Map":	// Per la Mappa di Navigazione
-				
-				FileDialog loadDialog = new FileDialog(frame, "Choose the Navigation Map", FileDialog.LOAD);
-				loadDialog.setDirectory("C:\\");
-				loadDialog.setFile("*.pl");
-				loadDialog.setVisible(true);
-				filename = loadDialog.getDirectory()+loadDialog.getFile();
-				if(filename.contains("null"))
-					break;
-				
-				btnSearch.setEnabled(true);				
-				
-				controller.execAction("LOAD "+filename);
-				
-				type = MapType.NAVIGATION;
-				break;
-				
-				
 			case "Search Path":
 				
 				MapElement goal = mapViewer.getGoal();
@@ -492,8 +453,6 @@ public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt, I
 					btnNavigate.setEnabled(true);							
 					btnLoad.setEnabled(false);
 					btnClear.setEnabled(true);
-					
-					type = MapType.NAVIGATION;
 				}
 				catch(NumberFormatException e1)
 				{
@@ -506,8 +465,6 @@ public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt, I
 				controller.execAction("NAVIGATE "+robotMode);
 				btnNavigate.setEnabled(false);
 				btnAbort.setEnabled(true);
-				
-				type = MapType.NAVIGATION;
 				break;
 				
 			case "Abort":
@@ -520,9 +477,13 @@ public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt, I
 				
 				break;
 				
-			case "Clear":
+			case "Clear Exploration":
 				controller.execAction("CLEAR ");
 				btnClear.setEnabled(false);
+				
+			case "Clear Path":
+				controller.execAction("CLEARPATH ");
+				btnClearPath.setEnabled(false);
 				
 				
 			default:

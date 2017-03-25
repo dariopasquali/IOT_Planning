@@ -209,8 +209,11 @@ public class Engine {
 		
 		map.setCellClear(y, x);
 		
+		notifyMyPosition();
+		
 		if(!(this instanceof FileEngine))
 			actor.moveForward();
+		
 		
 		//System.out.println(currentMap.toString());
 	}
@@ -239,6 +242,8 @@ public class Engine {
 		state.setDirection(leftMap.get(cd));
 		state.addCost(1);
 		
+		notifyMyPosition();
+		
 		if(!(this instanceof FileEngine))
 			actor.turnLeft();
 	}
@@ -247,6 +252,8 @@ public class Engine {
 		Direction cd = state.getDirection();
 		state.setDirection(rightMap.get(cd));
 		state.addCost(1);
+		
+		notifyMyPosition();
 		
 		if(!(this instanceof FileEngine))
 			actor.turnRight();
@@ -267,6 +274,17 @@ public class Engine {
 				turnRight();
 		}
 		
+	}
+	
+	/**
+	 * Sends an event to the RobotGUIManager to update the position during the navigation
+	 */
+	public void notifyMyPosition(){
+		
+		String payload = "position("+state.getX() + "," + state.getY() + ")," +
+				state.getDirection().toString().toLowerCase();
+		
+		actor.emit("show", "show(" + payload + ")");
 	}
 	
 	

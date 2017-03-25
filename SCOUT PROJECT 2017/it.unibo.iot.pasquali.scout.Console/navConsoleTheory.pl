@@ -51,6 +51,9 @@ updateMapAndReplan(position(ELx , ELy), position(CURx, CURy)) :-
 	actorPrintln(search),
 	Actor <- sendNavigationData.
 
+clearPath :-
+	actorobj(Actor),
+	Actor <- myClearPath.
 /*
 ------------------------------------------------------------
 initialize

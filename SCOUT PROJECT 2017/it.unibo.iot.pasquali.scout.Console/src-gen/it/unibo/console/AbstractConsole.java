@@ -123,16 +123,6 @@ public abstract class AbstractConsole extends QActor {
 	    		if( currentEvent.getEventId().equals("local_gui_command") ){
 	    		 		String parg = "";
 	    		 		/* SwitchPlan */
-	    		 		parg =  updateVars(  Term.createTerm("local_gui_command(COMMAND)"), Term.createTerm("local_gui_command(loadexpmap(PATH))"), 
-	    		 			    		  					Term.createTerm(currentEvent.getMsg()), parg);
-	    		 			if( parg != null ){
-	    		 				 if( ! planUtils.switchToPlan("loadExpMap").getGoon() ) break; 
-	    		 			}//else println("guard  fails");  //parg is null when there is no guard (onEvent)
-	    		 }
-	    		//onEvent
-	    		if( currentEvent.getEventId().equals("local_gui_command") ){
-	    		 		String parg = "";
-	    		 		/* SwitchPlan */
 	    		 		parg =  updateVars(  Term.createTerm("local_gui_command(COMMAND)"), Term.createTerm("local_gui_command(explore)"), 
 	    		 			    		  					Term.createTerm(currentEvent.getMsg()), parg);
 	    		 			if( parg != null ){
@@ -199,6 +189,16 @@ public abstract class AbstractConsole extends QActor {
 	    		 				 if( ! planUtils.switchToPlan("clearGUI").getGoon() ) break; 
 	    		 			}//else println("guard  fails");  //parg is null when there is no guard (onEvent)
 	    		 }
+	    		//onEvent
+	    		if( currentEvent.getEventId().equals("local_gui_command") ){
+	    		 		String parg = "";
+	    		 		/* SwitchPlan */
+	    		 		parg =  updateVars(  Term.createTerm("local_gui_command(COMMAND)"), Term.createTerm("local_gui_command(clearpath)"), 
+	    		 			    		  					Term.createTerm(currentEvent.getMsg()), parg);
+	    		 			if( parg != null ){
+	    		 				 if( ! planUtils.switchToPlan("clearPath").getGoon() ) break; 
+	    		 			}//else println("guard  fails");  //parg is null when there is no guard (onEvent)
+	    		 }
 	    		if( planUtils.repeatPlan(nPlanIter,0).getGoon() ) continue;
 	    break;
 	    }//while
@@ -209,33 +209,33 @@ public abstract class AbstractConsole extends QActor {
 	       return false;  
 	    }
 	    }
-	    public boolean loadExpMap() throws Exception{	//public to allow reflection
+	    public boolean loadMap() throws Exception{	//public to allow reflection
 	    try{
 	    	int nPlanIter = 0;
-	    	//curPlanInExec =  "loadExpMap";
+	    	//curPlanInExec =  "loadMap";
 	    	boolean returnValue = suspendWork;
 	    while(true){
-	    	curPlanInExec =  "loadExpMap";	//within while since it can be lost by switchlan
+	    	curPlanInExec =  "loadMap";	//within while since it can be lost by switchlan
 	    	nPlanIter++;
-	    		if( (guardVars = QActorUtils.evalTheGuard(this, " ??msg(local_gui_command,\"event\",SENDER,none,local_gui_command(loadexpmap(PATH)),MSGNUM)" )) != null ){
-	    		parg = "loadMap(PATH,exploration)";
+	    		if( (guardVars = QActorUtils.evalTheGuard(this, " ??msg(local_gui_command,\"event\",SENDER,none,local_gui_command(loadmap(PATH)),MSGNUM)" )) != null ){
+	    		parg = "loadMap(PATH)";
 	    		parg = QActorUtils.substituteVars(guardVars,parg);
 	    		//REGENERATE AKKA
 	    		aar = solveGoalReactive(parg,210000000,"","");
 	    		//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
 	    		if( aar.getInterrupted() ){
-	    			curPlanInExec   = "loadExpMap";
+	    			curPlanInExec   = "loadMap";
 	    			if( ! aar.getGoon() ) break;
 	    		} 			
 	    		}
-	    		temporaryStr = "\"++++++++++++++++++ EXPLORATION MAP LOADED ++++++++++++++++++\"";
+	    		temporaryStr = "\"++++++++++++++++++ MAP LOADED ++++++++++++++++++\"";
 	    		println( temporaryStr );  
-	    		returnValue = continueWork; //we must restore nPlanIter and curPlanInExec of the 'interrupted' plan
+	    		returnValue = continueWork;  
 	    break;
 	    }//while
 	    return returnValue;
 	    }catch(Exception e){
-	       //println( getName() + " plan=loadExpMap WARNING:" + e.getMessage() );
+	       //println( getName() + " plan=loadMap WARNING:" + e.getMessage() );
 	       QActorContext.terminateQActorSystem(this); 
 	       return false;  
 	    }
@@ -395,37 +395,6 @@ public abstract class AbstractConsole extends QActor {
 	    return returnValue;
 	    }catch(Exception e){
 	       //println( getName() + " plan=endOfExploration WARNING:" + e.getMessage() );
-	       QActorContext.terminateQActorSystem(this); 
-	       return false;  
-	    }
-	    }
-	    public boolean loadMap() throws Exception{	//public to allow reflection
-	    try{
-	    	int nPlanIter = 0;
-	    	//curPlanInExec =  "loadMap";
-	    	boolean returnValue = suspendWork;
-	    while(true){
-	    	curPlanInExec =  "loadMap";	//within while since it can be lost by switchlan
-	    	nPlanIter++;
-	    		if( (guardVars = QActorUtils.evalTheGuard(this, " ??msg(local_gui_command,\"event\",SENDER,none,local_gui_command(loadmap(PATH)),MSGNUM)" )) != null ){
-	    		parg = "loadMap(PATH,navigation)";
-	    		parg = QActorUtils.substituteVars(guardVars,parg);
-	    		//REGENERATE AKKA
-	    		aar = solveGoalReactive(parg,210000000,"","");
-	    		//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
-	    		if( aar.getInterrupted() ){
-	    			curPlanInExec   = "loadMap";
-	    			if( ! aar.getGoon() ) break;
-	    		} 			
-	    		}
-	    		temporaryStr = "\"++++++++++++++++++ MAP LOADED ++++++++++++++++++\"";
-	    		println( temporaryStr );  
-	    		returnValue = continueWork;  
-	    break;
-	    }//while
-	    return returnValue;
-	    }catch(Exception e){
-	       //println( getName() + " plan=loadMap WARNING:" + e.getMessage() );
 	       QActorContext.terminateQActorSystem(this); 
 	       return false;  
 	    }
@@ -649,6 +618,34 @@ public abstract class AbstractConsole extends QActor {
 	    return returnValue;
 	    }catch(Exception e){
 	       //println( getName() + " plan=clearGUI WARNING:" + e.getMessage() );
+	       QActorContext.terminateQActorSystem(this); 
+	       return false;  
+	    }
+	    }
+	    public boolean clearPath() throws Exception{	//public to allow reflection
+	    try{
+	    	int nPlanIter = 0;
+	    	//curPlanInExec =  "clearPath";
+	    	boolean returnValue = suspendWork;
+	    while(true){
+	    	curPlanInExec =  "clearPath";	//within while since it can be lost by switchlan
+	    	nPlanIter++;
+	    		parg = "clearPath";
+	    		//REGENERATE AKKA
+	    		aar = solveGoalReactive(parg,10000,"","");
+	    		//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
+	    		if( aar.getInterrupted() ){
+	    			curPlanInExec   = "clearPath";
+	    			if( ! aar.getGoon() ) break;
+	    		} 			
+	    		temporaryStr = "\"path cleared\"";
+	    		println( temporaryStr );  
+	    		returnValue = continueWork;  
+	    break;
+	    }//while
+	    return returnValue;
+	    }catch(Exception e){
+	       //println( getName() + " plan=clearPath WARNING:" + e.getMessage() );
 	       QActorContext.terminateQActorSystem(this); 
 	       return false;  
 	    }

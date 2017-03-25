@@ -26,8 +26,8 @@ Event expdata : expdata( POS , STATE )
 // ------------------------------------------------------------------
 
 // From Console to Robot to start the Navigation
-Dispatch navigate : navigate( PLAN , POS )
-Dispatch navigatefile : navigatefile( PLAN , POS , FILENAME)
+Dispatch navigate : navigate( PLAN_MOVES , POS )
+Dispatch navigatefile : navigatefile( PLAN_MOVES , POS , FILENAME)
 //PLAN = plan ( [ t || d || l || r ] )
 //POS = position ( Xs , Ys )
 //MODE = robot || simulated 
@@ -66,12 +66,13 @@ Event local_gui_command : local_gui_command(COMMAND)
  
 //Button --> COMMAND
 //
-//Load Exp Map --> loadexpmap(FILEPATH);
 //Explore --> explore || explore(FILENAME, START, BOUNDS, MODE); MODE = simulated || robot
 //Load Map --> loadmap ( PATH );
 //Find Path –-> findpath ( START , GOAL );
 //Start Navigation --> navigate(MODE); MODE = simulated || robot
 //Abort --> abort;
+//Clear Path --> clearpath
+//Clear Exploration --> clear
 
 
 // ------------------------------------------------------------------
@@ -105,7 +106,6 @@ QActor console context ctxConsole{
 		printCurrentEvent;
 		memoCurrentEvent;
 		
-		onEvent local_gui_command : local_gui_command (loadexpmap(PATH)) -> switchToPlan loadExpMap;
 		onEvent local_gui_command : local_gui_command (explore) -> switchToPlan exploration;
 		
  		onEvent local_gui_command : local_gui_command (explore(FILENAME, START, BOUNDS, MODE)) ->
@@ -116,17 +116,17 @@ QActor console context ctxConsole{
  		onEvent local_gui_command : local_gui_command (navigate(robot)) -> switchToPlan navigation;
  		onEvent local_gui_command : local_gui_command (navigate(simulated)) -> switchToPlan navigationFile;
  		onEvent local_gui_command : local_gui_command (clear) -> switchToPlan clearGUI;
+ 		onEvent local_gui_command : local_gui_command (clearpath) -> switchToPlan clearPath;
 		
 		repeatPlan 0
 		
-	Plan loadExpMap
-		[?? msg(local_gui_command, "event", SENDER, none, local_gui_command (loadexpmap(PATH)), MSGNUM)]
-			 solve loadMap(PATH, exploration) time(210000000) onFailSwitchTo loadMapFailure;
+	Plan loadMap resumeLastPlan
+		[?? msg(local_gui_command, "event", SENDER, none, local_gui_command (loadmap(PATH)), MSGNUM)]
+			 solve loadMap(PATH) time(210000000) onFailSwitchTo loadMapFailure;
 				
-		println("++++++++++++++++++ EXPLORATION MAP LOADED ++++++++++++++++++");
-		
-		resumeLastPlan
+		println("++++++++++++++++++ MAP LOADED ++++++++++++++++++")
 	
+// EXPLORATION ----------------------------------------------------------------------------
 	
 	Plan exploration
 		println("++++++++++++++++++ EXPLORATION ++++++++++++++++++");
@@ -176,14 +176,6 @@ QActor console context ctxConsole{
 		switchToPlan waitGUICommand
 			
 // --------------------- NAVIGATION --------------------------------
-
-			
-	Plan loadMap resumeLastPlan
-		[?? msg(local_gui_command, "event", SENDER, none, local_gui_command (loadmap(PATH)), MSGNUM)]
-			 solve loadMap(PATH, navigation) time(210000000) onFailSwitchTo loadMapFailure;
-				
-		println("++++++++++++++++++ MAP LOADED ++++++++++++++++++")
-		
 
 			
 	Plan findPath resumeLastPlan
@@ -241,6 +233,10 @@ QActor console context ctxConsole{
 	Plan clearGUI resumeLastPlan
 		solve clearGUI time(10000);
 		println("map cleared")
+	
+	Plan clearPath resumeLastPlan
+		solve clearPath time(10000);
+		println("path cleared")
 
 // ------------------------------------------------------------------
 //	PROLOG FAILURE ERROR HANDLERS

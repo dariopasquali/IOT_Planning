@@ -70,15 +70,14 @@ loadMapFromFileProlog(PATH) :-
 	Actor <- setMapElements(List),
 	assert(havemap).
 
-loadMap(PATH, MODE) :-
+loadMap(PATH) :-
 	gui(GUIMODE),
 	actorPrintln(PATH),
-	actorPrintln(MODE),
-	loadMap(PATH,GUIMODE,MODE).
+	loadMap(PATH,GUIMODE).
 
-loadMap(PATH, button, MODE) :-
+loadMap(PATH, button) :-
 	actorobj(Actor),
-	Actor <- loadMapButton(PATH, MODE),
+	Actor <- loadMapButton(PATH),
 	assert(havemap).
 	
 loadMap(PATH, image) :-
@@ -91,9 +90,6 @@ loadMapImage(PATH, MODE) :-
 	Actor <- loadMapImage(PATH, MODE),
 	assert(havemap).
 	
-clearGUI :-
-	actorobj(Actor),
-	Actor <- myClearGUI.
 
 
 /*

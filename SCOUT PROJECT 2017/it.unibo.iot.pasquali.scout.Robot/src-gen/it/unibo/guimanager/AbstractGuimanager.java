@@ -92,19 +92,11 @@ public abstract class AbstractGuimanager extends QActor {
 	    	curPlanInExec =  "enableOrDie";	//within while since it can be lost by switchlan
 	    	nPlanIter++;
 	    		if( (guardVars = QActorUtils.evalTheGuard(this, " !?robotMode(gui)" )) != null ){
-	    		parg = "showGUI";
-	    		parg = QActorUtils.substituteVars(guardVars,parg);
-	    		//REGENERATE AKKA
-	    		aar = solveGoalReactive(parg,0,"","");
-	    		//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
-	    		if( aar.getInterrupted() ){
-	    			curPlanInExec   = "enableOrDie";
-	    			if( ! aar.getGoon() ) break;
-	    		} 			
+	    		if( ! planUtils.switchToPlan("waitMap").getGoon() ) break;
 	    		}
-	    		else{ println( "robot mode = robot" );
+	    		else{ println( "TERMINATE because robot mode = robot" );
 	    		//QActorContext.terminateQActorSystem(this); 
-	    		}if( ! planUtils.switchToPlan("waitMap").getGoon() ) break;
+	    		}
 	    break;
 	    }//while
 	    return returnValue;
@@ -122,6 +114,8 @@ public abstract class AbstractGuimanager extends QActor {
 	    while(true){
 	    	curPlanInExec =  "waitMap";	//within while since it can be lost by switchlan
 	    	nPlanIter++;
+	    		temporaryStr = "\"++++++++++++++++++++++++++ ROBOT GUI WAIT MAP ++++++++++++++++++\"";
+	    		println( temporaryStr );  
 	    		//senseEvent
 	    		timeoutval = 1000000000;
 	    		aar = planUtils.senseEvents( timeoutval,"enableGUI","continue",
@@ -130,6 +124,7 @@ public abstract class AbstractGuimanager extends QActor {
 	    			//println("			WARNING: sense timeout");
 	    			addRule("tout(senseevent,"+getName()+")");
 	    		}
+	    		printCurrentEvent(false);
 	    		//onEvent
 	    		if( currentEvent.getEventId().equals("enableGUI") ){
 	    		 		String parg="showMap(START,FILENAME)";
@@ -194,13 +189,23 @@ public abstract class AbstractGuimanager extends QActor {
 	    		 }
 	    		//onEvent
 	    		if( currentEvent.getEventId().equals("end") ){
-	    		 		//println("WARNING: variable substitution not yet implmented " ); 
-	    		 		returnValue = continueWork; //we must restore nPlanIter and curPlanInExec of the 'interrupted' plan
+	    		 		String parg = "";
+	    		 		/* SwitchPlan */
+	    		 		parg =  updateVars(  Term.createTerm("end"), Term.createTerm("end"), 
+	    		 			    		  					Term.createTerm(currentEvent.getMsg()), parg);
+	    		 			if( parg != null ){
+	    		 				 if( ! planUtils.switchToPlan("waitMap").getGoon() ) break; 
+	    		 			}//else println("guard  fails");  //parg is null when there is no guard (onEvent)
 	    		 }
 	    		//onEvent
 	    		if( currentEvent.getEventId().equals("abort") ){
-	    		 		//println("WARNING: variable substitution not yet implmented " ); 
-	    		 		returnValue = continueWork; //we must restore nPlanIter and curPlanInExec of the 'interrupted' plan
+	    		 		String parg = "";
+	    		 		/* SwitchPlan */
+	    		 		parg =  updateVars(  Term.createTerm("abort"), Term.createTerm("abort"), 
+	    		 			    		  					Term.createTerm(currentEvent.getMsg()), parg);
+	    		 			if( parg != null ){
+	    		 				 if( ! planUtils.switchToPlan("waitMap").getGoon() ) break; 
+	    		 			}//else println("guard  fails");  //parg is null when there is no guard (onEvent)
 	    		 }
 	    		if( planUtils.repeatPlan(nPlanIter,0).getGoon() ) continue;
 	    break;

@@ -91,7 +91,7 @@ public class RobotGUI extends Frame implements IOutputEnvView, IBasicEnvAwt{
 	{
 		this.mapViewer = new MapViewer(false);
 		
-		mapViewer.createGridPanel(map.getXmax(), map.getXmax());
+		mapViewer.createGridPanel(map.getYmax(), map.getXmax());
 		List<IMapElement> elements = map.getElements();
 		
 		for(IMapElement e : elements)
@@ -151,7 +151,7 @@ public class RobotGUI extends Frame implements IOutputEnvView, IBasicEnvAwt{
 
 	@Override
 	public void addOutput(String msg) {
-
+		System.out.println("ROBOT GUI ||||| "+ msg);
 	}
 
 	@Override
