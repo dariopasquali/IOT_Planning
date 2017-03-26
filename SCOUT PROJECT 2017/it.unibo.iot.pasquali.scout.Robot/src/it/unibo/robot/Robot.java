@@ -181,6 +181,10 @@ public class Robot extends AbstractRobot {
 	public void initExploreMap(int startX, int startY, int mapWidth, int mapHeight){
 		engine = new Engine(startX, startY, mapWidth, mapHeight, this, true);
 		
+		engine.noneAll();
+		
+		disableDebugSensing();
+		
 		Explorer explorer = new Explorer(engine);
 		explorer.startExploration();
 		
@@ -205,8 +209,11 @@ public class Robot extends AbstractRobot {
 	 */
 	public void initExploreFile(int startX, int startY, String filename){
 				
-		engine = new FileEngine(startX, startY, loadMap(filename), this, true);
-		((QActorPlanUtilsDebug)planUtils).setEngine((FileEngine) engine);
+		engine = new FileEngine(startX, startY, loadMap(filename), this, true);		
+		engine.noneAll();
+		
+		((QActorPlanUtilsDebug)planUtils).setEngine((FileEngine) engine);		
+		enableDebugSensing();
 		
 		Explorer explorer = new Explorer(engine);
 		explorer.startExploration();
@@ -217,82 +224,6 @@ public class Robot extends AbstractRobot {
 //}}
 	
 	
-//{{ EXPLORATION MANAGEMENT **********************************************
-	
-/*
-	public void makeMove(String direction)
-	{
-		if(direction.equals("forward"))
-			engine.moveForward();
-		else
-			engine.moveBackward();
-		
-		State s = engine.getState();
-		
-		System.out.println(s.toString());
-		
-		String payload = "position("+s.getX() + "," + s.getY() + ")," +
-				s.getDirection().toString().toLowerCase();
-		
-		emit("show", "show(" + payload + ")");
-	}
-	
-	public void turn(String spinDir)
-	{
-		if(spinDir.equals("doubleRight"))
-			engine.turnDoubleRight();
-		else
-			engine.turnDoubleLeft();
-		
-		State s = engine.getState();
-		
-		System.out.println(s.toString());
-		
-		String payload = "position("+s.getX() + "," + s.getY() + ")," +
-				s.getDirection().toString().toLowerCase();
-		
-		emit("show", "show(" + payload + ")");
-	}
-	
-	public void addCurrentToVisited()
-	{
-		engine.addCurrentToVisited();
-	}
-	
-	public boolean checkCurrentAlreadyVisited()
-	{
-		return engine.isCurrentAlreadyVisited();
-	}	
-	
-	public boolean checkLeftVisited()
-	{
-		return engine.checkExploredLeft();
-	}	
-	
-	public void updateModel(String dir, String state)
-	{
-		State next = engine.checkAndUpdate(dir, state);
-		
-		this.newCellX = next.getX();
-		this.newCellY = next.getY();
-		
-		//return "position("+next.getX()+","+next.getY()+")";
-	}
-	
-	public int getNewCellX()
-	{
-		return newCellX;
-	}
-	
-	public int getNewCellY()
-	{
-		return newCellY;
-	}
-	
-*/	
-//}}
-
-
 //{{ NAVIGATION MANAGEMENT ****************************************************
 	
 	/**

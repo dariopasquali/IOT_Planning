@@ -224,7 +224,6 @@ public class MapViewer {
     
 	public void setCurrentPosition(int y, int x, String direction) {
 		
-		//CellState newCellState = getCellState(y, x);
 		setCellState(y, x, CellState.START);
 		getGridButton(y, x).setText(direction);
 		
@@ -234,7 +233,7 @@ public class MapViewer {
 			getGridButton(currentPosition.getY(), currentPosition.getX()).setText("");
 		}
 				
-		currentPosition = new MapElement(x, y);
+		currentPosition = new MapElement(y, x);
 		this.lastCurrentCellState = CellState.CLEAR;		
 	}
     

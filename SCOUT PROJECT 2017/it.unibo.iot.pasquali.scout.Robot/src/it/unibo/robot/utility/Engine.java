@@ -21,7 +21,7 @@ import it.unibo.robot.Robot;
 
 public class Engine {
 	
-	protected final static int SLEEP_TIME = 1000;
+	protected final static int SLEEP_TIME = 300;
 	
 	protected Map map;
 	protected State state;
@@ -617,7 +617,13 @@ public class Engine {
 		return unexpList;
 	}
 
+	public void noneAll() {
+		map.noneAll();	
+	}
 
+	public void clearAll() {
+		map.clearAll();	
+	}
 
 
 

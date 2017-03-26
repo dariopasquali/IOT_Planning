@@ -147,9 +147,9 @@ Robot mockScout QActor robot context ctxRobot{
 		
 		println("load theories");
 		
-		solve consult("theories/robotTheory.pl") time(210000000) onFailSwitchTo  consultPrologFailure ;
-		solve consult("theories/navRobotTheory.pl") time(210000000) onFailSwitchTo  consultPrologFailure ;
-		solve consult("theories/exploreRobotTheory.pl") time(210000000) onFailSwitchTo  consultPrologFailure ;
+		solve consult("robotTheory.pl") time(210000000) onFailSwitchTo  consultPrologFailure ;
+		solve consult("navRobotTheory.pl") time(210000000) onFailSwitchTo  consultPrologFailure ;
+		solve consult("exploreRobotTheory.pl") time(210000000) onFailSwitchTo  consultPrologFailure ;
 		solve consult("theories/talkTheory.pl") time(210000000) onFailSwitchTo  consultPrologFailure ;
 		
  		println("++++++++++++++++++ robot(starts) ++++++++++++++++++");
