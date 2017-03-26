@@ -8,7 +8,5 @@ import it.unibo.is.interfaces.IActivityBase;
 public interface IGUI {
 
 	public void setController(IActivityBase controller);
-	public void clear();
-	public void setPath(List<Point> list);
-	
+	public void setPath(List<Point> path);
 }

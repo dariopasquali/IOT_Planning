@@ -1,11 +1,7 @@
 package it.unibo.robot.utility;
 
 import it.unibo.domain.model.implementation.State;
-import it.unibo.domain.model.map.Map;
-import it.unibo.gui.CellState;
-import it.unibo.planning.astar.domain.Move;
-import it.unibo.planning.enums.Direction;
-import it.unibo.planning.enums.MoveType;
+import it.unibo.model.map.Map;
 import it.unibo.robot.Robot;
 
 public class FileEngine extends Engine {

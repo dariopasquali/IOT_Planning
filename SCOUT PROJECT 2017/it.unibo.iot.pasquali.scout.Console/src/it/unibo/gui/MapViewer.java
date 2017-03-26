@@ -10,8 +10,9 @@ import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
-import it.unibo.model.implementation.Map;
-import it.unibo.model.implementation.MapElement;
+import it.unibo.gui.enums.CellState;
+import it.unibo.model.map.Map;
+import it.unibo.model.map.MapElement;
 
 public class MapViewer {
 	

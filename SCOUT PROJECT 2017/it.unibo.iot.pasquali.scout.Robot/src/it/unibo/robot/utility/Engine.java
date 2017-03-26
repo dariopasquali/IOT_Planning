@@ -8,7 +8,7 @@ import java.util.Set;
 
 import it.unibo.contactEvent.interfaces.IEventItem;
 import it.unibo.domain.model.implementation.*;
-import it.unibo.domain.model.map.Map;
+import it.unibo.model.map.Map;
 import it.unibo.planning.astar.algo.Path;
 import it.unibo.planning.astar.domain.Move;
 import it.unibo.planning.enums.Direction;

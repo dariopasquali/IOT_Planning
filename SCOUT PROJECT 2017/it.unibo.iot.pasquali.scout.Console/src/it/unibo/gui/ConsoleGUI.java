@@ -20,15 +20,16 @@ import java.util.List;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 
+import it.unibo.gui.enums.CellState;
 import it.unibo.is.interfaces.IActivity;
 import it.unibo.is.interfaces.IActivityBase;
 import it.unibo.is.interfaces.IBasicEnvAwt;
 import it.unibo.is.interfaces.IOutputEnvView;
 import it.unibo.is.interfaces.IOutputView;
-import it.unibo.model.implementation.MapElement;
 import it.unibo.model.interfaces.IGUI;
 import it.unibo.model.interfaces.IMap;
 import it.unibo.model.interfaces.IMapElement;
+import it.unibo.model.map.MapElement;
 
 import java.awt.Font;
 import java.awt.Frame;
@@ -305,12 +306,6 @@ public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt, I
 	
 //{{ EXPLORATION -------------------------------------------------------	
 	
-//	public void initExplorationViewer()
-//	{
-//		this.mapViewer = new ExplorationViewer(true);
-//		frame.getContentPane().removeAll();
-//	}
-	
 	public void clearCurrentExplorationMap()
 	{
 		if(!mapLoaded)
@@ -336,7 +331,6 @@ public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt, I
 //		frame.getContentPane().removeAll();
 //	}
 	
-	@Override
 	public void setPath(List<Point> list) {
 		
 		mapViewer.clearPath();		
@@ -520,8 +514,8 @@ public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt, I
 //		System.out.println(msg);
 	}
 	
-	@Override
-	public synchronized void clear(  ){
+
+	public synchronized void clear(){
 		txtOut.setText("");
 		txtOut.validate();
 	}//clear
@@ -548,7 +542,8 @@ public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt, I
 	}
 //}}
 	
-// ----------------------------------------------------------	
+	
+//{{ VISIBLE ----------------------------------------------------------	
 
 	@Override
 	public void setVisible(boolean state)
@@ -562,6 +557,8 @@ public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt, I
 	public void close() {
 		frame.setVisible(false);		
 	}
+//}}
+	
 	
 //{{  ROBA DELLE INTERFACCE, SERVE SOLO A FARE ANDARE IL FRAMEWORK
 	

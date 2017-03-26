@@ -1,10 +1,11 @@
-package it.unibo.model.implementation;
+package it.unibo.model.map;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import it.unibo.model.interfaces.IMap;
 import it.unibo.model.interfaces.IMapElement;
+
 
 public class Map implements IMap{
 
@@ -121,18 +122,37 @@ public class Map implements IMap{
 	
 	// ACCESSOR ---------------------------------
 	
-	public int getYMax() {
-		return ymax;
-	}
-	
-	public int getXMax() {
-		return xmax;
-	}
-
 	@Override
 	public Integer[][] getIntMap()
 	{
 		return intmap;
+	}
+	
+	@Override
+	public int getXmax() {
+		return xmax;
+	}
+
+	@Override
+	public int getYmax() {
+		return ymax;
+	}
+
+	@Override
+	public List<IMapElement> getElements() {
+
+		List<IMapElement> list = new ArrayList<IMapElement>();
+		
+		for(int y=0; y<=ymax; y++)
+		{
+			for(int x=0; x<=xmax; x++)
+			{
+				if(intmap[y][x] == OBJ)
+					list.add(new MapElement(y,x));
+			}
+		}
+		
+		return list;		
 	}
 	
 	// CHECKERS -------------------------------
@@ -242,6 +262,19 @@ public class Map implements IMap{
 		}	
 	}
 	
+	public void fillUnexploredCell()
+	{
+		for(int y=0; y<=ymax; y++)
+		{
+			for(int x = 0; x<=xmax; x++)
+			{
+				if(intmap[y][x] == NONE)
+					intmap[y][x] = OBJ;
+			}
+		}
+	}
+	
+	// STRING REPRESENTATION -------------------------------------
 		
 	@Override
 	public String toString()
@@ -292,32 +325,7 @@ public class Map implements IMap{
 	}
 
 
-	@Override
-	public int getXmax() {
-		return xmax;
-	}
-
-	@Override
-	public int getYmax() {
-		return ymax;
-	}
-
-	@Override
-	public List<IMapElement> getElements() {
-
-		List<IMapElement> list = new ArrayList<IMapElement>();
-		
-		for(int y=0; y<=ymax; y++)
-		{
-			for(int x=0; x<=xmax; x++)
-			{
-				if(intmap[y][x] == OBJ)
-					list.add(new MapElement(y,x));
-			}
-		}
-		
-		return list;		
-	}
+	
 
 
 	

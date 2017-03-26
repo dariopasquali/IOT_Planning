@@ -83,7 +83,7 @@ protected IActorAction  action;
     	nPlanIter++;
     		temporaryStr = "\"load theories\"";
     		println( temporaryStr );  
-    		parg = "consult(\"robotTheory.pl\")";
+    		parg = "consult(\"theories/robotTheory.pl\")";
     		//REGENERATE AKKA
     		aar = solveGoalReactive(parg,210000000,"","");
     		//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
@@ -91,7 +91,7 @@ protected IActorAction  action;
     			curPlanInExec   = "init";
     			if( ! aar.getGoon() ) break;
     		} 			
-    		parg = "consult(\"navRobotTheory.pl\")";
+    		parg = "consult(\"theories/navRobotTheory.pl\")";
     		//REGENERATE AKKA
     		aar = solveGoalReactive(parg,210000000,"","");
     		//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
@@ -99,7 +99,7 @@ protected IActorAction  action;
     			curPlanInExec   = "init";
     			if( ! aar.getGoon() ) break;
     		} 			
-    		parg = "consult(\"exploreRobotTheory.pl\")";
+    		parg = "consult(\"theories/exploreRobotTheory.pl\")";
     		//REGENERATE AKKA
     		aar = solveGoalReactive(parg,210000000,"","");
     		//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
@@ -107,7 +107,7 @@ protected IActorAction  action;
     			curPlanInExec   = "init";
     			if( ! aar.getGoon() ) break;
     		} 			
-    		parg = "consult(\"talkTheory.pl\")";
+    		parg = "consult(\"theories/talkTheory.pl\")";
     		//REGENERATE AKKA
     		aar = solveGoalReactive(parg,210000000,"","");
     		//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());

@@ -41,24 +41,24 @@ public class Engine {
 		visited = new HashSet<Point>();
 		
 		leftMap = new HashMap<Direction,Direction>();
-		leftMap.put(Direction.NORTH, Direction.NORTHWEST);
-		leftMap.put(Direction.NORTHWEST, Direction.WEST);
-		leftMap.put(Direction.WEST, Direction.SOUTHWEST);
-		leftMap.put(Direction.SOUTHWEST, Direction.SOUTH);
-		leftMap.put(Direction.SOUTH, Direction.SOUTHEAST);
-		leftMap.put(Direction.SOUTHEAST, Direction.EAST);
-		leftMap.put(Direction.EAST, Direction.NORTHEAST);
-		leftMap.put(Direction.NORTHEAST, Direction.NORTH);
+		leftMap.put(Direction.NORTH, Direction.NORTH_WEST);
+		leftMap.put(Direction.NORTH_WEST, Direction.WEST);
+		leftMap.put(Direction.WEST, Direction.SOUTH_WEST);
+		leftMap.put(Direction.SOUTH_WEST, Direction.SOUTH);
+		leftMap.put(Direction.SOUTH, Direction.SOUTH_EAST);
+		leftMap.put(Direction.SOUTH_EAST, Direction.EAST);
+		leftMap.put(Direction.EAST, Direction.NORTH_EAST);
+		leftMap.put(Direction.NORTH_EAST, Direction.NORTH);
 		
 		rightMap = new HashMap<Direction,Direction>();
-		rightMap.put(Direction.NORTH, Direction.NORTHEAST);
-		rightMap.put(Direction.NORTHEAST, Direction.EAST);
-		rightMap.put(Direction.EAST, Direction.SOUTHEAST);
-		rightMap.put(Direction.SOUTHEAST, Direction.SOUTH);
-		rightMap.put(Direction.SOUTH, Direction.SOUTHWEST);
-		rightMap.put(Direction.SOUTHWEST, Direction.WEST);
-		rightMap.put(Direction.WEST, Direction.NORTHWEST);
-		rightMap.put(Direction.NORTHWEST, Direction.NORTH);
+		rightMap.put(Direction.NORTH, Direction.NORTH_EAST);
+		rightMap.put(Direction.NORTH_EAST, Direction.EAST);
+		rightMap.put(Direction.EAST, Direction.SOUTH_EAST);
+		rightMap.put(Direction.SOUTH_EAST, Direction.SOUTH);
+		rightMap.put(Direction.SOUTH, Direction.SOUTH_WEST);
+		rightMap.put(Direction.SOUTH_WEST, Direction.WEST);
+		rightMap.put(Direction.WEST, Direction.NORTH_WEST);
+		rightMap.put(Direction.NORTH_WEST, Direction.NORTH);
 	}
 	
 	// GETTERS ---------------------------------
@@ -110,7 +110,7 @@ public class Engine {
 			y -= 1;
 			break;
 			
-		case NORTHEAST:
+		case NORTH_EAST:
 			y -= 1;
 			x += 1;
 			break;
@@ -119,7 +119,7 @@ public class Engine {
 			x += 1;
 			break;
 			
-		case SOUTHEAST:
+		case SOUTH_EAST:
 			x += 1;
 			y += 1;
 			break;
@@ -128,7 +128,7 @@ public class Engine {
 			y += 1;
 			break;
 			
-		case SOUTHWEST:
+		case SOUTH_WEST:
 			y += 1;
 			x += 1;
 			break;
@@ -137,7 +137,7 @@ public class Engine {
 			x -= 1;
 			break;
 		
-		case NORTHWEST:
+		case NORTH_WEST:
 			x -= 1;
 			y -= 1;
 			break;
@@ -229,7 +229,7 @@ public class Engine {
 			y -= 1;
 			break;
 			
-		case NORTHEAST:
+		case NORTH_EAST:
 			y -= 1;
 			x += 1;
 			break;
@@ -238,7 +238,7 @@ public class Engine {
 			x += 1;
 			break;
 			
-		case SOUTHEAST:
+		case SOUTH_EAST:
 			x += 1;
 			y += 1;
 			break;
@@ -247,7 +247,7 @@ public class Engine {
 			y += 1;
 			break;
 			
-		case SOUTHWEST:
+		case SOUTH_WEST:
 			y += 1;
 			x += 1;
 			break;
@@ -256,7 +256,7 @@ public class Engine {
 			x -= 1;
 			break;
 		
-		case NORTHWEST:
+		case NORTH_WEST:
 			x -= 1;
 			y -= 1;
 			break;

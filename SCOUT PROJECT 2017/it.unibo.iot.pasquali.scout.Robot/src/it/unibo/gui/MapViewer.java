@@ -8,11 +8,11 @@ import java.awt.event.MouseListener;
 
 import javax.swing.JButton;
 import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
 
-import it.unibo.domain.model.map.Map;
-import it.unibo.domain.model.map.MapElement;
+import it.unibo.gui.enums.CellState;
 import it.unibo.is.interfaces.IActivityBase;
+import it.unibo.model.map.Map;
+import it.unibo.model.map.MapElement;
 
 public class MapViewer {
 	

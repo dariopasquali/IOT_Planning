@@ -1,7 +1,5 @@
 package it.unibo.gui;
 
-import java.awt.FileDialog;
-
 import javax.swing.JFrame;
 
 import java.awt.Color;
@@ -9,30 +7,22 @@ import java.awt.Component;
 import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
 import java.awt.Panel;
-import java.awt.Point;
-import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JPanel;
 
-import it.unibo.domain.model.interfaces.IMap;
-import it.unibo.domain.model.interfaces.IMapElement;
+import it.unibo.gui.enums.CellState;
 import it.unibo.is.interfaces.IActivity;
 import it.unibo.is.interfaces.IActivityBase;
 import it.unibo.is.interfaces.IBasicEnvAwt;
 import it.unibo.is.interfaces.IOutputEnvView;
 import it.unibo.is.interfaces.IOutputView;
+import it.unibo.model.map.Map;
 
-import java.awt.Font;
 import java.awt.Frame;
-import javax.swing.JTextArea;
-import javax.swing.JScrollPane;
-import javax.swing.JScrollBar;
 
 public class RobotGUI extends Frame implements IOutputEnvView, IBasicEnvAwt{
 
 	private static final long serialVersionUID = 1L;
-	
-	private MapType type;
 	
 	private JFrame frame;
 	
@@ -50,8 +40,7 @@ public class RobotGUI extends Frame implements IOutputEnvView, IBasicEnvAwt{
 	}
 	
 	public RobotGUI() {
-		initializeFrame();		
-		type = null;
+		initializeFrame();
 	}
 	
 	// INITIALIZATION ------------------------------------------------------
@@ -87,14 +76,14 @@ public class RobotGUI extends Frame implements IOutputEnvView, IBasicEnvAwt{
 		frame.repaint();
 	}
 	
-	public void setMap(IMap map)
+	public void setMap(Map m)
 	{
 		this.mapViewer = new MapViewer(true, controller);
 		
-		mapViewer.createGridPanel(map.getYmax(), map.getXmax());
-		List<IMapElement> elements = map.getElements();
+		mapViewer.createGridPanel(m.getYmax(), m.getXmax());
+		List<it.unibo.model.interfaces.IMapElement> elements = m.getElements();
 		
-		for(IMapElement e : elements)
+		for(it.unibo.model.interfaces.IMapElement e : elements)
 		{
 			mapViewer.setCellState(e.getY(), e.getX(), CellState.OBJECT);
 		}
@@ -115,17 +104,6 @@ public class RobotGUI extends Frame implements IOutputEnvView, IBasicEnvAwt{
 		frame.repaint();
 	}
 	
-	public void clearGUI()
-	{
-		if(type.equals(MapType.EXPLORATION))
-		{
-			mapViewer.noneAll();
-		}
-		else if(type.equals(MapType.NAVIGATION))
-		{
-			mapViewer.clearPath();
-		}
-	}
 	
 	public void setCurrentPosition(int y, int x, String direction) {
 		mapViewer.setCurrentPosition(y, x, direction);		

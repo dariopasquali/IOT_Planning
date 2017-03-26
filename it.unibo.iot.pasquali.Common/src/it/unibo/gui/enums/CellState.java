@@ -1,8 +1,8 @@
-package it.unibo.gui;
+package it.unibo.gui.enums;
 
 import java.awt.Color;
 
-import it.unibo.model.implementation.Map;
+import it.unibo.model.map.Map;
 
 public enum CellState {
 	CLEAR(Color.WHITE, Map.CLEAR),

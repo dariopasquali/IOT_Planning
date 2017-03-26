@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 import it.unibo.domain.model.implementation.State;
-import it.unibo.domain.model.map.Map;
+import it.unibo.model.map.Map;
 import it.unibo.planning.astar.algo.AStarSearchAgent;
 import it.unibo.planning.astar.algo.Path;
 import it.unibo.planning.astar.engine.AStarEngine;
@@ -17,12 +17,10 @@ public class Explorer {
 
 	private boolean explore;
 	private Engine engine;
-	private Robot actor;
 	
-	public Explorer(Robot robot, Engine engine)
+	public Explorer(Engine engine)
 	{
 		this.engine = engine;
-		this.actor = robot;
 	}
 
 	public void startExploration() {

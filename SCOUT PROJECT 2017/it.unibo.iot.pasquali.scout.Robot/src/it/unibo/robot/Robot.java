@@ -14,13 +14,13 @@ import java.util.Set;
 import alice.tuprolog.Term;
 import it.unibo.contactEvent.interfaces.IEventItem;
 import it.unibo.domain.model.implementation.State;
-import it.unibo.domain.model.map.Map;
 import it.unibo.iot.configurator.Configurator;
 import it.unibo.iot.models.sensorData.SensorType;
 import it.unibo.iot.models.sensorData.distance.IDistanceSensorData;
 import it.unibo.iot.sensors.ISensor;
 import it.unibo.iot.sensors.distanceSensor.DistanceSensor;
 import it.unibo.is.interfaces.IOutputEnvView;
+import it.unibo.model.map.Map;
 import it.unibo.planning.enums.Direction;
 import it.unibo.qactors.action.AsynchActionResult;
 import it.unibo.qactors.action.IActorAction.ActionExecMode;
@@ -181,7 +181,7 @@ public class Robot extends AbstractRobot {
 	public void initExploreMap(int startX, int startY, int mapWidth, int mapHeight){
 		engine = new Engine(startX, startY, mapWidth, mapHeight, this, true);
 		
-		Explorer explorer = new Explorer(this, engine);
+		Explorer explorer = new Explorer(engine);
 		explorer.startExploration();
 		
 		System.out.println("EXPLORATION DONE");	
@@ -208,7 +208,7 @@ public class Robot extends AbstractRobot {
 		engine = new FileEngine(startX, startY, loadMap(filename), this, true);
 		((QActorPlanUtilsDebug)planUtils).setEngine((FileEngine) engine);
 		
-		Explorer explorer = new Explorer(this, engine);
+		Explorer explorer = new Explorer(engine);
 		explorer.startExploration();
 		
 		System.out.println("EXPLORATION DONE");		

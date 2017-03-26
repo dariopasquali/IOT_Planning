@@ -11,11 +11,11 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import it.unibo.domain.model.map.Map;
 import it.unibo.gui.RobotGUI;
 import it.unibo.is.interfaces.IActivity;
 import it.unibo.is.interfaces.IIntent;
 import it.unibo.is.interfaces.IOutputEnvView;
+import it.unibo.model.map.Map;
 import it.unibo.qactors.QActorContext;
 
 public class Guimanager extends AbstractGuimanager implements IActivity
