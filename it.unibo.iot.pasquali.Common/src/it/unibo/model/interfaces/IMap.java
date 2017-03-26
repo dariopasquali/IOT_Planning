@@ -19,6 +19,9 @@ public interface IMap {
 	
 	void setCellClear(int y, int x);
 	boolean isCellClear(int y, int x);
+	boolean isCellNone(int y, int x);
+	boolean isCellObj(int y, int x);
+	boolean isValidCell(int y, int x);
 	
 
 }

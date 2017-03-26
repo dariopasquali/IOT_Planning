@@ -28,7 +28,15 @@ public class Map implements IMap{
 	 * 			S
 	 */
 	
+//{{ CONSTRUCTORS ---------------------------------------------------
 	
+	/**
+	 * Construct the {@code Map} based on another map.
+	 * 
+	 * @param ymax  the height of the map
+	 * @param xmax  the width of the map
+	 * @param intmap  the other initialization map
+	 */
 	public Map(int ymax, int xmax, Integer[][] intmap)
 	{
 		this.xmax = xmax;
@@ -39,10 +47,14 @@ public class Map implements IMap{
 			for(int x=0; x<=xmax; x++)
 				this.intmap[y][x] = intmap[y][x];
 		
-		//this.intmap = intmap.clone();
-		
 	}
 	
+	/**
+	 * Construct a, all {@code CLEAR Map}.
+	 * 
+	 * @param ymax  is the height of the map
+	 * @param xmax  is the width of the map
+	 */
 	public Map(int ymax, int xmax) {
 
 		this.ymax = ymax;
@@ -52,28 +64,28 @@ public class Map implements IMap{
 		clearAll();
 	}
 	
-	public Map(Map currentMap) {
-		this.ymax = currentMap.ymax;
-		this.xmax = currentMap.xmax;
-		this.intmap = currentMap.intmap.clone();
+	
+	/**
+	 * Clone another {@code Map}
+	 * 
+	 * @param other  the other map
+	 */
+	public Map(Map other) {
+		this.ymax = other.ymax;
+		this.xmax = other.xmax;
+		this.intmap = other.intmap.clone();
 	}
 
-	public static int fromStringToState(String s)
-	{
-		s = s.toUpperCase();
-		
-		switch(s)
-		{
-		case("OBJECT"): return OBJ;
-		case("OBJ"): return OBJ;
-		case("CLEAR"): return CLEAR;
-		default: return NONE;
-		}
-	}
+//}}
 	
 	
-	// ADD ELEMENTS ----------------------------------------------
+//{{ MAP CREATION ----------------------------------------------
 	
+	/**
+	 * Add one or more elements from a Prolog representation.
+	 * 
+	 * @param elem  the element represented like element(X,Y)
+	 */
 	@Override
 	public void addElementFromString(String elem) {
 
@@ -98,6 +110,13 @@ public class Map implements IMap{
 			
 	}
 
+	
+	/**
+	 * Instantiate a {@code Map} from a Prolog representation.
+	 * 
+	 * @param map  the map represented like map(W,H)
+	 * @return
+	 */
 	public static Map createMapFromPrologRep(String map)
 	{
 		if(!map.contains("map"))
@@ -110,34 +129,47 @@ public class Map implements IMap{
 		 * |
 		 * Y
 		 */
-		
-		
+				
 		String[] s = map.split(",");
 		String[] sxmax = s[0].split("\\(");
 		String[] symax = s[1].split("\\)");
 			
 		return new Map(Integer.parseInt(symax[0]), Integer.parseInt(sxmax[1]));
 	}
-		
+
+//}}	
+
 	
-	// ACCESSOR ---------------------------------
+//{{ GET/SET ---------------------------------
 	
+	/**
+	 * @return the internal model representation
+	 */
 	@Override
 	public Integer[][] getIntMap()
 	{
 		return intmap;
 	}
 	
+	/**
+	 * @return the map width
+	 */
 	@Override
 	public int getXmax() {
 		return xmax;
 	}
 
+	/**
+	 * @return the map height
+	 */
 	@Override
 	public int getYmax() {
 		return ymax;
 	}
 
+	/**
+	 * @return a list of the map elements
+	 */
 	@Override
 	public List<IMapElement> getElements() {
 
@@ -155,8 +187,19 @@ public class Map implements IMap{
 		return list;		
 	}
 	
-	// CHECKERS -------------------------------
+//}}
 	
+	
+//{{ CHECK MAP STATE -------------------------------
+	
+	
+	/**
+	 * Check if the cell is {@code CLEAR}
+	 * 
+	 * @param y  the Y coordinate
+	 * @param x  the x coordinate
+	 */
+	@Override
 	public boolean isCellClear(int y, int x) {
 		
 		return y>=0 &&
@@ -166,6 +209,13 @@ public class Map implements IMap{
 				(intmap[y][x]==CLEAR);
 	}
 	
+	/**
+	 * Check if the cell is {@code NONE}
+	 * 
+	 * @param y  the Y coordinate
+	 * @param x  the x coordinate
+	 */
+	@Override
 	public boolean isCellNone(int y, int x) {
 		
 		return y>=0 &&
@@ -175,6 +225,14 @@ public class Map implements IMap{
 				(intmap[y][x]==NONE);
 	}
 	
+	
+	/**
+	 * Check if the cell is {@code OBJ}
+	 * 
+	 * @param y  the Y coordinate
+	 * @param x  the x coordinate
+	 */
+	@Override
 	public boolean isCellObj(int y, int x) {
 		
 		return y>=0 &&
@@ -184,12 +242,19 @@ public class Map implements IMap{
 				(intmap[y][x]==OBJ);
 	}
 	
+	/**
+	 * Check if the cell is inside the map
+	 * 
+	 * @param y  the Y coordinate
+	 * @param x  the x coordinate
+	 */
+	@Override
 	public boolean isValidCell(int y, int x)
 	{
 		return y>=0 && y <= ymax && x >=0 && x <= xmax;
 	}
 	
-	// SETTERS --------------------------------------------
+// SET CELL STATE --------------------------------------------
 	
 	public void setCellClear(int y, int x) {
 		
@@ -271,6 +336,19 @@ public class Map implements IMap{
 				if(intmap[y][x] == NONE)
 					intmap[y][x] = OBJ;
 			}
+		}
+	}
+	
+	public static int fromStringToState(String s)
+	{
+		s = s.toUpperCase();
+		
+		switch(s)
+		{
+		case("OBJECT"): return OBJ;
+		case("OBJ"): return OBJ;
+		case("CLEAR"): return CLEAR;
+		default: return NONE;
 		}
 	}
 	

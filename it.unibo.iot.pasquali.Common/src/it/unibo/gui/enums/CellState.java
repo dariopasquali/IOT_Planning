@@ -4,6 +4,9 @@ import java.awt.Color;
 
 import it.unibo.model.map.Map;
 
+/**
+ * Provides the possible value of a cell on the Map in the GUI.
+ */
 public enum CellState {
 	CLEAR(Color.WHITE, Map.CLEAR),
 	OBJECT(Color.BLACK, Map.OBJ),
@@ -20,6 +23,13 @@ public enum CellState {
 	public Color getColor(){return color;}
 	public int getMapState(){return mapState;}
 
+	
+	/**
+	 * Give the {@code CellState} relative to the background Color
+	 * 
+	 * @param background  {@code Color} of the cell
+	 * @return the relative {@code CellState} 
+	 */
 	public static CellState fromColor(Color background) {
 		
 		if(background.equals(Color.WHITE))
@@ -40,6 +50,13 @@ public enum CellState {
 		return NONE;
 	}
 	
+	
+	/**
+	 * Gives the {@code CellState} relative to the type of cell.
+	 * 
+	 * @param name  of the cell type
+	 * @return  the relative {@code CellState}
+	 */
 	public static CellState fromString(String name)
 	{
 		name = name.toUpperCase();
