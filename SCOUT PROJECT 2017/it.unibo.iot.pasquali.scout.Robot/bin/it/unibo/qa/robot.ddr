@@ -86,7 +86,12 @@ Event local_robot_gui : local_robot_gui(COMMAND)
 // ------------------------------------------------------------------
 
 Context ctxRobot ip [ host="localhost" port=8020]
-//EventHandler evh for updateSimulation -print;
+
+EventHandler evh for updateSimulation -print{ 
+	memo currentEvent for robot;
+	solve updateSimulationWorld for robot
+};
+
 
 Context ctxConsole ip [ host="localhost" port=8010]
 

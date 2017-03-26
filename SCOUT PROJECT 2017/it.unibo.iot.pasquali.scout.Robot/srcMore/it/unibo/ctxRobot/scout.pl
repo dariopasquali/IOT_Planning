@@ -9,6 +9,7 @@ qactor( console_ctrl , ctxconsole, "it.unibo.console.Console"   ). %%control-dri
 qactor( guimanager , ctxrobot, "it.unibo.guimanager.MsgHandle_Guimanager"   ). %%store msgs 
 qactor( guimanager_ctrl , ctxrobot, "it.unibo.guimanager.Guimanager"   ). %%control-driven 
 %%% -------------------------------------------
+eventhandler(evh,ctxrobot,"it.unibo.ctxRobot.Evh","updateSimulation").  
 %%% -------------------------------------------
 qactor( robot , ctxrobot, "it.unibo.robot.MsgHandle_Robot" ). 
 qactor( robot_ctrl , ctxrobot, "it.unibo.robot.Robot" ). 

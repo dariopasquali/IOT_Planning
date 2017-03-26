@@ -143,11 +143,9 @@ myClearPlan(PC,P):-
 
 myClearPlan(_,_).
 
-updateSimulationWorld(position(X,Y)) :-
+updateSimulationWorld :-
 	actorobj(Actor),
-	actorPrintln(X),
-	actorPrintln(Y),
-	Actor <- updateSimulationWorld(X,Y).
+	Actor <- updateSimulationWorld.
 
 /*
 ------------------------------------------------------------

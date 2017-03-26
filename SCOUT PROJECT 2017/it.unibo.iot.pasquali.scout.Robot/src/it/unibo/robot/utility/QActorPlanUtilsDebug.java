@@ -50,6 +50,7 @@ public class QActorPlanUtilsDebug extends QActorPlanUtils{
 		}
 		else
 		{
+			/*
 			// Not to sense the world but the system
 			if(!events.contains("obstaclefront") && !events.contains("obstacleleft"))
 			{
@@ -72,17 +73,8 @@ public class QActorPlanUtilsDebug extends QActorPlanUtils{
 				
 				return ares;
 			}
-			
-			/*
-			 * if(engine trova cella object)
-			 * {
-			 * 		ev = quello sopra
-			 * }
-			 * else
-			 * {
-			 * 		ev = set events = ""
-			 * }
-			 */
+			*/
+
 			boolean obj = false;
 			
 			if(events.contains("obstaclefront"))

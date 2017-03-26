@@ -42,9 +42,6 @@ import it.unibo.qactors.QActorUtils;
  */
 public class Robot extends AbstractRobot { 
 	
-	private final static String MODE_SIMULATED = "simulated";
-	private final static String MODE_REAL_ROBOT = "robot";
-	
 	private int defaultSpeed, defaultTime;
 	private int defaultTurnSpeed, defaultTurnTime;
 	
@@ -334,8 +331,8 @@ public class Robot extends AbstractRobot {
 		
 		for(String m : moves)
 		{
-			if(simulated)
-				pathPlan.addSenseEvent(1000, "updateSimulation", "simulatedWorldChanged");
+			//if(simulated)
+			//	pathPlan.addSenseEvent(1000, "updateSimulation", "simulatedWorldChanged");
 			
 			switch(m)
 			{
@@ -453,10 +450,24 @@ public class Robot extends AbstractRobot {
 	}
 	
 	
-	public void updateSimulationWorld(int x, int y){
+	public synchronized void updateSimulationWorld(String msg){
 		
 		System.out.println("Update the World Map");
-		((FileEngine)engine).setObject(new State(y,x));
+		
+		if(!msg.contains("updateSimulation"))
+			return;
+		
+		msg = msg.replace('(', ' ');
+		msg = msg.replace(')', ' ');
+		msg = msg.replace(',', ' ');
+		msg = msg.trim();
+		
+		String[] params = msg.split(" ");
+		
+		((FileEngine)engine).setObject(
+				new State(Integer.parseInt(params[3]), Integer.parseInt(params[2])));
+		
+		System.out.println(((FileEngine)engine).getWorldMap().toString());
 	}
 	/*
 	public Direction makeSpin(Direction start, SpinDirection spin) { //TODO use the Engine

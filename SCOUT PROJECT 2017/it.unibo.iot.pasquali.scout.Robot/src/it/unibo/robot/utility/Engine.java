@@ -21,7 +21,7 @@ import it.unibo.robot.Robot;
 
 public class Engine {
 	
-	protected final static int SLEEP_TIME = 300;
+	protected final static int SLEEP_TIME = 1000;
 	
 	protected Map map;
 	protected State state;
