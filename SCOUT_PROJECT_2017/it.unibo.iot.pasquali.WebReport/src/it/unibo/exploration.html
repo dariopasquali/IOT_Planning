@@ -1,0 +1,421 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.o../html4/strict.dtd">
+<html>
+
+	<link rel="stylesheet" type="text/css" href="../../css/tabStyle.css">
+	<script type="text/javascript" src="../css/issStyle.js"></script>
+	<style>
+h2 {
+    font: 100% Lucida Sans;
+    background-color: #f6d8f8;
+}
+h3 {
+    font: 90% Lucida Sans; 
+    width: 100%;
+    background-color: #f3f3f7;
+    color: #191818;
+}
+#i {
+     color: #ff1010;
+} 
+b{
+	font: 100% Lucida Console;
+	color: #2219fd;
+    font-weight: bold;
+}
+tt{
+	font: 90% Lucida Console;
+	color: #c90b46;
+    font-weight: bold;
+}
+
+.entity_title{
+	font-size: x-large;
+	font-weight: bold; 
+	background: #28c717;
+	width: 100%;
+}
+
+.subtytle{
+	font: 100% Lucida Console;
+	color: black;
+    font-weight: bold;
+}
+
+</style>
+	
+	<head>
+		<title>Scout System Report Exploration</title>
+	</head>
+    
+	<body>    
+	 
+		<div class="container wrapper"> 
+			<div class="wrapper">
+				<div id="main"> 
+				
+					<h1>Scout System - Exploration</h1>
+					<button onclick="window.location.href='home.html'">Home</button>
+					
+					<div style="background-color:#fbffb6; width:100%;float:left;"> 
+						<h3>VISION</h3>
+						
+						Create a system that can autonomously explore and map an unknown environment.<br>
+					</div> 
+					
+					<div style="background-color:#ecf8d1; width:100%;float:left;">     
+						<h3>GOALS</h3>
+						<ul>
+						
+							<li> Design and build the Exploration Phase in both the entities of the System, in order to define a navigation map</li>
+							<li> Study an algorithm to explore the environment in a logical manner</li>
+							<li> Create a map that can be interpreted and used by an autonomous Navigation agent</li>
+							<li> Design and build a simulated and/or concrete autonomous agent.</li>
+						
+						</ul>				 
+					</div>
+					  
+					    
+					<div style="background-color:#d5faf1; width:100%;float:left;">
+						<h3>WORK TO DO</h3>
+						<ol>
+							<li>Build the Exploration Model of the of the Robot;</li>
+							<li>Build the Exploration Model of the Console;</li>
+							<li>Testing the components (unit testing);</li>
+							<li>Define a valid algorithm to explore the unknown environment;</li>
+							<li>Define a proper way to save the map;</li>
+							<li>Build a simulated system and test it;</li>
+							<li>Build a concrete system and test it;</li>
+						</ol>				    
+					</div>  
+					  
+					<br>
+
+<!-- ***************************************************************************************** -->					
+
+					
+					<div class="entity_title">Robot Analysis</div>					
+										    
+					<h2>Robot Model - Structure</h2> 
+					
+					<tt>Name</tt>: Robot<br>
+					<tt>Context</tt>: ctxRobot<br>
+					
+					The Robot is a composed entity that can navigate autonomously in the environment;<br>
+					It's based on Raspberry Pi technology and equipped with sensor and motor, based on the DDR architecture:
+					
+					<ul>
+						<li><i>Two DC Motors</i>, that allow the Robot to move in the environment, do strict curves and change his speed;</li>
+						<li><i>Front Sonar sensor</i>, allow the Robot to sense objects in front of him;</li>
+						<li><i>Left Sonar sensor</i>, allow the Robot to sense objects left of him;</li>
+					</ul>
+					
+					The Robot offers a limited set of features:
+					<ul>
+						<li>Explore from a START point the entire environment;</li>
+						<li>Explore from an unknown point the entire environment;</li>
+						<li>Abort the Exploration in every moment;</li>
+					</ul>
+					
+					<br>					
+					<h2>Robot Model - Behavior</h2>					
+					<br>
+					
+					<tt>Assumption 0</tt>: Robot start position is exactly the user defined START POSITION, Robot start direction is the Map NORTH.
+					<br><tt>Assumption 1</tt>: The environment is in some way complete bounded, so the exploration will, soon or later, end.
+					<br>
+					<ol>
+						<li>At the Beginning of the Exploration phase the Robot waits a command (with or without START position and environment BOUNDS) from the Console;</li>
+						<li>When it received the command, it begins to explore the environment;</li>
+						<li>Every time it sense a new cell, it sends a notification to the Console;</li>
+						<li>Robot must be reactive andstop the Exploration if needed;</li>
+						<li>When the Exploration is done, it notify this event to the Console.</li>
+					</ol> 
+
+<!-- ***************************************************************************************** -->					
+					
+					
+					<div class="entity_title">Console Analysis</div>
+					<br>
+					
+					<h2>Console Model - Structure</h2> 
+					
+					<tt>Name</tt>: Console<br>
+					<tt>Context</tt>: ctxConsole<br>
+					
+					The Console is an atomic entity able to interact with the User and equipped with better computational capabilities.
+					<br>To handle that tasks, It must be implemented on a desktop or mobile architecture and show an appropriate GUI.
+					
+					The Console offers a limited set of features:
+					<ul>
+						<li>Start the Robot Exploration;</li>
+						<li>Abort the Exploration in every moment;</li>
+						<li>Show the Exploration progress in real time on GUI.</li>
+					</ul>
+					
+					<br>					
+					<h2>Robot Model - Behavior</h2>
+									
+					<ol>
+						<li>At the Beginning of the Exploration phase the Console waits that the user select the Exploration Map;</li>
+						<li>Console show the map on GUI in a proper way</li>
+						<li>Then user selects the START position</li>
+						<li>When user decides to start the Exploration, the Console send the command to the Robot and show an unexplored map of the same size.<br><br>
+						During the Exploration can happen that:
+							<ul>
+								<li>In every moment the User can abort the Exploration, so Console have to transmit this command to Robot</li>
+								<li>If Robot find a new cell it sends the new cell position and state (clear or object);</li>
+								<li>Robot explore all the environment and send a notification to Console to end the Exploration phase.</li>
+							</ul>
+						</li>
+					</ol> 
+					
+<!-- ***************************************************************************************** -->					
+					
+					
+					<br>
+					<div class="entity_title">Interaction</div>
+					<br>
+					
+					I prefer to analyze both the entities in the same paragraph.<br>
+					In this section i have to choose the type and format of data transmitted between Robot and Console.
+					
+					<ul>
+						<li>
+							<tt>local_gui_command : local_gui_command (COMMAND)</tt>, this <b>event</b> is emitted by the GUI on user interaction, Console sense this event in order to handle the user interaction.
+							The payload COMMAND can be:
+							<ul>
+								<li><i>explore</i>,<br> to start the Robot Exploration without any data;</li>
+								<li><i>explore(FILENAME, START, BOUNDS, MODE)</i>,<br>to start the Robot Exploration with more information. The command provides the map FILENAME, the START position in the usually known format, the width and height BOUNDS and the MODE, simulated or robot.</li>
+							</ul>
+							<br>
+						</li>
+						
+						<li>
+							<tt>exploredebug : exploredebug ( START , BOUNDS )</tt>, this <b>message</b> is send from the Console to the Robot to start the Exploration with some knowledge about the environment (to test purpose)
+							<br>I prefer the message form because Console perfectly knows the receiver of the data, furthermore a message is safer than an event, and i don't want to lose this command.
+							<ul>
+								<li>START is position( X , Y );</li>
+								<li>BOUNDS is map( WIDTH , HEIGH )</li>
+							</ul>
+							The message is used to start a real world exploration.
+							<br><br>
+						</li>
+						
+						<li>
+							<tt>explorefile : explorefile(START , FILENAME )</tt>, this <b>message</b> is send from the Console to the Robot to start the Exploration with some knowledge about the environment (to test purpose)
+							<br>I prefer the message form because Console perfectly knows the receiver of the data, furthermore a message is safer than an event, and i don't want to lose this command.
+							<ul>
+								<li>START is position( X , Y );</li>
+								<li>FILENAME is map absolute filename</li>
+							</ul>
+							The message is used to start a simulated exploration based on a file.
+							<br><br>
+						</li>
+
+						<li>
+							<tt>explore : explore </tt>, this <b>message</b> is send from the Console to the Robot to start the Exploration without any knowledge about the environment
+							<br>I prefer the message form because Console perfectly knows the receiver of the data, furthermore a message is safer than an event, and i don't want to lose this command.
+							<br>This message is not implemented but start the exploration without any information of the world.
+							<br><br>
+						</li>
+						
+						
+						<li>
+							<tt>obstaclefront : obstacleleft</tt> is the <b>event</b> emitted by the Front Sonar when it detect an obstacle in the sensing distance, the Robot may listen or not this event;
+							<br><br>
+						</li>
+
+						<li>
+							<tt>obstacleleft : obstacleleft</tt> is the <b>event</b> emitted by the Left Sonar when it detect an obstacle in the sensing distance, the Robot may listen or not this event;
+							<br><br>
+						</li>
+						
+						<li>
+							<tt>expdata : expdata ( POS , STATE )</tt>, is an <b>event</b> emitted by Robot and sensed by Console. It is used to notify the Console of a new founded Cell.
+							<ul>
+								<li> POS is position ( X , Y );</li>
+								<li> STATE is clear or object.</li>
+							</ul>
+							<br><br>
+						</li>
+						
+						<li>
+							<tt>abort : abort</tt>, is an <b>event</b> emitted by Console and sensed by Robot, it's used to abort the Navigation;
+							<br><br>
+						</li>
+						
+						<li>
+							<tt>end : end</tt>, is and <b>event</b> emitted by Robot when it reach the GOAL.
+							<br><br>
+						</li>						
+					</ul> 
+					
+					For expdata,and end, i prefer the event form because the Console may not be the only entity concerned to listen that events.
+					<br> The same applies to abort, maybe i have multiple robots.
+					
+<!-- ***************************************************************************************** -->					
+
+					<br><br>
+					<div class="entity_title">QActor Models & Prolog Theory</div>
+					<br>
+					
+					<tt>Console Model</tt> ----> <a href="qa/ConsoleExploration.qa">console.qa</a>
+					<br><tt>Console Prolog Theory</tt> ----> <a href="prolog/consoleExplorationTheory.pl">consoleTheory.pl</a>
+					
+					<br><br>
+					
+					<tt>Robot Model</tt> ----> <a href="qa/RobotExploration.ddr">robot.ddr</a>
+					<br><tt>Robot Prolog Theory</tt> ----> <a href="prolog/robotExplorationTheory.pl">robotTheory.pl</a>
+
+<!-- ***************************************************************************************** -->					
+
+					
+					<br><br>
+					<div class="entity_title">Exploration Problem Analysis</div>
+					<br>
+					
+					As I said in the <a href="home.html">home page</a>, In the Exploration phase a don't need a lot of computational power because the exploration seep depend on the Robot speed.<br>
+					To obstain a more precise exploration I prefer to slow down the Robot speed.<br>
+					So the system is very similar to ButtonLedSystem beacuse the Console sends a command to the Robot and it execute it in some (unknown from the Console) way.
+					<br><br>
+					
+					Anyhow, i assume that:
+					<br><br>
+					<tt>Assumption 1</tt>: The map is divided in squared cells of uniform size. The size of a cell is based on robot dimensions. Consequently, the navigation is discrete.
+					<br>The map has a maximum width and height and can be or not bounded by obstacles borders.
+					<br> 
+					
+					<h2>Detect Obstacles</h2><br>
+					
+					In Order to detect unexpected obstacles Robot can use the Sonar.
+					<br>The problem is <b>when</b> be sensitive.<br>
+					
+					<br><tt>Assumption 2</tt>: Robot can only step forward of a defined distance, or turn left/right of a defined angle.
+					<br><br>
+					
+					During a rotation the Robot position doesn't change, so it can find an unexpected obstacle only during a step forward.<br>
+					There are a lot of available techniques, i decide to adopt a pessimistic one:<br>
+					The detection distance of Sonar is equal to step distance, before every forward movement Robot listen to Sonar to know if the next cell is clear.
+					<br>This solution is a bit pessimistic but very simple to implement and also is the normal behavior of an intelligent agent.
+					<br><br>
+
+					In the Exploration phase the Robot will use 2 Sonars, one frontal and one left. The reason will be clear in the Algorithm Section.
+					
+					
+					<br><h2>Handle new objects</h2><br>
+					
+					The requirements said that:<br><br>
+					
+					<i>During the Exploration, the system must show the state of the task in a proper way.</i>
+
+					Robot must notify the Console every time it detect a new cell, bot CLEAR and OBJECT.<br>
+						
+					So, both Robot and Console mantaint the current explored Map.
+					
+<!-- ***************************************************************************************** -->					
+
+					
+					<br><br>
+					<div class="entity_title">Explore</div>
+					<br>
+					
+					There are a lot of way to Explore an unknown environment.
+					<br>First of all, What do i mean with "Explore"?<br><br>
+					
+					Whit <tt>Explore</tt> I mean the process where, an autonomous agent that knows almos nothing about the environment, incrementally detect elements around it in order to define a digital representation of the space.			
+					
+					<br><h2>Exploration Algorithm</h2>
+					
+					My Exploration Algorithm is base on somethings really different, a Maze solving Algorithm called Left Wall Follower.
+					<br> You can find more information <a href"https://en.wikipedia.org/wiki/Maze_solving_algorithm">here</a>.
+
+					The Left Hand Wall Follower is a maze solving algorith for "simply connected" or "perfect" mazes. In a perfect maze every wall is connected with the external borders, in other words, if I follow a wall while my left hand touch it everytime, soon or later i'll reach the exit.
+					<br>
+					With this very big assumption we can't have a single object alone in a clear space beacuse, with the simple rule said, we'll fall into an infinite loop of wall following.
+					<br><br>
+
+					So I has to modify the simple wall follower algorithm in order to:
+					<ul>
+						<li>Detect and Avoid loop situation;</li>
+						<li>Know if there is some unexplored spaces.</li>
+					</ul>
+					<br>
+
+					Fortunatly those two tasks can be achieved at the same time.<br>
+
+					<i>The robot mantain a digital representation of the explored world, when it walks on an already explored cell, it makes a local search to find if there is a hole in his exploration map.<br>If so, it find the best path to traver to the unexplored area.
+					<br><br> If no hole is found, the Exploration is complete.
+					</i>
+
+					<br>To implement this algorithm there are 3 things to define:
+					<ol>
+						<li>How the environment is represented? ---> <a href="#MapDescription"> Map Description </a>;</li>
+						<li>Which moves are possible? ---> <a href="#MoveDescription">Move Description</a></li>
+						<li>How can I find an unexplored area? ---> <a href="#Breadth">Breadth First Algorithm</a></li>
+						<li>How can I generate the best path to that area? ---> <a href="#Astar">Planning Algorithm</a></li>
+					</ol> 
+					
+					<br><a name="MapDescription"></a><h2>Map Description</h2>
+					
+					According with Assumption 1, the map:
+					<ul>
+						<li>is discretized in uniform size cells;</li>
+						<li>has defined width and height;</li>
+						<li>can be or not be bounded by obstacle borders.</li>
+					</ul>
+					
+					For example, this is a valid Map.<br><br>
+					<img alt="" src="img/mapexample.png">
+					
+					<br><br>In my map model obstacles are the black cells, white cells are walkable areas.
+					
+					<br><br><tt>Assumption 4</tt> The Robot fits perfectly the cell.
+					
+					
+					<br><a name="MoveDescription"></a><h2>Move Description</h2><br>
+					
+					In the Navigation, i have to minimize the travel time, so i use both tiled and diagonal movements.
+					<br> In the Exploration indeed i must wall ol the walkable area, so i don't take any advantage with diagonal moves.
+					
+					So I prefer to use a more classical model:
+					<ul>
+						<li>Each cell is defined as only X and Y coordinates;</li>
+						<li>At each state, the Robot can move to one of the adjacent cell;</li>
+						<li>This movement is atomic, also if include rotation;</li>
+						<li>Rotation are alway of 90°;</li>
+						<li>Move horizontal and vertical cost 10;</li>
+					</ul>
+					
+					<br>Is very important to mantain a correct description of the internal state in order to process the sensed obstacles of real world and send data to Console.
+					
+					<br><a href="#Breadth"></a><h2>Breadth First Algorithm</h2>
+					
+					When Robot detect an already walked cell it make a search in order to find the nearest unexplored aread. This search is based on Breadth First Algorithm.
+
+					<br> This is an uninformed algorithm based on a search tree. It starts from the root node (the already explored cell) and evaluate the neighbor nodes before moving to the farther level neighbors.
+					<br><br>
+
+					So this algorithm starts from the current already explored cell and expands, as a wildfire in each direction until it finds an unexplored cell.
+					<br>The expansion is made anly with allowed movements, if the adjacent cell is a wall the Robot will not expand it.
+					<br>
+					So it will find only reachable unexplored areas.
+
+					<br><br>Look <a href="https://en.wikipedia.org/wiki/Breadth-first_search">here</a> for more information.
+					
+					<br><a href="#Astar"></a><h2>Planning Algorithm</h2>
+
+					When I find an unexplored cell, Robot have to travel from the current position to that location. This task is the same as the Navigation task, indeed I used the same solution explained in the <a href="navigation.html">Navigation</a><br> page.
+
+					During this travel is used the digital representation of the world, moreover, the Robot assume a Closed World Assumption:<br>
+					<i>"If a cell is Unexplored it's an Obstacle"</i>.
+									
+				</div>
+			</div>    
+		    &emsp; 
+		<div style="background-color:#0ce0f2; width:100%;text-align:center;font-size:small;color:white">
+		By DP   
+		</div>    
+	
+	</body>
+</html>
