@@ -5,6 +5,11 @@
 	<link rel="stylesheet" type="text/css" href="../../css/tabStyle.css">
 	<script type="text/javascript" src="../css/issStyle.js"></script>
 	<style>
+
+div.wrapper {
+	font-family: Arial, Helvetica, sans-serif;
+}
+
 h2 {
     font: 100% Lucida Sans;
     background-color: #f6d8f8;
@@ -27,6 +32,13 @@ tt{
 	font: 90% Lucida Console;
 	color: #c90b46;
     font-weight: bold;
+}
+
+.entity_title{
+	font-size: x-large;
+	font-weight: bold; 
+	background: #6FF130;
+	width: 100%;
 }
 </style>
 	
@@ -65,9 +77,9 @@ tt{
 					    
 					</div>
 					
-					<h2>Requirements</h2>
+					<div class="entity_title">Requirements</div>
 						
-						We have to design and build a Scout system that can offer two basic features:
+						<br>We have to design and build a Scout system that can offer two basic features:
 						<br>
 						<ol>
 							<li>
@@ -87,7 +99,7 @@ tt{
 						<br><br>
 						During the exploration we assume that the environment is complete bounded in some way, so the exploration will end soon on later.<br>
 												
-						<br><br>
+						<br>
 						<b>NAVIGATION NOTES</b>
 						<br><br>
 						During the navigation we assume that the plan is dynamic so, the Robot must detect unexpected obstacles.<br>
@@ -97,7 +109,6 @@ tt{
 							<li> After that, if the obstacle is still there, the Robot must generate an alternative plan for the current position to GOAL, that avoid the new obstacle.
 						</ol>
 						
-						<br><br>
 						<b>TECNICAL NOTES</b>
 						<br>
 						<ul>
@@ -122,11 +133,9 @@ tt{
 						</ol>				    
 					</div>  
 					  
-					<br>
-					
-										    
-					<h2>Scout System Model</h2> 
-					After requirement analysis we can state that:
+					</br>										    
+					<div class="entity_title">Scout System Model</div> 
+					<br>After requirement analysis we can state that:
 					    
 					The Robot is the only concrete entity defined in the system, it has to do a lot of tasks:
 					<ul>
@@ -151,9 +160,24 @@ tt{
 					<br><br>
 					To better define and build the System, i split it in two parts based on the two well defined behavior phases.
 					<br><br>
-					<a href="exploration.html">EXPLORATION</a><br>
-					<a href="navigation.html">NAVIGATION</a><br>
+					<a href="exploration.html">Exploration Analysis</a><br>
+					<a href="navigation.html">Navigation Analysis</a><br>
+					<br>
+									
+				<div class="entity_title">Scout System Implementation</div>
+				<br>
 				
+				After the Model definition I have to implement the System, i choose, following the requirements,
+				to implement:
+				<ul>
+					<li>Console in a Windows based architecture;</li>
+					<li>Robot in a Windows (simulated) and Rasperry Pi (real) architecture.</li>
+				</ul>
+				<br>
+				I think is better to analyse the System all together.
+				
+				<h2>System unifyed Model</h2>
+				  
 				</div>
 			</div>    
 		    &emsp; 
