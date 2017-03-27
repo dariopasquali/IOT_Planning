@@ -16,18 +16,7 @@ navRobotTheory.pl
 
 planFilename("scout.txt").
 planName(scout).
-/*
-planBaseID(1).
 
-planName(NAME):-
-	planBaseName(BASE),
-	planBaseID(ID),
-	atom_concat(BASE,ID,NAME),
-	actorPrintln(NAME),
-	ID1 is ID + 1,
-	retract(planBaseID(_)),
-	assert(planBaseID(ID1)).
-*/
 
 defaultSpeed(60).
 defaultDuration(1000).
@@ -146,6 +135,8 @@ myClearPlan(_,_).
 updateSimulationWorld :-
 	actorobj(Actor),
 	Actor <- updateSimulationWorld.
+	
+
 
 /*
 ------------------------------------------------------------

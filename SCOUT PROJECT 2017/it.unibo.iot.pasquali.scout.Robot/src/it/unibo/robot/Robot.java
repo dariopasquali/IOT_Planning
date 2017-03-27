@@ -47,7 +47,8 @@ public class Robot extends AbstractRobot {
 	
 	private ArrayList<State> path;
 	
-	private Engine engine = null;	
+	private Engine engine = null;
+	private String currentFilename;	
 	
 	//private HashMap<Integer, Direction> spinMap;
 	
@@ -58,6 +59,8 @@ public class Robot extends AbstractRobot {
 		super(actorId,myCtx,outEnvView ,it.unibo.qactors.QActorUtils.robotBase );
 		
 		QActorPlanUtils myUtils = new QActorPlanUtilsDebug(this, actionUtils, outEnvView);
+		
+		this.currentFilename = "";
 		
 		this.planUtils = myUtils;		
 		/*
@@ -145,10 +148,15 @@ public class Robot extends AbstractRobot {
 	{
 		System.out.println("Navigation Mode --> SIMULATED");
 		
-		Map m = loadMap(filename);
-		this.engine = new FileEngine(sx, sy, m, this, false);
-		//((FileEngine)engine).setObject(new State(2,2));
-		((QActorPlanUtilsDebug)planUtils).setEngine(((FileEngine)engine));
+		if(currentFilename.equals(filename))
+			System.out.println("Engine already has the most recent Map");
+		else
+		{
+			Map m = loadMap(filename);
+			this.engine = new FileEngine(sx, sy, m, this, false);
+			//((FileEngine)engine).setObject(new State(2,2));
+			((QActorPlanUtilsDebug)planUtils).setEngine(((FileEngine)engine));
+		}		
 		
 		System.out.println(((FileEngine)engine).getWorldMap().toString());
 		
@@ -408,9 +416,13 @@ public class Robot extends AbstractRobot {
 	*/
 //}}	
 
+	
 //{{ UTILITIES ---------------------------------------------------------------
 	
 	private Map loadMap(String filename){
+		
+		this.currentFilename = filename;
+		
 		Map m = null;
 		
 		List<String> data = new ArrayList<String>();						

@@ -107,7 +107,7 @@ protected IActorAction  action;
     			curPlanInExec   = "init";
     			if( ! aar.getGoon() ) break;
     		} 			
-    		parg = "consult(\"theories/talkTheory.pl\")";
+    		parg = "consult(\"talkTheory.pl\")";
     		//REGENERATE AKKA
     		aar = solveGoalReactive(parg,210000000,"","");
     		//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
