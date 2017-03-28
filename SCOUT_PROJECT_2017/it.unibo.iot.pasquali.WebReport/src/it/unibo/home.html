@@ -40,6 +40,7 @@ tt{
 	background: #6FF130;
 	width: 100%;
 }
+
 </style>
 	
 	<head>
@@ -94,14 +95,14 @@ tt{
 						For that purpose we have a Mobile Agent, aka <b>Robot</b>, that can move in the environment.
 						Moreover it must be equipped with appropriate sensor in order to sense the environment.
 						
-						<br><br>
-						<b>EXPLORATION NOTES</b>
-						<br><br>
+						<br>
+						<h2>EXPLORATION NOTES</h2>
+
 						During the exploration we assume that the environment is complete bounded in some way, so the exploration will end soon on later.<br>
 												
 						<br>
-						<b>NAVIGATION NOTES</b>
-						<br><br>
+						<h2>NAVIGATION NOTES</h2>
+
 						During the navigation we assume that the plan is dynamic so, the Robot must detect unexpected obstacles.<br>
 						When an unexpected obstacle is found:
 						<ol>
@@ -109,8 +110,8 @@ tt{
 							<li> After that, if the obstacle is still there, the Robot must generate an alternative plan for the current position to GOAL, that avoid the new obstacle.
 						</ol>
 						
-						<b>TECNICAL NOTES</b>
-						<br>
+						<h2>TECNICAL NOTES</h2>
+
 						<ul>
 							<li>The Robot must be a Differential Drive Robot (aka DDR), with a Raspberry Pi core.</li>
 							<li>During the Exploration, the system must show the state of the task in a proper way.</li>
@@ -164,20 +165,326 @@ tt{
 					<a href="navigation.html">Navigation Analysis</a><br>
 					<br>
 									
-				<div class="entity_title">Scout System Implementation</div>
+				<div class="entity_title">Another Step Before Implementation</div>
 				<br>
 				
-				After the Model definition I have to implement the System, i choose, following the requirements,
-				to implement:
+				Basing on the model defined, i'm going to implement the System.<br><br> In order to make it easy to debug without the need of build a physical Robot, i introduced a third enitity in the Robot context.<br>
+
+				The GUImanager provides a graphical interface that show the movements of the Robot in a simulated world, this wolrd is based on the same map used at Console side. With this trick I can view the Robot moving according with algorith during Exploration and Navigation.
+				<br><br>
+
+				Let's make a simple analysis of this entity.
+				<br>
+
+				<h2>GUImanager Model - Structure</h2> 
+
+				<tt>Name</tt>: GUImanager<br>
+				<tt>Context</tt>: ctxRobot<br>
+				<br>
+				The GUImanager is an atomic entity that, obviously, manage a GUI and show, in an interactive way, the movements of Robot in the virtual enivronment.<br>
+				Moreover it allow the user to interact with the virtual environment (without infect the intial static Map), in order to place a new unexpected obstacle. This feature is very useful to test Navigation.
+					
+					The GUImanager offers a limited set of features:
+					<ul>
+						<li>Show a Map based on a file name;</li>
+						<li>Show the Robot initial position;</li>
+						<li>Dynamically update the Robot position and Direction, accordin with algorith progression;</li>
+						<li>Update the virtual environment at runtime with an unexpected object.</li>
+					</ul>
+				Moreover the GUImanager must be launched only if we are working with a simulated robot.
+				<br>
+
+				<h2>GUImanager Model - Bheaviour</h2>
+
+				<ol>
+					<li>Firt of all, GUImanager checks an internal flag to know if we are working with a simulated or real robot;</li>
+					<li>If we are in a simluation it waits a Map and the Robot initial position, otherwise it terminates;</li>
+					<li>When it receive a map filename, it loads and show data. Than waits for position updates;</li>
+					<li>When it receive a position update, it updates the position on the GUI;</li>
+					<li>If the User interact with the GUI in order to place an unexpected obstacle, this new object is notified to the Robot;</li>
+					<li>When Exploration or Navigation ends, it waits another Map and position.</li>
+				</ol>
+
+				<h2>GUImanager Model - Interaction</h2>
+
+				GUImanager interact only with Robot, Since they are in the same context the interaction is simple.
+				<br>However, we have:
+
 				<ul>
-					<li>Console in a Windows based architecture;</li>
-					<li>Robot in a Windows (simulated) and Rasperry Pi (real) architecture.</li>
+					<li>
+						<tt>enableGUI : enableGUI(START, FILENAME)</tt>, this <b>event</b> is emitted by the Robot when a simulated Exploration or Navigation is started. I choose the event type because there may be more than one entity that provides a virtual representation of the environment. (Maybe one of that is in Unity :D). 
+						<ul>
+								<li>FILENAME is the absolute filename of the Map;</li>
+								<li>START is the initial Robot position in the format position( X , Y ). Initial direction is always NORTH.</li>
+						</ul>
+						<br>
+					</li>
+
+					<li>
+						<tt>show : show(POS, DIR)</tt>, this <b>event</b> is emitted by the Robot when his position and/or direction changes.<br> I choose the event type for the same reason up said.
+						<ul>
+								<li>POS is the position in the format position( X , Y );</li>
+								<li>DIR is the cardinal direction.</li>
+						</ul>
+						<br>
+					</li>
+
+					<li>
+						<tt>updateSimulation : updateSimulation(POSITION)</tt>, this <b>event</b> is emitted by the GUImanager the user place a new object in the environment. I choose to bypass the usually way to detect local_gui interaction in order to give a much better reactivity.<br>
+						This event is sensed, at Robot side, by an EventHandler that update the virtual world representation in a synchronized manner.
+						<ul>
+								<li>POSITION is the position of the object in the format position( X , Y ).</li>
+						</ul>
+						<br>
+					</li>
 				</ul>
 				<br>
-				I think is better to analyse the System all together.
+
+				<div class="entity_title">Scout System Implementation - Console</div>
+				<br>
+				<h2>Console Model</h2>
+				<br>
+
+				<tt>Complete Console model</tt>: <a href="qa/console.qa">console.qa</a>.<br><br>
+
+				<tt>Common Prolog theory</tt>: <a href="prolog/consoleTheory.pl">consoleTheory.pl</a>.<br><br>
+
+				<tt>Exploration Prolog Theory</tt>: <a href="prolog/consoleExplorationTheory.pl">consoleExplorationTheory.pl</a>.<br><br>
+
+				<tt>Navigation Prolog Theory</tt>: <a href="prolog/consoleNavigationTheory.pl">consoleNavigationTheory.pl</a>.<br><br>
+
+				<br>In the image you can see a complete flow chart of Console behavior, please see how much is symetric.
+				<br><br>
+				<img src="img/ConsoleFlow.png">
+				<br><br>
+				I know, is very very small, but you can generate this flow char with this <a href="finiteStateMachines/console.gv">file</a> on this <a href="http://www.webgraphviz.com">website</a>.
+				<br><br>
+				<h2>Console GUI</h2>
+				<br>
+
+				As the Requirements said, Console provide a friendly User interface that show the Exploration/Navigation progression and allow the user to control the execution flow.<br>
+				I choose to split the GUI into three subGUI, one for each task to achieve, to give more relevance to the Map visualization:
+				<br>
+				<ul>
+					<li>
+						<img src="img/explorationMapFrame.jpg">
+						<br><br>
+						The Map Frame shows the environment, loaded from a file, as a matrix of button. We can have 3 kind of cell:
+						<ul>
+							<li><b>White Cell</b>: is a walkable space;</li>
+							<li><b>Black Cell</b>: is a unwalkable space;</li>
+							<li><b>Gray Cell</b>: is a unexplored space. </li>
+						</ul>
+						In the Image we can see the map showed during the Exploration at Console side. This map is incrementally revealed as the Exploration proceeds.
+						<br><br>
+						This frame also allow the user to:
+						<ul>
+							<li>Select START psition with a left mouse click;</li>
+							<li>Select GOAL position with a right mouse click;</li>
+							<li>Erease START or GOAL position with a middle mouse click.</li>
+						</ul>	
+					</li>
+					<br>
+					<hr>
+					<br>
+					<li>
+						<img src="img/controlFrame.png"><br><br>
+						
+						The Control Frame allow the user to interact with the Scout System and command the avalaible functions.
+						<ul><br>
+							
+							<li><b>Load Map</b>, load an environment map from a previously created Prolog model. This map can be used both for Exploration or Navigation;</li><br>
+							
+							<li><b>Explore</b>, starts the Robot Exploration, but only if the user select a START position in the map;</li><br>
+							
+							<li><b>Save Map</b>, once the Exploration is done, user can save the explored map in a proper file;</li><br>
+							
+							<li><b>Search Path</b>, once user has uploaded a map and selected START and GOAL, Console find, and show the best traverl path;</li><br>
+
+							<li><b>Navigate</b>, once the best path is founded this button command the start of Robot Navigation</li><br>
+
+							<li><b>Abort</b>, allow to interrupt the current task;</li><br>
+
+							<li><b>Clear Path</b>, clear the showed Navigation path, restoring the default map representation;</li><br>
+
+							<li><b>Clear Exploration</b>, clear the expolored area, restoring the all unexplored map.</li><br>
+						</ul>						
+					</li>
+					<br>
+					<hr>
+					<br>
+
+					<li>
+						<img src="img/outputFrame.png"><br><br>
+						The output Frame shows the Standard output of the Console.						
+					</li>
+				</ul>
+				<br>
+
+				With this 3-frame representation i can, for example, command the Exploration then toggle fullscreen of Map Frame and analyze the evolution of the map.<br><br>
+
+				<h2>Class Structure</h2>
+				<br>
+
+				I used the QActor framework, developed by Antonio Natali, to automatically generate the Java code from the model.
+				<br>I also have to implement my personal behavior.<br>
+				I'll make a simple overview of project structure and class responsability but, for the full code, i refer to <a href="https://github.com/dariopasquali/IOT_Planning/tree/master/SCOUT_PROJECT_2017/it.unibo.iot.pasquali.scout.Console">github repository</a>.<br><br>
+
+				The Console class strutcure is very very simple.<br>
+				<br>
+				<img src="img/consoleUML.jpg"><br><br>
+
+				What isn't envelop in a package bubble is part of the the it.unibo.iot.pasquali.scout.Console java project. Other classes come from different support projects explained later.
+				<br><br>
+
+				<ul>
+					<li><b>AbstractConsole</b> is generated by AN framework and implements the structure-behavior-interaction defined in the model;</li><br>
+
+					<li><b>Console</b> extends AbstractConsole and implements the concrete business logic of the entity. It offer method to load/store maps, to interact with AStarAlgorith in order to find the best path, and manage the incremental update of the exploration;</li><br>
+
+					<li><b>ConsoleGUI</b> is the graphical interface offeret by Console, it receive user interaction and trasmit those command to che Console;</li><br>
+
+					<li><b>MapViewer</b> is the GUI component that show the map;</li><br>
+				</ul>
+
+				<div class="entity_title">Scout System Implementation - Robot</div>
+
+				<h2>Robot Model</h2>
+				<br>
 				
-				<h2>System unifyed Model</h2>
-				  
+				<tt>Complete Robot model (also with GUImanager model)</tt>: <a href="qa/robot.ddr">robot.ddr</a>.<br><br>
+
+				<tt>Real and Mock Robot configuration</tt>: <a href="qa/uniboRobots.baseddr">uniboRobots.baseddr</a>.<br><br>
+
+				<tt>Common Prolog theory</tt>: <a href="prolog/robotTheory.pl">robotTheory.pl</a>.<br><br>
+
+				<tt>Exploration Prolog Theory</tt>: <a href="prolog/robotExplorationTheory.pl">robotExplorationTheory.pl</a>.<br><br>
+
+				<tt>Navigation Prolog Theory</tt>: <a href="prolog/robotNavigationTheory.pl">robotNavigationTheory.pl</a>.<br><br>
+
+				<br>In the image you can see a complete flow chart of Robot behavior.
+				<br><br>
+				<img src="img/RobotFlow.png">
+				<br><br>
+				I know, is very very small, but you can generate this flow char with this <a href="finiteStateMachines/robot.gv">file</a> on this <a href="http://www.webgraphviz.com">website</a>.
+				<br><br>
+
+				<h2>Class Structure</h2>
+				<br>
+
+				As the Console, I usedt the QActor framework to generate project components from the model, also I insert my own business logic.<br>
+				I'll make a simple overview of project structure and class responsability but, for the full code, i refer to <a href="https://github.com/dariopasquali/IOT_Planning/tree/master/SCOUT_PROJECT_2017/it.unibo.iot.pasquali.scout.Robot">github repository</a>.<br><br>
+
+				The Robot class structure is a bit more complex, nut not so much.<br>
+				<br>
+				<img src="img/RobotUML.jpg"><br><br>
+
+				<ul>
+					<li><b>AbstractRobot</b> is generated by AN framework and implements the structure-behavior-interaction defined in the model;</li><br>
+
+					<li>
+						<b>Robot</b> is, obviously, the heart of the entity. It offer a large set of features like:
+						<ul>
+							<li>Configure the Robot with default speed movement;</li>
+							<li>Intialize an Engine for real world Exploration or Navigation;</li>
+							<li>Initialize a FileEngine for simulated Exploration or Navigation;</li>
+							<li>Translate the plan received from Console in an executable Plan;</li>
+							<li>Receive and Transmit messages and events;</li>
+							<li>Interact with Console during the Navigation and Exploration;</li>
+							<li><tt>Control the hardware to move the physical Robot in real world.</tt></li>
+						</ul>
+						<br>
+						So Robot class is like the body of the system;
+					</li><br>
+
+					<li>
+						<b>Engine and FileEngine</b> if Robot is the body, this is the Memory, to way to access the world representation. Engine and also FileEngine mantains the map virtual representation and offer features to change the current Robot state.<br>But is still the Robot that know ow to move in the real world.<br>
+
+						The difference between Engine and FileEngine (that extends the first) is that I use Engine when I run a real world task, sense events with the physical Sonar and move the physical motors.<br>I use FileEngine when I run a simulation execution, it sense objects on the world (explored) map representation and move the virtual robot on it;
+					</li><br>
+
+					<li><b>QActorPlanUtilsDebug</b> is an extension of the existing QActorPlanUtils class in order to sense the digial environment when I run a simulated execution;</li>
+					<br>
+
+					<li><b>Explorer</b> implements the left hand wall following algorithm that will be explained in the next Section;</li>
+					<br>
+
+					<li><b>Plan</b> implements the translation between Console plan end executable Plan, it will be explained after Explorer;</li>
+					<br>
+
+					<li><b>PlanSaver</b> simply saves the plan on a file with the proper <b>PlanExtension.</b></li><br>
+				</ul>
+
+				<h2>Left Hand Explorer</h2>
+				<br>
+
+				As I said in the model analysis section, the exploration alghoritm is based on the wall fallower maze solver, with a bit changes.
+				<br> There is a pseudocode of the algorithm.<br><br>
+
+
+				<img src="img/explorationPseudo1.png"><br>
+				<img src="img/explorationPseudo2.png"><br><br>
+				
+				As you can see, the Robot always "touch" the left wall with its Sensor;<br>
+				when this contact is loosed it turn left to follow the wall; if there is no wall to follow, Robot will move straight forward until it hit a wall.<br><br>
+
+				When i fall into a loop, I use a serach algorithm to find the nearest not explored area and find the shortest path to move to it.<br><br>
+
+				The algorithm terminates when it falls into a loop but there isn't any unexplored and reachable area.
+
+				<h2>Plan</h2>
+
+				This class handle the task to translate the Plan generated by the Console in something machine readable and executable.
+				<br>For a comunication optimization reason, the Console generate a plan in a very short formt, a <b>list of prolog term</b>:<br>
+
+				For example, let's see the path show in the model analysis.
+				<br><br>
+				<img src="img/pathexample.png"><br>
+
+				This plan is converted in:<br>
+				<b>[r,r,r,r,t,t,t,l,d,l,t,r,d,d,d,r,t,t,t,t,t,t,t,t,l,d,r,t,t,t,t,r,d,r,t,t,l,d,d,r,t,t,t,t,t,t,r,r,t,t,t,l,d,r,t,t,t,t,t,<br>t,r,d,r,t,l,d,r,t,t,t,t,r,d,r,t,t,t,t,t,t,r,r,t,t,t,t,r,r,t,t,t,r,r,t,t,r,r,t]</b>
+				<br><br>
+
+				Remember that:
+				<ul>
+					<li>Green cell is the START position;</li>
+					<li>Red cell is the GOAL position;</li>
+					<li>Cyan cells are the path;</li>
+					<li>Navigation and Exploration always starts from NORTH direction;</li>
+					<li>Robot default rotation angle is 45°.</li>
+				</ul>
+				<br>
+
+				So path movements are translate into a shortert form like:
+				<ul>
+					<li>move horizontal or vertical ---> <tt>t</tt></li>
+					<li>move diagonal ---> <tt>d</tt>. It's different because the diagonal is longer than the side, so Robot has to move much time.</li>
+					<li>turn left ---> <tt>l</tt></li>
+					<li>turn right ---> <tt>r</tt></li>
+				</ul>
+				<br>
+				<hr>
+				<br>
+
+				On Robot side, that prolog list is translated and saved into a <a href="prolog/scout.pl">file</a>.
+				<br><br>
+
+				This Plan use the same prolog sintax used in the autogenerated plan.txt, so every QActor is able to load an run the scout plan.<br>
+				<br>
+
+				You also can see that the plan is enriched with contourn functions like print of the state, sensing and flow control.<br>
+				Morehover the Plan respect the requirement and the considerations of <b>when</b> to sense for objects.
+				<br><br>
+
+				<b>Plan</b> class offer features to create complete executable prolog like plan whitout argue with the prolog representation.
+
+				<br><br>
+
+				<div class="entity_title">Scout System Implementation - GUImanager</div><br><br>
+
+
+
+
 				</div>
 			</div>    
 		    &emsp; 

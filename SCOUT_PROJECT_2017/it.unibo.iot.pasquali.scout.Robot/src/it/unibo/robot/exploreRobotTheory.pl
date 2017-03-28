@@ -44,6 +44,6 @@ initialize
 ------------------------------------------------------------
 */
 initExpRobot :-  
-	actorPrintln("-----------------------------------------------------initExpRobot").
+	actorPrintln("initRobot - Exploration theory loaded").
  
 :- initialization(initExpRobot).

@@ -4,7 +4,21 @@ robotTheory.pl
 ===============================================================
 */
 
-%% SENTENCES EXECUTION ------------------------------------------------------
+%% DEBUG CONTROL -----------------------------------------------
+
+enableDebugSensing :-
+	actorobj(Actor),
+	actorPrintln("enable debug sensing"),
+	Actor <- enableDebugSensing.
+	
+disableDebugSensing :-
+	actorobj(Actor),
+	actorPrintln("disable debug sensing"),
+	Actor <- disableDebugSensing.	
+
+
+
+%% OLD SENTENCES EXECUTION for resumable plans ------------------------------------------------------
 
 myRunTheSentence(CURPLAN, Actor, sentence( GUARD, MOVE, EVENTS, PLANS ) ):-
   	( GUARD = - G , !, retract(G),  ! ; GUARD, ! ),
@@ -31,25 +45,12 @@ myExecuteCmd(CURPLAN, Actor, move(solve,GOAL,DURATION), Events, Plans, RES ):-
 	Actor <- solveSentence(sentence(true, GOAL, 0, '', '', '')) returns AAR,
 	AAR <- getResult returns RES.
 
-%% DEBUG CONTROL -----------------------------------------------
-
-enableDebugSensing :-
-	actorobj(Actor),
-	actorPrintln("enable debug sensing"),
-	Actor <- enableDebugSensing.
-	
-disableDebugSensing :-
-	actorobj(Actor),
-	actorPrintln("disable debug sensing"),
-	Actor <- disableDebugSensing.	
-
-
 /*
 ------------------------------------------------------------
 initialize
 ------------------------------------------------------------
 */
 initRobot :-  
-	actorPrintln("-----------------------------------------------initRobot").
+	actorPrintln("initRobot - Common Theory loaded").
  
 :- initialization(initRobot).

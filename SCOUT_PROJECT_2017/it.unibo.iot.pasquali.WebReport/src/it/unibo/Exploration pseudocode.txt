@@ -1,0 +1,101 @@
+	public void startExploration() {
+
+		explore <- true;	
+		set Current as CLEAR;		
+		findLeftWall();
+	}
+
+	function findLeftWall() {
+
+		if (not explore)
+			endOfExploration();
+
+		if (there is a frontal object) {
+			turn Right;
+			followWall();
+		}
+
+		if (explore && there isn't a left object) {
+
+			do {
+				move Forward;
+				set Current as VISITED;		
+
+				if (there is a frontal object) {
+					turn Right;
+					break;
+				}
+
+				if (there is a left object) {
+					break;
+				}
+
+			} while (true);
+		}
+
+		followWall();
+
+	}
+
+	function followWall() {
+		
+		if(not explore)			
+			terminate the Exploration;
+		
+		do{
+			
+			if(there isn't a frontal object)
+			{
+				move Forward;
+				
+				if(i'm in a loop) //Current is already VISITED
+				{
+					n <- findNearestNotExploredCell();					
+					if(n == null)
+					{
+						explore <- false;						
+						terminate the Exploration;
+					}
+					
+					path <- computeBestPath(n);				
+					travel(path);					
+					findLeftWall();
+				}
+				
+				set Current as VISITED;
+			}
+			else
+			{
+				if(there isn't a left object && I didn't explore left cell)
+				{
+					turn Left;
+				}
+				else
+					turn Right;
+			}	
+
+		}while(explore && there is a left object);
+		
+		if(explore)
+		{
+			turn Left;
+			findLeftWall();
+		}
+		
+	}
+
+	private Path computeBestPath(Point goal) {
+
+		AStarSearchAgent agent = new AStarSearchAgent();
+		
+		path = find the best path from Current position to Goal position using AStarSearchAgent;		
+		
+		return path;
+	}
+
+	private Point findNearestNotExploredCell()
+	{
+		return the nearest not explored cell using a Breadth first algorithm;
+	}
+	
+}

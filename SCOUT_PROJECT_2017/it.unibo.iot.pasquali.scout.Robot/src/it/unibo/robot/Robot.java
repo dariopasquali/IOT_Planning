@@ -372,23 +372,6 @@ public class Robot extends AbstractRobot {
 	}
 	
 	
-	public void consultFromFile(String filename)
-	{
-		System.out.println("loading...");
-		QActorUtils.consultFromFile(pengine, filename);
-	}		
-	
-	
-	@Override
-	public AsynchActionResult solveGoalReactive(String goal, int time, String evList, String planList){
-		
-		System.out.println("solve ---> "+goal);
-		
-		super.solveGoal(goal);
-		return new AsynchActionResult(null, time+1, true, true, "", null);		
-	}
-	
-	
 	public synchronized void updateSimulationWorld(String msg){
 		
 		System.out.println("Update the World Map");
@@ -458,6 +441,22 @@ public class Robot extends AbstractRobot {
 		}
 		
 		return m;
+	}
+	
+	public void consultFromFile(String filename)
+	{
+		System.out.println("loading...");
+		QActorUtils.consultFromFile(pengine, filename);
+	}		
+	
+	
+	@Override
+	public AsynchActionResult solveGoalReactive(String goal, int time, String evList, String planList){
+		
+		System.out.println("solve ---> "+goal);
+		
+		super.solveGoal(goal);
+		return new AsynchActionResult(null, time+1, true, true, "", null);		
 	}
 	
 //}}	
@@ -659,7 +658,7 @@ public class Robot extends AbstractRobot {
 	{
 		try
 		{
-			execute("forward", defaultSpeed, 0, defaultTime, "", "");
+			super.execute("forward", defaultSpeed, 0, defaultTime, "", "");
 		}
 		catch (Exception e) 
 		{
@@ -675,7 +674,7 @@ public class Robot extends AbstractRobot {
 	{
 		try
 		{
-			execute("backward", defaultSpeed, 0, defaultTime, "", "");
+			super.execute("backward", defaultSpeed, 0, defaultTime, "", "");
 		}
 		catch (Exception e) 
 		{
@@ -691,7 +690,7 @@ public class Robot extends AbstractRobot {
 	{
 		try
 		{
-			execute("left", defaultTurnSpeed, 0, defaultTurnTime, "", "");
+			super.execute("left", defaultTurnSpeed, 0, defaultTurnTime, "", "");
 		}
 		catch (Exception e) 
 		{
@@ -707,7 +706,7 @@ public class Robot extends AbstractRobot {
 	{
 		try
 		{
-			execute("right", defaultTurnSpeed, 0, defaultTurnTime, "", "");
+			super.execute("right", defaultTurnSpeed, 0, defaultTurnTime, "", "");
 		}
 		catch (Exception e) 
 		{

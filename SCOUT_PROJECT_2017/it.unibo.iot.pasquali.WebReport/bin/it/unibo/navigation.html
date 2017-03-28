@@ -113,7 +113,7 @@ tt{
 					<ul>
 						<li>Navigate from a START point to a GOAL point;</li>
 						<li>Abort the Navigation in every moment;</li>
-						<li>Avoid unexpected obstacles.</li>
+						<li>Autonomously avoid unexpected obstacles.</li>
 					</ul>
 					
 					<br>					
@@ -128,11 +128,11 @@ tt{
 						<li>Then it runs the Navigation Plan:
 							<ul>
 								<li>Before each forward movement, it check the presence of unexpected obstacles;</li>
-								<li>If it find and obstacle, after a defined timeout,<br> it send the current position and new obstacle position to Console,<br> then wait the new Navigation Data,<br> create the new Plan and run it</li>
-								<li>Before every move it upgrade it's current position or direction.</li>
+								<li>If it find and obstacle, it waits a defined timeout.<br>If the object is still there, it sends the current position and the new obstacle position to Console,<br> then wait the new Navigation Data,<br> create the new Plan and run it.</li>
+								<li>Before every move it update it's current position or direction.</li>
 							</ul>
 						</li>
-						<li>When it reached GOAL communicate, it to Console.</li>
+						<li>When it reaches the GOAL, it sends a notification to the Console.</li>
 					</ol> 
 
 <!-- ***************************************************************************************** -->					
@@ -161,9 +161,10 @@ tt{
 					<h2>Robot Model - Behavior</h2>
 									
 					<ol>
-						<li>At the Beginning of the Navigation phase the Console waits that the user select the Map file;</li>
-						<li>When it received that, it load the Map and show it on GUI;</li>
-						<li>Now the user can select the START and the GOAL point;</li>
+						<li>At the Beginning of the Navigation phase the Console waits that the user selects the Map file;</li>
+						<li>When it received the file, it loads the Map and show it on GUI;</li>
+						<li>the user selects START and GOAL point;</li>
+						<li>Then trigger the Search of the Best path;</li>
 						<li>When user decide to start the Navigation, the Console send the Navigation Data to the Robot.<br>
 							During the Navigation can happen that:
 							<ul>
@@ -182,30 +183,31 @@ tt{
 					<div class="entity_title">Interaction</div>
 					<br>
 					
-					I prefer to analyze the of both the entities in the same paragraph.<br>
+					I prefer to analyze both the entities in the same paragraph.<br>
 					In this section i have to choose the type and format of data transmitted between Robot and Console.
 					
 					<ul>
 						<li>
-							<tt>local_gui_command : local_gui_command (COMMAND)</tt>, this <b>event</b> is emitted by the GUI on user interaction, Console sense this event in order to handle the user interaction.
+							<tt>local_gui_command : local_gui_command(COMMAND)</tt>, this <b>event</b> is emitted by the GUI on user interaction, Console sense this event in order to handle the user interaction.
 							The payload COMMAND can be:
 							<ul>
-								<li><i>loadmap ( PATH )</i>,<br> where PATH is the absolute filepath of the map file;</li>
-								<li><i>findpath ( START , GOAL , ALGO )</i>,<br> START and GOAL are in the format position(X,Y), ALGO isn't used at the moment but it can be used to select the planning algorithm in the future;</li>
-								<li><i>navigate</i>,<br> to start the Robot navigation;</li>
-								<li><i>abort</i>,<br> to stop the Robot Navigation.</li> 
+								<li><i>loadmap ( PATH )</i>,<br>where PATH is the absolute filepath of the map file;</li>
+								<li><i>findpath ( START , GOAL)</i>,<br>START and GOAL are in the format position(X,Y);</li>
+								<li><i>navigate(MODE)</i>,<br>to start the Robot navigation. Mode can be <i>simulated</i> or <i>robot</i>.</li>
+								<li><i>abort</i>,<br>to stop the Robot Navigation;</li> 
+								<li><i>clearpath</i>,<br>to clear an already showed path and repeart the process.</li>
 							</ul>
 							<br>
 						</li>
 						
 						<li>
-							<tt>navdata : navdata ( PLAN , POS )</tt>, this <b>message</b> is send from the Console to the Robot to transmit the navigation data (before and during the Navigation, if is needed).
+							<tt>navigate : navigate( PLAN_MOVES , POS )</tt>, this <b>message</b> is send from the Console to the Robot to transmit the navigation data (before and during the Navigation, if is needed).
 							<br>I prefer the message form because Console perfectly knows the receiver of the data, furthermore a message is safer than an event, and i don't want to lose those data.
 							<br>This message also command the start of the Robot Navigation.
 							<ul>
 								<li>POS is the same of START and GOAL, position(X,Y);</li>
 								<li>
-									PLAN is more complex, Since a plan can be very long I prefer to encode possible moves in a very short codification.<br>
+									PLAN_MOVES is more complex. Since a plan can be very long I prefer to encode possible moves in a very short codification.<br>
 									So i assume that a robot can only execute 3 kind of moves:
 									<ul>
 										<li>
@@ -213,10 +215,10 @@ tt{
 											diagonal is different by horizontal or vertical move because the diagonal of a square is longer than the side, so the Robot has to increase the move forward distance.
 										</li>
 										<li>
-											<tt>spin left</tt> of a defined angle, this is encoded with <tt>l</tt>;
+											<tt>turn left</tt> of 45°, this is encoded with <tt>l</tt>;
 										</li>
 										<li>
-											<tt>spin right</tt> of a defined angle, this is encoded with <tt>r</tt>; 
+											<tt>turn right</tt> of 45°, this is encoded with <tt>r</tt>; 
 										</li>
 									</ul>
 									
@@ -227,13 +229,19 @@ tt{
 						</li>
 						
 						<li>
-							<tt>obstacle : obstacle</tt> is the <b>event</b> emitted by Sonar when it detect an obstacle in the sensing distance, the Robot may listen or not this event;
+							<tt>navigatefile : navigatefile( PLAN_MOVES , POS , FILENAME)</tt>, as the previous message, is starts the navigation from the POS point followuing the PLAN_MOVES plan. It also provides the map FILEMANE usefull during <i>simulated</i> Navigation;
 							<br><br>
 						</li>
+
+						<li>
+							<tt>obstaclefront : obstaclefront</tt> is the <b>event</b> emitted by Sonar when it detect a frontal obstacle in the sensing distance, the Robot may listen or not this event;
+							<br><br>
+						</li>
+
 						
 						<li>
-							<tt>update : update(POS, NEWELEMENT)</tt>, is an <b>event</b> emitted by Robot and sensed by Console. It is used to request a new plan when an unexpected obstacle is detected.
-							<br> NEWELEMENT and POS are in the format position ( X , Y );
+							<tt>update : update(OBJECT, CURRENT)</tt>, is an <b>event</b> emitted by Robot and sensed by Console. It is used to request a new plan when an unexpected obstacle is detected.
+							<br> OBJECT and CURRENT are in the format position ( X , Y );
 							<br><br>
 						</li>
 						
@@ -257,13 +265,13 @@ tt{
 					<div class="entity_title">QActor Models & Prolog Theory</div>
 					<br>
 					
-					<tt>Console Model</tt> ----> <a href="console.qa">console.qa</a>
-					<br><tt>Console Prolog Theory</tt> ----> <a href="consoleTheory.pl">consoleTheory.pl</a>
+					<tt>Console Model</tt> ----> <a href="qa/ConsoleNavigation.qa">console.qa</a>
+					<br><tt>Console Prolog Theory</tt> ----> <a href="prolog/consoleNavigationTheory.pl">consoleTheory.pl</a>
 					
 					<br><br>
 					
-					<tt>Robot Model</tt> ----> <a href="robot.ddr">robot.ddr</a>
-					<br><tt>Robot Prolog Theory</tt> ----> <a href="robotTheaory.pl">robotTheory.pl</a>
+					<tt>Robot Model</tt> ----> <a href="qa/RobotNavigation.ddr">robot.ddr</a>
+					<br><tt>Robot Prolog Theory</tt> ----> <a href="prolog/robotNavigationTheory.pl">robotTheory.pl</a>
 
 <!-- ***************************************************************************************** -->					
 
@@ -279,27 +287,27 @@ tt{
 					<br>
 					Anyhow, i assume that:
 					<br><br>
-					<tt>Assumption 1</tt>: The (static) map is divided in squared cells of uniform size. The size of a cell is based on robot dimensions. Consequently, the navigation is discrete.
-					<br>The map has a maximum width and height and can be or not bounded by obstacles borders.
+					<tt>Assumption 1</tt>: The map is divided in squared cells of uniform size. The size of a cell is based on robot dimensions. Consequently, the navigation is discrete.
+					<br>The map has a maximum width and height and must be bounded by obstacles borders.
 					<br> 
 					
 					<h2>Detect Obstacles</h2><br>
 					
-					In Order to detect unexpected obstacles Robot can use the Sonar.
+					In Order to detect unexpected obstacles Robot can use the Frontal Sonar.
 					<br>The problem is <b>when</b> be sensitive.<br>
 					
 					<br><tt>Assumption 2</tt>: Robot can only step forward of a defined distance, or turn left/right of a defined angle.
 					<br><br>
 					
-					During a rotation the Robot position doesen't change, so it can find an unexpected obstacle only during a step forward.<br>
+					During a rotation the Robot position doesn't change, so it can find an unexpected obstacle only during a step forward.<br>
 					There are a lot of available techniques, i decide to adopt a pessimistic one:<br>
-					The detection distance of Sonar is equal to step distance, before every forward movement Robot listen to Sonar to know if the next cell is clear.
-					<br>This solution is a bit pessimistic but very simple to implement ad also is the normal behavior of an intelligent agent.
+					<i>The detection distance of Sonar is equal to step distance, before every forward movement Robot listen to Sonar to know if the next cell is clear.
+					<br>This solution is a bit pessimistic but very simple to implement ad also is the normal behavior of an intelligent agent.</i>
 					
 					
-					<br><h2>Handle dynamic obstacles</h2><br>
+					<br><h2>Handle dynamic obstacles</h2>
 					
-					The requirements said that:<br><br>
+					The requirements sais that:<br><br>
 					
 					<i>During the navigation we assume that the plan is dynamic so, the Robot must detect unexpected obstacles.<br>
 						When an unexpected obstacle is found:</i>
@@ -308,7 +316,7 @@ tt{
 							<li><i>After that, if the obstacle is still there, the Robot must generate an alternative plan for the current position to GOAL, that avoid the new obstacle.</i>
 						</ol>
 						
-					Since the Robot is less powerful than Console, and also it don't known the full map, I once again decide to delegate the task to compute the alternative plan to Console. 
+					Since the Robot is less powerful than Console, and also it doesn't known the full map, I once again decide to delegate the task to compute the alternative plan to Console. 
 					
 <!-- ***************************************************************************************** -->					
 
@@ -320,12 +328,12 @@ tt{
 					There are a lot of way to make a Planner, but in my first implementation, I don't strictly make a Planner.
 					<br>First of all, a little summary about what a Plan is in this context:<br><br>
 					
-					Whit <tt>Plan</tt> i mean a finite sequence of action, in this case move action, to reach a defined purpose (the GOAL).
+					Whit <tt>Plan</tt> I mean a finite sequence of actions, in this case move action, to reach a defined purpose (the GOAL).
 					<br>In this domain, the Robot can:
 					<ul>
-						<li>move forward</li>
-						<li>turn right</li>
-						<li>turn left</li>
+						<li>move forward of his lenght</li>
+						<li>turn right of 45°</li>
+						<li>turn left of 45°</li>
 					</ul>
 					
 					A usually known <tt>Planner</tt> is an agent that, basing on an environment description, the initial state and the objective to reach, create the Plan.<br>
@@ -335,43 +343,31 @@ tt{
 					
 					<br><h2>Search Algorithm</h2>
 					
-					A search algorithm is an artificial intelligence algorithm, used to find a precise state in a search graph.<br>
+					A* search algorithm is an artificial intelligence algorithm, used to find a precise state in a state graph.<br>
 					This graph (or sometimes tree) is usually dynamically generated during the search based on domain description.
 					More info <a href="http://www.cs.ubbcluj.ro/~csatol/log_funk/prolog/slides/7-search.pdf">here</a>. 
 					
 					<br><h2>A* Search</h2>
 					
-					The A* Search Algorithm is a basic informed algorithm that consider both distance from GOAL and the cost to reach the state.
-					<br>At each search loop it consider as the current state to explore, the state that minimize the sum of distance from GOAL and path cost.
+					The A* Search Algorithm is a basic informed algorithm that consider both distance from GOAL and the heuristic cost to reach the state.
+					<br>At each search loop it consider as the current state to explore, the state that minimize the sum of those values.
 					<br>With this technique it can understand if a path is useless or if there is a shortest path to reach GOAL.
 					
 					<br>To implement this algorithm there are 3 things to define:
 					<ol>
-						<li>How the environment is represented? ---> Map Description;</li>
-						<li>Which moves are possible? ---> Move Description</li>
-						<li>How to Compute the Distance from Goal? ---> Heuristic</li>
+						<li>How the environment is represented? ---> <a href="#MapDescription"> Map Description </a>;</li>
+						<li>Which moves are possible? ---> <a href="#MoveDescription">Move Description</a></li>
+						<li>How to Compute the Distance from Goal? ---> <a href="#Heuristic">Heuristic</a></li>
 					</ol> 
 					
 					<br>More info <a href="https://en.wikipedia.org/wiki/A*_search_algorithm">here</a>.
 					
-					<br><h2>Map Description</h2>
+					<br><a name="MapDescription"></a><h2>Map Description</h2>
 					
-					According with Assumption 1, the map:
-					<ul>
-						<li>is discretized in uniform size cells;</li>
-						<li>has defined width and height;</li>
-						<li>can be or not be bounded by obstacle borders.</li>						
-					</ul>
-					
-					For example, this is a valid Map.<br><br>
-					<img alt="" src="mapexample.png">
-					
-					<br><br>In my map model obstacles are the black cells, white cells are walkable areas.
-					
-					<br><br><tt>Assumption 4</tt> The Robot fits perfectly the cell.
+					The Map model is the same of the <a href="exploration.html#MapDescription">Exploration phase</a>
 					
 					
-					<br><h2>Move Description and Cost</h2><br>
+					<br><a name="MoveDescription"></a><h2>Move Description and Cost</h2><br>
 					
 					In a search algorithm we can think at a cell like a node of the search graph, each cell is a different state, the purpose of the planner is to find the GOAL state.
 					<br> To change the current state it needs a way to moves between cells. The description of move is very important in order to improve the performances of agent.
@@ -390,26 +386,27 @@ tt{
 					
 					<ul>
 						<li>For each graph node, I have to store the Robot current direction;</li>
-						<li>Know Where i can go based on the direction is very expensive;</li>
+						<li>Know where i can go based on the direction is very expensive;</li>
 						<li>More important, for each map position i have 8 stacked nodes, one for each cardinal direction.
 						<br>Also that nodes have always the same distance from GOAL position, so the only way to know if the direction is wrong is to wait that the cost increases, and this is very very slow.</li> 
 					</ul>
-					
+
+					<hr>
+
 					So I prefer to use a more classical model:
-					<ul>
+					<i><ul>
 						<li>Each state is defined as only X and Y coordinates;</li>
 						<li>At each state, the Robot can move to one of the adjacent cell;</li>
 						<li>This movement is atomic, also if include rotation;</li>
 						<li>Move horizontal and vertical cost 10;</li>
 						<li>Move diagonal cost 15;</li> 
-					</ul>
+					</ul></i>
 					
-					So the Search algorithm only define the sequence of states to reach the GOAL state
-					<br>then another algorithm create the sequence of moves with rotations.
+					So, the Search algorithm only defines the sequence of states to reach the GOAL. Then another algorithm create the sequence of moves with rotations.
 					
-					With this model, the search is faster because at each move the distance between current state and GOAL state changes, so the agent realizes earlier if the path is wrong.
+					With this model, the search is faster because, at each move, the distance between current state and GOAL state changes, so the agent realizes earlier if the path is wrong.
 					
-					<br><h2>Heuristic</h2>
+					<br><a name="Heuristic"></a><h2>Heuristic</h2>
 					
 					The Heuristic is a function that compute how a node of the graph is "good".
 					<br>The heuristic function must be admissible, meaning that it never overestimates the actual cost to get to the GOAL node.
@@ -423,12 +420,12 @@ tt{
 					
 					As you can see in the image, the algorithm find the best path from top left corner in 3848 ms.
 					<br><br>
-					<img alt="" src="pathexample.png">
+					<img alt="" src="img/pathexample.png">
 					<br><br>
 					
 					<br><h2>Next Work</h2>
 					
-					The A* search is good but absolutely not scalable (over 200x200 maps the computation time drastically increase);
+					The A* search is good but absolutely not scalable (over 200x200 cells the computation time drastically increase);
 					<br>Also I works on a very simple world, with a lots of assumptions, for example the real world is not discrete.
 					<br> So I'm moving in two different ways:
 					<ul>

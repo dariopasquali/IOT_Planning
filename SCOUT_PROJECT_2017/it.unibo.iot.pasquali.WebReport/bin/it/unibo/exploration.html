@@ -32,7 +32,7 @@ tt{
 .entity_title{
 	font-size: x-large;
 	font-weight: bold; 
-	background: #28c717;
+	background: #6FF130;
 	width: 100%;
 }
 
@@ -107,7 +107,7 @@ tt{
 					<ul>
 						<li><i>Two DC Motors</i>, that allow the Robot to move in the environment, do strict curves and change his speed;</li>
 						<li><i>Front Sonar sensor</i>, allow the Robot to sense objects in front of him;</li>
-						<li><i>Left Sonar sensor</i>, allow the Robot to sense objects in left of him;</li>
+						<li><i>Left Sonar sensor</i>, allow the Robot to sense objects left of him;</li>
 					</ul>
 					
 					The Robot offers a limited set of features:
@@ -128,8 +128,8 @@ tt{
 						<li>At the Beginning of the Exploration phase the Robot waits a command (with or without START position and environment BOUNDS) from the Console;</li>
 						<li>When it received the command, it begins to explore the environment;</li>
 						<li>Every time it sense a new cell, it sends a notification to the Console;</li>
-						<li>Robot must be reactive to and abort command from the Console, and stop the Exploration;</li>
-						<li>When it explore all the environment, it notify it to the Console.</li>
+						<li>Robot must be reactive andstop the Exploration if needed;</li>
+						<li>When the Exploration is done, it notify this event to the Console.</li>
 					</ol> 
 
 <!-- ***************************************************************************************** -->					
@@ -157,12 +157,14 @@ tt{
 					<h2>Robot Model - Behavior</h2>
 									
 					<ol>
-						<li>At the Beginning of the Exploration phase the Console waits that the user select the START position and BOUNDS, or start the Exploration;</li>
-						<li>When user decide to start the Exploration, the Console send the command to the Robot.<br>
-							During the Exploration can happen that:
+						<li>At the Beginning of the Exploration phase the Console waits that the user select the Exploration Map;</li>
+						<li>Console show the map on GUI in a proper way</li>
+						<li>Then user selects the START position</li>
+						<li>When user decides to start the Exploration, the Console send the command to the Robot and show an unexplored map of the same size.<br><br>
+						During the Exploration can happen that:
 							<ul>
-								<li>In Every moment the User can abort the Exploration, so Console have to transmit this command to Robot</li>
-								<li>If Robot find a new cell it sends the new cell position and state (clear or obstacle);</li>
+								<li>In every moment the User can abort the Exploration, so Console have to transmit this command to Robot</li>
+								<li>If Robot find a new cell it sends the new cell position and state (clear or object);</li>
 								<li>Robot explore all the environment and send a notification to Console to end the Exploration phase.</li>
 							</ul>
 						</li>
@@ -184,31 +186,48 @@ tt{
 							The payload COMMAND can be:
 							<ul>
 								<li><i>explore</i>,<br> to start the Robot Exploration without any data;</li>
-								<li><i>explore( START , BOUNDS )</i>,<br>to start the Robot Exploration with defined START position and map BOUNDS</li>
+								<li><i>explore(FILENAME, START, BOUNDS, MODE)</i>,<br>to start the Robot Exploration with more information. The command provides the map FILENAME, the START position in the usually known format, the width and height BOUNDS and the MODE, simulated or robot.</li>
 							</ul>
 							<br>
 						</li>
 						
 						<li>
-							<tt>explore : explore ( START , BOUNDS )</tt>, this <b>message</b> is send from the Console to the Robot to start the Exploration with some knowledge about the environment (to test purpose)
+							<tt>exploredebug : exploredebug ( START , BOUNDS )</tt>, this <b>message</b> is send from the Console to the Robot to start the Exploration with some knowledge about the environment (to test purpose)
 							<br>I prefer the message form because Console perfectly knows the receiver of the data, furthermore a message is safer than an event, and i don't want to lose this command.
 							<ul>
 								<li>START is position( X , Y );</li>
 								<li>BOUNDS is map( WIDTH , HEIGH )</li>
 							</ul>
-							<br>
+							The message is used to start a real world exploration.
+							<br><br>
 						</li>
 						
 						<li>
+							<tt>explorefile : explorefile(START , FILENAME )</tt>, this <b>message</b> is send from the Console to the Robot to start the Exploration with some knowledge about the environment (to test purpose)
+							<br>I prefer the message form because Console perfectly knows the receiver of the data, furthermore a message is safer than an event, and i don't want to lose this command.
+							<ul>
+								<li>START is position( X , Y );</li>
+								<li>FILENAME is map absolute filename</li>
+							</ul>
+							The message is used to start a simulated exploration based on a file.
+							<br><br>
+						</li>
+
+						<li>
 							<tt>explore : explore </tt>, this <b>message</b> is send from the Console to the Robot to start the Exploration without any knowledge about the environment
 							<br>I prefer the message form because Console perfectly knows the receiver of the data, furthermore a message is safer than an event, and i don't want to lose this command.
+							<br>This message is not implemented but start the exploration without any information of the world.
 							<br><br>
 						</li>
 						
 						
 						<li>
-							<tt>obstacle : obstacle( DIRECTION )</tt> is the <b>event</b> emitted by the Front or Left Sonar when it detect an obstacle in the sensing distance, the Robot may listen or not this event;
-							<ul><li>DIRECTION is front or left.</li></ul>
+							<tt>obstaclefront : obstacleleft</tt> is the <b>event</b> emitted by the Front Sonar when it detect an obstacle in the sensing distance, the Robot may listen or not this event;
+							<br><br>
+						</li>
+
+						<li>
+							<tt>obstacleleft : obstacleleft</tt> is the <b>event</b> emitted by the Left Sonar when it detect an obstacle in the sensing distance, the Robot may listen or not this event;
 							<br><br>
 						</li>
 						
@@ -241,29 +260,29 @@ tt{
 					<div class="entity_title">QActor Models & Prolog Theory</div>
 					<br>
 					
-					<tt>Console Model</tt> ----> <a href="exploreConsole.qa">console.qa</a>
-					<br><tt>Console Prolog Theory</tt> ----> <a href="consoleTheory.pl">consoleTheory.pl</a>
+					<tt>Console Model</tt> ----> <a href="qa/ConsoleExploration.qa">console.qa</a>
+					<br><tt>Console Prolog Theory</tt> ----> <a href="prolog/consoleExplorationTheory.pl">consoleTheory.pl</a>
 					
 					<br><br>
 					
-					<tt>Robot Model</tt> ----> <a href="exploreRobot.ddr">robot.ddr</a>
-					<br><tt>Robot Prolog Theory</tt> ----> <a href="robotTheory.pl">robotTheory.pl</a>
+					<tt>Robot Model</tt> ----> <a href="qa/RobotExploration.ddr">robot.ddr</a>
+					<br><tt>Robot Prolog Theory</tt> ----> <a href="prolog/robotExplorationTheory.pl">robotTheory.pl</a>
 
 <!-- ***************************************************************************************** -->					
 
 					
 					<br><br>
-					<div class="entity_title">Navigation Problem Analysis</div>
+					<div class="entity_title">Exploration Problem Analysis</div>
 					<br>
 					
-					As I said in the <a href="home.html">home page</a>, I delegate the task to compute the best path to the Console,<br>
-					so Robot is just an executor, something that receive a sequence of command and simply execute them (this is very very similar to ButtonLedSystem).
+					As I said in the <a href="home.html">home page</a>, In the Exploration phase a don't need a lot of computational power because the exploration seep depend on the Robot speed.<br>
+					To obstain a more precise exploration I prefer to slow down the Robot speed.<br>
+					So the system is very similar to ButtonLedSystem beacuse the Console sends a command to the Robot and it execute it in some (unknown from the Console) way.
 					<br><br>
-					Since Console compute the path isn't necessary to transmit the Map to the Robot, it only needs path and start position (to dynamically compute the current position).
-					<br>
+					
 					Anyhow, i assume that:
 					<br><br>
-					<tt>Assumption 1</tt>: The (static) map is divided in squared cells of uniform size. The size of a cell is based on robot dimensions. Consequently, the navigation is discrete.
+					<tt>Assumption 1</tt>: The map is divided in squared cells of uniform size. The size of a cell is based on robot dimensions. Consequently, the navigation is discrete.
 					<br>The map has a maximum width and height and can be or not bounded by obstacles borders.
 					<br> 
 					
@@ -275,150 +294,121 @@ tt{
 					<br><tt>Assumption 2</tt>: Robot can only step forward of a defined distance, or turn left/right of a defined angle.
 					<br><br>
 					
-					During a rotation the Robot position doesen't change, so it can find an unexpected obstacle only during a step forward.<br>
+					During a rotation the Robot position doesn't change, so it can find an unexpected obstacle only during a step forward.<br>
 					There are a lot of available techniques, i decide to adopt a pessimistic one:<br>
 					The detection distance of Sonar is equal to step distance, before every forward movement Robot listen to Sonar to know if the next cell is clear.
-					<br>This solution is a bit pessimistic but very simple to implement ad also is the normal behavior of an intelligent agent.
+					<br>This solution is a bit pessimistic but very simple to implement and also is the normal behavior of an intelligent agent.
+					<br><br>
+
+					In the Exploration phase the Robot will use 2 Sonars, one frontal and one left. The reason will be clear in the Algorithm Section.
 					
 					
-					<br><h2>Handle dynamic obstacles</h2><br>
+					<br><h2>Handle new objects</h2><br>
 					
 					The requirements said that:<br><br>
 					
-					<i>During the navigation we assume that the plan is dynamic so, the Robot must detect unexpected obstacles.<br>
-						When an unexpected obstacle is found:</i>
-						<ol>
-							<li><i>The Robot stops and waits a defined time.</i></li>
-							<li><i>After that, if the obstacle is still there, the Robot must generate an alternative plan for the current position to GOAL, that avoid the new obstacle.</i>
-						</ol>
+					<i>During the Exploration, the system must show the state of the task in a proper way.</i>
+
+					Robot must notify the Console every time it detect a new cell, bot CLEAR and OBJECT.<br>
 						
-					Since the Robot is less powerful than Console, and also it don't known the full map, I once again decide to delegate the task to compute the alternative plan to Console. 
+					So, both Robot and Console mantaint the current explored Map.
 					
 <!-- ***************************************************************************************** -->					
 
 					
 					<br><br>
-					<div class="entity_title">Compute The best Path</div>
+					<div class="entity_title">Explore</div>
 					<br>
 					
-					There are a lot of way to make a Planner, but in my first implementation, I don't strictly make a Planner.
-					<br>First of all, a little summary about what a Plan is in this context:<br><br>
+					There are a lot of way to Explore an unknown environment.
+					<br>First of all, What do i mean with "Explore"?<br><br>
 					
-					Whit <tt>Plan</tt> i mean a finite sequence of action, in this case move action, to reach a defined purpose (the GOAL).
-					<br>In this domain, the Robot can:
+					Whit <tt>Explore</tt> I mean the process where, an autonomous agent that knows almos nothing about the environment, incrementally detect elements around it in order to define a digital representation of the space.			
+					
+					<br><h2>Exploration Algorithm</h2>
+					
+					My Exploration Algorithm is base on somethings really different, a Maze solving Algorithm called Left Wall Follower.
+					<br> You can find more information <a href"https://en.wikipedia.org/wiki/Maze_solving_algorithm">here</a>.
+
+					The Left Hand Wall Follower is a maze solving algorith for "simply connected" or "perfect" mazes. In a perfect maze every wall is connected with the external borders, in other words, if I follow a wall while my left hand touch it everytime, soon or later i'll reach the exit.
+					<br>
+					With this very big assumption we can't have a single object alone in a clear space beacuse, with the simple rule said, we'll fall into an infinite loop of wall following.
+					<br><br>
+
+					So I has to modify the simple wall follower algorithm in order to:
 					<ul>
-						<li>move forward</li>
-						<li>turn right</li>
-						<li>turn left</li>
+						<li>Detect and Avoid loop situation;</li>
+						<li>Know if there is some unexplored spaces.</li>
 					</ul>
-					
-					A usually known <tt>Planner</tt> is an agent that, basing on an environment description, the initial state and the objective to reach, create the Plan.<br>
-					This Plan must be the best possible, according with the environment description.
 					<br>
-					My planner is not a usually known Planner, it's nothing more than an <tt>A* search algorithm</tt>, applied on the map environment.				
-					
-					<br><h2>Search Algorithm</h2>
-					
-					A search algorithm is an artificial intelligence algorithm, used to find a precise state in a search graph.<br>
-					This graph (or sometimes tree) is usually dynamically generated during the search based on domain description.
-					More info <a href="http://www.cs.ubbcluj.ro/~csatol/log_funk/prolog/slides/7-search.pdf">here</a>. 
-					
-					<br><h2>A* Search</h2>
-					
-					The A* Search Algorithm is a basic informed algorithm that consider both distance from GOAL and the cost to reach the state.
-					<br>At each search loop it consider as the current state to explore, the state that minimize the sum of distance from GOAL and path cost.
-					<br>With this technique it can understand if a path is useless or if there is a shortest path to reach GOAL.
-					
+
+					Fortunatly those two tasks can be achieved at the same time.<br>
+
+					<i>The robot mantain a digital representation of the explored world, when it walks on an already explored cell, it makes a local search to find if there is a hole in his exploration map.<br>If so, it find the best path to traver to the unexplored area.
+					<br><br> If no hole is found, the Exploration is complete.
+					</i>
+
 					<br>To implement this algorithm there are 3 things to define:
 					<ol>
-						<li>How the environment is represented? ---> Map Description;</li>
-						<li>Which moves are possible? ---> Move Description</li>
-						<li>How to Compute the Distance from Goal? ---> Heuristic</li>
+						<li>How the environment is represented? ---> <a href="#MapDescription"> Map Description </a>;</li>
+						<li>Which moves are possible? ---> <a href="#MoveDescription">Move Description</a></li>
+						<li>How can I find an unexplored area? ---> <a href="#Breadth">Breadth First Algorithm</a></li>
+						<li>How can I generate the best path to that area? ---> <a href="#Astar">Planning Algorithm</a></li>
 					</ol> 
 					
-					<br>More info <a href="https://en.wikipedia.org/wiki/A*_search_algorithm">here</a>.
-					
-					<br><h2>Map Description</h2>
+					<br><a name="MapDescription"></a><h2>Map Description</h2>
 					
 					According with Assumption 1, the map:
 					<ul>
 						<li>is discretized in uniform size cells;</li>
 						<li>has defined width and height;</li>
-						<li>can be or not be bounded by obstacle borders.</li>						
+						<li>can be or not be bounded by obstacle borders.</li>
 					</ul>
 					
 					For example, this is a valid Map.<br><br>
-					<img alt="" src="mapexample.png">
+					<img alt="" src="img/mapexample.png">
 					
 					<br><br>In my map model obstacles are the black cells, white cells are walkable areas.
 					
 					<br><br><tt>Assumption 4</tt> The Robot fits perfectly the cell.
 					
 					
-					<br><h2>Move Description and Cost</h2><br>
+					<br><a name="MoveDescription"></a><h2>Move Description</h2><br>
 					
-					In a search algorithm we can think at a cell like a node of the search graph, each cell is a different state, the purpose of the planner is to find the GOAL state.
-					<br> To change the current state it needs a way to moves between cells. The description of move is very important in order to improve the performances of agent.
-					<br> In a first implementation i used a description like this:
-					
-					<br><i>A Robot in a certain state can</i>:
-					<ol>
-						<li><i>Move forward (horizontal or vertical) in the next cell. It costs 10;</i></li>
-						<li><i>Move forward (diagonal) in the next cell. It costs 15;</i></li>
-						<li><i>Turn right or left on itself to 45°. It Costs 10;</i></li>
-						<li><i>Turn right or left on itself to 90°. It Costs 20;</i></li>
-					</ol>
-					
-					This seems a good model, The Robot never go back and I consider only 5 possible successors instead of 8.
-					<br>But there is a lot of problems.
-					
-					<ul>
-						<li>For each graph node, I have to store the Robot current direction;</li>
-						<li>Know Where i can go based on the direction is very expensive;</li>
-						<li>More important, for each map position i have 8 stacked nodes, one for each cardinal direction.
-						<br>Also that nodes have always the same distance from GOAL position, so the only way to know if the direction is wrong is to wait that the cost increases, and this is very very slow.</li> 
-					</ul>
+					In the Navigation, i have to minimize the travel time, so i use both tiled and diagonal movements.
+					<br> In the Exploration indeed i must wall ol the walkable area, so i don't take any advantage with diagonal moves.
 					
 					So I prefer to use a more classical model:
 					<ul>
-						<li>Each state is defined as only X and Y coordinates;</li>
+						<li>Each cell is defined as only X and Y coordinates;</li>
 						<li>At each state, the Robot can move to one of the adjacent cell;</li>
 						<li>This movement is atomic, also if include rotation;</li>
+						<li>Rotation are alway of 90ï¿½;</li>
 						<li>Move horizontal and vertical cost 10;</li>
-						<li>Move diagonal cost 15;</li> 
 					</ul>
 					
-					So the Search algorithm only define the sequence of states to reach the GOAL state
-					<br>then another algorithm create the sequence of moves with rotations.
+					<br>Is very important to mantain a correct description of the internal state in order to process the sensed obstacles of real world and send data to Console.
 					
-					With this model, the search is faster because at each move the distance between current state and GOAL state changes, so the agent realizes earlier if the path is wrong.
+					<br><a href="#Breadth"></a><h2>Breadth First Algorithm</h2>
 					
-					<br><h2>Heuristic</h2>
-					
-					The Heuristic is a function that compute how a node of the graph is "good".
-					<br>The heuristic function must be admissible, meaning that it never overestimates the actual cost to get to the GOAL node.
-					<br>In this domain the heuristic is the Manhattan distance between current state and GOAL state.
-					
-					<br><br><b>Distance = | goalX - currentX | + | goalY - currentY |</b>
-					
-					<br><br>More info <a href="https://en.wikipedia.org/wiki/Taxicab_geometry" >here</a>.
-					
-					<br><h2>Examples</h2>					
-					
-					As you can see in the image, the algorithm find the best path from top left corner in 3848 ms.
+					When Robot detect an already walked cell it make a search in order to find the nearest unexplored aread. This search is based on Breadth First Algorithm.
+
+					<br> This is an uninformed algorithm based on a search tree. It starts from the root node (the already explored cell) and evaluate the neighbor nodes before moving to the farther level neighbors.
 					<br><br>
-					<img alt="" src="pathexample.png">
-					<br><br>
+
+					So this algorithm starts from the current already explored cell and expands, as a wildfire in each direction until it finds an unexplored cell.
+					<br>The expansion is made anly with allowed movements, if the adjacent cell is a wall the Robot will not expand it.
+					<br>
+					So it will find only reachable unexplored areas.
+
+					<br><br>Look <a href="https://en.wikipedia.org/wiki/Breadth-first_search">here</a> for more information.
 					
-					<br><h2>Next Work</h2>
-					
-					The A* search is good but absolutely not scalable (over 200x200 maps the computation time drastically increase);
-					<br>Also I works on a very simple world, with a lots of assumptions, for example the real world is not discrete.
-					<br> So I'm moving in two different ways:
-					<ul>
-						<li>Implement a better type of A* search, called <a href="https://harablog.wordpress.com/2011/09/07/jump-point-search/" >Jump Point Search</a></li>
-						<li>Implement a usually known Planner, in particular a Conditional Planner
-					</ul>
+					<br><a href="#Astar"></a><h2>Planning Algorithm</h2>
+
+					When I find an unexplored cell, Robot have to travel from the current position to that location. This task is the same as the Navigation task, indeed I used the same solution explained in the <a href="navigation.html">Navigation</a><br> page.
+
+					During this travel is used the digital representation of the world, moreover, the Robot assume a Closed World Assumption:<br>
+					<i>"If a cell is Unexplored it's an Obstacle"</i>.
 									
 				</div>
 			</div>    

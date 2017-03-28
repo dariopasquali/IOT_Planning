@@ -227,7 +227,10 @@ public class Console extends AbstractConsole implements IActivity{
 				
 	}
 
-	// GUI INTERACTION ---------------------------------------------------
+//}}	
+	
+	
+//{{ GUI INTERACTION ---------------------------------------------------
 	
 	/**
 	 * Load the map from the Prolog file and show it on GUI as a Button Matrix.
@@ -294,7 +297,9 @@ public class Console extends AbstractConsole implements IActivity{
 	{
 		((ConsoleGUI)env).clearPath();
 	}
-		
+
+//}}
+	
 	/* (non-Javadoc)
 	 * @see it.unibo.is.interfaces.IActivityBase#execAction(java.lang.String)
 	 */

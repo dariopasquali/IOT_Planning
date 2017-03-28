@@ -81,7 +81,7 @@ public class Explorer {
 						break;
 					}
 					
-					Path path = computeBestPath(n);;
+					Path path = computeBestPath(n);
 					
 					engine.travel(path);
 					

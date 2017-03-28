@@ -21,43 +21,13 @@ planName(scout).
 defaultSpeed(60).
 defaultDuration(1000).
 
+%% INIT NAVIGATION ---------------------------------------------------
+
 initialConfigNavRobot :-
 	defaultSpeed(S),
 	defaultDuration(T),
 	actorobj(Actor),
 	Actor <- initialConfigRobot(S,T,S,S).
-
-%% LIST OF ELEMENT MANAGEMENT -----------------------------------------------
-
-add_tail([],X,[X]).
-add_tail([H|T],X,[H|L]) :-
-	add_tail(T,X,L).
-
-getElements(List) :-
-	getElements([], 1, List).
-	
-getElements(List, ID, ToList) :-
-	mapdata(ID, E), !,
-	add_tail(List, E, List1),
-	ID1 is ID + 1,
-	getElements(List1, ID1, ToList).
-	
-getElements(List, _, List).
-
-notContainsElement(E, []).
-notContainsElement(E, [E|_]) :- !, fail.
-notContainsElement(E, [H|T]) :-
-	containsElement(E,T).
-
-
-%% NAVIGATION PLAN MANAGEMENT ----------------------------------------
-
-setNavPlan(plan(PLAN)) :-
-	actorobj(Actor),
-	planName(NAME),
-	actorPrintln(NAME),
-	actorPrintln("setNavigationPlan!!!!"),
-	Actor <- setNavigationPlan(NAME, PLAN).
 	
 configEngine(position(SX, SY)) :-
 	actorPrintln("confingEngine!!!!"),
@@ -68,6 +38,16 @@ configFileEngine(position(SX, SY), FILENAME) :-
 	actorPrintln("configFileEngine!!!!"),
 	actorobj(Actor),
 	Actor <- configFileEngine(SX, SY, FILENAME).
+
+%% PLAN MANAGEMENT ----------------------------------------
+
+setNavPlan(plan(PLAN)) :-
+	actorobj(Actor),
+	planName(NAME),
+	actorPrintln(NAME),
+	actorPrintln("setNavigationPlan!!!!"),
+	Actor <- setNavigationPlan(NAME, PLAN).
+	
 	
 loadNavigationData(PLAN, POS) :-
 	actorPrintln(PLAN),
@@ -85,37 +65,12 @@ loadNavigationData(PLAN, POS, FILENAME) :-
 	configFileEngine(POS, FILENAME),
 	setNavPlan(PLAN).
 	
-
+	
 loadThePlan( FName ):-
 	actorobj(Actor),
 	actorPrintln(FName),
 	Actor <- consultFromFile(  FName  ).
 
-myRunPlan(PLANNAME) :-
-	runPlan(PLANNAME).
-
-runResumablePlan(PLAN) :-
-	actorobj(Actor),
-	myExecPlan(PLAN,Actor,PLAN,1).
-
-myExecPlan(CURPLAN,Actor,P,PC) :-
-	plan(PC, P, S),
-	actorPrintln(S),
-	myRunTheSentence(CURPLAN,Actor,S),
-	PC1 is PC + 1,
-	myExecPlan(CURPLAN,Actor,P,PC1).
-
-executeCmd( Actor,  move(switchplan,PNAME), Events, Plans, done(switchplan) ):-
-	actorPrintln(  PNAME ),
-	Actor <- switchPlan(PNAME).
-	
-executeCmd(Actor, move(senseEvent,TIMEOUT,EVENTSLIST, PLANSLIST), Events, Plans, RES ):-
-	actorPrintln(sense(EVENTLIST)),
-	Actor <- senseEvent(TIMEOUT, EVENTSLIST, PLANSLIST).
-
-notifyUnexpectedObstacle :-
-	actorobj(Actor),
-	Actor <- notifyObstacle.
 
 myClearPlan(P) :-
 	actorPrintln(clear),
@@ -132,11 +87,47 @@ myClearPlan(PC,P):-
 
 myClearPlan(_,_).
 
+	
+%% PLAN EXECUTION -----------------------------------------
+	
+myRunPlan(PLANNAME) :-
+	runPlan(PLANNAME).
+
+
+myExecPlan(CURPLAN,Actor,P,PC) :-
+	plan(PC, P, S),
+	actorPrintln(S),
+	myRunTheSentence(CURPLAN,Actor,S),
+	PC1 is PC + 1,
+	myExecPlan(CURPLAN,Actor,P,PC1).
+
+
+executeCmd(Actor,  move(switchplan,PNAME), Events, Plans, done(switchplan) ):-
+	actorPrintln(  PNAME ),
+	Actor <- switchPlan(PNAME).
+	
+	
+executeCmd(Actor, move(senseEvent,TIMEOUT,EVENTSLIST, PLANSLIST), Events, Plans, RES ):-
+	actorPrintln(sense(EVENTLIST)),
+	Actor <- senseEvent(TIMEOUT, EVENTSLIST, PLANSLIST).
+
+%% WORLD INTERACTION ------------------------------------------------------
+
+notifyUnexpectedObstacle :-
+	actorobj(Actor),
+	Actor <- notifyObstacle.
+
 updateSimulationWorld :-
 	actorobj(Actor),
 	Actor <- updateSimulationWorld.
-	
 
+%% OLD ---------------------------------------------------
+
+/*
+runResumablePlan(PLAN) :-
+	actorobj(Actor),
+	myExecPlan(PLAN,Actor,PLAN,1).
+*/
 
 /*
 ------------------------------------------------------------
@@ -144,6 +135,6 @@ initialize
 ------------------------------------------------------------
 */
 initNavRobot  :-  
-	actorPrintln("------------------------------------------------------------initNavRobot").
+	actorPrintln("initRobot - Navigatin Theory loaded").
  
 :- initialization(initNavRobot).

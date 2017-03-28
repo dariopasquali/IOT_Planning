@@ -1,44 +1,26 @@
 System scout
 
 // ------------------------------------------------------------------
-//		EXPLORATION - INTERACTION
-// ------------------------------------------------------------------
-
-// From Console to Robot to start Exploration
-Dispatch explore : explore
-Dispatch explore : explore ( START , BOUNDS )
-
-//START = position ( X , Y )
-//BOUNDS = map ( W , H )
-//The second message is used for the debug
-
-// From Robot to Console to notify a new cell state
-Event expdata : expdata ( POS , STATE )
-
-//POS = position ( X , Y )
-//STATE = clear || object
-//maybe i can send only the obstacle cell
-
-// ------------------------------------------------------------------
 //		NAVIGATION - INTERACTION
 // ------------------------------------------------------------------
 
 // From Console to Robot to start the Navigation
-Dispatch navigate : navigate ( PLAN , POS )
-
-//PLAN = plan ( [ t || d || l || r ] )
-//POS = position ( Xs , Ys ) 
+Dispatch navigate : navigate( PLAN_MOVES , POS )
+Dispatch navigatefile : navigatefile( PLAN_MOVES , POS , FILENAME)
+//PLAN_MOVES = plan ( [ t || d || l || r ] )
+//POS = position ( Xs , Ys )
+//MODE = robot || simulated 
 // 
 //t = forward tiled
 //d = forward diagonal
-//l = left (45 or 90 degrees)
-//r = right
+//l = left (45 degrees)
+//r = right (45 degrees)
 
 
 // Raised by Robot when find an unexpected
 // obstacle during the navigation
-Event update : update ( OBJECT , CURRENT )
-//ELEMENT = potition ( X , Y )
+Event update : update( OBJECT , CURRENT )
+//OBJECT = potition ( X , Y )
 //CURRENT = position ( X , Y )
 
 
@@ -63,28 +45,27 @@ Event local_gui_command : local_gui_command(COMMAND)
  
 //Button --> COMMAND
 //
-//Explore --> explore || explore( START , BOUNDS );
 //Load Map --> loadmap ( PATH );
-//Find Path –-> findpath ( START , GOAL );
-//Start Navigation --> navigate;
+//Find Path â€“-> findpath ( START , GOAL );
+//Start Navigation --> navigate(MODE); MODE = simulated || robot
 //Abort --> abort;
+//Clear Path --> clearpath
 
 
 // ------------------------------------------------------------------
 //			CONTEXTS
 // ------------------------------------------------------------------
 
-Context ctxRobot ip [ host="localhost" port=8020] -standalone 
+Context ctxRobot ip [ host="localhost" port=8020]
 Context ctxConsole ip [ host="localhost" port=8010]
 
-QActor console context ctxConsole -g cyan{
+QActor console context ctxConsole{
 	
 // ------------------------------------------------------------------
 //			NORMAL PLANS
 // ------------------------------------------------------------------
 	
 	Plan init normal
-		solve consult("expConsoleTheory.pl") time(0) onFailSwitchTo  consultPrologFailure ;
 		solve consult("navConsoleTheory.pl") time(0) onFailSwitchTo  consultPrologFailure ;		
 		solve consult("consoleTheory.pl") time(0) onFailSwitchTo  consultPrologFailure ;
 		
@@ -96,56 +77,32 @@ QActor console context ctxConsole -g cyan{
 		println("++++++++++++++++++ WAIT COMMAND ++++++++++++++++++");
 		
 		sense time(999999999) local_gui_command -> continue;
-		[ ?? tout(X,Y) ] switchToPlan handleTimeout;
+		//[ ?? tout(X,Y) ] switchToPlan handleTimeout;
 		
 		printCurrentEvent;
 		memoCurrentEvent;
 		
-		onEvent local_gui_command : local_gui_command (explore) -> switchToPlan exploration;
- 		onEvent local_gui_command : local_gui_command (explore(START,BOUNDS)) -> switchToPlan explorationDebug;
- 		onEvent local_gui_command : local_gui_command (loadmap(PATH)) -> switchToPlan loadMap;
+		onEvent local_gui_command : local_gui_command (loadmap(PATH)) -> switchToPlan loadMap;
  		onEvent local_gui_command : local_gui_command (findpath(START,GOAL)) -> switchToPlan findPath;
- 		onEvent local_gui_command : local_gui_command (navigate) -> switchToPlan navigation;
+ 		onEvent local_gui_command : local_gui_command (navigate(robot)) -> switchToPlan navigation;
+ 		onEvent local_gui_command : local_gui_command (navigate(simulated)) -> switchToPlan navigationFile;
+ 		onEvent local_gui_command : local_gui_command (clearpath) -> switchToPlan clearPath;
 		
 		repeatPlan 0
 		
-	Plan exploration
-		println("++++++++++++++++++ EXPLORATION ++++++++++++++++++");
-		
-		solve showClearMap time(60000) onFailSwitchTo  explorationFailure;	
-		forward robot -m explore : explore;
-	
-		switchToPlan waitEndOfExploration
-			
-	Plan explorationDebug
-		println("++++++++++++++++++ EXPLORATION DEBUG ++++++++++++++++++");
-			
-		solve showClearMap(BOUNDS) time(60000) onFailSwitchTo  explorationFailure;		
-		[?? msg(local_gui_command, "event", SENDER, none, local_gui_command (explore(START,BOUNDS)), MSGNUM)]
-			 forward robot -m explore : explore(START,BOUNDS);
-		
-		switchToPlan waitEndOfExploration
-			
-	Plan waitEndOfExploration resumeLastPlan
-		receiveMsg time(999999999) react event abort -> abortCommand;
-		
-		printCurrentMessage;
-			
-		onMsg expdata : expdata(POS , STATE) ->
-			solve updateMap(POS , STATE) time(210000000) onFailSwitchTo explorationFailure
-			
-			
-	Plan loadMap
+	Plan loadMap resumeLastPlan
 		[?? msg(local_gui_command, "event", SENDER, none, local_gui_command (loadmap(PATH)), MSGNUM)]
 			 solve loadMap(PATH) time(210000000) onFailSwitchTo loadMapFailure;
 				
 		println("++++++++++++++++++ MAP LOADED ++++++++++++++++++")
-		
+	
+// --------------------- NAVIGATION --------------------------------
 
 			
-	Plan findPath
+	Plan findPath resumeLastPlan
+	
 		[?? msg(local_gui_command, "event", SENDER, none, local_gui_command (findpath(START,GOAL)), MSGNUM)]
-		solve searchBestPath(START,GOAL) time(210000000) onFailSwitchTo  findpathFailure;
+			solve searchBestPath(START,GOAL) time(210000000) onFailSwitchTo  findpathFailure;
 	
 		println("++++++++++++++++++ PATH FOUND ++++++++++++++++++")
 	
@@ -158,10 +115,16 @@ QActor console context ctxConsole -g cyan{
 		switchToPlan waitEndOfNavigation
 		
 		
+	Plan navigationFile
+		println("++++++++++++++++++ NAVIGATION FILE ++++++++++++++++++");
+		
+		solve startNavigationFile time(60000) onFailSwitchTo  navigationFailure;
+		
+		switchToPlan waitEndOfNavigation	
+		
 		
 	Plan waitEndOfNavigation
 		sense time(999999999) local_gui_command, update, end -> continue, continue, continue;
- 		[ ?? tout(X,Y) ] switchToPlan handleTimeout;
  		
  		printCurrentEvent;
  		memoCurrentEvent;
@@ -169,7 +132,7 @@ QActor console context ctxConsole -g cyan{
  		onEvent local_gui_command : local_gui_command(abort) -> switchToPlan abortCommand; 
  						
 		onEvent update : update (OBJECT, CURRENT) ->
-			 solve updateMapAndReplan(OBJECT , CURRENT) time(600000)
+			 solve updateMapAndReplan(OBJECT , CURRENT) time(0)
 			 onFailSwitchTo  alternativeFindpathFailure;	
 			 	
 		onEvent end : end -> switchToPlan endOfNavigation;
@@ -181,10 +144,16 @@ QActor console context ctxConsole -g cyan{
 		println("++++++++++++++++++ NAVIGATION ENDED :D ++++++++++++++++++");
 		switchToPlan waitGUICommand	
 	
+// COMMON -----------------------------------------------------------------------------	
+	
 	Plan abortCommand
 		emit abort : abort;
 		println("++++++++++++++++++ COMMAND ABORTED ++++++++++++++++++");
 		switchToPlan waitGUICommand	
+	
+	Plan clearPath resumeLastPlan
+		solve clearPath time(10000);
+		println("path cleared")
 
 // ------------------------------------------------------------------
 //	PROLOG FAILURE ERROR HANDLERS
@@ -192,9 +161,6 @@ QActor console context ctxConsole -g cyan{
 		
 	Plan handleTimeout
  		println("timeout!! GOODBYE")
- 	
- 	Plan explorationFailure            
-		println("Explore FAILURE" ) 
  	
  	Plan loadMapFailure           
 		println("Load Map FAILURE" ) 
@@ -218,14 +184,6 @@ QActor console context ctxConsole -g cyan{
 
 
 QActor robot context ctxRobot{
- 	Plan init normal
-		println( "NEVER HERE. I'm just a placeholder" ) 
+ 	Plan init normal		
+		println( "just a placeholder" ) 	
  }
-
-
-
-
-
-
-
-

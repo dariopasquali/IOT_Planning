@@ -1,0 +1,196 @@
+RobotSystem scout
+
+// ------------------------------------------------------------------
+//		NAVIGATION - INTERACTION
+// ------------------------------------------------------------------
+
+// From Console to Robot to start the Navigation
+Dispatch navigate : navigate ( PLAN_MOVES , POS )
+Dispatch navigatefile : navigatefile( PLAN_MOVES , POS , FILENAME)
+//PLAN_MOVES = plan ( [ t || d || l || r ] )
+//POS = position ( Xs , Ys ) 
+//MODE = robot || simulated
+// 
+//t = forward tiled
+//d = forward diagonal
+//l = left (45 or 90 degrees)
+//r = right
+
+
+// Raised by Robot when find an unexpected
+// obstacle during the navigation
+Event update : update ( OBJECT , CURRENT )
+//OBJECT = position ( X , Y )
+//CURRENT = position ( X , Y )
+
+
+// ------------------------------------------------------------------
+//		COMMON - INTERACTION
+// ------------------------------------------------------------------
+
+// Raised by Console to abort the current command
+Event abort : abort
+
+// Raised by Robot when it ends the current command
+Event end : end
+
+
+// ------------------------------------------------------------------
+//		LOCAL - INTERACTION
+// ------------------------------------------------------------------
+
+// Raised by Sonar when an obstacle is detected
+// The user can define the sensing distance in the sensorTheory.pl
+
+Event obstaclefront : obstaclefront
+
+// ------------------------------------------------------------------
+//			CONTEXTS
+// ------------------------------------------------------------------
+
+Context ctxRobot ip [ host="localhost" port=8020]
+Context ctxConsole ip [ host="localhost" port=8010]
+
+QActor console context ctxConsole{
+ 	Plan init normal
+		println( "NEVER HERE. I'm just a placeholder" ) 
+ }
+
+Robot mockScout QActor robot context ctxRobot{
+
+// ------------------------------------------------------------------
+//			NORMAL PLANS
+// ------------------------------------------------------------------
+
+	
+	Plan init normal
+		
+		println("load theories");
+		
+		solve consult("robotTheory.pl") time(210000000) onFailSwitchTo  consultPrologFailure ;
+		solve consult("navRobotTheory.pl") time(210000000) onFailSwitchTo  consultPrologFailure ;
+		solve consult("talkTheory.pl") time(210000000) onFailSwitchTo  consultPrologFailure ;
+		
+ 		println("++++++++++++++++++ robot(starts) ++++++++++++++++++");
+ 		
+ 		switchToPlan waitConsoleCommand
+ 		
+ 	Plan waitConsoleCommand
+ 		
+		println("++++++++++++++++++ WAIT CONSOLE COMMAND ++++++++++++++++++");
+ 		
+ 		receiveMsg time(600000000);
+ 		printCurrentMessage;
+ 		memoCurrentMessage;
+ 		
+ 		onMsg navigate : navigate(PLAN_MOVES, POS) -> switchToPlan navigation;
+ 		onMsg navigatefile : navigatefile( PLAN_MOVES , POS , FILENAME) -> switchToPlan navigationFile;
+ 		
+ 		repeatPlan 0		
+ 
+ // *********** NAVIGATION PLANS **********************
+ 		
+ 	Plan navigation
+ 		println("I Received some navigation data");
+ 		
+ 		solve initialConfigNavRobot time(0);
+ 		
+ 		[?? msg(_, _, SENDER, X, navigate(PLAN_MOVES, POS), MSGNUM)] 
+ 			solve loadNavigationData(PLAN_MOVES, POS) time (100000) onFailSwitchTo loadMapFailure;
+ 		
+ 		switchToPlan startNavigation 	
+ 	
+ 	Plan navigationFile
+ 		println("I Received some navigation data and a filename");
+ 		
+ 		solve initialConfigNavRobot time(0);
+
+ 		[?? msg(_, _, SENDER, X, navigatefile( PLAN_MOVES , POS , FILENAME), MSGNUM)] 
+ 			solve loadNavigationData(PLAN_MOVES, POS, FILENAME) time (100000) onFailSwitchTo loadMapFailure;
+ 		
+ 		switchToPlan startNavigation 	
+ 		
+ 	Plan startNavigation
+ 	
+ 		[ !? planName(PLANNAME) ] solve myClearPlan(PLANNAME) time(0);
+ 		[ !? planFilename(FILENAME) ]  solve loadThePlan(FILENAME) time(300000000);
+  		
+ 		println("++++++++++++++++++ Plan Loaded ++++++++++++++++++");	
+ 		println(" ");
+ 		println(" ");
+ 		
+ 		[ !? planName(PLANNAME) ] solve showPlan(PLANNAME) time(1000);
+ 		
+ 		println(" ");
+ 		println(" ");
+ 		println("++++++++++++++++++ ++++++++++++++++++ ++++++++++++++++++");	
+
+		[ !? planName(PLANNAME) ] solve myRunPlan(PLANNAME) time(1000000000)
+
+ 	
+ 	Plan waitAndEvaluate resumeLastPlan
+ 		
+ 		println("maybe there is an unexpected static obstacle");
+ 		delay time(6000);
+ 		println("are you there obstacle ??");
+ 		
+ 		sense time(5000) obstaclefront -> notifyUnexpectedObstacle	
+ 		
+ 		
+ 	Plan notifyUnexpectedObstacle
+ 		
+ 		println("I found an unexpected static obstacle");
+ 		
+ 		solve notifyUnexpectedObstacle time(0);
+ 		
+ 		println("Unexpected Obstacle notified, I wait the new plan");
+ 		
+ 		switchToPlan waitConsoleCommand 		
+ 		
+ 	
+ 	Plan notifyEndOfNavigation	
+ 	
+ 		println("notify End"); 	
+ 			
+ 		emit end : end;
+ 		
+ 		switchToPlan waitConsoleCommand	
+ 		
+ 	Plan abort 
+ 		println("Current command aborted");
+ 		switchToPlan waitConsoleCommand
+	
+// ------------------------------------------------------------------
+//	PROLOG FAILURE ERROR HANDLERS
+// ------------------------------------------------------------------
+		
+	Plan handleTimeout
+ 		println("timeout!! GOODBYE")
+ 	
+ 	Plan loadMapFailure           
+		println("Load Map FAILURE" ) 
+		 
+ 	Plan findpathFailure           
+		println("Find Path FAILURE" )  
+ 	
+ 	Plan navigationFailure            
+		println("Navigation FAILURE" )
+		
+	Plan alternativeFindpathFailure            
+		println("Alternative Find Path FAILURE" )  
+ 		
+ 	Plan consultPrologFailure            
+		println("The consult is gone wrong, maybe there are errors in the prolog file" ) 
+ 		
+ 	Plan generalPrologFailure            
+		println("Prolog goal FAILURE" ) 
+}
+
+
+
+
+
+
+
+
+
