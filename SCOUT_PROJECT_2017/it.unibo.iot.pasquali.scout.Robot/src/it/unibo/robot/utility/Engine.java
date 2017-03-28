@@ -188,7 +188,7 @@ public class Engine {
 			
 		case SOUTH_WEST:
 			y += 1;
-			x += 1;
+			x -= 1;
 			break;
 			
 		case WEST:
@@ -324,7 +324,7 @@ public class Engine {
 			
 		case SOUTH_WEST:
 			y += 1;
-			x += 1;
+			x -= 1;
 			break;
 			
 		case WEST:

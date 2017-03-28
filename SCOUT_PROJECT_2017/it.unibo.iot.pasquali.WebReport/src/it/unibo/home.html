@@ -458,7 +458,7 @@ tt{
 				So path movements are translate into a shortert form like:
 				<ul>
 					<li>move horizontal or vertical ---> <tt>t</tt></li>
-					<li>move diagonal ---> <tt>d</tt>. It's different because the diagonal is longer than the side, so Robot has to move much time.</li>
+					<li>move diagonal ---> <tt>d</tt>. It's different because the diagonal is longer than the side, so Robot has to move much longer.</li>
 					<li>turn left ---> <tt>l</tt></li>
 					<li>turn right ---> <tt>r</tt></li>
 				</ul>
@@ -480,16 +480,85 @@ tt{
 
 				<br><br>
 
-				<div class="entity_title">Scout System Implementation - GUImanager</div><br><br>
+				<div class="entity_title">Scout System Implementation - GUImanager</div>
 
+				<br><br>
+				As already said, GUImanager is an example of entity that show the virtual world navigated bt the Robot during Exploration and Navigation.<br>
+				I implemented a simple GUI, similar to the Console, but this actor can be, for example, a Unity 3d simulation, ora a terminal text representation, or whatever.<br><br>
 
+				<h2>Graphical Interface</h2>
+				<br>
 
+				The GUI provided by this entity is very the same of Map Frame of the Console, the difference is that now we can see both the environment and the Robot position and direction.
+				<br><br>
+
+				<img src="img/exploration.gif"><br>
+				<br>
+
+				In the image you can see the Exploration of heart Map:
+				<ul>
+					<li>In the right frame there is the Console Map Frame that is incrementally updated as the Exploration progress;</li>
+					<li>In the left frame there is the GUImanager Map Frame that show the current robot position and direction.</li>
+				</ul>
+				<br>
+
+				<h2>Change the World</h2>
+				<br>
+
+				The GUImanager also allow the user to interact and change the virtual world, this feature is very useful, during the Navigation.<br>
+				As the requirements, if the Robot find an unexpected obstacle, it has to stop, wait a defined time and, if the object is still there, change the plan.<br><br>
+
+				<br><br>
+
+				<img src="img/navigation.gif"><br>
+				<br>
+
+				In the image you can see the Navigation of random Map:
+				<ul>
+					<li>In the right frame there is the Console Map Frame that shows the best path from current position to GOAL;</li>
+					<li>In the left frame there is the GUImanager Map Frame that show the current robot position and direction.</li>
+				</ul>
+				<br>
+
+				<div class="entity_title">Scout System Implementation - Other Components</div>
+
+				<br> To work correctly, the Scout System also needs two other projects Common stuff and SearchAlgorithm.<br><br>
+
+				<h2>it.unibo.iot.pasquali.Common</h2>
+				<br>
+
+				This project containts those classes used by Robot and Console, it allow me to not rewrite useless stuff.<br><br>
+
+				<img src="img/CommonUML.png"><br>
+				<br>
+
+				We find:<br>
+				<ul>
+					<li>Interfaces for map virtual representation;</li>
+					<li>Enums to define planning move types.</li>
+				</ul>
+
+				<h2>it.unibo.iot.pasquali.SearchAlgorithm</h2>
+				<br>
+
+				This project containts the algorith to find the best path between two points.<br><br>
+				The algorithm is already been analyzed in the model section, however it's a simple implementation of <a href="https://en.wikipedia.org/wiki/A*_search_algorithm">this</a>.<br><br>
+
+				<img src="img/AStarUML.png"><br>
+				<br>
+
+				We find:<br>
+				<ul>
+					<li>The <b>Engine</b> manages internal state representation and offer <b>Moves</b> to change it;</li>
+					<li>The <b>AStarSearchAgent</b> implements the A* algorithm;</li>
+					<li><b>Path</b> provides a representation of the travel like List of <b>State</b> visited or <b>Move</b> to be applied.</li>
+				</ul>
 
 				</div>
 			</div>    
 		    &emsp; 
-		<div style="background-color:#0ce0f2; width:100%;text-align:center;font-size:small;color:white">
-		By DP   
+		<div style="width:100%;text-align:center;font-size:small;">
+		By DP -- Source code at <a href="https://github.com/dariopasquali/IOT_Planning">https://github.com/dariopasquali/IOT_Planning </a>
 		</div>    
 	
 	</body>
