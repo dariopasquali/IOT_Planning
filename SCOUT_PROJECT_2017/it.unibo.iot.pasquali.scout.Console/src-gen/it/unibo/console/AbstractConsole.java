@@ -59,7 +59,7 @@ public abstract class AbstractConsole extends QActor {
 	    try{
 	    	int nPlanIter = 0;
 	    	//curPlanInExec =  "init";
-	    	boolean returnValue = suspendWork;
+	    	boolean returnValue = continueWork;
 	    while(true){
 	    	curPlanInExec =  "init";	//within while since it can be lost by switchlan
 	    	nPlanIter++;
@@ -103,7 +103,7 @@ public abstract class AbstractConsole extends QActor {
 	    try{
 	    	int nPlanIter = 0;
 	    	//curPlanInExec =  "waitGUICommand";
-	    	boolean returnValue = suspendWork;
+	    	boolean returnValue = continueWork;
 	    while(true){
 	    	curPlanInExec =  "waitGUICommand";	//within while since it can be lost by switchlan
 	    	nPlanIter++;
@@ -213,7 +213,7 @@ public abstract class AbstractConsole extends QActor {
 	    try{
 	    	int nPlanIter = 0;
 	    	//curPlanInExec =  "loadMap";
-	    	boolean returnValue = suspendWork;
+	    	boolean returnValue = continueWork;
 	    while(true){
 	    	curPlanInExec =  "loadMap";	//within while since it can be lost by switchlan
 	    	nPlanIter++;
@@ -244,7 +244,7 @@ public abstract class AbstractConsole extends QActor {
 	    try{
 	    	int nPlanIter = 0;
 	    	//curPlanInExec =  "exploration";
-	    	boolean returnValue = suspendWork;
+	    	boolean returnValue = continueWork;
 	    while(true){
 	    	curPlanInExec =  "exploration";	//within while since it can be lost by switchlan
 	    	nPlanIter++;
@@ -274,7 +274,7 @@ public abstract class AbstractConsole extends QActor {
 	    try{
 	    	int nPlanIter = 0;
 	    	//curPlanInExec =  "explorationDebug";
-	    	boolean returnValue = suspendWork;
+	    	boolean returnValue = continueWork;
 	    while(true){
 	    	curPlanInExec =  "explorationDebug";	//within while since it can be lost by switchlan
 	    	nPlanIter++;
@@ -315,7 +315,7 @@ public abstract class AbstractConsole extends QActor {
 	    try{
 	    	int nPlanIter = 0;
 	    	//curPlanInExec =  "waitEndOfExploration";
-	    	boolean returnValue = suspendWork;
+	    	boolean returnValue = continueWork;
 	    while(true){
 	    	curPlanInExec =  "waitEndOfExploration";	//within while since it can be lost by switchlan
 	    	nPlanIter++;
@@ -381,7 +381,7 @@ public abstract class AbstractConsole extends QActor {
 	    try{
 	    	int nPlanIter = 0;
 	    	//curPlanInExec =  "endOfExploration";
-	    	boolean returnValue = suspendWork;
+	    	boolean returnValue = continueWork;
 	    while(true){
 	    	curPlanInExec =  "endOfExploration";	//within while since it can be lost by switchlan
 	    	nPlanIter++;
@@ -403,7 +403,7 @@ public abstract class AbstractConsole extends QActor {
 	    try{
 	    	int nPlanIter = 0;
 	    	//curPlanInExec =  "findPath";
-	    	boolean returnValue = suspendWork;
+	    	boolean returnValue = continueWork;
 	    while(true){
 	    	curPlanInExec =  "findPath";	//within while since it can be lost by switchlan
 	    	nPlanIter++;
@@ -434,7 +434,7 @@ public abstract class AbstractConsole extends QActor {
 	    try{
 	    	int nPlanIter = 0;
 	    	//curPlanInExec =  "navigation";
-	    	boolean returnValue = suspendWork;
+	    	boolean returnValue = continueWork;
 	    while(true){
 	    	curPlanInExec =  "navigation";	//within while since it can be lost by switchlan
 	    	nPlanIter++;
@@ -462,7 +462,7 @@ public abstract class AbstractConsole extends QActor {
 	    try{
 	    	int nPlanIter = 0;
 	    	//curPlanInExec =  "navigationFile";
-	    	boolean returnValue = suspendWork;
+	    	boolean returnValue = continueWork;
 	    while(true){
 	    	curPlanInExec =  "navigationFile";	//within while since it can be lost by switchlan
 	    	nPlanIter++;
@@ -490,7 +490,7 @@ public abstract class AbstractConsole extends QActor {
 	    try{
 	    	int nPlanIter = 0;
 	    	//curPlanInExec =  "waitEndOfNavigation";
-	    	boolean returnValue = suspendWork;
+	    	boolean returnValue = continueWork;
 	    while(true){
 	    	curPlanInExec =  "waitEndOfNavigation";	//within while since it can be lost by switchlan
 	    	nPlanIter++;
@@ -556,7 +556,7 @@ public abstract class AbstractConsole extends QActor {
 	    try{
 	    	int nPlanIter = 0;
 	    	//curPlanInExec =  "endOfNavigation";
-	    	boolean returnValue = suspendWork;
+	    	boolean returnValue = continueWork;
 	    while(true){
 	    	curPlanInExec =  "endOfNavigation";	//within while since it can be lost by switchlan
 	    	nPlanIter++;
@@ -576,7 +576,7 @@ public abstract class AbstractConsole extends QActor {
 	    try{
 	    	int nPlanIter = 0;
 	    	//curPlanInExec =  "abortCommand";
-	    	boolean returnValue = suspendWork;
+	    	boolean returnValue = continueWork;
 	    while(true){
 	    	curPlanInExec =  "abortCommand";	//within while since it can be lost by switchlan
 	    	nPlanIter++;
@@ -598,7 +598,7 @@ public abstract class AbstractConsole extends QActor {
 	    try{
 	    	int nPlanIter = 0;
 	    	//curPlanInExec =  "clearGUI";
-	    	boolean returnValue = suspendWork;
+	    	boolean returnValue = continueWork;
 	    while(true){
 	    	curPlanInExec =  "clearGUI";	//within while since it can be lost by switchlan
 	    	nPlanIter++;
@@ -626,7 +626,7 @@ public abstract class AbstractConsole extends QActor {
 	    try{
 	    	int nPlanIter = 0;
 	    	//curPlanInExec =  "clearPath";
-	    	boolean returnValue = suspendWork;
+	    	boolean returnValue = continueWork;
 	    while(true){
 	    	curPlanInExec =  "clearPath";	//within while since it can be lost by switchlan
 	    	nPlanIter++;
@@ -654,7 +654,7 @@ public abstract class AbstractConsole extends QActor {
 	    try{
 	    	int nPlanIter = 0;
 	    	//curPlanInExec =  "handleTimeout";
-	    	boolean returnValue = suspendWork;
+	    	boolean returnValue = continueWork;
 	    while(true){
 	    	curPlanInExec =  "handleTimeout";	//within while since it can be lost by switchlan
 	    	nPlanIter++;
@@ -673,7 +673,7 @@ public abstract class AbstractConsole extends QActor {
 	    try{
 	    	int nPlanIter = 0;
 	    	//curPlanInExec =  "explorationFailure";
-	    	boolean returnValue = suspendWork;
+	    	boolean returnValue = continueWork;
 	    while(true){
 	    	curPlanInExec =  "explorationFailure";	//within while since it can be lost by switchlan
 	    	nPlanIter++;
@@ -692,7 +692,7 @@ public abstract class AbstractConsole extends QActor {
 	    try{
 	    	int nPlanIter = 0;
 	    	//curPlanInExec =  "loadMapFailure";
-	    	boolean returnValue = suspendWork;
+	    	boolean returnValue = continueWork;
 	    while(true){
 	    	curPlanInExec =  "loadMapFailure";	//within while since it can be lost by switchlan
 	    	nPlanIter++;
@@ -711,7 +711,7 @@ public abstract class AbstractConsole extends QActor {
 	    try{
 	    	int nPlanIter = 0;
 	    	//curPlanInExec =  "findpathFailure";
-	    	boolean returnValue = suspendWork;
+	    	boolean returnValue = continueWork;
 	    while(true){
 	    	curPlanInExec =  "findpathFailure";	//within while since it can be lost by switchlan
 	    	nPlanIter++;
@@ -730,7 +730,7 @@ public abstract class AbstractConsole extends QActor {
 	    try{
 	    	int nPlanIter = 0;
 	    	//curPlanInExec =  "navigationFailure";
-	    	boolean returnValue = suspendWork;
+	    	boolean returnValue = continueWork;
 	    while(true){
 	    	curPlanInExec =  "navigationFailure";	//within while since it can be lost by switchlan
 	    	nPlanIter++;
@@ -749,7 +749,7 @@ public abstract class AbstractConsole extends QActor {
 	    try{
 	    	int nPlanIter = 0;
 	    	//curPlanInExec =  "alternativeFindpathFailure";
-	    	boolean returnValue = suspendWork;
+	    	boolean returnValue = continueWork;
 	    while(true){
 	    	curPlanInExec =  "alternativeFindpathFailure";	//within while since it can be lost by switchlan
 	    	nPlanIter++;
@@ -768,7 +768,7 @@ public abstract class AbstractConsole extends QActor {
 	    try{
 	    	int nPlanIter = 0;
 	    	//curPlanInExec =  "consultPrologFailure";
-	    	boolean returnValue = suspendWork;
+	    	boolean returnValue = continueWork;
 	    while(true){
 	    	curPlanInExec =  "consultPrologFailure";	//within while since it can be lost by switchlan
 	    	nPlanIter++;
@@ -787,7 +787,7 @@ public abstract class AbstractConsole extends QActor {
 	    try{
 	    	int nPlanIter = 0;
 	    	//curPlanInExec =  "generalPrologFailure";
-	    	boolean returnValue = suspendWork;
+	    	boolean returnValue = continueWork;
 	    while(true){
 	    	curPlanInExec =  "generalPrologFailure";	//within while since it can be lost by switchlan
 	    	nPlanIter++;
