@@ -2,22 +2,9 @@
 package it.unibo.ctxRobot;
 import it.unibo.is.interfaces.IOutputEnvView;
 import it.unibo.qactors.QActorContext;
-import it.unibo.qactors.QActorUtils;
-import it.unibo.robot.Robot;
 
 public class Evh extends AbstractEvh { 
 	public Evh(String name, QActorContext myCtx, IOutputEnvView outEnvView, String[] eventIds ) throws Exception {
 		super(name, myCtx, outEnvView,eventIds);
   	}
-	
-	@Override
-	public void handleCurrentEvent() throws Exception {
-		event = this.currentEvent; //AKKA getEventItem();
-		if( event == null ) return;
-
-		showMsg( event.getPrologRep()  );
-		
-		Robot robot = (Robot)QActorUtils.getQActor("robot_ctrl");
-		robot.updateSimulationWorld(event.getMsg());
-	}//handleCurrentEvent
 }

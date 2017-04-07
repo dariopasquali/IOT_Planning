@@ -26,14 +26,6 @@ import it.unibo.planning.astar.engine.AStarEngine;
 import it.unibo.qactors.QActorContext;
 import it.unibo.qactors.QActorUtils;
 
-/**
- * @author Dario
- *
- */
-/**
- * @author Dario
- *
- */
 public class Console extends AbstractConsole implements IActivity{ 
 	
 	

@@ -101,16 +101,16 @@ myExecPlan(CURPLAN,Actor,P,PC) :-
 	PC1 is PC + 1,
 	myExecPlan(CURPLAN,Actor,P,PC1).
 
-
+/*
 executeCmd(Actor,  move(switchplan,PNAME), Events, Plans, done(switchplan) ):-
 	actorPrintln(  PNAME ),
 	Actor <- switchPlan(PNAME).
-	
-	
+*/	
+/*	
 executeCmd(Actor, move(senseEvent,TIMEOUT,EVENTSLIST, PLANSLIST), Events, Plans, RES ):-
-	actorPrintln(sense(EVENTLIST)),
+	actorPrintln(sense),
 	Actor <- senseEvent(TIMEOUT, EVENTSLIST, PLANSLIST).
-
+*/
 %% WORLD INTERACTION ------------------------------------------------------
 
 notifyUnexpectedObstacle :-
