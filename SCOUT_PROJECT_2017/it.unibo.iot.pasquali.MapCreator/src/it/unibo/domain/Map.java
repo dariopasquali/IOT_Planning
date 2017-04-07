@@ -1,14 +1,7 @@
 package it.unibo.domain;
 
-import java.awt.Color;
-import java.awt.image.BufferedImage;
-import java.awt.image.DataBufferByte;
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.imageio.ImageIO;
 
 //import org.opencv.core.CvType;
 //import org.opencv.core.Mat;
@@ -16,6 +9,10 @@ import javax.imageio.ImageIO;
 //import org.opencv.highgui.Highgui;
 
 import it.unibo.domain.interfaces.IMapElement;
+import it.unibo.domain.model.Fact;
+import it.unibo.domain.model.Graph;
+import it.unibo.domain.model.Move;
+import it.unibo.domain.model.State;
 
 
 
@@ -56,10 +53,10 @@ public class Map {
 		this.Xmax = x;
 		this.Ymax = y;
 		
-		intmap = new Integer[x+1][y+1];
-		for(int k=0; k<=Xmax; k++)
+		intmap = new Integer[x][y];
+		for(int k=0; k<Xmax; k++)
 		{
-			for(int j = 0; j<=Ymax; j++)
+			for(int j = 0; j<Ymax; j++)
 			{
 				intmap[k][j] = 0;
 			}
@@ -73,7 +70,10 @@ public class Map {
 	public void addElement(IMapElement newElement) {
 		
 		if(!elements.contains(newElement))
-			elements.add(newElement);		
+		{
+			elements.add(newElement);
+			intmap[newElement.getX()][newElement.getY()] = 1;
+		}
 	}
 
 	public List<IMapElement> getElements() {
@@ -98,7 +98,8 @@ public class Map {
 
 	public void removeElement(int c, int r) {
 		MapElement toRemove = new MapElement(c,r);		
-		elements.remove(toRemove);		
+		elements.remove(toRemove);
+		intmap[c][r] = 0;
 	}
 	
 
@@ -205,6 +206,166 @@ public class Map {
 			return false;
 		else
 			return true;
+	}
+
+	public Graph getPOPGraph() {
+
+		String graph = "";
+		String moves = "";
+		
+		Graph g = new Graph();
+		
+		for(int c=0; c<Xmax; c++)
+		{
+			for(int r=0; r<Ymax; r++)
+			{
+				if(intmap[c][r] == 0)
+					g.addState(new State(c,r));
+			}
+		}				
+		
+		for(int c=0; c<Xmax; c++)
+		{
+			for(int i=0; i<(Ymax-1); i++)
+			{
+				if(intmap[c][i] == 0 && intmap[c][i+1] == 0)
+				{
+					State a = new State(c,i);
+					State b = new State(c,i+1);
+					
+					g.addConnection(a.toString(), b.toString());
+					g.addConnection(b.toString(), a.toString());
+					
+					Move m = new Move(a, b);					
+					Fact f = new Fact("at", m);
+					f.addParam(a.toString());
+					m.addPre(f);
+					
+					f = new Fact("connected", m);
+					f.addParam(a.toString());
+					f.addParam(b.toString());
+					m.addPre(f);
+					
+					f = new Fact("at", m);
+					f.addParam(b.toString());
+					m.addEffect(f);
+					
+					f = new Fact("not at", m);
+					f.addParam(a.toString());
+					m.addEffect(f);					
+					g.addMove(m);
+					
+			//--------------------------------------------------------------
+					
+					m = new Move(b, a);					
+					f = new Fact("at", m);
+					f.addParam(b.toString());
+					m.addPre(f);
+					
+					f = new Fact("connected", m);
+					f.addParam(b.toString());
+					f.addParam(a.toString());
+					m.addPre(f);
+					
+					f = new Fact("at", m);
+					f.addParam(a.toString());
+					m.addEffect(f);
+					
+					f = new Fact("not at", m);
+					f.addParam(b.toString());
+					m.addEffect(f);					
+					g.addMove(m);
+					
+/*					
+					graph += "connected(p("+c+","+i+"),p("+c+","+(i+1)+")).\n";
+					graph += "connected(p("+c+","+(i+1)+"),p("+c+","+i+")).\n";
+					
+					moves += "move(p("+c+","+i+"),"
+							+ "p("+c+","+(i+1)+"),"
+									+ "[at(p("+c+","+i+")), connected(p("+c+","+i+"),p("+c+","+(i+1)+"))],"
+											+ "[at(p("+c+","+(i+1)+")), not at(p("+c+","+i+"))]).\n";
+					
+					moves += "move(p("+c+","+(i+1)+"),"
+							+ "p("+c+","+i+"),"
+									+ "[at(p("+c+","+(i+1)+")), connected(p("+c+","+(i+1)+"),p("+c+","+i+"))],"
+											+ "[at(p("+c+","+i+")), not at(p("+c+","+(i+1)+"))]).\n";
+*/
+				}
+			}
+		}
+		
+		
+		for(int r=0; r<Ymax; r++)
+		{
+			for(int j=0; j<(Xmax-1); j++)
+			{
+				if(intmap[j][r] == 0 && intmap[j+1][r] == 0)
+				{
+					State a = new State(j,r);
+					State b = new State(j+1,r);
+					
+					g.addConnection(a.toString(), b.toString());
+					g.addConnection(b.toString(), a.toString());
+					
+					Move m = new Move(a, b);					
+					Fact f = new Fact("at", m);
+					f.addParam(a.toString());
+					m.addPre(f);
+					
+					f = new Fact("connected", m);
+					f.addParam(a.toString());
+					f.addParam(b.toString());
+					m.addPre(f);
+					
+					f = new Fact("at", m);
+					f.addParam(b.toString());
+					m.addEffect(f);
+					
+					f = new Fact("not at", m);
+					f.addParam(a.toString());
+					m.addEffect(f);					
+					g.addMove(m);
+					
+			//--------------------------------------------------------------
+					
+					m = new Move(b, a);					
+					f = new Fact("at", m);
+					f.addParam(b.toString());
+					m.addPre(f);
+					
+					f = new Fact("connected", m);
+					f.addParam(b.toString());
+					f.addParam(a.toString());
+					m.addPre(f);
+					
+					f = new Fact("at", m);
+					f.addParam(a.toString());
+					m.addEffect(f);
+					
+					f = new Fact("not at", m);
+					f.addParam(b.toString());
+					m.addEffect(f);					
+					g.addMove(m);
+					
+/*					
+					graph += "connected(p("+j+","+r+"),p("+(j+1)+","+r+")).\n";
+					graph += "connected(p("+(j+1)+","+r+"),p("+j+","+r+")).\n";
+					
+					moves += "move(p("+j+","+r+"),"
+							+ "p("+(j+1)+","+r+"),"
+									+ "[at(p("+j+","+r+")), connected(p("+j+","+r+"),p("+(j+1)+","+r+"))],"
+											+ "[at(p("+(j+1)+","+r+")), not at(p("+j+","+r+"))]).\n";
+					
+					moves += "move(p("+(j+1)+","+r+"),"
+							+ "p("+j+","+r+"),"
+									+ "[at(p("+(j+1)+","+r+")), connected(p("+(j+1)+","+r+"),p("+j+","+r+"))],"
+											+ "[at(p("+j+","+r+")), not at(p("+(j+1)+","+r+"))]).\n";
+*/				
+				}
+			}
+		}		
+		
+		return g;
 	}
 
 }

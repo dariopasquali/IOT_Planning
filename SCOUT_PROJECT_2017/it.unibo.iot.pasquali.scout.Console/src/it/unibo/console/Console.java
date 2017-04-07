@@ -138,6 +138,7 @@ public class Console extends AbstractConsole implements IActivity{
 		path = agent.searchBestPath(engine,new Point(sx,sy), new Point(gx,gy));		
 			
 		println("Search Time --> " + (System.currentTimeMillis() - st) +" ms");
+		println("Plan size --->" + path.getMoves().size());
 	}
 
 	

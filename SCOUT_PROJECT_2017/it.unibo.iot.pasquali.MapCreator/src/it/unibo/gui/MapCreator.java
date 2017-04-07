@@ -22,6 +22,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -35,6 +36,7 @@ import javax.swing.event.ChangeListener;
 import it.unibo.domain.Map;
 import it.unibo.domain.MapElement;
 import it.unibo.domain.interfaces.IMapElement;
+import it.unibo.domain.model.Graph;
 import it.unibo.gui.MapViewerPanel.CellState;
 
 import java.awt.Color;
@@ -462,13 +464,13 @@ public class MapCreator extends Frame{
 						m.addElement(new MapElement(0,y));
 					
 					for(int x = 0; x<m.getXmax(); x++)
-						m.addElement(new MapElement(x,m.getYmax()));
+						m.addElement(new MapElement(x,m.getYmax()-1));
 					
-					for(int y = 0; y<=m.getYmax(); y++)
-						m.addElement(new MapElement(m.getXmax(),y));
+					for(int y = 0; y<m.getYmax(); y++)
+						m.addElement(new MapElement(m.getXmax()-1,y));
 				}
 				
-				setMap(m,1);
+				setMap(m);
 				
 				btnSaveMap.setEnabled(true);
 				btnSaveImage.setEnabled(true);
@@ -494,6 +496,7 @@ public class MapCreator extends Frame{
 					break;
 				
 				storeMap(fname);
+				storePopGraph(fname+".pop");
 				
 				break;
 				
@@ -710,7 +713,7 @@ public class MapCreator extends Frame{
 					m.addElementsFromString(s[1]);
 				}
 			}
-			setMap(m,1);
+			setMap(m);
 		}
 		
 	}
@@ -718,11 +721,11 @@ public class MapCreator extends Frame{
 	
 		
 	
-	public void setMap(Map map, int precision) {
+	public void setMap(Map map) {
 
 		this.map = map;
 		
-		gbp.createGridPanel(map.getYmax()+precision, map.getXmax()+precision);
+		gbp.createGridPanel(map.getYmax(), map.getXmax());
 		List<IMapElement> elements = map.getElements();
 		
 		for(IMapElement e : elements)
@@ -737,6 +740,25 @@ public class MapCreator extends Frame{
 		gbp.setBrushSize(Integer.parseInt((String)spinBrush.getValue()));
 		gbp.setBrushColor(Color.BLACK);
 	}
+	
+	
+	public void storePopGraph(String fname)
+	{
+		map = gbp.getMap();
+		
+		try
+		{
+			FileOutputStream fsout = new FileOutputStream( new File(fname) );
+			ObjectOutputStream oout = new ObjectOutputStream(fsout);
+			
+			Graph graph = map.getPOPGraph();
+			
+			oout.writeObject(graph);
+			oout.close();				
+		} catch (Exception e) {
+			System.out.println("QActor  ERROR " + e.getMessage());
+ 		}
+	}
 
 	public void storeMap(String fname) {
 		
@@ -748,7 +770,7 @@ public class MapCreator extends Frame{
 			{
 				FileOutputStream fsout = new FileOutputStream( new File(fname) );
 				fsout.write(map.toString().getBytes());
-				fsout.close();
+				fsout.close();				
 			} catch (Exception e) {
 				System.out.println("QActor  ERROR " + e.getMessage());
 	 		}
