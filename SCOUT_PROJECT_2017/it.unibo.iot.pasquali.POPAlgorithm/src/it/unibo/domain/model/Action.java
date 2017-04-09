@@ -13,6 +13,8 @@ public class Action implements Serializable, Comparable<Action>{
 	protected double heuristic;
 	protected double cost;
 	
+	
+	
 	public Action(String name)
 	{
 		this.name = name;

@@ -107,14 +107,14 @@ public class Plan {
 	public void addSenseEvent(int timeout, String ee, String pp)
 	{
 		
-		String e = "[";
-		String p = "[";
-		e+=ee;
-		p+=pp;
-		e+="]";
-		p+="]";
+		//String e = "[";
+		//String p = "[";
+		//e+=ee;
+		//p+=pp;
+		//e+="]";
+		//p+="]";
 		
-		plan += "plan("+moveCounter+","+planName+", sentence(true,move(senseEvent,"+timeout+","+e+","+p+"),'', '' ))\n";
+		plan += "plan("+moveCounter+","+planName+", sentence(true,move(senseEvent,"+timeout+",\""+ee+"\",\""+pp+"\"),'', '' ))\n";
 		moveCounter++;
 	}
 	

@@ -1,7 +1,6 @@
 package it.unibo.domain.model;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 
 public class Move extends Action implements Serializable{
 	

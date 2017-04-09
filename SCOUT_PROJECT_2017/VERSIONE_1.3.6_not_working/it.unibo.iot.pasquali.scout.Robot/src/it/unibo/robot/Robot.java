@@ -154,7 +154,7 @@ public class Robot extends AbstractRobot {
 		{
 			Map m = loadMap(filename);
 			this.engine = new FileEngine(sx, sy, m, this, false);
-			//((FileEngine)engine).setObject(new State(2,2));
+			((FileEngine)engine).setObject(new State(2,2));
 			((QActorPlanUtilsDebug)planUtils).setEngine(((FileEngine)engine));
 		}		
 		
@@ -277,11 +277,13 @@ public class Robot extends AbstractRobot {
 			{
 			case "t":
 				pathPlan.addSenseEvent(1000, "obstaclefront", "waitAndEvaluate");
+				//pathPlan.addForwardMove(speed, time, "[obstaclefront]", "[waitAndEvaluate]");
 				pathPlan.addForwardMove(speed, time);
 				break;
 				
 			case "d":
 				pathPlan.addSenseEvent(1000, "obstaclefront", "waitAndEvaluate");
+				//pathPlan.addForwardMove(speed, diagoTime, "[obstaclefront]", "[waitAndEvaluate]");
 				pathPlan.addForwardMove(speed, diagoTime);
 				break;
 				
@@ -306,7 +308,7 @@ public class Robot extends AbstractRobot {
 		}
 		
 		pathPlan.addPrint("fine Navigazione");
-		pathPlan.addSwitchPlan("notifyEndOfNavigation");
+		//pathPlan.addSwitchPlan("notifyEndOfNavigation");
 		
 		PlanSaver planSaver = new PlanSaver(planName, PlanExtension.PLAIN_TEXT);
 		planSaver.addPlan(pathPlan);
@@ -349,12 +351,17 @@ public class Robot extends AbstractRobot {
 	}
 	
 	
-	@Override
-	public AsynchActionResult execute(String command, int speed, int angle, int moveTime, 
+	public boolean myExecute(String command, int speed, int angle, int moveTime, 
 			String  events, String plans) throws Exception
 	{		
+		/*
+		 * Modifica dell world theory per avere move reattive, ora ritorna boolean
+		 */
+		
 		updateMyPosition(command);
-		return super.execute(command, speed, angle, moveTime, events, plans);		
+		//return super.execute(command, speed, angle, moveTime, events, plans);	
+		
+		return super.execRobotMove(curPlanInExec, command, speed, angle, moveTime, events, plans);
 	}
 	
 	
@@ -487,6 +494,11 @@ public class Robot extends AbstractRobot {
 	 * @return			The first Event that is detected or null
 	 */
 	public IEventItem senseEvent(int timeout, String event, String plan){
+		
+		/*
+		 * Nell def della world theory ha tolto la move nelal sintassi
+		 * dirgli di fare una uniformazione
+		 */
 		
 		event = event.replace('[', ' ');
 		event = event.replace(']', ' ');

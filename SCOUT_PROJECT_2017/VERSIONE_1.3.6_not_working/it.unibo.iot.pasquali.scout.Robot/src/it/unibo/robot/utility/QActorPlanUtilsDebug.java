@@ -99,7 +99,7 @@ public class QActorPlanUtilsDebug extends QActorPlanUtils{
 			IEventItem ev = new EventItem(events, events, new LocalTime(tout-1), "sensor");
 						
 			super.actor.setCurrentEvent(ev);
-			aar = new AsynchActionResult(null, tout-1, true, true, "", ev);			
+			aar = new AsynchActionResult(null, tout-1, false, true, "", ev);			
 			return aar;
 		}
 		
