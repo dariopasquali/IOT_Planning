@@ -1,19 +1,24 @@
 package it.unibo.planning;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 import it.unibo.domain.model.Action;
 import it.unibo.domain.model.Fact;
+import it.unibo.domain.model.conditional.ConditionalAction;
 
-public class ChoicePoint {
+public class ChoicePoint implements Serializable{
 
 	// Sempre associato alle move, quando faccio check non ho alcuna scelta
+	// quando faccio check apro un branch che risolvo poi al prossimo loop
 	
 	private Fact root;	
-	private List<Action> stepSuccessors;
-	private List<Action> newSuccessor;
+	private List<ConditionalAction> stepSuccessors;
+	private List<ConditionalAction> newSuccessor;
+	
+	private ConditionalAction lastChoice = null;
 	
 	private Plan state;
 	
@@ -32,22 +37,20 @@ public class ChoicePoint {
 		onStep = true;
 	}
 	
-	public Action getNext(){
-		
-		Action a = null;
+	public ConditionalAction getNext(){
 		
 		if(onStep){
 			
-			a = getFromStep();
+			lastChoice = getFromStep();
 			
-			if(a != null)
-				return a;			
+			if(lastChoice != null)
+				return lastChoice;			
 		}
 		
-		return getFromAction();
+		return lastChoice = getFromAction();
 	}
 	
-	private Action getFromStep(){
+	private ConditionalAction getFromStep(){
 		
 		if(stepSuccessors.isEmpty())
 		{
@@ -58,8 +61,7 @@ public class ChoicePoint {
 		return stepSuccessors.remove(0);
 		
 	}
-	
-	private Action getFromAction(){
+	private ConditionalAction getFromAction(){
 		
 		if(newSuccessor.isEmpty())
 		{
@@ -69,11 +71,11 @@ public class ChoicePoint {
 		return newSuccessor.remove(0);
 	}
 
-	public void addStep(Action a) {
+	public void addStep(ConditionalAction a) {
 		stepSuccessors.add(a);
 	}
 
-	public void addAction(Action a) {
+	public void addAction(ConditionalAction a) {
 		newSuccessor.add(a);
 	}
 	
@@ -107,9 +109,20 @@ public class ChoicePoint {
 	}
 
 	
-	
-	private Fact getRoot() {
-		return root;
+	@Override
+	public String toString()
+	{
+		return root.toString();
 	}
+
+	public void setState(Plan state) {
+		this.state = state;		
+	}
+
+	public ConditionalAction getLastChoice() {
+		return lastChoice;
+	}
+	
+	
 	
 }

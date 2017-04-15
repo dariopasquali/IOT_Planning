@@ -119,6 +119,10 @@ public class AStarSearchAgent {
 			{
 				path.setMoves(recostructPath(start, current));
 				path.setPoints(fromStateToPoint(recostructStatePath(current)));
+				
+				openSet.clear();
+				closedSet.clear();
+				
 				return path;
 			}
 			
@@ -226,7 +230,12 @@ public class AStarSearchAgent {
 		
 		
 		ArrayList<PositionMove> dirs = new ArrayList<PositionMove>();
-		dirs.add(current.getPositionGenMove());
+		
+		PositionMove m = current.getPositionGenMove();
+		if(m == null)
+			return new ArrayList<Move>();
+		
+		dirs.add(m);
 		
 		while(cameFrom.containsKey(current))
 		{
@@ -257,7 +266,11 @@ public class AStarSearchAgent {
 		
 		
 		ArrayList<PositionMove> dirs = new ArrayList<PositionMove>();
-		dirs.add(current.getPositionGenMove());
+		PositionMove m = current.getPositionGenMove();
+		if(m == null)
+			return new ArrayList<Move>();
+		
+		dirs.add(m);
 		
 		while(cameFrom.containsKey(current))
 		{

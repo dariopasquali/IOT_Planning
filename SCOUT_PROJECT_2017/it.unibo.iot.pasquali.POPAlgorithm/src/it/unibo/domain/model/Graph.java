@@ -4,8 +4,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import alice.tuprolog.Term;
-
 public class Graph implements Serializable{
 	
 	private List<State> states;

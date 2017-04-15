@@ -1,10 +1,12 @@
 package it.unibo.domain.model.conditional;
 
+import java.io.Serializable;
+
 import it.unibo.domain.graph.State;
 import it.unibo.domain.model.Fact;
 import it.unibo.enums.ActionType;
 
-public class Move extends ConditionalAction{
+public class Move extends ConditionalAction implements Serializable{
 
 	/*
 	 * move(From, To, PRElist, EFFlist, heuristic).
@@ -36,16 +38,20 @@ public class Move extends ConditionalAction{
 		
 		this.type = ActionType.MOVE;
 		
-		Fact f = new Fact("at", this);
-		
-		f.addParam(from.toString());
-		this.addPre(f);
-		
-		f = new Fact("connected", this);
+		Fact f = new Fact("clear", this);
 		f.addParam(from.toString());
 		f.addParam(to.toString());
+		this.addPre(f);		
+		
+		f = new Fact("at", this);		
+		f.addParam(from.toString());
 		this.addPre(f);
 		
+//		f = new Fact("connected", this);
+//		f.addParam(from.toString());
+//		f.addParam(to.toString());
+//		this.addPre(f);
+				
 		f = new Fact("at", this);
 		f.addParam(to.toString());
 		this.addEffect(f);

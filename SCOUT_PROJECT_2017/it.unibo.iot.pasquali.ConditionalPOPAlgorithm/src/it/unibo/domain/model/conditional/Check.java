@@ -1,10 +1,15 @@
 package it.unibo.domain.model.conditional;
 
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+
 import it.unibo.domain.graph.State;
 import it.unibo.domain.model.Fact;
 import it.unibo.enums.ActionType;
+import it.unibo.utils.LabelNameGenerator;
 
-public class Check extends ConditionalAction{
+public class Check extends ConditionalAction implements Serializable{
 
 	/*
 	 * check(From, To, PRElist, MutualEFFlist, 0).
@@ -14,8 +19,10 @@ public class Check extends ConditionalAction{
 	
 	private State from, to;
 	
+	private List<ConditionalLabel> labels;
+	
 	public Check(State from, State to) {
-		super("move");
+		super("check");
 		this.from = from;
 		this.to = to;
 		
@@ -23,6 +30,9 @@ public class Check extends ConditionalAction{
 	}
 	
 	private void init(){
+		
+		labels = new ArrayList<>();
+		String label = LabelNameGenerator.getUniqueLabel();
 		
 		this.type = ActionType.CHECK;
 		
@@ -34,19 +44,79 @@ public class Check extends ConditionalAction{
 		f = new Fact("clear", this);
 		f.addParam(from.toString());
 		f.addParam(to.toString());
-		this.addEffect(f);
+		this.addEffect(f);		
+		labels.add(new ConditionalLabel(f.toString()+"-"+label, 1, f, null));
+		
 		
 		f = new Fact("not clear", this);
 		f.addParam(from.toString());
 		f.addParam(to.toString());
 		this.addEffect(f);
+		labels.add(new ConditionalLabel(f.toString()+"-"+label, 2, f, null));
 		
 	}
 	
+	public List<ConditionalLabel> getLabels(){
+		return labels;
+	}
+	
+	
+	public State getFrom() {
+		return from;
+	}
+
+	public void setFrom(State from) {
+		this.from = from;
+	}
+
+	public State getTo() {
+		return to;
+	}
+
+	public void setTo(State to) {
+		this.to = to;
+	}
+
+	
 	@Override
-	public void addEffect(Fact f)
+	public boolean equals(Object o)
 	{
+		if(!(o instanceof Check))
+			return false;
 		
+		Check m = (Check)o;
+		
+		return m.toString().equalsIgnoreCase(this.toString());		
+	}
+	
+	@Override
+	public String toString()
+	{
+		String ret = "check(";
+		
+		ret += from+","+to+",[";
+		
+		for(int i=0; i<pre.size(); i++)
+		{
+			ret+=pre.get(i).toString();
+			if(i != (pre.size()-1))
+				ret+=",";
+		}
+		
+		ret += "],[";
+		
+		for(int i=0; i<eff.size(); i++)
+		{
+			ret+=eff.get(i).toString();
+			if(i != (eff.size()-1))
+				ret+=";";
+		}
+		
+		ret += "],";
+		ret += (heuristic+cost);
+		ret += ").";
+		
+		return ret;
 	}
 	
 	

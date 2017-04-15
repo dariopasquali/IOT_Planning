@@ -1,9 +1,11 @@
 package it.unibo.domain.model.conditional;
 
+import java.io.Serializable;
+
 import it.unibo.domain.model.Fact;
 import it.unibo.planning.ChoicePoint;
 
-public class ConditionalLabel {
+public class ConditionalLabel implements Serializable{
 	
 	private String rootName;
 	
@@ -24,6 +26,9 @@ public class ConditionalLabel {
 	
 
 	public String getRootName() {
+		if(rootName.contains("not "))
+			return rootName.replace("not ", "");
+		
 		return rootName;
 	}
 
@@ -63,5 +68,32 @@ public class ConditionalLabel {
 		this.choice = choice;
 	}
 	
+	@Override
+	public String toString()
+	{
+		return rootName+"-"+ID;
+	}
+
+
+	@Override
+	public boolean equals(Object o){
+		if(!(o instanceof ConditionalLabel))
+			return false;
+		
+		ConditionalLabel l = (ConditionalLabel)o;
+		
+		return l.getRootName().equals(rootName) && l.getID() == ID;				
+	}
+
+	public boolean sameRootDifferentID(ConditionalLabel g) {
+		//TODO
+		String rg = g.getRootName();
+		
+		if(rg.equals(rootName))
+			if(g.getID() != ID)
+				return true;
+		
+		return false;	
+	}
 	
 }

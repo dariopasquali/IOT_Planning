@@ -35,8 +35,8 @@ import javax.swing.event.ChangeListener;
 
 import it.unibo.domain.Map;
 import it.unibo.domain.MapElement;
+import it.unibo.domain.graph.Graph;
 import it.unibo.domain.interfaces.IMapElement;
-import it.unibo.domain.model.Graph;
 import it.unibo.gui.MapViewerPanel.CellState;
 
 import java.awt.Color;

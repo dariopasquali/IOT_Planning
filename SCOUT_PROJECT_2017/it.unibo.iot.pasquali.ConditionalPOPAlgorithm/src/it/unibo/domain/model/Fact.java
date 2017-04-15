@@ -26,7 +26,7 @@ public class Fact implements Serializable{
 	public void addParam(String param){
 		if(!params.contains(param))
 		{
-			if(!p.contentEquals(""))
+			if(!p.equals(""))
 				p+=",";
 			
 			params.add(param);
@@ -67,5 +67,16 @@ public class Fact implements Serializable{
 			return false;
 		else
 			return ((Fact) o).toString().equals(this.toString());
+	}
+	
+	public boolean getTruthValue(){
+		return !name.contains("not ");
+	}
+	
+	public String getKenrel(){
+		if(!getTruthValue())
+			return name.replace("not ", "")+ "("+ p +")";
+		
+		return toString();
 	}
 }

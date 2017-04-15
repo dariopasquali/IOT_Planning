@@ -6,6 +6,7 @@ import java.util.List;
 
 import it.unibo.domain.model.Fact;
 import it.unibo.domain.model.conditional.Check;
+import it.unibo.domain.model.conditional.ConditionalAction;
 import it.unibo.domain.model.conditional.Move;
 
 public class Graph implements Serializable{
@@ -14,16 +15,19 @@ public class Graph implements Serializable{
 	
 	private List<Fact> connections;
 	
-	private List<Move> moves;
+	//private List<Move> moves;	
+	//private List<Check> checks;
 	
-	private List<Check> checks;
+	private List<ConditionalAction> actions;
 	
 	public Graph()
 	{
 		this.states = new ArrayList<>();
 		this.connections = new ArrayList<>();
-		this.moves = new ArrayList<>();
-		this.checks = new ArrayList<Check>();
+//		this.moves = new ArrayList<>();
+//		this.checks = new ArrayList<Check>();
+		
+		this.actions = new ArrayList<ConditionalAction>();
 	}
 	
 	public void addState(State s){
@@ -42,13 +46,13 @@ public class Graph implements Serializable{
 	}
 	
 	public void addMove(Move m){
-		if(!moves.contains(m))
-			moves.add(m);
+//		if(!actions.contains(m))
+			actions.add(m);
 	}
 	
 	public void addCheck(Check c){
-		if(!checks.contains(c))
-			checks.add(c);
+//		if(!actions.contains(c))
+			actions.add(c);
 	}
 	
 	@Override
@@ -64,10 +68,10 @@ public class Graph implements Serializable{
 		for(Fact s : connections)
 			ret += s.toString() +".\n";
 		
-		for(Move m : moves)
-			ret += m.toString() + "\n";
-		
-		for(Check c : checks)
+//		for(Move m : moves)
+//			ret += m.toString() + "\n";
+
+		for(ConditionalAction c : actions)
 			ret += c.toString() + "\n";
 		
 		return ret;
@@ -77,16 +81,16 @@ public class Graph implements Serializable{
 		return connections;
 	}
 
-	public List<Move> getMoves() {
-		return moves;
+	public List<ConditionalAction> getActions() {
+		return actions;
 	}
 	
 	public List<State> getStates(){
 		return states;
 	}
 	
-	public List<Check> getChecks(){
-		return checks;
-	}
+//	public List<Check> getChecks(){
+//		return checks;
+//	}
 
 }

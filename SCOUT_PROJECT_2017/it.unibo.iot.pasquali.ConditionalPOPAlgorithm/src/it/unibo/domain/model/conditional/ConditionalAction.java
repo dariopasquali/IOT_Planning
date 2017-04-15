@@ -1,12 +1,13 @@
 package it.unibo.domain.model.conditional;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 import it.unibo.domain.model.Action;
 import it.unibo.enums.ActionType;
 
-public class ConditionalAction extends Action{
+public class ConditionalAction extends Action implements Serializable{
 
 	protected List<Goal> reason;
 	protected List<ConditionalLabel> context;
@@ -18,6 +19,7 @@ public class ConditionalAction extends Action{
 	{
 		super(name);
 		reason = new ArrayList<Goal>();
+		context = new ArrayList<ConditionalLabel>();
 	}
 	
 	public ConditionalAction(String name, double heuristic)
@@ -50,6 +52,24 @@ public class ConditionalAction extends Action{
 
 	public void setType(ActionType type) {
 		this.type = type;
+	}
+
+	public void mergeReason(List<Goal> toMerge) {
+		
+		for(Goal g : toMerge)
+		{
+			if(!reason.contains(g))
+				reason.add(g);
+		}
+		
+	}
+
+	public void addConditionalLabels(List<ConditionalLabel> globalContext) {
+		
+		for(ConditionalLabel l : globalContext)
+			if(!context.contains(l))
+				context.add(l);
+		
 	}
 	
 	

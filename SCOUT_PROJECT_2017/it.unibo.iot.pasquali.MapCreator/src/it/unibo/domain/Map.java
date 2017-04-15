@@ -3,6 +3,9 @@ package it.unibo.domain;
 import java.util.ArrayList;
 import java.util.List;
 
+import it.unibo.domain.graph.Graph;
+import it.unibo.domain.graph.State;
+
 //import org.opencv.core.CvType;
 //import org.opencv.core.Mat;
 //import org.opencv.core.MatOfByte;
@@ -10,9 +13,8 @@ import java.util.List;
 
 import it.unibo.domain.interfaces.IMapElement;
 import it.unibo.domain.model.Fact;
-import it.unibo.domain.model.Graph;
-import it.unibo.domain.model.Move;
-import it.unibo.domain.model.State;
+import it.unibo.domain.model.conditional.Check;
+import it.unibo.domain.model.conditional.Move;
 
 
 
@@ -236,45 +238,15 @@ public class Map {
 					g.addConnection(a.toString(), b.toString());
 					g.addConnection(b.toString(), a.toString());
 					
-					Move m = new Move(a, b);					
-					Fact f = new Fact("at", m);
-					f.addParam(a.toString());
-					m.addPre(f);
-					
-					f = new Fact("connected", m);
-					f.addParam(a.toString());
-					f.addParam(b.toString());
-					m.addPre(f);
-					
-					f = new Fact("at", m);
-					f.addParam(b.toString());
-					m.addEffect(f);
-					
-					f = new Fact("not at", m);
-					f.addParam(a.toString());
-					m.addEffect(f);					
-					g.addMove(m);
-					
-			//--------------------------------------------------------------
-					
+					Move m = new Move(a, b);										
+					g.addMove(m);				
 					m = new Move(b, a);					
-					f = new Fact("at", m);
-					f.addParam(b.toString());
-					m.addPre(f);
-					
-					f = new Fact("connected", m);
-					f.addParam(b.toString());
-					f.addParam(a.toString());
-					m.addPre(f);
-					
-					f = new Fact("at", m);
-					f.addParam(a.toString());
-					m.addEffect(f);
-					
-					f = new Fact("not at", m);
-					f.addParam(b.toString());
-					m.addEffect(f);					
 					g.addMove(m);
+					
+					Check ch = new Check(a, b);										
+					g.addCheck(ch);				
+					ch = new Check(b, a);					
+					g.addCheck(ch);
 					
 /*					
 					graph += "connected(p("+c+","+i+"),p("+c+","+(i+1)+")).\n";
@@ -307,45 +279,15 @@ public class Map {
 					g.addConnection(a.toString(), b.toString());
 					g.addConnection(b.toString(), a.toString());
 					
-					Move m = new Move(a, b);					
-					Fact f = new Fact("at", m);
-					f.addParam(a.toString());
-					m.addPre(f);
-					
-					f = new Fact("connected", m);
-					f.addParam(a.toString());
-					f.addParam(b.toString());
-					m.addPre(f);
-					
-					f = new Fact("at", m);
-					f.addParam(b.toString());
-					m.addEffect(f);
-					
-					f = new Fact("not at", m);
-					f.addParam(a.toString());
-					m.addEffect(f);					
-					g.addMove(m);
-					
-			//--------------------------------------------------------------
-					
+					Move m = new Move(a, b);										
+					g.addMove(m);				
 					m = new Move(b, a);					
-					f = new Fact("at", m);
-					f.addParam(b.toString());
-					m.addPre(f);
-					
-					f = new Fact("connected", m);
-					f.addParam(b.toString());
-					f.addParam(a.toString());
-					m.addPre(f);
-					
-					f = new Fact("at", m);
-					f.addParam(a.toString());
-					m.addEffect(f);
-					
-					f = new Fact("not at", m);
-					f.addParam(b.toString());
-					m.addEffect(f);					
 					g.addMove(m);
+					
+					Check ch = new Check(a, b);										
+					g.addCheck(ch);				
+					ch = new Check(b, a);					
+					g.addCheck(ch);
 					
 /*					
 					graph += "connected(p("+j+","+r+"),p("+(j+1)+","+r+")).\n";
