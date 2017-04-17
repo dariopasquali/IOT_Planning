@@ -82,14 +82,14 @@ public class ConditionalLabel implements Serializable{
 		
 		ConditionalLabel l = (ConditionalLabel)o;
 		
-		return l.getRootName().equals(rootName) && l.getID() == ID;				
+		return l.getRootName().equals(getRootName()) && l.getID() == ID;				
 	}
 
 	public boolean sameRootDifferentID(ConditionalLabel g) {
 		//TODO
 		String rg = g.getRootName();
 		
-		if(rg.equals(rootName))
+		if(rg.equals(getRootName()))
 			if(g.getID() != ID)
 				return true;
 		

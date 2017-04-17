@@ -123,5 +123,20 @@ public class Move extends ConditionalAction implements Serializable{
 		
 		return m.getFrom().equals(to) && m.getTo().equals(from);
 	}
+
+	@Override
+	public ConditionalAction copy() {
+		Move cm = new Move(from, to, heuristic);
+		cm.setContext(this.getContext());
+		cm.setReason(this.getReason());
+		return cm;
+	}
+	
+	@Override
+	public String getShortName(){
+		
+		return "move( "+from+" , "+to+" )";
+		
+	}
 	
 }

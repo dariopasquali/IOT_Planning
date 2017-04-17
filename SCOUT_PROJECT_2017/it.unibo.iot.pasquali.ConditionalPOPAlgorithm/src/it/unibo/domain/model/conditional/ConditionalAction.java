@@ -26,6 +26,7 @@ public class ConditionalAction extends Action implements Serializable{
 	{
 		super(name, heuristic);
 		context = new ArrayList<ConditionalLabel>();
+		reason = new ArrayList<Goal>();
 	}
 
 	public List<Goal> getReason() {
@@ -36,6 +37,14 @@ public class ConditionalAction extends Action implements Serializable{
 		return context;
 	}
 	
+	protected void setContext(List<ConditionalLabel> context){
+		this.context = new ArrayList<ConditionalLabel>(context);
+	}
+	
+	protected void setReason(List<Goal> reason){
+		this.reason = new ArrayList<Goal>(reason);
+	}
+	
 	public void addReason(Goal r)
 	{
 		reason.add(r);
@@ -43,7 +52,8 @@ public class ConditionalAction extends Action implements Serializable{
 	
 	public void addConditionalLabel(ConditionalLabel l)
 	{
-		context.add(l);
+		if(!context.contains(l))
+			context.add(l);
 	}
 
 	public ActionType getType() {
@@ -72,5 +82,23 @@ public class ConditionalAction extends Action implements Serializable{
 		
 	}
 	
+	public void addReasons(List<Goal> goals) {
+		
+		for(Goal l : goals)
+			if(!reason.contains(l))
+				reason.add(l);
+		
+	}
+	
+	public ConditionalAction copy(){
+		ConditionalAction a = new ConditionalAction(name);
+		a.setContext(context);
+		a.setReason(reason);
+		return a;
+	}
+	
+	public String getShortName(){
+		return name;
+	}
 	
 }

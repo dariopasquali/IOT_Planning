@@ -41,13 +41,13 @@ public class Planner {
 	
 	private Plan plan = null;
 	
-	private double stepCost;
-	
 	private HeuristicEvaluator heuristic = null;
 	
 	private int currentGoalNumber;
 	
 	private List<ConditionalLabel> globalContext = null;
+	
+	private Check currentBranchGenerativeCheck = null;
 	
 	public Planner(State start, State goal, Graph graph, HeuristicEvaluator heuristic) {
 		super();
@@ -57,8 +57,6 @@ public class Planner {
 		this.heuristic = heuristic;
 		
 		this.heuristicMap = new HashMap<String, Double>();
-		
-		this.stepCost = 1;
 		
 		this.lastStep = new Move(new State(-1,-1), new State(-1,-1));
 		
@@ -121,7 +119,7 @@ public class Planner {
 		
 	}
 
-	public Plan findPlan(){
+	public Plan findPlan() throws Exception{
 		
 		plan = new Plan();
 		
@@ -129,6 +127,8 @@ public class Planner {
 		
 		while(plan.hasGoalToSolve())
 		{
+			System.out.println("new goal");
+			
 			Goal goal = plan.selectGoalToSolve();			
 			globalContext = goal.getGlobalContext();			
 			plan.addStep(goal.getAction());
@@ -139,14 +139,17 @@ public class Planner {
 			
 			while(plan.hasPreconditionToSolve())
 			{
+				System.out.println("new subgoal");
+				
 				Fact subgoal = plan.selectPreconditionToSolve();
 				
 				if(branchChoicePoint != null && subgoal.equals(branchChoicePoint.getSubGoal()))
 				{
 					branchChoicePoint.setState(new Plan(plan));
-					branchChoicePoint.getSubGoal().setStep(goal.getAction());
+					branchChoicePoint.getSubGoal().setStep(lastStep);
 					currentPoint = branchChoicePoint;
 					branchChoicePoint = null;
+					currentBranchGenerativeCheck = goal.getGenerativeCheck();
 				}
 				
 				ChoicePoint choice = null;
@@ -176,13 +179,13 @@ public class Planner {
 								if(!((Move)a).isOppositeTo((Move)lastStep))
 								{
 									a.setCost(0);
-									choice.addAction(a);
+									choice.addAction(a.copy());
 								}
 							}
 							else
 							{
 								a.setCost(0);
-								choice.addAction(a);
+								choice.addAction(a.copy());
 							}
 						}
 					}				
@@ -211,6 +214,13 @@ public class Planner {
 				plan.addCausalLink(new CausalLink(step, (ConditionalAction) subgoal.getStep(), subgoal));
 				plan.addOrderConstraint(new Order(step, (ConditionalAction) subgoal.getStep()));
 				
+				if(currentBranchGenerativeCheck != null)
+				{
+					plan.addOrderConstraint(new Order(currentBranchGenerativeCheck, step));
+					plan.addConditioningLink(new ConditioningLink(currentBranchGenerativeCheck, step, currentBranchGenerativeCheck.getLabels().get(1)));
+					currentBranchGenerativeCheck = null;
+				}
+				
 				if(choice.fromStep()) //addLink
 				{			
 					// update reason di tutti i gli ascendenti dello step aggiunto
@@ -219,7 +229,7 @@ public class Planner {
 				else //addStep
 				{
 					step.addConditionalLabels(globalContext);
-					plan.addStep(step);
+					
 					
 					if(step.getType().equals(ActionType.CHECK))
 					{
@@ -233,15 +243,21 @@ public class Planner {
 							// se arrivo a un goal, aggiorna la reason dello step aggiunto con il goal
 							List<Goal> reason = new ArrayList<Goal>();
 							reason.add(g);
-							plan.updateReason(step,reason);
+							//plan.updateReason(step,reason);
+							step.mergeReason(reason);
 						}
 						
 						//create branch
 						List<ConditionalLabel> context = new ArrayList<ConditionalLabel>(globalContext);
 						context.add(((Check)step).getLabels().get(1));	
 						
+						plan.addConditioningLink(
+								new ConditioningLink(step,
+										(ConditionalAction) subgoal.getStep(),
+										((Check) step).getLabels().get(0)));
+						
 						ChoicePoint alternative = findOpenChoiceFor((Check)step);						
-						Goal branch = createNewGoal(context, alternative);
+						Goal branch = createNewGoal(context, alternative, (Check)step);
 						plan.addGoal(branch);
 					}
 					else
@@ -253,13 +269,16 @@ public class Planner {
 							// se arrivo a un goal, aggiorna la reason dello step aggiunto con il goal
 							List<Goal> reason = new ArrayList<Goal>();
 							reason.add(g);
-							plan.updateReason(step,reason);
+							//plan.updateReason(step,reason);
+							step.mergeReason(reason);
 						}
 					}
 					
+					plan.addStep(step);
+					
 				}
 				
-				if(step instanceof Move)
+				if(step instanceof Move || step.getName().contains("stop"))
 					lastStep = (ConditionalAction)step;
 				
 				solveThreats();
@@ -337,8 +356,8 @@ public class Planner {
 		}		
 	}
 	
-	private Fact checkThreat(ConditionalAction step, CausalLink link)
-	{
+	private Fact checkThreat(ConditionalAction step, CausalLink link){
+		
 		if(checkContextCompatibility(step.getContext(), link.getTo().getContext()))
 		{
 			if(isPossiblyAfter(step, link.getFrom()) && isPossiblyBefore(step, link.getTo()))
@@ -546,13 +565,31 @@ public class Planner {
 			
 			plan.addStep(fail);
 			plan.addCausalLink(new CausalLink(fail, g.getAction(), subgoal));
-			plan.addOrderConstraint(new Order(fail, g.getAction()));			
+			plan.addOrderConstraint(new Order(fail, g.getAction()));
+			
+			if(g.getGenerativeCheck() != null)
+			{
+				plan.addOrderConstraint(new Order(g.getGenerativeCheck(), fail));
+				plan.addConditioningLink(new ConditioningLink(g.getGenerativeCheck(), fail, g.getGenerativeCheck().getLabels().get(1)));
+			}
+			
 			return;
 		}
 		
-		this.stepCost = currentPoint.getStepCost();
-		plan = currentPoint.getState();
-		plan.restoreSubgoal(currentPoint.getSubGoal());
+		clearSameLevelOpenChoice(currentPoint);
+		
+		plan = new Plan(currentPoint.getState());
+		plan.restoreSubgoal(currentPoint.getSubGoal());		
+	}
+
+	private void clearSameLevelOpenChoice(ChoicePoint choice) {
+
+
+		for(int i=0; i<openChoice.size(); i++)
+		{
+			if(openChoice.get(i).getSubGoal().getStep().equals(choice.getLastChoice()))
+				openChoice.remove(i);
+		}
 		
 	}
 
@@ -607,7 +644,7 @@ public class Planner {
 		currentGoalNumber++;
 	}
 	
-	private Goal createNewGoal(List<ConditionalLabel> context, ChoicePoint alternative){
+	private Goal createNewGoal(List<ConditionalLabel> context, ChoicePoint alternative, Check generativeCheck){
 		
 		ConditionalAction stopStep = new ConditionalAction("stop"+currentGoalNumber);
 		currentGoalNumber++;
@@ -618,7 +655,7 @@ public class Planner {
 		stopStep.addPre(goalPos);
 		stopStep.addConditionalLabels(context);
 		
-		return new Goal(stopStep, context, alternative);		
+		return new Goal(stopStep, context, alternative, generativeCheck);		
 	}
 
 }

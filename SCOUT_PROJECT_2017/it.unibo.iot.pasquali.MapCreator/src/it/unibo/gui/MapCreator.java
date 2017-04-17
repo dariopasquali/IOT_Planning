@@ -698,7 +698,7 @@ public class MapCreator extends Frame{
 				
 			} catch (Exception e)
 			{
-				System.out.println("QActor  ERROR " + e.getMessage());
+				e.printStackTrace();
 			}
 			
 			for(int i=0; i<data.size(); i++)
@@ -756,7 +756,7 @@ public class MapCreator extends Frame{
 			oout.writeObject(graph);
 			oout.close();				
 		} catch (Exception e) {
-			System.out.println("QActor  ERROR " + e.getMessage());
+			e.printStackTrace();
  		}
 	}
 
@@ -772,7 +772,7 @@ public class MapCreator extends Frame{
 				fsout.write(map.toString().getBytes());
 				fsout.close();				
 			} catch (Exception e) {
-				System.out.println("QActor  ERROR " + e.getMessage());
+				e.printStackTrace();
 	 		}
 		}
 		else if(haveImage)
@@ -783,7 +783,7 @@ public class MapCreator extends Frame{
 				fsout.write(imageMap.toString().getBytes());
 				fsout.close();
 			} catch (Exception e) {
-				System.out.println("QActor  ERROR " + e.getMessage());
+				e.printStackTrace();
 	 		}
 		}		
 	}

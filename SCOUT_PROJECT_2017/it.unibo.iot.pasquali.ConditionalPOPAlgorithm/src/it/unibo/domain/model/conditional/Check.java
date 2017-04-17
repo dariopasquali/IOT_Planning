@@ -26,12 +26,21 @@ public class Check extends ConditionalAction implements Serializable{
 		this.from = from;
 		this.to = to;
 		
-		init();		
+		init(false);		
 	}
 	
-	private void init(){
+	public Check(State from, State to, List<ConditionalLabel> labels) {
+		super("check");
+		this.from = from;
+		this.to = to;
+		this.labels = new ArrayList<ConditionalLabel>(labels);
 		
-		labels = new ArrayList<>();
+		init(true);		
+	}
+	
+	private void init(boolean clone){
+		
+		if(!clone) labels = new ArrayList<ConditionalLabel>();
 		String label = LabelNameGenerator.getUniqueLabel();
 		
 		this.type = ActionType.CHECK;
@@ -45,14 +54,14 @@ public class Check extends ConditionalAction implements Serializable{
 		f.addParam(from.toString());
 		f.addParam(to.toString());
 		this.addEffect(f);		
-		labels.add(new ConditionalLabel(f.toString()+"-"+label, 1, f, null));
+		if(!clone) labels.add(new ConditionalLabel(f.toString()+"-"+label, 1, f, null));
 		
 		
 		f = new Fact("not clear", this);
 		f.addParam(from.toString());
 		f.addParam(to.toString());
 		this.addEffect(f);
-		labels.add(new ConditionalLabel(f.toString()+"-"+label, 2, f, null));
+		if(!clone) labels.add(new ConditionalLabel(f.toString()+"-"+label, 2, f, null));
 		
 	}
 	
@@ -118,6 +127,19 @@ public class Check extends ConditionalAction implements Serializable{
 		
 		return ret;
 	}
+
+	@Override
+	public ConditionalAction copy() {
+		Check cm = new Check(from, to, labels);
+		cm.setContext(this.getContext());
+		cm.setReason(this.getReason());	
+		return cm;
+	}
 	
-	
+	@Override
+	public String getShortName(){
+		
+		return "check( "+from+" , "+to+" )";
+		
+	}
 }

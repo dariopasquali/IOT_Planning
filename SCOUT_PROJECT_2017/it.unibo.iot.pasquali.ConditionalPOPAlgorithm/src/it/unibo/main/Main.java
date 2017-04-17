@@ -5,7 +5,10 @@ import java.util.ArrayList;
 import it.unibo.domain.graph.Graph;
 import it.unibo.domain.graph.State;
 import it.unibo.domain.model.Action;
+import it.unibo.domain.model.conditional.ConditionalAction;
+import it.unibo.domain.model.conditional.ConditionalLabel;
 import it.unibo.model.interfaces.IMap;
+import it.unibo.planning.ConditionalPlanNode;
 import it.unibo.planning.ConditioningLink;
 import it.unibo.planning.Order;
 import it.unibo.planning.Plan;
@@ -24,18 +27,30 @@ public class Main{
 		
 		HeuristicEvaluator heuristic = new HeuristicEvaluator(map);
 		
-		Planner planner = new Planner(new State(1,1), new State(2,2), simple, heuristic);
+		Planner planner = new Planner(new State(1,1), new State(3,3), simple, heuristic);
 		
 		long starttime = System.currentTimeMillis();
 		
-		Plan plan = planner.findPlan();
+		Plan plan = null;
+		try {
+			plan = planner.findPlan();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 		System.out.println("SEARCH TIME -->>> "+(System.currentTimeMillis()-starttime)+"\n\n");
 		
 		String p = "STEPS------------\n";
 		
 		for(Action a : plan.getSteps())
-			p += a.toString() + "\n";
+		{
+			p += a.toString() + " ";
+			for(ConditionalLabel c : ((ConditionalAction) a).getContext())
+				p += c.toString()+" ; ";
+			
+			p+="\n";
+		}
 		
 		p += "\nORDER-------------\n";
 		
@@ -51,9 +66,9 @@ public class Main{
 		
 		
 		System.out.println("********** ORDERED ACTIONS *******");
-		ArrayList<Action> ordered = plan.numbering();
+		ArrayList<ConditionalPlanNode> conditionalPlan = plan.numbering();
 		
-		for(Action a : ordered)
+		for(ConditionalPlanNode a : conditionalPlan)
 		{
 			System.out.println(a.toString());
 		}
