@@ -4,7 +4,9 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.TreeSet;
 
+import it.unibo.domain.graph.State;
 import it.unibo.domain.model.Action;
 import it.unibo.domain.model.Fact;
 import it.unibo.domain.model.conditional.ConditionalAction;
@@ -25,6 +27,8 @@ public class ChoicePoint implements Serializable{
 	private boolean onStep;
 	
 	private double stepCost;
+	
+	private TreeSet<State> visited = new TreeSet<State>();
 	
 	public ChoicePoint(Fact root, Plan state, double stepCost) {
 		super();
@@ -121,6 +125,14 @@ public class ChoicePoint implements Serializable{
 
 	public ConditionalAction getLastChoice() {
 		return lastChoice;
+	}
+
+	public TreeSet<State> getVisited() {
+		return visited;
+	}
+
+	public void setVisited(TreeSet<State> visited) {
+		this.visited = visited;
 	}
 	
 	

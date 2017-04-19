@@ -25,7 +25,7 @@ public class Order implements Serializable{
 	
 	@Override
 	public String toString(){
-		return "order("+before+","+after+")";
+		return "order("+before.getShortName()+" , "+after.getShortName()+")";
 	}
 	
 	@Override

@@ -101,4 +101,14 @@ public class ConditionalAction extends Action implements Serializable{
 		return name;
 	}
 	
+	@Override
+	public boolean equals(Object o){
+		
+		if(!(o instanceof ConditionalAction))
+			return false;
+		
+		return super.equals(o) &&
+				((ConditionalAction)o).getContext().containsAll(context);
+		
+	}
 }

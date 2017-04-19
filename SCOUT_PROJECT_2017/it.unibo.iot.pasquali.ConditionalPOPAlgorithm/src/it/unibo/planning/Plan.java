@@ -9,9 +9,11 @@ import java.util.TreeSet;
 
 import it.unibo.domain.model.Action;
 import it.unibo.domain.model.Fact;
+import it.unibo.domain.model.conditional.Check;
 import it.unibo.domain.model.conditional.ConditionalAction;
 import it.unibo.domain.model.conditional.ConditionalLabel;
 import it.unibo.domain.model.conditional.Goal;
+import it.unibo.enums.ActionType;
 
 public class Plan implements Serializable{
 	
@@ -94,17 +96,17 @@ public class Plan implements Serializable{
 	}
 	
 	public void addCausalLink(CausalLink l){
-		if(!links.contains(l))
+		//if(!links.contains(l))
 			links.add(l);
 	}
 	
 	public void addOrderConstraint(Order o){
-		if(!orders.contains(o))
+		//if(!orders.contains(o))
 			orders.add(o);
 	}
 
 	public void addConditioningLink(ConditioningLink o){
-		if(!conditioningLinks.contains(o))
+		//if(!conditioningLinks.contains(o))
 			conditioningLinks.add(o);
 	}
 
@@ -205,15 +207,17 @@ public class Plan implements Serializable{
 					{
 						if(to.getAction().equals(branch.getAfter()))
 						{
-							if(branch.getCondition().getID() == 1)
+							if(branch.getCondition().getID() == 1) //true conditional label
 							{
 								//clear branch
-								node.setBranchClearID(to.getId());
+								if(node.getBranchClearID() == -1) 
+									node.setBranchClearID(to.getId());
 							}
-							else
+							else //not true conditional label
 							{
 								//not clear branch
-								node.setBranchNotClearID(to.getId());
+								if(node.getBranchNotClearID() == -1) 
+									node.setBranchNotClearID(to.getId());
 							}
 						}
 					}
@@ -221,6 +225,21 @@ public class Plan implements Serializable{
 			}
 		}
 		
+		int failID;
+		
+		conditionalPlan.add(new ConditionalPlanNode(new ConditionalAction("fail"), ID));
+		failID = ID;
+		ID ++;
+		conditionalPlan.add(new ConditionalPlanNode(new ConditionalAction("stop"), ID));
+		ID ++;
+		
+				
+		for(ConditionalPlanNode node : conditionalPlan)
+		{
+			if(node.getAction() instanceof Check)
+				if(node.getBranchNotClearID() == -1)
+					node.setBranchNotClearID(failID);
+		}
 		
 		return conditionalPlan;
 	}
@@ -264,27 +283,25 @@ public class Plan implements Serializable{
 	public Goal updateContextDescending(ConditionalAction step, ConditionalLabel context) {
 
 		updateContext(step, context);
+		
 		if(step.getName().contains("stop"))
 			return new Goal(step, step.getContext());
 		
 		Goal g = null;
 		
-		for(int i=0; i<links.size(); i++)
+		for(CausalLink link : links)
 		{
-			for(CausalLink link : links)
+			if(link.getFrom().equals(step))
 			{
-				if(link.getFrom().equals(step))
-				{
-					g = updateContextDescending(link.getTo(), context);
-				}				
-			}	
+				g = updateContextDescending(link.getTo(), context);
+			}				
 		}
 		
 		return g;
 	}
 
 	private void updateContext(ConditionalAction currentStep, ConditionalLabel context) {
-
+	
 		for(ConditionalAction a : steps)
 		{
 			if(a.equals(currentStep))

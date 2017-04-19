@@ -4,6 +4,8 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import it.unibo.domain.model.conditional.ConditionalAction;
+
 public class Action implements Serializable, Comparable<Action>{
 
 	protected String name;
@@ -100,6 +102,15 @@ public class Action implements Serializable, Comparable<Action>{
 			return 0;
 		
 		return -1;
+	}
+	
+	@Override
+	public boolean equals(Object o){
+		
+		if(!(o instanceof Action))
+			return false;
+		
+		return ((Action)o).getName().equals(name);		
 	}
 	
 }

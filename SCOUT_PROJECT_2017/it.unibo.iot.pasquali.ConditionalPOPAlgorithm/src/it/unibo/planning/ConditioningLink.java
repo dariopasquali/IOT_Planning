@@ -44,7 +44,7 @@ public class ConditioningLink implements Serializable{
 	
 	@Override
 	public String toString(){
-		return "conditioning{"+before.toString()+","+condition.toString()+","+after.toString()+"}";
+		return "conditioning{"+before.getShortName()+" , "+condition.toString()+" , "+after.getShortName()+"}";
 	}
 	
 

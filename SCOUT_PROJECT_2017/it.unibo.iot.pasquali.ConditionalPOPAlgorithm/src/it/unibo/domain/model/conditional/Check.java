@@ -95,7 +95,7 @@ public class Check extends ConditionalAction implements Serializable{
 		
 		Check m = (Check)o;
 		
-		return m.toString().equalsIgnoreCase(this.toString());		
+		return super.equals(o) && m.getShortName().equalsIgnoreCase(this.getShortName());		
 	}
 	
 	@Override

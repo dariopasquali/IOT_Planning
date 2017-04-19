@@ -2,7 +2,7 @@ package it.unibo.domain.graph;
 
 import java.io.Serializable;
 
-public class State implements Serializable{
+public class State implements Serializable, Comparable<State>{
 
 	private int x,y;	
 	private double heuristic;
@@ -56,5 +56,13 @@ public class State implements Serializable{
 
 	public void setHeuristic(double heuristic) {
 		this.heuristic = heuristic;
+	}
+
+	@Override
+	public int compareTo(State o) {
+		if(o.getX() == x && o.getY()==y)
+			return 0;
+		
+		return -1;
 	}
 }

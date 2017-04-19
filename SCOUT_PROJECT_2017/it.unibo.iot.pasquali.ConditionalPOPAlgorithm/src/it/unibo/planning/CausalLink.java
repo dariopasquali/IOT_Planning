@@ -32,7 +32,7 @@ public class CausalLink implements Serializable{
 	
 	@Override
 	public String toString(){
-		return "causal<"+from+","+to+","+condition+">";
+		return "causal<"+from.getShortName()+" , "+to.getShortName()+" , "+condition+">";
 	}
 	
 	@Override

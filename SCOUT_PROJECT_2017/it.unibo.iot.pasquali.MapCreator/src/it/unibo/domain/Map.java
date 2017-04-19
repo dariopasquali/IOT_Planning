@@ -235,8 +235,11 @@ public class Map {
 					State a = new State(c,i);
 					State b = new State(c,i+1);
 					
-					g.addConnection(a.toString(), b.toString());
-					g.addConnection(b.toString(), a.toString());
+//					g.addConnection(a.toString(), b.toString());
+//					g.addConnection(b.toString(), a.toString());
+					
+					g.addState(a);
+					g.addState(b);
 					
 					Move m = new Move(a, b);										
 					g.addMove(m);				

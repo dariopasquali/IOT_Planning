@@ -69,5 +69,14 @@ public class Goal implements Serializable{
 	public void setGenerativeCheck(Check generativeCheck) {
 		this.generativeCheck = generativeCheck;
 	}
+	
+	@Override
+	public boolean equals(Object o){
+		
+		if(!(o instanceof Goal))
+			return false;
+		
+		return ((Goal)o).getAction().equals(this.getAction());
+	}
 
 }

@@ -48,5 +48,9 @@ public class PlanNode implements Comparable<PlanNode>, Serializable{
 	}
 
 		
+	@Override
+	public String toString(){
+		return action.toString();
+	}
 	
 }

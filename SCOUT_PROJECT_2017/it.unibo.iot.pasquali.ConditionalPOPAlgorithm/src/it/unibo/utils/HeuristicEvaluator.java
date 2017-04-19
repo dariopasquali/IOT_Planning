@@ -15,6 +15,9 @@ public class HeuristicEvaluator {
 	
 	public HeuristicEvaluator(IMap m){
 	
+		if(m == null)
+			return;
+		
 		agent = new AStarSearchAgent();		
 		engine = new AStarEngine();
 		

@@ -86,7 +86,7 @@ public class Move extends ConditionalAction implements Serializable{
 		
 		Move m = (Move)o;
 		
-		return m.toString().equalsIgnoreCase(this.toString());		
+		return super.equals(o) && m.getShortName().equalsIgnoreCase(this.getShortName());		
 	}
 	
 	@Override
