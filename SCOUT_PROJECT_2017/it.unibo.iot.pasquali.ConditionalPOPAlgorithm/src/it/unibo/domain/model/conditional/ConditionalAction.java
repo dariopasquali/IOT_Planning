@@ -14,12 +14,15 @@ public class ConditionalAction extends Action implements Serializable{
 	
 	protected ActionType type;
 	
+	protected List<ConditionalAction> successors;
+	
 	
 	public ConditionalAction(String name)
 	{
 		super(name);
 		reason = new ArrayList<Goal>();
 		context = new ArrayList<ConditionalLabel>();
+		successors = new ArrayList<ConditionalAction>();
 	}
 	
 	public ConditionalAction(String name, double heuristic)
@@ -27,6 +30,7 @@ public class ConditionalAction extends Action implements Serializable{
 		super(name, heuristic);
 		context = new ArrayList<ConditionalLabel>();
 		reason = new ArrayList<Goal>();
+		successors = new ArrayList<ConditionalAction>();
 	}
 
 	public List<Goal> getReason() {
@@ -111,4 +115,14 @@ public class ConditionalAction extends Action implements Serializable{
 				((ConditionalAction)o).getContext().containsAll(context);
 		
 	}
+	
+	public void addSuccessor(ConditionalAction next)
+	{
+		this.successors.add(next);
+	}
+	
+	public List<ConditionalAction> getSuccessors(){
+		return successors;
+	}
+	
 }

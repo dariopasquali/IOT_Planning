@@ -4,18 +4,15 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
 
-import it.unibo.domain.model.Action;
 import it.unibo.domain.model.Fact;
 import it.unibo.domain.model.conditional.Check;
 import it.unibo.domain.model.conditional.ConditionalAction;
 import it.unibo.domain.model.conditional.ConditionalLabel;
 import it.unibo.domain.model.conditional.Goal;
-import it.unibo.enums.ActionType;
+import it.unibo.interfaces.IRunnablePopPlan;
 
-public class Plan implements Serializable{
+public class Plan implements Serializable, IRunnablePopPlan{
 	
 	private List<ConditionalAction> steps;
 	
@@ -26,7 +23,8 @@ public class Plan implements Serializable{
 	private List<Order> orders;
 	private List<ConditioningLink> conditioningLinks;
 	
-
+//{{ INITIALIZATION ----------------------------------------------------------------
+	
 	public Plan()
 	{
 		this.steps = new ArrayList<>();
@@ -53,18 +51,16 @@ public class Plan implements Serializable{
 	
 	public void init(ConditionalAction start, ConditionalAction stop) {
 		
-		// ci pensa il planner a mettere stop in steps e preconditions
-		
-		steps.add(start);
-		//steps.add(stop);
-		
-		orders.add(new Order(start, stop));
-		
-		//openPreconditions.addAll(stop.getPre());
-		
+		steps.add(start);		
+		orders.add(new Order(start, stop));		
 		openGoals.add(new Goal(stop));
 	}
 
+//}}
+	
+
+//{{ GETTERS -----------------------------------------------------------------------	
+	
 	public List<ConditionalAction> getSteps() {
 		return steps;
 	}
@@ -80,6 +76,21 @@ public class Plan implements Serializable{
 	public List<Order> getOrders() {
 		return orders;
 	}
+	
+	public List<Goal> getOpenGoals() {
+		return openGoals;
+	}
+
+	public List<ConditioningLink> getConditioningLinks() {
+		return conditioningLinks;
+	}
+
+	
+	
+//}}	
+	
+	
+//{{ ADDERS ------------------------------------------------------------------------	
 	
 	public void addStep(ConditionalAction step){
 		steps.add(step);
@@ -110,6 +121,15 @@ public class Plan implements Serializable{
 			conditioningLinks.add(o);
 	}
 
+	public void addSubgoal(Fact subGoal) {
+		openPreconditions.add(subGoal);	
+	}
+	
+//}}
+	
+	
+//{{ TERMINATION TEST --------------------------------------------------------------	
+	
 	public boolean hasGoalToSolve() {
 		return !openGoals.isEmpty();
 	}
@@ -126,24 +146,142 @@ public class Plan implements Serializable{
 		return openGoals.remove(0);
 	}
 
-	public void addSubgoal(Fact subGoal) {
-		openPreconditions.add(subGoal);	
-	}
+//}}	
+	
 	
 	public void restoreSubgoal(Fact subGoal){
 		openPreconditions.add(0, subGoal);
 	}
 	
+	public void updateReasonAscending(ConditionalAction step, List<Goal> reason) {
+		
+		updateReason(step, reason);
+		
+		if(step.getName().contains("start"))
+			return;
+		
+		ConditionalAction currentStep = step;
+		
+		for(int i=0; i<links.size(); i++){
+			
+			for(CausalLink link : links)
+			{
+				if(link.getTo().equals(currentStep)){
+					
+					currentStep = link.getFrom();
+					
+					updateReason(link.getTo(), reason);				
+				}
+			}
+		}
+	}
 	
-	
-	public List<Goal> getOpenGoals() {
-		return openGoals;
+	public void updateReason(ConditionalAction step, List<Goal> reason){
+		
+		for(ConditionalAction a : steps){
+			if(a.equals(step))
+			{
+				a.mergeReason(reason);
+				return;
+			}
+		}	
 	}
 
-	public List<ConditioningLink> getConditioningLinks() {
-		return conditioningLinks;
+	
+	
+	private void updateContextDescending(HashSet<ConditionalAction> closed,
+			ConditionalAction step,
+			List<ConditionalLabel> context)
+	{
+		step.addConditionalLabels(context);
+		
+		for(ConditionalAction a : step.getSuccessors())
+		{
+			if(!closed.contains(a))
+			{
+				closed.add(a);
+				updateContextDescending(closed, a, context);
+			}
+		}
+		
+	}
+	
+	private void updateContextDescending(HashSet<ConditionalAction> closed,
+			ConditionalAction step,
+			ConditionalLabel context)
+	{
+		step.addConditionalLabel(context);
+		
+		for(ConditionalAction a : step.getSuccessors())
+		{
+			if(!closed.contains(a))
+			{
+				closed.add(a);
+				updateContextDescending(closed, a, context);
+			}
+		}
+	}
+		
+	
+	
+	public void updateContextDescending(ConditionalAction step, List<ConditionalLabel> context)
+	{
+//		step.addConditionalLabels(context);
+//		
+//		if(step.getName().contains("stop"))
+//			return;
+//		
+//		for(ConditionalAction a : step.getSuccessors())
+//		{
+//			updateContextDescending(a, context);
+//		}	
+		
+		updateContextDescending(new HashSet<ConditionalAction>(), step, context);
+		
+	}	
+	
+	public void updateContextDescending(ConditionalAction step, ConditionalLabel context) {
+
+//		//System.out.println("update descending --- "+step.getShortName());
+//		
+//		updateContext(step, context);
+//		
+//		if(step.getName().contains("stop"))
+//			return;
+//		
+//		for(ConditionalAction a : step.getSuccessors())
+//		{
+//			updateContextDescending(a, context);
+//		}
+		
+		updateContextDescending(new HashSet<ConditionalAction>(), step, context);
+		
 	}
 
+	
+//	public Goal descendingGoalLookup(ConditionalAction step) {
+//		
+//		ConditionalAction currentStep = step;
+//		
+//		if(currentStep.getName().contains("stop"))
+//			return new Goal(currentStep, currentStep.getContext());
+//		
+//		for(CausalLink link : links)
+//		{
+//			if(link.getFrom().equals(currentStep))
+//			{
+//				currentStep = link.getTo();						
+//				
+//				if(currentStep.getName().contains("stop"))
+//					return new Goal(currentStep, currentStep.getContext());
+//			}				
+//		}	
+//		
+//		return null;
+//	}
+	
+
+	@Override
 	public ArrayList<ConditionalPlanNode> numbering(){
 		
 		int ID = 0;
@@ -186,15 +324,19 @@ public class Plan implements Serializable{
 			conditionalPlan.add(new ConditionalPlanNode((ConditionalAction) noPre.action, ID)); //depth first
 			ID ++;
 			
+			ArrayList<PlanNode> toAdd = new ArrayList<PlanNode>();
+			
 			for(PlanNode n : nodes)
 			{
 				if(n.pre.contains(noPre.action))
 				{
 					n.pre.remove(noPre.action);
 					if(n.pre.isEmpty())
-						noPreList.add(0, n);
+						toAdd.add(n);
 				}
-			}			
+			}
+			
+			noPreList.addAll(0, toAdd);
 		}
 		
 		for(ConditioningLink branch : conditioningLinks)
@@ -244,92 +386,6 @@ public class Plan implements Serializable{
 		return conditionalPlan;
 	}
 
-	public void updateReasonAscending(ConditionalAction step, List<Goal> reason) {
-		
-		updateReason(step, reason);
-		
-		if(step.getName().contains("start"))
-			return;
-		
-		ConditionalAction currentStep = step;
-		
-		for(int i=0; i<links.size(); i++){
-			
-			for(CausalLink link : links)
-			{
-				if(link.getTo().equals(currentStep)){
-					
-					currentStep = link.getFrom();
-					
-					updateReason(link.getTo(), reason);				
-				}
-			}
-		}
-	}
 	
-	public void updateReason(ConditionalAction step, List<Goal> reason){
-		
-		for(ConditionalAction a : steps){
-			if(a.equals(step))
-			{
-				a.mergeReason(reason);
-				return;
-			}
-		}
-		
-		
-	}
-
-	public Goal updateContextDescending(ConditionalAction step, ConditionalLabel context) {
-
-		updateContext(step, context);
-		
-		if(step.getName().contains("stop"))
-			return new Goal(step, step.getContext());
-		
-		Goal g = null;
-		
-		for(CausalLink link : links)
-		{
-			if(link.getFrom().equals(step))
-			{
-				g = updateContextDescending(link.getTo(), context);
-			}				
-		}
-		
-		return g;
-	}
-
-	private void updateContext(ConditionalAction currentStep, ConditionalLabel context) {
 	
-		for(ConditionalAction a : steps)
-		{
-			if(a.equals(currentStep))
-				a.addConditionalLabel(context);
-		}
-		
-	}
-
-	public Goal descendingGoalLookup(ConditionalAction step) {
-		
-		ConditionalAction currentStep = step;
-		
-		if(currentStep.getName().contains("stop"))
-			return new Goal(currentStep, currentStep.getContext());
-		
-		for(CausalLink link : links)
-		{
-			if(link.getFrom().equals(currentStep))
-			{
-				currentStep = link.getTo();						
-				
-				if(currentStep.getName().contains("stop"))
-					return new Goal(currentStep, currentStep.getContext());
-			}				
-		}	
-		
-		return null;
-	}
-	
-
 }

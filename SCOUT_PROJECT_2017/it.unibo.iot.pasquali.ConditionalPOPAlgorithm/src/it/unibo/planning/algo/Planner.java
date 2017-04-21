@@ -58,8 +58,7 @@ public class Planner {
 		
 		this.heuristicMap = new HashMap<String, Double>();
 		
-		//this.lastStep = new Move(new State(-1,-1), new State(-1,-1));
-		this.lastStep = new Move(new AbcState(""), new AbcState(""));
+		this.lastStep = new Move(new State(-1,-1), new State(-1,-1));		
 		
 		visited = new TreeSet<State>();
 		
@@ -76,13 +75,10 @@ public class Planner {
 	private void evaluateStates(){
 		
 		for(State s : graph.getStates())
-		{
-			//s.setHeuristic(heuristic.evaluate(s, start));
+		{			
 			try
-			{
-				//System.out.print(s.toString());
+			{				
 				heuristicMap.put(s.toString(), heuristic.evaluate(s, start));
-				//System.out.println(heuristicMap.size());
 			}
 			catch(Exception e)
 			{
@@ -96,8 +92,7 @@ public class Planner {
 		List<State> states = graph.getStates();
 		
 		for(Entry<String, Double> e : heuristicMap.entrySet())
-			System.out.println(e.getKey() +"-->"+ e.getValue());			
-		
+			System.out.println(e.getKey() +"-->"+ e.getValue());	
 		
 		for(ConditionalAction m1 : possibleMoves)
 		{	
@@ -107,13 +102,8 @@ public class Planner {
 			Move m = (Move) m1;
 			
 			try
-			{
-				//System.out.println(m.getFrom().toString());
-				
-				double h = heuristicMap.get(m.getFrom().toString());
-				
-				//System.out.print(" "+h+"\n");
-				
+			{				
+				double h = heuristicMap.get(m.getFrom().toString());				
 				m.setHeuristic(h);
 			}
 			catch(Exception e)
@@ -179,8 +169,7 @@ public class Planner {
 			globalContext = goal.getGlobalContext();			
 			plan.addStep(goal.getAction());
 			
-			//lastStep = new Move(new State(-1,-1), new State(-1,-1));
-			this.lastStep = new Move(new AbcState(""), new AbcState(""));
+			lastStep = new Move(new State(-1,-1), new State(-1,-1));
 			
 			visited = new TreeSet<>();
 			
@@ -191,7 +180,7 @@ public class Planner {
 			{
 				Fact subgoal = plan.selectPreconditionToSolve();
 				
-				System.out.println("new subgoal --- "+subgoal.toString());
+				//System.out.println("new subgoal --- "+subgoal.toString());
 				
 				if(branchChoicePoint != null && subgoal.equals(branchChoicePoint.getSubGoal()))
 				{
@@ -215,7 +204,7 @@ public class Planner {
 					}
 					
 					choice = new ChoicePoint(subgoal, new Plan(plan), 1);
-					choice.setVisited(new TreeSet(visited));
+					choice.setVisited(new TreeSet<State>(visited));
 					
 					List<ConditionalAction> steps = plan.getSteps();			
 					
@@ -235,10 +224,24 @@ public class Planner {
 						{
 							if((lastStep instanceof Move) && (a instanceof Move))
 							{
-								if(!((Move)a).isOppositeTo((Move)lastStep) && !visited.contains(((Move)a).getFrom()))
+								if(!((Move)a).isOppositeTo((Move)lastStep))
 								{
-									a.setCost(0);
-									choice.addAction(a.copy());
+									boolean found = false;
+									for(State s : visited)
+									{
+										if(s.equals(((Move)a).getFrom()))
+										{
+											found = true;
+											break;
+										}
+												
+									}
+									
+									if(!found)
+									{
+										a.setCost(0);
+										choice.addAction(a.copy());
+									}									
 								}
 							}
 							else
@@ -274,42 +277,28 @@ public class Planner {
 				plan.addCausalLink(new CausalLink(step, (ConditionalAction) subgoal.getStep(), subgoal));
 				plan.addOrderConstraint(new Order(step, (ConditionalAction) subgoal.getStep()));
 				
-//				if(currentBranchGenerativeCheck != null)
-//				{
-//					plan.addOrderConstraint(new Order(currentBranchGenerativeCheck, step));
-//					plan.addConditioningLink(new ConditioningLink(currentBranchGenerativeCheck, step, currentBranchGenerativeCheck.getLabels().get(1)));
-//					currentBranchGenerativeCheck = null;
-//				}
+				step.addSuccessor((ConditionalAction) subgoal.getStep());
 				
 				if(choice.fromStep()) //addLink
 				{			
 					// update reason di tutti i gli ascendenti dello step aggiunto
 					plan.updateReasonAscending(step, ((ConditionalAction)subgoal.getStep()).getReason());
 					
-//					if(!step.getShortName().contains("start"))
-//						for(ConditionalLabel l : globalContext)
-//							plan.updateContextDescending(step, l);
+					plan.updateContextDescending((ConditionalAction) subgoal.getStep(), step.getContext());
 				}
 				else //addStep
 				{
-					step.addConditionalLabels(globalContext);
-					
+					step.addConditionalLabels(globalContext);					
 					
 					if(step.getType().equals(ActionType.CHECK))
 					{
-						// aggiorna i contesti degli step discendenti da quello
-						//del quale si è soddisfatto il prerequisito
-						Goal g = plan.updateContextDescending(
+
+						plan.updateContextDescending(
 								(ConditionalAction)subgoal.getStep(), ((Check) step).getLabels().get(0));
-						
-						if(g != null)
-						{
-							// se arrivo a un goal, aggiorna la reason dello step aggiunto con il goal
-							List<Goal> reason = new ArrayList<Goal>();
-							reason.add(g);
-							//plan.updateReason(step,reason);
-							step.mergeReason(reason);
-						}
+					
+						List<Goal> reason = new ArrayList<Goal>();
+						reason.add(goal);
+						step.mergeReason(reason);
 						
 						//create branch
 						List<ConditionalLabel> context = new ArrayList<ConditionalLabel>(globalContext);
@@ -326,16 +315,11 @@ public class Planner {
 					}
 					else
 					{
-						Goal g = plan.descendingGoalLookup(	(ConditionalAction)subgoal.getStep());
+						//Goal g = plan.descendingGoalLookup(	(ConditionalAction)subgoal.getStep());
 						
-						if(g != null)
-						{
-							// se arrivo a un goal, aggiorna la reason dello step aggiunto con il goal
-							List<Goal> reason = new ArrayList<Goal>();
-							reason.add(g);
-							//plan.updateReason(step,reason);
-							step.mergeReason(reason);
-						}
+						List<Goal> reason = new ArrayList<Goal>();
+						reason.add(goal);
+						step.mergeReason(reason);
 					}
 					
 					plan.addStep(step);
@@ -345,7 +329,6 @@ public class Planner {
 				if(step instanceof Move || step.getName().contains("stop"))
 				{
 					lastStep = (ConditionalAction)step;
-					//visited.add(((Move)step).getFrom());
 					visited.add(((Move)step).getTo());
 				}
 				
@@ -375,12 +358,6 @@ public class Planner {
 			plan.addStep(fail);
 			plan.addCausalLink(new CausalLink(fail, g.getAction(), subgoal));
 			plan.addOrderConstraint(new Order(fail, g.getAction()));
-			
-//			if(g.getGenerativeCheck() != null)
-//			{
-//				plan.addOrderConstraint(new Order(g.getGenerativeCheck(), fail));
-//				plan.addConditioningLink(new ConditioningLink(g.getGenerativeCheck(), fail, g.getGenerativeCheck().getLabels().get(1)));
-//			}
 			
 			return;
 		}
@@ -440,8 +417,7 @@ public class Planner {
 	
 //{{ CONTEXT COMPATIBILITY ----------------------------------------------------------
 	
-	private boolean checkLabelCompatibility(ConditionalLabel label1, ConditionalLabel label2)
-	{
+	private boolean checkLabelCompatibility(ConditionalLabel label1, ConditionalLabel label2){
 		/*
 		 * Two labels are compatible if have the same ID or come from different checks
 		 * A1 !comp A2
@@ -460,32 +436,10 @@ public class Planner {
 		 * is compatible with each label of the second context
 		 */
 		
-		
-//		boolean keepSearch = false;
-		
+
 		if(c1.isEmpty() || c2.isEmpty())
 			return true;
-		
-//		for(ConditionalLabel l : c1)
-//		{
-//			keepSearch = false;
-//			
-//			for(ConditionalLabel g : c2)
-//			{
-//				if(l.sameRootDifferentID(g))
-//					return false;
-//				
-//				if(l.equals(g))
-//				{
-//					keepSearch = true;
-//					break;
-//				}
-//			}
-//			
-//			if(!keepSearch)
-//				return false;
-//		}
-		
+	
 		for(ConditionalLabel l1 : c1)
 		{
 			for(ConditionalLabel l2 : c2)
@@ -522,6 +476,8 @@ public class Planner {
 	
 	private void connectAlternatives(Goal goal) {
 		
+//		System.out.println("connect alternatives");
+		
 		if(goal.getGenerativeCheck() == null)
 			return;
 		
@@ -540,27 +496,6 @@ public class Planner {
 		{
 			if(step.getContext().containsAll(goal.getGlobalContext()))
 			{
-//				if(step.getShortName().contains("fail"))
-//				{
-//					plan.addConditioningLink(new ConditioningLink(goal.getGenerativeCheck(), step, goal.getGenerativeCheck().getLabels().get(1)));
-//					plan.addOrderConstraint(new Order(goal.getGenerativeCheck(), step));
-//					plan.updateContextDescending(step, goal.getGenerativeCheck().getLabels().get(1));
-//					break;
-//				}
-//				
-//				if(step instanceof Check)
-//				{
-//					for(CausalLink link : plan.getLinks())
-//					{
-//						if(link.getTo().equals(step) && link.getFrom().getShortName().contains("start"))
-//						{
-//							plan.addConditioningLink(new ConditioningLink(goal.getGenerativeCheck(), step, goal.getGenerativeCheck().getLabels().get(1)));
-//							plan.addOrderConstraint(new Order(goal.getGenerativeCheck(), step));
-//							plan.updateContextDescending(step, goal.getGenerativeCheck().getLabels().get(1));
-//							break;
-//						}
-//					}
-//				}
 				subtree.add(step);
 			}
 		}		
@@ -583,6 +518,10 @@ public class Planner {
 		 * 
 		 * Connetti la prima check alla seconda con un conditioning link basato sulla label negativa
 		 */
+		
+		if(subtree.size() < 2)
+			return;
+		
 		for(int i = 0; i<plan.getConditioningLinks().size(); i++)
 		{
 			ConditioningLink condition = plan.getConditioningLinks().get(i);			
@@ -606,7 +545,7 @@ public class Planner {
 			
 			if(!found)
 			{
-				for(ConditionalAction a : subtree)
+				for(ConditionalAction a : subtree) //TODO dovrei anche aggiornare i contesti a cascata??? Ha senso come cosa?????
 				{
 					if((a instanceof Check) &&
 							((Check)a).getFrom().equals(((Check)condition.getBefore()).getFrom()))

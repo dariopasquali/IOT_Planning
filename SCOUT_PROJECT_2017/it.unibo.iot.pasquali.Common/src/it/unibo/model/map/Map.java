@@ -431,18 +431,11 @@ public class Map implements IMap{
 	}
 //}}
 
-	
+	public Integer[][] getNoObjects() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
-
-	
-	
-
-
-	
-	
-	
-
-	
 
 	
 }

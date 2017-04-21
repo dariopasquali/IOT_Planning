@@ -38,7 +38,7 @@ public class Main{
 		
 		//HeuristicEvaluator heuristic = new HeuristicEvaluatorMock4();
 		
-		Planner planner = new Planner(new State(1,1), new State(6,6), simple, heuristic);
+		Planner planner = new Planner(new State(1,1), new State(4,3), simple, heuristic);
 		
 		long starttime = System.currentTimeMillis();
 		

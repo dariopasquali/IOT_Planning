@@ -32,7 +32,6 @@ public class MapViewerPanel {
 	}
 	
 	
-	
 	private JPanel p;
 	private Map map;
 	private int rows, cols;
