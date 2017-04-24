@@ -274,6 +274,8 @@ public class Planner {
 				
 				ConditionalAction step = choice.getNext();
 				
+				//System.out.println(step.getShortName());
+				
 				plan.addCausalLink(new CausalLink(step, (ConditionalAction) subgoal.getStep(), subgoal));
 				plan.addOrderConstraint(new Order(step, (ConditionalAction) subgoal.getStep()));
 				
@@ -345,7 +347,7 @@ public class Planner {
 	
 	private void failAndBacktrack(Goal g, Fact subgoal) {
 		
-		System.out.println("rollback");
+		//System.out.println("rollback");
 		
 		currentPoint = findRollbackOpenChoice(subgoal);		
 		

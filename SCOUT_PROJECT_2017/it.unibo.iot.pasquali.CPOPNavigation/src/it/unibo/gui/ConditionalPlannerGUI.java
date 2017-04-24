@@ -208,7 +208,7 @@ public class ConditionalPlannerGUI extends Frame{
 	private void initializeOutputFrame()
 	{
 		outputFrame = new JFrame();
-		outputFrame.setBounds(300, 300, 700, 300);
+		outputFrame.setBounds(600, 600, 700, 300);
 		outputFrame.setTitle("Output Frame");		
 		outputFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
@@ -234,6 +234,8 @@ public class ConditionalPlannerGUI extends Frame{
 		scrollBar = new JScrollBar();
 		panelOutput.setRowHeaderView(scrollBar);
 		panelOutput.add(scrollBar);		
+		
+		controller.setStdOutput(txtOut);
 	}
 	
 	
@@ -303,18 +305,20 @@ public class ConditionalPlannerGUI extends Frame{
 				
 				break;
 				
-			case "Navigate":
+			case "Navigate (auto)":
 				
 				btnNextStep.setEnabled(false);
-			
+				mapViewer.setMapState(MapViewer.NAVIGATION);
+				
 				println("The agent will navigate autonomously in the map");
 				
 				controller.initNavigation(mapViewer);
 				controller.navigate();
+				mapViewer.setMapState(MapViewer.PLANNING);
 				
 				break;
 				
-			case "Next Step":
+			case "Next Step (manual)":
 				
 				if(!initDone)
 				{
@@ -323,6 +327,7 @@ public class ConditionalPlannerGUI extends Frame{
 					println("You can click a CLEAR cell in order to create a new obstacle");
 					
 					btnNavigate.setEnabled(false);
+					mapViewer.setMapState(MapViewer.NAVIGATION);
 					
 					controller.initNavigation(mapViewer);
 					
@@ -395,6 +400,9 @@ public class ConditionalPlannerGUI extends Frame{
 			return;
 		}
 		
+		println("\n---------------------------\n");
+		println("CONDITIONAL PLAN");
+		
 		for(ConditionalPlanNode n : plan)
 			println(n.toString());		
 	}
@@ -426,6 +434,5 @@ public class ConditionalPlannerGUI extends Frame{
 		txtOut.append(msg+"\n");
 		txtOut.validate();
 		txtOut.setCaretPosition(txtOut.getDocument().getLength());
-//		System.out.println(msg);
 	}
 }

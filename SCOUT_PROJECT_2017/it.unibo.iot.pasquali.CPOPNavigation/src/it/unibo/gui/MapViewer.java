@@ -2,7 +2,9 @@ package it.unibo.gui;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.GridLayout;
+import java.awt.Point;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
@@ -10,6 +12,7 @@ import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
+import it.unibo.execution.enums.CDirection;
 import it.unibo.gui.enums.CellState;
 import it.unibo.model.map.Map;
 import it.unibo.model.map.MapElement;
@@ -32,6 +35,9 @@ public class MapViewer {
     protected MapElement start, goal;
     
     protected Controller controller;
+    
+    private Point currentPosition;
+    private CellState lastCurrentCellState;
  
     private class ClickHandler implements MouseListener{
 
@@ -118,6 +124,7 @@ public class MapViewer {
     {
     	this.enableClick = true;
     	this.mapState = PLANNING;
+    	this.controller = controller;
     }
  
 // ACCESSOR --------------------------------------------------------    
@@ -161,7 +168,9 @@ public class MapViewer {
 
 	protected JButton createCell(final int y, final int x) {
         final JButton b = new JButton("");
-                
+        
+        b.setFont(new Font("Monospaced", Font.PLAIN, 17));
+        
         if(enableClick)
         	b.addMouseListener(new ClickHandler(y, x));
         return b;
@@ -302,4 +311,63 @@ public class MapViewer {
 		
 	}
 
+	public void updatePosition(Point next) {
+
+		SwingUtilities.invokeLater(new Runnable() {
+			
+			@Override
+			public void run() {
+				setCellState(next.y, next.x, CellState.START);
+				
+				if(currentPosition != null && !(currentPosition.getX() == next.x && currentPosition.getY() == next.y))
+				{
+					setCellState((int)currentPosition.getY(), (int)currentPosition.getX(), lastCurrentCellState);
+					getGridButton((int)currentPosition.getY(), (int)currentPosition.getX()).setText("");
+				}
+				
+				currentPosition = next;
+				lastCurrentCellState = CellState.CLEAR;
+				
+				p.revalidate();
+				p.repaint();
+				
+			}
+		});		
+		
+	}
+
+	public void updateDirection(CDirection ndir) {
+
+		SwingUtilities.invokeLater(new Runnable() {
+			
+			@Override
+			public void run() {
+				if(currentPosition == null)
+					getGridButton(start.getY(), start.getX()).setText(ndir.toString());
+				else
+					getGridButton(currentPosition.y, currentPosition.x).setText(ndir.toString());
+				
+				p.revalidate();
+				p.repaint();
+				
+			}
+		});
+		
+	}
+	
+	public void updateCurrentPosition(int y, int x, String direction) {
+		
+		setCellState(y, x, CellState.START);
+		getGridButton(y, x).setText(direction);
+		
+		if(currentPosition != null && !(currentPosition.getX() == x && currentPosition.getY() == y))
+		{			
+			setCellState((int)currentPosition.getY(), (int)currentPosition.getX(), lastCurrentCellState);
+			getGridButton((int)currentPosition.getY(), (int)currentPosition.getX()).setText("");
+		}
+				
+		currentPosition = new Point(x, y);
+		this.lastCurrentCellState = CellState.CLEAR;		
+	}
+	
 }

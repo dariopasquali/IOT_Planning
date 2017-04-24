@@ -5,7 +5,6 @@ import java.util.HashMap;
 
 import it.unibo.domain.graph.State;
 import it.unibo.model.interfaces.IMap;
-import it.unibo.planning.astar.algo.Path;
 import it.unibo.utils.HeuristicEvaluator;
 
 public class HeuristicEvaluatorMock4 extends HeuristicEvaluator{

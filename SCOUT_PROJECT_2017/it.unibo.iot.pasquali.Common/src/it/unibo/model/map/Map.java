@@ -432,8 +432,14 @@ public class Map implements IMap{
 //}}
 
 	public Integer[][] getNoObjects() {
-		// TODO Auto-generated method stub
-		return null;
+
+		Integer[][] noobj = new Integer[ymax+1][xmax+1];
+		
+		for(int y=0; y<=ymax; y++)
+			for(int x=0; x<=xmax; x++)
+				noobj[y][x] = 0;
+		
+		return noobj;	
 	}
 
 

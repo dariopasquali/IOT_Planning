@@ -45,6 +45,5 @@ public class CausalLink implements Serializable{
 		
 		return l.getFrom().equals(from) && l.getTo().equals(to) && l.getCondition().equals(condition);
 				
-	}
-	
+	}	
 }

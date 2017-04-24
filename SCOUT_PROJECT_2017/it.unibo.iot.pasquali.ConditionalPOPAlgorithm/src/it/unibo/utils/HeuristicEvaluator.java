@@ -26,8 +26,10 @@ public class HeuristicEvaluator {
 	
 	public double evaluate(State from, State to)
 	{
-		Path path = agent.searchBestPath(engine, new Point(from.getX(), from.getY()), new Point(to.getX(), to.getY()));
-		return path.getPoints().size();
+		//Path path = agent.searchBestPath(engine, new Point(from.getX(), from.getY()), new Point(to.getX(), to.getY()));
+		//return path.getPoints().size();
+		
+		return Math.abs(to.getY()-from.getY()) + Math.abs(to.getX()-from.getX());
 	}
 
 }

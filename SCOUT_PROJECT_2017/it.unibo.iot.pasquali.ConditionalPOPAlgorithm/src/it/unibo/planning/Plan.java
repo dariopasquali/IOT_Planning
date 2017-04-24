@@ -2,15 +2,28 @@ package it.unibo.planning;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
+import it.unibo.domain.graph.State;
 import it.unibo.domain.model.Fact;
 import it.unibo.domain.model.conditional.Check;
 import it.unibo.domain.model.conditional.ConditionalAction;
 import it.unibo.domain.model.conditional.ConditionalLabel;
 import it.unibo.domain.model.conditional.Goal;
+import it.unibo.domain.model.conditional.Move;
+import it.unibo.execution.domain.CFail;
+import it.unibo.execution.domain.CMove;
+import it.unibo.execution.domain.CSense;
+import it.unibo.execution.domain.CSpin;
+import it.unibo.execution.domain.CStep;
+import it.unibo.execution.domain.CStop;
+import it.unibo.execution.enums.CDirection;
+import it.unibo.execution.enums.ConditionalMoveType;
+import it.unibo.execution.enums.SpinAngle;
 import it.unibo.interfaces.IRunnablePopPlan;
+import it.unibo.planning.enums.SpinDirection;
 
 public class Plan implements Serializable, IRunnablePopPlan{
 	
@@ -148,10 +161,16 @@ public class Plan implements Serializable, IRunnablePopPlan{
 
 //}}	
 	
+
+// {{ BRANCH MANAGEMENT --------------------------------------------------------------
 	
 	public void restoreSubgoal(Fact subGoal){
 		openPreconditions.add(0, subGoal);
 	}
+	
+//}}
+	
+//{{ REASON & CONTEXT UPDATE ----------------------------------------------------------
 	
 	public void updateReasonAscending(ConditionalAction step, List<Goal> reason) {
 		
@@ -187,8 +206,6 @@ public class Plan implements Serializable, IRunnablePopPlan{
 		}	
 	}
 
-	
-	
 	private void updateContextDescending(HashSet<ConditionalAction> closed,
 			ConditionalAction step,
 			List<ConditionalLabel> context)
@@ -226,63 +243,22 @@ public class Plan implements Serializable, IRunnablePopPlan{
 	
 	public void updateContextDescending(ConditionalAction step, List<ConditionalLabel> context)
 	{
-//		step.addConditionalLabels(context);
-//		
-//		if(step.getName().contains("stop"))
-//			return;
-//		
-//		for(ConditionalAction a : step.getSuccessors())
-//		{
-//			updateContextDescending(a, context);
-//		}	
-		
 		updateContextDescending(new HashSet<ConditionalAction>(), step, context);
 		
 	}	
 	
 	public void updateContextDescending(ConditionalAction step, ConditionalLabel context) {
 
-//		//System.out.println("update descending --- "+step.getShortName());
-//		
-//		updateContext(step, context);
-//		
-//		if(step.getName().contains("stop"))
-//			return;
-//		
-//		for(ConditionalAction a : step.getSuccessors())
-//		{
-//			updateContextDescending(a, context);
-//		}
-		
-		updateContextDescending(new HashSet<ConditionalAction>(), step, context);
-		
+		updateContextDescending(new HashSet<ConditionalAction>(), step, context);		
 	}
-
 	
-//	public Goal descendingGoalLookup(ConditionalAction step) {
-//		
-//		ConditionalAction currentStep = step;
-//		
-//		if(currentStep.getName().contains("stop"))
-//			return new Goal(currentStep, currentStep.getContext());
-//		
-//		for(CausalLink link : links)
-//		{
-//			if(link.getFrom().equals(currentStep))
-//			{
-//				currentStep = link.getTo();						
-//				
-//				if(currentStep.getName().contains("stop"))
-//					return new Goal(currentStep, currentStep.getContext());
-//			}				
-//		}	
-//		
-//		return null;
-//	}
+//}}
 	
 
+//{{ RUNNABLE PLAN METHOD -------------------------------------------------------
+	
 	@Override
-	public ArrayList<ConditionalPlanNode> numbering(){
+	public List<ConditionalPlanNode> numbering(){
 		
 		int ID = 0;
 		
@@ -387,5 +363,170 @@ public class Plan implements Serializable, IRunnablePopPlan{
 	}
 
 	
+	public static List<CMove> expandPlan(List<ConditionalPlanNode> numbered, SpinAngle defSpinAngle){
+		
+		List<CMove> moves = new ArrayList<CMove>();		
+		HashMap<Integer, Integer> mapping = new HashMap<>();
+		HashMap<Integer, CDirection> branchStartDir = new HashMap<>();
+		
+		int ID = 0;
+		CDirection currentDir = null;
+		
+		for(int i=1; i<numbered.size(); i++)
+		{
+			ConditionalPlanNode node = numbered.get(i);
+			
+			if(node.getAction().getShortName().contains("check"))
+			{
+				Check c = (Check)node.getAction();	
+				
+				if(!branchStartDir.containsKey(node.getId()))
+				{
+					if(currentDir == null)
+						currentDir = CDirection.NORTH;
+				}						
+				else
+					currentDir = branchStartDir.get(node.getId());
+				
+				mapping.put(node.getId(), ID);
+				
+				List<CMove> spins = fromStatetoMoves(ID, c.getFrom(), c.getTo(), currentDir, defSpinAngle);				
+				currentDir = updateDirection(currentDir, spins, defSpinAngle);
+				
+				if(!spins.isEmpty())
+				{
+					ID = spins.get(spins.size()-1).getId();
+					ID++;
+					moves.addAll(spins);
+				}				
+				moves.add(new CSense(ID, node.getBranchClearID(), node.getBranchNotClearID()));	
+				
+				branchStartDir.put(node.getBranchNotClearID(), currentDir);
+			}
+			else if(node.getAction().getShortName().contains("move"))
+			{
+				moves.add(new CStep(ID));
+				mapping.put(node.getId(), ID);
+			}
+			else if(node.getAction().getShortName().contains("stop"))
+			{
+				moves.add(new CStop(ID));
+				mapping.put(node.getId(), ID);
+			}
+			else if(node.getAction().getShortName().contains("fail"))
+			{
+				moves.add(new CFail(ID));
+				mapping.put(node.getId(), ID);
+			}		
+			
+			ID++;
+		}	
+		
+		
+		for(CMove m : moves)
+		{
+			if(m.getType().equals(ConditionalMoveType.SENSE))
+			{
+				((CSense) m).setBranches(mapping.get(((CSense) m).getBranchIDClear()),
+						mapping.get(((CSense) m).getBranchIDNotClear()));
+			}
+		}
+		
+		return moves;
+	}
 	
+	
+	private static CDirection updateDirection(CDirection currentDir, List<CMove> spins, SpinAngle defSpinAngle) {
+
+		HashMap<CDirection, CDirection> rigth = new HashMap<>();
+		rigth.put(CDirection.NORTH, CDirection.EAST);
+		rigth.put(CDirection.EAST, CDirection.SOUTH);
+		rigth.put(CDirection.SOUTH, CDirection.WEST);
+		rigth.put(CDirection.WEST, CDirection.NORTH);
+		
+		
+		HashMap<CDirection, CDirection> left = new HashMap<>();
+		left.put(CDirection.NORTH, CDirection.WEST);
+		left.put(CDirection.EAST, CDirection.NORTH);
+		left.put(CDirection.SOUTH, CDirection.EAST);
+		left.put(CDirection.WEST, CDirection.SOUTH);
+		
+		CDirection dir = currentDir;
+		
+		for(int i=0; i<spins.size(); i++)
+		{
+			if(spins.get(i).toString().contains("r"))
+				dir = rigth.get(dir);
+			else
+				dir = left.get(dir);
+			
+			if(defSpinAngle.equals(SpinAngle.d45)) i++;
+		}
+		
+		return dir;		
+	}
+
+	private static List<CMove> fromStatetoMoves(int startID, State from, State to, CDirection cdir, SpinAngle defSpinAngle)
+	{
+		List<CMove> moves = new ArrayList<CMove>();
+		
+		int spins = (int) (calcRotationAngleInDegrees(cdir.getPhase(), from,  to)/defSpinAngle.getAngle());
+		
+		if(spins > 4)
+			spins = spins - 8;
+		
+		if(spins < -4)
+			spins = 8 + spins;
+		
+		if(spins > 0)
+		{	
+			for(int i=0; i<spins; i++)
+			{
+				moves.add(new CSpin(startID, SpinDirection.RIGHT));
+				startID++;
+			}
+		}
+		else if(spins<0)
+		{
+			for(int i=0; i<Math.abs(spins); i++)
+			{
+				moves.add(new CSpin(startID, SpinDirection.LEFT));
+				startID++;
+			}
+		}	
+		
+		return moves;
+	}
+	
+	private static int calcRotationAngleInDegrees(int startDir, State from, State to)
+	{
+
+	    /*
+	     * calcolo la posizione di to rispetto a from,
+	     * gli associo uno sfasamento rispetto allo zero
+	     * e lo sottraggo a startDir
+	     */
+		
+		int deltaX = to.getX() - from.getX();
+		int deltaY = to.getY() - from.getY();
+		
+		CDirection toEntraceDir = null;
+		
+		if(deltaX == 0 && deltaY == 1)
+			toEntraceDir = CDirection.SOUTH;
+		
+		else if(deltaX == 0 && deltaY == -1)
+			toEntraceDir = CDirection.NORTH;
+		
+		else if(deltaX == 1 && deltaY == 0)
+			toEntraceDir = CDirection.EAST;
+		
+		else
+			toEntraceDir = CDirection.WEST;
+		
+		return toEntraceDir.getPhase() - startDir;		
+	}
+
+	
+//}}	
 }

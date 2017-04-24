@@ -1,6 +1,7 @@
 package it.unibo.main;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import it.unibo.domain.graph.Graph;
 import it.unibo.domain.graph.State;
@@ -77,7 +78,7 @@ public class Main{
 		
 		
 		System.out.println("********** ORDERED ACTIONS *******");
-		ArrayList<ConditionalPlanNode> conditionalPlan = plan.numbering();
+		List<ConditionalPlanNode> conditionalPlan = plan.numbering();
 		
 		for(ConditionalPlanNode a : conditionalPlan)
 		{
