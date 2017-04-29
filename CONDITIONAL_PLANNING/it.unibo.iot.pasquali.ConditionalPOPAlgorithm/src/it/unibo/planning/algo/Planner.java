@@ -336,6 +336,8 @@ public class Planner {
 			
 		}
 		
+		System.out.println(plan.getGraphvizRepresentation());
+		
 		return plan;
 	}
 	
@@ -528,13 +530,13 @@ public class Planner {
 			if(subtree.contains(condition.getBefore()))
 				continue;
 						
-			boolean found = true;
+			boolean found = false;
 			
 			for(ConditioningLink link : plan.getConditioningLinks())
 			{
 				if(factsInConflict(condition.getCondition().getValue(), link.getCondition().getValue()))
 				{
-					found = false;
+					found = true;
 					break;
 				}
 			}
@@ -544,12 +546,15 @@ public class Planner {
 				for(ConditionalAction a : subtree) //TODO dovrei anche aggiornare i contesti a cascata??? Ha senso come cosa?????
 				{
 					if((a instanceof Check) &&
-							((Check)a).getFrom().equals(((Check)condition.getBefore()).getFrom()))
+							((Check)a).getFrom().equals(((Check)condition.getBefore()).getFrom()) &&
+							!((Check)a).getTo().equals(((Check)condition.getBefore()).getTo()))
 					{
 						plan.addConditioningLink(new ConditioningLink(condition.getBefore(),
 								a, ((Check)condition.getBefore()).getLabels().get(1)));
 						
 						plan.addOrderConstraint(new Order(condition.getBefore(), a));
+						
+						//plan.updateContextDescending(a, condition.getBefore().getContext());
 					}
 				}
 			}

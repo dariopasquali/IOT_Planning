@@ -154,6 +154,9 @@ public class Controller {
 	
 	private boolean navigationStep(int i) {
 
+		if(i < 0)
+			return false;
+		
 		CMove move = moves.get(i);			
 		
 		switch(move.getType()){
@@ -206,9 +209,9 @@ public class Controller {
 			if(!alternatives.isEmpty() && backtrack == null)
 				backtrack = alternatives.remove(choose.getParent());
 			
-			if(backtrack == null || choose.getParent() == -1)
+			if(backtrack == null || backtrack.getParent() == -1)
 			{
-				println("FAIL");
+				println("******************** FAIL");
 				return false;						
 			}
 			else
@@ -237,7 +240,7 @@ public class Controller {
 			
 			
 		case STOP:				
-			println("END OF EXECUTION");
+			println("************************* END OF EXECUTION");
 			return false;
 			
 		default:

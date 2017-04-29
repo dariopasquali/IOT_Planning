@@ -298,6 +298,9 @@ public class Plan implements Serializable, IRunnablePopPlan{
 		
 		while(!noPreList.isEmpty())
 		{
+			if(ID == 27)
+				System.out.println("POPP");
+			
 			PlanNode noPre = noPreList.remove(0);
 			
 			conditionalPlan.add(new ConditionalPlanNode((ConditionalAction) noPre.action, ID)); //depth first
@@ -543,6 +546,22 @@ public class Plan implements Serializable, IRunnablePopPlan{
 		return toEntraceDir.getPhase() - startDir;		
 	}
 
-	
+	public String getGraphvizRepresentation()
+	{
+		String graph = "\n\ndigraph conditionalPlan{\n";
+		
+		for(Order o : orders)
+		{
+			graph += "\""+ o.getBefore().getGraphvizLabel() +"\" -> \""+ o.getAfter().getGraphvizLabel() +"\"\n";
+		}		
+		
+		for(ConditioningLink l : conditioningLinks)
+		{
+			String label = (l.getCondition().getID()==1) ? "t" : "f";
+			graph += "\""+ l.getBefore().getGraphvizLabel() +"\" -> \""+ l.getAfter().getGraphvizLabel() +"\" [style=dashed label=\""+label+"\"] \n";
+		}
+		graph += "}";
+		return graph;
+	}
 //}}	
 }

@@ -7,7 +7,7 @@ public class LabelNameGenerator {
 	private static String abc = "abcdefghilmnopqrstuvzABCDEFGHILMNOPQRSTUVZ0123456789";	
 	private static Random random;
 	
-	private static int len = 10;
+	private static int len = 3;
 	
 	static{
 		random = new Random(System.currentTimeMillis());

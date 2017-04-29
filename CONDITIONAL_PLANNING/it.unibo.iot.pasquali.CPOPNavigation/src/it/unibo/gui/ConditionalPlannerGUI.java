@@ -313,6 +313,7 @@ public class ConditionalPlannerGUI extends Frame{
 				println("The agent will navigate autonomously in the map");
 				
 				controller.initNavigation(mapViewer);
+				
 				controller.navigate();
 				mapViewer.setMapState(MapViewer.PLANNING);
 				

@@ -101,6 +101,5 @@ public class ConditionalLabel implements Serializable{
 				return true;
 		
 		return false;	
-	}
-	
+	}	
 }

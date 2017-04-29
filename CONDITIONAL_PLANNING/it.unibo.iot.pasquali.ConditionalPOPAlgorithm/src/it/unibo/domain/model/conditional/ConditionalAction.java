@@ -129,4 +129,15 @@ public class ConditionalAction extends Action implements Serializable{
 		return "";
 	}
 	
+	public String getGraphvizLabel()
+	{
+		String s = "";
+		for(Goal l : reason)
+		s+=""+l.getAction().getShortName().replace("stop", "");
+		
+//		for(ConditionalLabel l : context)
+//			s+=""+l.getUniqueLabel();
+		
+		return getShortName()+s;
+	}
 }
