@@ -103,12 +103,20 @@ public class MapViewer {
 					if(getGridButton(y, x).getBackground().equals(CellState.START.getColor()))
 					{
 						start = null;
+						setCellClear(y, x);
 					}
 					else if(getGridButton(y, x).getBackground().equals(CellState.GOAL.getColor()))
 					{
 						goal = null;
+						setCellClear(y, x);
 					}
-					setCellClear(y, x);				
+					else
+					{
+						getGridButton(y, x).setBackground(CellState.OBJECT.getColor());
+						map.setCellObj(y, x);
+						controller.setObstacle(x,y);
+					}
+									
 				}
 			}
 			else if(mapState == NAVIGATION)

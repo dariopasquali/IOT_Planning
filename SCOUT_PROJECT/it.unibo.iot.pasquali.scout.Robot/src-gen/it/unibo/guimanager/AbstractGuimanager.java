@@ -59,7 +59,7 @@ public abstract class AbstractGuimanager extends QActor {
 	    try{
 	    	int nPlanIter = 0;
 	    	//curPlanInExec =  "init";
-	    	boolean returnValue = suspendWork;
+	    	boolean returnValue = continueWork;
 	    while(true){
 	    	curPlanInExec =  "init";	//within while since it can be lost by switchlan
 	    	nPlanIter++;
@@ -87,7 +87,7 @@ public abstract class AbstractGuimanager extends QActor {
 	    try{
 	    	int nPlanIter = 0;
 	    	//curPlanInExec =  "enableOrDie";
-	    	boolean returnValue = suspendWork;
+	    	boolean returnValue = continueWork;
 	    while(true){
 	    	curPlanInExec =  "enableOrDie";	//within while since it can be lost by switchlan
 	    	nPlanIter++;
@@ -110,7 +110,7 @@ public abstract class AbstractGuimanager extends QActor {
 	    try{
 	    	int nPlanIter = 0;
 	    	//curPlanInExec =  "waitMap";
-	    	boolean returnValue = suspendWork;
+	    	boolean returnValue = continueWork;
 	    while(true){
 	    	curPlanInExec =  "waitMap";	//within while since it can be lost by switchlan
 	    	nPlanIter++;
@@ -157,7 +157,7 @@ public abstract class AbstractGuimanager extends QActor {
 	    try{
 	    	int nPlanIter = 0;
 	    	//curPlanInExec =  "waitUpdates";
-	    	boolean returnValue = suspendWork;
+	    	boolean returnValue = continueWork;
 	    while(true){
 	    	curPlanInExec =  "waitUpdates";	//within while since it can be lost by switchlan
 	    	nPlanIter++;
@@ -221,7 +221,7 @@ public abstract class AbstractGuimanager extends QActor {
 	    try{
 	    	int nPlanIter = 0;
 	    	//curPlanInExec =  "consultPrologFailure";
-	    	boolean returnValue = suspendWork;
+	    	boolean returnValue = continueWork;
 	    while(true){
 	    	curPlanInExec =  "consultPrologFailure";	//within while since it can be lost by switchlan
 	    	nPlanIter++;

@@ -77,7 +77,7 @@ protected IActorAction  action;
     try{
     	int nPlanIter = 0;
     	//curPlanInExec =  "init";
-    	boolean returnValue = suspendWork;
+    	boolean returnValue = continueWork;
     while(true){
     	curPlanInExec =  "init";	//within while since it can be lost by switchlan
     	nPlanIter++;
@@ -131,7 +131,7 @@ protected IActorAction  action;
     try{
     	int nPlanIter = 0;
     	//curPlanInExec =  "waitConsoleCommand";
-    	boolean returnValue = suspendWork;
+    	boolean returnValue = continueWork;
     while(true){
     	curPlanInExec =  "waitConsoleCommand";	//within while since it can be lost by switchlan
     	nPlanIter++;
@@ -204,7 +204,7 @@ protected IActorAction  action;
     try{
     	int nPlanIter = 0;
     	//curPlanInExec =  "exploration";
-    	boolean returnValue = suspendWork;
+    	boolean returnValue = continueWork;
     while(true){
     	curPlanInExec =  "exploration";	//within while since it can be lost by switchlan
     	nPlanIter++;
@@ -223,7 +223,7 @@ protected IActorAction  action;
     try{
     	int nPlanIter = 0;
     	//curPlanInExec =  "explorationFile";
-    	boolean returnValue = suspendWork;
+    	boolean returnValue = continueWork;
     while(true){
     	curPlanInExec =  "explorationFile";	//within while since it can be lost by switchlan
     	nPlanIter++;
@@ -256,7 +256,7 @@ protected IActorAction  action;
     		emit( "end", temporaryStr );
     		temporaryStr = "\"Exploration Done ****************************\"";
     		println( temporaryStr );  
-    		returnValue = continueWork; //we must restore nPlanIter and curPlanInExec of the 'interrupted' plan
+    		//we should restore nPlanIter and curPlanInExec of the 'interrupted' plan ???
     break;
     }//while
     return returnValue;
@@ -270,7 +270,7 @@ protected IActorAction  action;
     try{
     	int nPlanIter = 0;
     	//curPlanInExec =  "explorationDebug";
-    	boolean returnValue = suspendWork;
+    	boolean returnValue = continueWork;
     while(true){
     	curPlanInExec =  "explorationDebug";	//within while since it can be lost by switchlan
     	nPlanIter++;
@@ -291,7 +291,7 @@ protected IActorAction  action;
     		emit( "end", temporaryStr );
     		temporaryStr = "\"Exploration Done ****************************\"";
     		println( temporaryStr );  
-    		returnValue = continueWork; //we must restore nPlanIter and curPlanInExec of the 'interrupted' plan
+    		//we should restore nPlanIter and curPlanInExec of the 'interrupted' plan ???
     break;
     }//while
     return returnValue;
@@ -305,7 +305,7 @@ protected IActorAction  action;
     try{
     	int nPlanIter = 0;
     	//curPlanInExec =  "navigation";
-    	boolean returnValue = suspendWork;
+    	boolean returnValue = continueWork;
     while(true){
     	curPlanInExec =  "navigation";	//within while since it can be lost by switchlan
     	nPlanIter++;
@@ -344,7 +344,7 @@ protected IActorAction  action;
     try{
     	int nPlanIter = 0;
     	//curPlanInExec =  "navigationFile";
-    	boolean returnValue = suspendWork;
+    	boolean returnValue = continueWork;
     while(true){
     	curPlanInExec =  "navigationFile";	//within while since it can be lost by switchlan
     	nPlanIter++;
@@ -387,7 +387,7 @@ protected IActorAction  action;
     try{
     	int nPlanIter = 0;
     	//curPlanInExec =  "startNavigation";
-    	boolean returnValue = suspendWork;
+    	boolean returnValue = continueWork;
     while(true){
     	curPlanInExec =  "startNavigation";	//within while since it can be lost by switchlan
     	nPlanIter++;
@@ -460,7 +460,7 @@ protected IActorAction  action;
     try{
     	int nPlanIter = 0;
     	//curPlanInExec =  "waitAndEvaluate";
-    	boolean returnValue = suspendWork;
+    	boolean returnValue = continueWork;
     while(true){
     	curPlanInExec =  "waitAndEvaluate";	//within while since it can be lost by switchlan
     	nPlanIter++;
@@ -494,7 +494,7 @@ protected IActorAction  action;
     try{
     	int nPlanIter = 0;
     	//curPlanInExec =  "notifyUnexpectedObstacle";
-    	boolean returnValue = suspendWork;
+    	boolean returnValue = continueWork;
     while(true){
     	curPlanInExec =  "notifyUnexpectedObstacle";	//within while since it can be lost by switchlan
     	nPlanIter++;
@@ -524,7 +524,7 @@ protected IActorAction  action;
     try{
     	int nPlanIter = 0;
     	//curPlanInExec =  "notifyEndOfNavigation";
-    	boolean returnValue = suspendWork;
+    	boolean returnValue = continueWork;
     while(true){
     	curPlanInExec =  "notifyEndOfNavigation";	//within while since it can be lost by switchlan
     	nPlanIter++;
@@ -546,7 +546,7 @@ protected IActorAction  action;
     try{
     	int nPlanIter = 0;
     	//curPlanInExec =  "simulatedWorldChanged";
-    	boolean returnValue = suspendWork;
+    	boolean returnValue = continueWork;
     while(true){
     	curPlanInExec =  "simulatedWorldChanged";	//within while since it can be lost by switchlan
     	nPlanIter++;
@@ -566,7 +566,7 @@ protected IActorAction  action;
     try{
     	int nPlanIter = 0;
     	//curPlanInExec =  "abort";
-    	boolean returnValue = suspendWork;
+    	boolean returnValue = continueWork;
     while(true){
     	curPlanInExec =  "abort";	//within while since it can be lost by switchlan
     	nPlanIter++;
@@ -586,7 +586,7 @@ protected IActorAction  action;
     try{
     	int nPlanIter = 0;
     	//curPlanInExec =  "handleTimeout";
-    	boolean returnValue = suspendWork;
+    	boolean returnValue = continueWork;
     while(true){
     	curPlanInExec =  "handleTimeout";	//within while since it can be lost by switchlan
     	nPlanIter++;
@@ -605,7 +605,7 @@ protected IActorAction  action;
     try{
     	int nPlanIter = 0;
     	//curPlanInExec =  "explorationFailure";
-    	boolean returnValue = suspendWork;
+    	boolean returnValue = continueWork;
     while(true){
     	curPlanInExec =  "explorationFailure";	//within while since it can be lost by switchlan
     	nPlanIter++;
@@ -624,7 +624,7 @@ protected IActorAction  action;
     try{
     	int nPlanIter = 0;
     	//curPlanInExec =  "loadMapFailure";
-    	boolean returnValue = suspendWork;
+    	boolean returnValue = continueWork;
     while(true){
     	curPlanInExec =  "loadMapFailure";	//within while since it can be lost by switchlan
     	nPlanIter++;
@@ -643,7 +643,7 @@ protected IActorAction  action;
     try{
     	int nPlanIter = 0;
     	//curPlanInExec =  "findpathFailure";
-    	boolean returnValue = suspendWork;
+    	boolean returnValue = continueWork;
     while(true){
     	curPlanInExec =  "findpathFailure";	//within while since it can be lost by switchlan
     	nPlanIter++;
@@ -662,7 +662,7 @@ protected IActorAction  action;
     try{
     	int nPlanIter = 0;
     	//curPlanInExec =  "navigationFailure";
-    	boolean returnValue = suspendWork;
+    	boolean returnValue = continueWork;
     while(true){
     	curPlanInExec =  "navigationFailure";	//within while since it can be lost by switchlan
     	nPlanIter++;
@@ -681,7 +681,7 @@ protected IActorAction  action;
     try{
     	int nPlanIter = 0;
     	//curPlanInExec =  "alternativeFindpathFailure";
-    	boolean returnValue = suspendWork;
+    	boolean returnValue = continueWork;
     while(true){
     	curPlanInExec =  "alternativeFindpathFailure";	//within while since it can be lost by switchlan
     	nPlanIter++;
@@ -700,7 +700,7 @@ protected IActorAction  action;
     try{
     	int nPlanIter = 0;
     	//curPlanInExec =  "consultPrologFailure";
-    	boolean returnValue = suspendWork;
+    	boolean returnValue = continueWork;
     while(true){
     	curPlanInExec =  "consultPrologFailure";	//within while since it can be lost by switchlan
     	nPlanIter++;
@@ -719,7 +719,7 @@ protected IActorAction  action;
     try{
     	int nPlanIter = 0;
     	//curPlanInExec =  "generalPrologFailure";
-    	boolean returnValue = suspendWork;
+    	boolean returnValue = continueWork;
     while(true){
     	curPlanInExec =  "generalPrologFailure";	//within while since it can be lost by switchlan
     	nPlanIter++;

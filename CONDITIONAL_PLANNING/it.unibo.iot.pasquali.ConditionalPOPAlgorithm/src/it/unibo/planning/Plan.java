@@ -298,9 +298,6 @@ public class Plan implements Serializable, IRunnablePopPlan{
 		
 		while(!noPreList.isEmpty())
 		{
-			if(ID == 27)
-				System.out.println("POPP");
-			
 			PlanNode noPre = noPreList.remove(0);
 			
 			conditionalPlan.add(new ConditionalPlanNode((ConditionalAction) noPre.action, ID)); //depth first

@@ -489,14 +489,14 @@ public class MapCreator extends Frame{
 				
 				FileDialog storeDialog = new FileDialog(frame, "Create new Map", FileDialog.SAVE);
 				storeDialog.setDirectory("C:\\");
-				storeDialog.setFile(".pl");
+				storeDialog.setFile("");
 				storeDialog.setVisible(true);
 				String fname = storeDialog.getDirectory()+storeDialog.getFile();
 				if(fname.contains("null"))
 					break;
 				
 				storeMap(fname);
-				storePopGraph(fname+".pop");
+				//storePopGraph(fname+".pop");
 				
 				break;
 				

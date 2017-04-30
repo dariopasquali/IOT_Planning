@@ -12,7 +12,9 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
@@ -65,7 +67,6 @@ public class ConditionalPlannerGUI extends Frame{
 	private JButton btnCreatePlan;
 	private JButton btnNavigate;
 	private Component horizontalStrut_5;
-	private JButton btnNextStep;
 	private JCheckBox checkOnlyBorders;
 	private Component horizontalStrut_6;
 
@@ -73,6 +74,9 @@ public class ConditionalPlannerGUI extends Frame{
 
 	private JTextArea txtOut;
 	private JScrollBar scrollBar;
+	
+	private Plan plan;
+	private ClickHandler handler;
 	
 	
 	/**
@@ -96,6 +100,9 @@ public class ConditionalPlannerGUI extends Frame{
 	 * Create the application.
 	 */
 	public ConditionalPlannerGUI() {
+		
+		handler = new ClickHandler();
+		
 		initialize();
 		initializeOutputFrame();
 	}
@@ -104,7 +111,7 @@ public class ConditionalPlannerGUI extends Frame{
 	 * Initialize the contents of the frame.
 	 */
 	private void initialize() {
-		
+			
 		frame = new JFrame();
 		frame.setBounds(100, 100, 911, 485);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -133,13 +140,13 @@ public class ConditionalPlannerGUI extends Frame{
 		
 		btnLoad = new JButton("Load Map");
 		btnLoad.setFont(new Font("Tahoma", Font.PLAIN, 15));
-		btnLoad.addActionListener(new ClickHandler());
+		btnLoad.addActionListener(handler);
 		boxMapManager.add(btnLoad);
 		
 		btnCreatePlan = new JButton("Create Plan");
 		btnCreatePlan.setEnabled(false);
 		btnCreatePlan.setFont(new Font("Tahoma", Font.PLAIN, 15));
-		btnCreatePlan.addActionListener(new ClickHandler());
+		btnCreatePlan.addActionListener(handler);
 		boxMapManager.add(btnCreatePlan);
 		
 		checkOnlyBorders = new JCheckBox("Only Borders");
@@ -165,24 +172,18 @@ public class ConditionalPlannerGUI extends Frame{
 		btnSavePlan = new JButton("Save Plan");
 		btnSavePlan.setEnabled(false);
 		btnSavePlan.setFont(new Font("Tahoma", Font.PLAIN, 15));
-		btnSavePlan.addActionListener(new ClickHandler());
+		btnSavePlan.addActionListener(handler);
 		boxMapManager.add(btnSavePlan);
 		
 		horizontalStrut_5 = Box.createHorizontalStrut(20);
 		boxMapManager.add(horizontalStrut_5);
 		
-		btnNavigate = new JButton("Navigate (auto)");
+		btnNavigate = new JButton("Navigate");
 		btnNavigate.setEnabled(false);
 		btnNavigate.setFont(new Font("Tahoma", Font.PLAIN, 15));
-		btnNavigate.addActionListener(new ClickHandler());
+		btnNavigate.addActionListener(handler);
 		
 		boxMapManager.add(btnNavigate);
-		
-		btnNextStep = new JButton("Next Step (manual)");
-		btnNextStep.setFont(new Font("Tahoma", Font.PLAIN, 15));
-		btnNextStep.setEnabled(false);
-		btnNextStep.addActionListener(new ClickHandler());
-		boxMapManager.add(btnNextStep);
 		
 		panelMap = new JPanel();
 		GridBagConstraints gbc_panel = new GridBagConstraints();
@@ -202,7 +203,7 @@ public class ConditionalPlannerGUI extends Frame{
 		controller = new Controller();		
 		controller.setPlanningMode(PlanningMode.WITH_OBJECTS);
 		
-		mapViewer = new MapViewer(controller); 	
+		mapViewer = new MapViewer(controller);
 	}
 
 	private void initializeOutputFrame()
@@ -238,7 +239,6 @@ public class ConditionalPlannerGUI extends Frame{
 		controller.setStdOutput(txtOut);
 	}
 	
-	
 	private class ClickHandler implements ActionListener{
 
 		boolean initDone = false;
@@ -262,7 +262,7 @@ public class ConditionalPlannerGUI extends Frame{
 				
 				println("Left Click --> select START position");
 				println("Right Click --> select GOAL position");
-				println("Wheel Click --> erease selection");
+				println("Wheel Click --> plance obstacle and erase position");
 				println("If you tick the 'Only Borders' checkbox,\n the system creates a more generic plan, but it requires more time");
 				
 				break;
@@ -286,28 +286,26 @@ public class ConditionalPlannerGUI extends Frame{
 				
 				long s = System.currentTimeMillis();
 				
-				List<ConditionalPlanNode> plan = controller.createPlan(new State(start.getX(), start.getY()), new State(goal.getX(), goal.getY()));
+				plan = controller.createPlan(new State(start.getX(), start.getY()), new State(goal.getX(), goal.getY()));
 				
 				println("TIME ---> "+(System.currentTimeMillis()-s));
 				
 				
-				showPlan(plan);
+				showPlan(plan.numbering());
 				
 				btnSavePlan.setEnabled(true);
 				btnNavigate.setEnabled(true);
-				btnNextStep.setEnabled(true);
 				
 				break;
 				
 			case "Save Plan":
 				
-				println("not yet implemented :(");
+				storePlan(plan);
 				
 				break;
 				
-			case "Navigate (auto)":
+			case "Navigate":
 				
-				btnNextStep.setEnabled(false);
 				mapViewer.setMapState(MapViewer.NAVIGATION);
 				
 				println("The agent will navigate autonomously in the map");
@@ -319,30 +317,33 @@ public class ConditionalPlannerGUI extends Frame{
 				
 				break;
 				
-			case "Next Step (manual)":
-				
-				if(!initDone)
-				{
-					println("the agent will navigate in the map following the generated plan");
-					println("click this button for every step to navigate");
-					println("You can click a CLEAR cell in order to create a new obstacle");
-					
-					btnNavigate.setEnabled(false);
-					mapViewer.setMapState(MapViewer.NAVIGATION);
-					
-					controller.initNavigation(mapViewer);
-					
-					initDone = true;
-				}
-				
-				initDone = controller.nextStep();				
-				break;			
+//			case "Next Step (manual)":
+//				
+//				if(!initDone)
+//				{
+//					println("the agent will navigate in the map following the generated plan");
+//					println("click this button for every step to navigate");
+//					println("You can click a CLEAR cell in order to create a new obstacle");
+//					
+//					btnNavigate.setEnabled(false);
+//					mapViewer.setMapState(MapViewer.NAVIGATION);
+//					
+//					controller.initNavigation(mapViewer);
+//					
+//					initDone = true;
+//				}
+//				
+//				initDone = controller.nextStep();				
+//				break;			
 			}
 			
 			
 		}
 		
 	}
+	
+	
+	
 	
 	public Map loadMap(){
 		
@@ -391,7 +392,45 @@ public class ConditionalPlannerGUI extends Frame{
 		return m;			
 	}	
 	
-	
+	public void storePlan(Plan plan){
+		
+		FileDialog storeDialog = new FileDialog(frame, "Create new Plan", FileDialog.SAVE);
+		storeDialog.setDirectory("C:\\");
+		storeDialog.setVisible(true);
+		String fname = storeDialog.getDirectory()+storeDialog.getFile();
+		if(fname.contains("null"))
+			return;
+		
+		String head = "/*"
+				+ "\n*"
+				+ "\n* A GraphViz DOT FSM description"
+				+ "\n* Please use a GraphViz visualizer (like http://www.webgraphviz.com)"
+				+ "\n*"
+				+ "\n* Generated by DP"
+				+ "\n*"
+				+ "\n*/";
+		
+		String numbered = "";
+		for(ConditionalPlanNode n : plan.numbering())
+			numbered += n.toString()+"\n";
+		
+		String graphviz = head + "\n\n\n" + plan.getGraphvizRepresentation();
+		
+		
+		try
+		{
+			FileOutputStream fsout = new FileOutputStream( new File(fname+".txt") );
+			fsout.write(numbered.getBytes());
+			fsout.close();		
+			
+			fsout = new FileOutputStream( new File(fname+".gviz") );
+			fsout.write(graphviz.getBytes());
+			fsout.close();
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+ 		}
+	}
 	
 	public void showPlan(List<ConditionalPlanNode> plan) {
 

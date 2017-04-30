@@ -33,7 +33,8 @@ public class Controller {
 
 	private Map map;
 	private PlanningMode planningMode;
-	private List<ConditionalPlanNode> plan;
+	private Plan plan;
+	private List<ConditionalPlanNode> conditionalPlan;
 	
 	private List<CMove> moves;
 	private Engine engine;
@@ -64,7 +65,7 @@ public class Controller {
 			this.map = map;				
 	}
 
-	public List<ConditionalPlanNode> createPlan(State start, State goal) {
+	public Plan createPlan(State start, State goal) {
 		
 		this.start = start;
 		
@@ -88,7 +89,8 @@ public class Controller {
 		
 		try
 		{
-			plan = planner.findPlan().numbering();
+			plan = planner.findPlan();
+			conditionalPlan = plan.numbering();
 			return plan;
 		}
 		catch (Exception e) 
@@ -110,7 +112,7 @@ public class Controller {
 
 		this.view = mapViewer;
 		
-		moves = Plan.expandPlan(plan, SpinAngle.d90);
+		moves = Plan.expandPlan(conditionalPlan, SpinAngle.d90);
 		
 		println("\n-------------------------------------------\n");
 		println("EXPANDED RUNNABLE CONDITIONAL PLAN\n");
@@ -139,124 +141,124 @@ public class Controller {
 	}
 
 	
-	public boolean nextStep() {
-		
-		if(nextStepPointer < moves.size() && keepNav)
-		{
-			keepNav = navigationStep(nextStepPointer);
-			nextStepPointer++;
-		}
-		
-		return keepNav;		
-	}
-
-	
-	
-	private boolean navigationStep(int i) {
-
-		if(i < 0)
-			return false;
-		
-		CMove move = moves.get(i);			
-		
-		switch(move.getType()){
-		
-		case STEP:				
-			Point next = engine.makeMove((CStep) move);				
-			view.updateCurrentPosition(next.y, next.x, engine.getDirection().toString());				
-			reverse.push(((CStep)move).getReverse());
-			
-			System.out.println("STEP");
-			break;				
-			
-			
-		case SPIN:
-			CDirection ndir = engine.makeSpin((CSpin) move);				
-			view.updateCurrentPosition(engine.getPosition().y, engine.getPosition().x, ndir.toString());				
-			reverse.push(((CSpin)move).getReverse());
-			
-			System.out.println("SPIN "+ move.toString());
-			break;
-			
-			
-		case SENSE:
-			
-			System.out.println("SENSE");
-			
-			choose.setReverse(reverse);
-			alternatives.put(choose.getId(), choose);
-			reverse = new ArrayDeque<CMove>();
-			
-			if(sense(engine.getPosition(), engine.getDirection())) //next position is CLEAR
-			{
-				choose = new Choose(parentID, i, ((CSense)move).getBranchIDNotClear());
-				parentID = i;
-			}
-			else
-			{
-				choose = new Choose(parentID, i, failID);
-				parentID = i;
-				nextStepPointer = ((CSense)move).getBranchIDNotClear()-1;
-			}				
-			break;
-			
-		
-			
-		case FAIL:
-			
-			Choose backtrack = alternatives.remove(parentID);
-			
-			if(!alternatives.isEmpty() && backtrack == null)
-				backtrack = alternatives.remove(choose.getParent());
-			
-			if(backtrack == null || backtrack.getParent() == -1)
-			{
-				println("******************** FAIL");
-				return false;						
-			}
-			else
-			{
-				while(!backtrack.getReverse().isEmpty())
-				{
-					CMove m = backtrack.getReverse().pop();
-					
-					if(m.getType().equals(ConditionalMoveType.STEP))
-					{
-						engine.makeMove(m);
-						view.updateCurrentPosition(engine.getPosition().y, engine.getPosition().x, engine.getDirection().toString());
-					}
-					else
-					{
-						engine.makeSpin(m);
-						view.updateCurrentPosition(engine.getPosition().y, engine.getPosition().x, engine.getDirection().toString());
-					}
-				}
-				
-				parentID = backtrack.getParent();
-				nextStepPointer = backtrack.getAlternativeID()-1;					
-			}				
-			break;
-			
-			
-			
-		case STOP:				
-			println("************************* END OF EXECUTION");
-			return false;
-			
-		default:
-			return true;			
-		
-		}	
-		
-		
-//		try {
-//			Thread.sleep(700);
-//		} catch (InterruptedException e) {
-//			e.printStackTrace();
+//	public boolean nextStep() {
+//		
+//		if(nextStepPointer < moves.size() && keepNav)
+//		{
+//			keepNav = navigationStep(nextStepPointer);
+//			nextStepPointer++;
 //		}
-		
-		return true;
-	}
+//		
+//		return keepNav;		
+//	}
+
+	
+	
+//	private boolean navigationStep(int i) {
+//
+//		if(i < 0)
+//			return false;
+//		
+//		CMove move = moves.get(i);			
+//		
+//		switch(move.getType()){
+//		
+//		case STEP:				
+//			Point next = engine.makeMove((CStep) move);				
+//			view.updateCurrentPosition(next.y, next.x, engine.getDirection().toString());				
+//			reverse.push(((CStep)move).getReverse());
+//			
+//			System.out.println("STEP");
+//			break;				
+//			
+//			
+//		case SPIN:
+//			CDirection ndir = engine.makeSpin((CSpin) move);				
+//			view.updateCurrentPosition(engine.getPosition().y, engine.getPosition().x, ndir.toString());				
+//			reverse.push(((CSpin)move).getReverse());
+//			
+//			System.out.println("SPIN "+ move.toString());
+//			break;
+//			
+//			
+//		case SENSE:
+//			
+//			System.out.println("SENSE");
+//			
+//			choose.setReverse(reverse);
+//			alternatives.put(choose.getId(), choose);
+//			reverse = new ArrayDeque<CMove>();
+//			
+//			if(sense(engine.getPosition(), engine.getDirection())) //next position is CLEAR
+//			{
+//				choose = new Choose(parentID, i, ((CSense)move).getBranchIDNotClear());
+//				parentID = i;
+//			}
+//			else
+//			{
+//				choose = new Choose(parentID, i, failID);
+//				parentID = i;
+//				nextStepPointer = ((CSense)move).getBranchIDNotClear()-1;
+//			}				
+//			break;
+//			
+//		
+//			
+//		case FAIL:
+//			
+//			Choose backtrack = alternatives.remove(parentID);
+//			
+//			if(!alternatives.isEmpty() && backtrack == null)
+//				backtrack = alternatives.remove(choose.getParent());
+//			
+//			if(backtrack == null || backtrack.getParent() == -1)
+//			{
+//				println("******************** FAIL");
+//				return false;						
+//			}
+//			else
+//			{
+//				while(!backtrack.getReverse().isEmpty())
+//				{
+//					CMove m = backtrack.getReverse().pop();
+//					
+//					if(m.getType().equals(ConditionalMoveType.STEP))
+//					{
+//						engine.makeMove(m);
+//						view.updateCurrentPosition(engine.getPosition().y, engine.getPosition().x, engine.getDirection().toString());
+//					}
+//					else
+//					{
+//						engine.makeSpin(m);
+//						view.updateCurrentPosition(engine.getPosition().y, engine.getPosition().x, engine.getDirection().toString());
+//					}
+//				}
+//				
+//				parentID = backtrack.getParent();
+//				nextStepPointer = backtrack.getAlternativeID()-1;					
+//			}				
+//			break;
+//			
+//			
+//			
+//		case STOP:				
+//			println("************************* END OF EXECUTION");
+//			return false;
+//			
+//		default:
+//			return true;			
+//		
+//		}	
+//		
+//		
+////		try {
+////			Thread.sleep(700);
+////		} catch (InterruptedException e) {
+////			e.printStackTrace();
+////		}
+//		
+//		return true;
+//	}
 	
 	private boolean sense(Point position, CDirection direction) {
 
@@ -421,7 +423,7 @@ public class Controller {
 				
 				
 				try {
-					Thread.sleep(500);
+					Thread.sleep(1000);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}

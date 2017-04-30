@@ -36,10 +36,6 @@ import it.unibo.qactors.QActorUtils;
  * @author Dario
  *
  */
-/**
- * @author Dario
- *
- */
 public class Robot extends AbstractRobot { 
 	
 	private int defaultSpeed, defaultTime;
