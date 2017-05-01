@@ -120,4 +120,6 @@ public interface IMap {
 	 * @param x  width coordinate of the cell
 	 */
 	void setCellObj(int y, int x);
+	
+	public Integer[][] getNoObjects();
 }

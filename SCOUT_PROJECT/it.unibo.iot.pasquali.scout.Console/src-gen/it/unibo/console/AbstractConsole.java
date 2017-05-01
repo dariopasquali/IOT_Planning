@@ -59,7 +59,7 @@ public abstract class AbstractConsole extends QActor {
 	    try{
 	    	int nPlanIter = 0;
 	    	//curPlanInExec =  "init";
-	    	boolean returnValue = continueWork;
+	    	boolean returnValue = suspendWork;		//MARCHH2017
 	    while(true){
 	    	curPlanInExec =  "init";	//within while since it can be lost by switchlan
 	    	nPlanIter++;
@@ -103,15 +103,14 @@ public abstract class AbstractConsole extends QActor {
 	    try{
 	    	int nPlanIter = 0;
 	    	//curPlanInExec =  "waitGUICommand";
-	    	boolean returnValue = continueWork;
+	    	boolean returnValue = suspendWork;		//MARCHH2017
 	    while(true){
 	    	curPlanInExec =  "waitGUICommand";	//within while since it can be lost by switchlan
 	    	nPlanIter++;
 	    		temporaryStr = "\"++++++++++++++++++ WAIT COMMAND ++++++++++++++++++\"";
 	    		println( temporaryStr );  
 	    		//senseEvent
-	    		timeoutval = 999999999;
-	    		aar = planUtils.senseEvents( timeoutval,"local_gui_command","continue",
+	    		aar = planUtils.senseEvents( 999999999,"local_gui_command","continue",
 	    		"" , "",ActionExecMode.synch );
 	    		if( ! aar.getGoon() || aar.getTimeRemained() <= 0 ){
 	    			//println("			WARNING: sense timeout");
@@ -213,7 +212,7 @@ public abstract class AbstractConsole extends QActor {
 	    try{
 	    	int nPlanIter = 0;
 	    	//curPlanInExec =  "loadMap";
-	    	boolean returnValue = continueWork;
+	    	boolean returnValue = suspendWork;		//MARCHH2017
 	    while(true){
 	    	curPlanInExec =  "loadMap";	//within while since it can be lost by switchlan
 	    	nPlanIter++;
@@ -244,7 +243,7 @@ public abstract class AbstractConsole extends QActor {
 	    try{
 	    	int nPlanIter = 0;
 	    	//curPlanInExec =  "exploration";
-	    	boolean returnValue = continueWork;
+	    	boolean returnValue = suspendWork;		//MARCHH2017
 	    while(true){
 	    	curPlanInExec =  "exploration";	//within while since it can be lost by switchlan
 	    	nPlanIter++;
@@ -274,7 +273,7 @@ public abstract class AbstractConsole extends QActor {
 	    try{
 	    	int nPlanIter = 0;
 	    	//curPlanInExec =  "explorationDebug";
-	    	boolean returnValue = continueWork;
+	    	boolean returnValue = suspendWork;		//MARCHH2017
 	    while(true){
 	    	curPlanInExec =  "explorationDebug";	//within while since it can be lost by switchlan
 	    	nPlanIter++;
@@ -315,13 +314,12 @@ public abstract class AbstractConsole extends QActor {
 	    try{
 	    	int nPlanIter = 0;
 	    	//curPlanInExec =  "waitEndOfExploration";
-	    	boolean returnValue = continueWork;
+	    	boolean returnValue = suspendWork;		//MARCHH2017
 	    while(true){
 	    	curPlanInExec =  "waitEndOfExploration";	//within while since it can be lost by switchlan
 	    	nPlanIter++;
 	    		//senseEvent
-	    		timeoutval = 999999999;
-	    		aar = planUtils.senseEvents( timeoutval,"local_gui_command,expdata,end","continue,continue,continue",
+	    		aar = planUtils.senseEvents( 999999999,"local_gui_command,expdata,end","continue,continue,continue",
 	    		"" , "",ActionExecMode.synch );
 	    		if( ! aar.getGoon() || aar.getTimeRemained() <= 0 ){
 	    			//println("			WARNING: sense timeout");
@@ -381,7 +379,7 @@ public abstract class AbstractConsole extends QActor {
 	    try{
 	    	int nPlanIter = 0;
 	    	//curPlanInExec =  "endOfExploration";
-	    	boolean returnValue = continueWork;
+	    	boolean returnValue = suspendWork;		//MARCHH2017
 	    while(true){
 	    	curPlanInExec =  "endOfExploration";	//within while since it can be lost by switchlan
 	    	nPlanIter++;
@@ -403,7 +401,7 @@ public abstract class AbstractConsole extends QActor {
 	    try{
 	    	int nPlanIter = 0;
 	    	//curPlanInExec =  "findPath";
-	    	boolean returnValue = continueWork;
+	    	boolean returnValue = suspendWork;		//MARCHH2017
 	    while(true){
 	    	curPlanInExec =  "findPath";	//within while since it can be lost by switchlan
 	    	nPlanIter++;
@@ -434,7 +432,7 @@ public abstract class AbstractConsole extends QActor {
 	    try{
 	    	int nPlanIter = 0;
 	    	//curPlanInExec =  "navigation";
-	    	boolean returnValue = continueWork;
+	    	boolean returnValue = suspendWork;		//MARCHH2017
 	    while(true){
 	    	curPlanInExec =  "navigation";	//within while since it can be lost by switchlan
 	    	nPlanIter++;
@@ -462,7 +460,7 @@ public abstract class AbstractConsole extends QActor {
 	    try{
 	    	int nPlanIter = 0;
 	    	//curPlanInExec =  "navigationFile";
-	    	boolean returnValue = continueWork;
+	    	boolean returnValue = suspendWork;		//MARCHH2017
 	    while(true){
 	    	curPlanInExec =  "navigationFile";	//within while since it can be lost by switchlan
 	    	nPlanIter++;
@@ -490,13 +488,12 @@ public abstract class AbstractConsole extends QActor {
 	    try{
 	    	int nPlanIter = 0;
 	    	//curPlanInExec =  "waitEndOfNavigation";
-	    	boolean returnValue = continueWork;
+	    	boolean returnValue = suspendWork;		//MARCHH2017
 	    while(true){
 	    	curPlanInExec =  "waitEndOfNavigation";	//within while since it can be lost by switchlan
 	    	nPlanIter++;
 	    		//senseEvent
-	    		timeoutval = 999999999;
-	    		aar = planUtils.senseEvents( timeoutval,"local_gui_command,update,end","continue,continue,continue",
+	    		aar = planUtils.senseEvents( 999999999,"local_gui_command,update,end","continue,continue,continue",
 	    		"" , "",ActionExecMode.synch );
 	    		if( ! aar.getGoon() || aar.getTimeRemained() <= 0 ){
 	    			//println("			WARNING: sense timeout");
@@ -556,7 +553,7 @@ public abstract class AbstractConsole extends QActor {
 	    try{
 	    	int nPlanIter = 0;
 	    	//curPlanInExec =  "endOfNavigation";
-	    	boolean returnValue = continueWork;
+	    	boolean returnValue = suspendWork;		//MARCHH2017
 	    while(true){
 	    	curPlanInExec =  "endOfNavigation";	//within while since it can be lost by switchlan
 	    	nPlanIter++;
@@ -576,7 +573,7 @@ public abstract class AbstractConsole extends QActor {
 	    try{
 	    	int nPlanIter = 0;
 	    	//curPlanInExec =  "abortCommand";
-	    	boolean returnValue = continueWork;
+	    	boolean returnValue = suspendWork;		//MARCHH2017
 	    while(true){
 	    	curPlanInExec =  "abortCommand";	//within while since it can be lost by switchlan
 	    	nPlanIter++;
@@ -598,7 +595,7 @@ public abstract class AbstractConsole extends QActor {
 	    try{
 	    	int nPlanIter = 0;
 	    	//curPlanInExec =  "clearGUI";
-	    	boolean returnValue = continueWork;
+	    	boolean returnValue = suspendWork;		//MARCHH2017
 	    while(true){
 	    	curPlanInExec =  "clearGUI";	//within while since it can be lost by switchlan
 	    	nPlanIter++;
@@ -626,7 +623,7 @@ public abstract class AbstractConsole extends QActor {
 	    try{
 	    	int nPlanIter = 0;
 	    	//curPlanInExec =  "clearPath";
-	    	boolean returnValue = continueWork;
+	    	boolean returnValue = suspendWork;		//MARCHH2017
 	    while(true){
 	    	curPlanInExec =  "clearPath";	//within while since it can be lost by switchlan
 	    	nPlanIter++;
@@ -654,7 +651,7 @@ public abstract class AbstractConsole extends QActor {
 	    try{
 	    	int nPlanIter = 0;
 	    	//curPlanInExec =  "handleTimeout";
-	    	boolean returnValue = continueWork;
+	    	boolean returnValue = suspendWork;		//MARCHH2017
 	    while(true){
 	    	curPlanInExec =  "handleTimeout";	//within while since it can be lost by switchlan
 	    	nPlanIter++;
@@ -673,7 +670,7 @@ public abstract class AbstractConsole extends QActor {
 	    try{
 	    	int nPlanIter = 0;
 	    	//curPlanInExec =  "explorationFailure";
-	    	boolean returnValue = continueWork;
+	    	boolean returnValue = suspendWork;		//MARCHH2017
 	    while(true){
 	    	curPlanInExec =  "explorationFailure";	//within while since it can be lost by switchlan
 	    	nPlanIter++;
@@ -692,7 +689,7 @@ public abstract class AbstractConsole extends QActor {
 	    try{
 	    	int nPlanIter = 0;
 	    	//curPlanInExec =  "loadMapFailure";
-	    	boolean returnValue = continueWork;
+	    	boolean returnValue = suspendWork;		//MARCHH2017
 	    while(true){
 	    	curPlanInExec =  "loadMapFailure";	//within while since it can be lost by switchlan
 	    	nPlanIter++;
@@ -711,7 +708,7 @@ public abstract class AbstractConsole extends QActor {
 	    try{
 	    	int nPlanIter = 0;
 	    	//curPlanInExec =  "findpathFailure";
-	    	boolean returnValue = continueWork;
+	    	boolean returnValue = suspendWork;		//MARCHH2017
 	    while(true){
 	    	curPlanInExec =  "findpathFailure";	//within while since it can be lost by switchlan
 	    	nPlanIter++;
@@ -730,7 +727,7 @@ public abstract class AbstractConsole extends QActor {
 	    try{
 	    	int nPlanIter = 0;
 	    	//curPlanInExec =  "navigationFailure";
-	    	boolean returnValue = continueWork;
+	    	boolean returnValue = suspendWork;		//MARCHH2017
 	    while(true){
 	    	curPlanInExec =  "navigationFailure";	//within while since it can be lost by switchlan
 	    	nPlanIter++;
@@ -749,7 +746,7 @@ public abstract class AbstractConsole extends QActor {
 	    try{
 	    	int nPlanIter = 0;
 	    	//curPlanInExec =  "alternativeFindpathFailure";
-	    	boolean returnValue = continueWork;
+	    	boolean returnValue = suspendWork;		//MARCHH2017
 	    while(true){
 	    	curPlanInExec =  "alternativeFindpathFailure";	//within while since it can be lost by switchlan
 	    	nPlanIter++;
@@ -768,7 +765,7 @@ public abstract class AbstractConsole extends QActor {
 	    try{
 	    	int nPlanIter = 0;
 	    	//curPlanInExec =  "consultPrologFailure";
-	    	boolean returnValue = continueWork;
+	    	boolean returnValue = suspendWork;		//MARCHH2017
 	    while(true){
 	    	curPlanInExec =  "consultPrologFailure";	//within while since it can be lost by switchlan
 	    	nPlanIter++;
@@ -787,7 +784,7 @@ public abstract class AbstractConsole extends QActor {
 	    try{
 	    	int nPlanIter = 0;
 	    	//curPlanInExec =  "generalPrologFailure";
-	    	boolean returnValue = continueWork;
+	    	boolean returnValue = suspendWork;		//MARCHH2017
 	    while(true){
 	    	curPlanInExec =  "generalPrologFailure";	//within while since it can be lost by switchlan
 	    	nPlanIter++;

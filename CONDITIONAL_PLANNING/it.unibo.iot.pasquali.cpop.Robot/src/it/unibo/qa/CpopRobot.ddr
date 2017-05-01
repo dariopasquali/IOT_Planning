@@ -7,7 +7,7 @@ RobotSystem scout
 // From Console to Robot to start the Navigation
 Dispatch navigate : navigate ( PLAN_MOVES , POS )
 Dispatch navigatefile : navigatefile( PLAN_MOVES , POS , FILENAME)
-//PLAN = plan ( [ t || d || l || r ] )
+//PLAN_MOVES = plan ( [ t || d || l || r ] )
 //POS = position ( Xs , Ys )
 // 
 //t = forward tiled

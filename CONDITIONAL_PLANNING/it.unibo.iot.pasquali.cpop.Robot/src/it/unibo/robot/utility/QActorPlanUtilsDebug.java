@@ -81,10 +81,6 @@ public class QActorPlanUtilsDebug extends QActorPlanUtils{
 			{
 				obj = engine.checkObjFront();
 			}
-			else
-			{
-				obj = engine.checkObjLeft();
-			}
 			
 			if(!obj)
 			{

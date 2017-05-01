@@ -104,13 +104,17 @@ public class NavigationController {
 						
 						if(m.getType().equals(ConditionalMoveType.STEP))
 						{
-							engine.makeMove(m);
-							publish(new CState(engine.getPosition(), engine.getDirection()));
+							if(m.toString().contains("t"))
+								engine.moveForward();
+							else
+								engine.moveBackward();
 						}
 						else
 						{
-							engine.makeSpin(m);
-							publish(new CState(engine.getPosition(), engine.getDirection()));
+							if(m.toString().contains("r"))
+								engine.turnDoubleRight();
+							else
+								engine.turnDoubleLeft();
 						}
 					}
 					
@@ -138,6 +142,8 @@ public class NavigationController {
 			}
 			
 		}
+		
+		return true;
 		
 	}
 	

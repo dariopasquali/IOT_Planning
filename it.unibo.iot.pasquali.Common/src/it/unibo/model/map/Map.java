@@ -431,6 +431,7 @@ public class Map implements IMap{
 	}
 //}}
 
+	@Override
 	public Integer[][] getNoObjects() {
 
 		Integer[][] noobj = new Integer[ymax+1][xmax+1];

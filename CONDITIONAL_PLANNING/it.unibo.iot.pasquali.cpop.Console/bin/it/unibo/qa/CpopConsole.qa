@@ -1,0 +1,155 @@
+System scout
+
+// ------------------------------------------------------------------
+//		NAVIGATION - INTERACTION
+// ------------------------------------------------------------------
+
+// From Console to Robot to start the Navigation
+Dispatch navigate : navigate( PLAN_MOVES , POS )
+Dispatch navigatefile : navigatefile( PLAN_MOVES , POS , FILENAME)
+//PLAN_MOVES = plan ( [ t || d || l || r ] )
+//POS = position ( Xs , Ys )
+// 
+//t = forward tiled
+//l = left (90 degrees)
+//r = right
+//h = stop
+//f = fail
+
+// ------------------------------------------------------------------
+//		COMMON - INTERACTION
+// ------------------------------------------------------------------
+
+// Raised by Robot when it ends the current command
+Event end : end
+
+
+// ------------------------------------------------------------------
+//		LOCAL - INTERACTION
+// ------------------------------------------------------------------
+
+
+// Raised by the GUI on user interaction
+Event local_gui_command : local_gui_command(COMMAND)
+ 
+//Button --> COMMAND
+//
+//Load Map --> loadmap ( PATH );
+//Create Plan –-> createplan ( START , GOAL , MODE ); MODE = objects || clear
+//Navigate --> navigate(MODE); MODE = simulated || robot
+//Save Plan --> saveplan( PLAN );
+
+
+// ------------------------------------------------------------------
+//			CONTEXTS
+// ------------------------------------------------------------------
+
+Context ctxRobot ip [ host="localhost" port=8020]
+Context ctxConsole ip [ host="localhost" port=8010]
+
+QActor console context ctxConsole{
+	
+// ------------------------------------------------------------------
+//			NORMAL PLANS
+// ------------------------------------------------------------------
+	
+	Plan init normal
+		solve consult("navConsoleTheory.pl") time(0) onFailSwitchTo  consultPrologFailure ;		
+		solve consult("consoleTheory.pl") time(0) onFailSwitchTo  consultPrologFailure ;
+		
+ 		println("++++++++++++++++++ console(starts) ++++++++++++++++++");
+ 		switchToPlan waitGUICommand
+ 		
+ 		
+ 	Plan waitGUICommand
+		println("++++++++++++++++++ WAIT COMMAND ++++++++++++++++++");
+		
+		sense time(999999999) local_gui_command -> continue;
+				
+		printCurrentEvent;
+		memoCurrentEvent;
+		
+		onEvent local_gui_command : local_gui_command (loadmap(PATH)) -> switchToPlan loadMap;
+ 		onEvent local_gui_command : local_gui_command (createplan(START,GOAL,MODE)) -> switchToPlan createPlan;
+ 		onEvent local_gui_command : local_gui_command (navigate(robot)) -> switchToPlan navigation;
+ 		onEvent local_gui_command : local_gui_command (navigate(simulated)) -> switchToPlan navigationFile;
+ 		onEvent local_gui_command : local_gui_command (saveplan(PLAN)) -> switchToPlan savePlan;
+		
+		repeatPlan 0
+		
+	Plan loadMap resumeLastPlan
+		[?? msg(local_gui_command, "event", SENDER, none, local_gui_command (loadmap(PATH)), MSGNUM)]
+			 solve loadMap(PATH) time(210000000) onFailSwitchTo loadMapFailure;
+				
+		println("++++++++++++++++++ MAP LOADED ++++++++++++++++++")
+		
+		
+	Plan savePlan resumeLastPlan
+		[?? msg(local_gui_command, "event", SENDER, none, local_gui_command (saveplan(PLAN)), MSGNUM)]
+			 solve loadPap(PATH) time(210000000) onFailSwitchTo loadMapFailure;
+				
+		println("++++++++++++++++++ MAP LOADED ++++++++++++++++++")
+	
+// --------------------- NAVIGATION --------------------------------
+
+			
+	Plan createPlan resumeLastPlan
+	
+		[?? msg(local_gui_command, "event", SENDER, none, local_gui_command (createplan(START,GOAL,MODE)), MSGNUM)]
+			solve createPlan(START,GOAL,MODE) time(210000000) onFailSwitchTo  generalPrologFailure;
+	
+		println("++++++++++++++++++ PLAN CREATED ++++++++++++++++++")
+	
+			
+	Plan navigation
+		println("++++++++++++++++++ NAVIGATION ++++++++++++++++++");
+		
+		solve startNavigation time(60000) onFailSwitchTo  navigationFailure;		
+		switchToPlan waitEndOfNavigation
+		
+		
+	Plan navigationFile
+		println("++++++++++++++++++ NAVIGATION FILE ++++++++++++++++++");
+		
+		solve startNavigationFile time(60000) onFailSwitchTo  navigationFailure;		
+		switchToPlan waitEndOfNavigation	
+		
+		
+	Plan waitEndOfNavigation
+	
+		sense time(999999999) end -> endOfNavigation;
+		repeatPlan 0
+
+	Plan endOfNavigation
+	
+		println("++++++++++++++++++ NAVIGATION ENDED :D ++++++++++++++++++");
+		switchToPlan waitGUICommand	
+	
+
+
+// ------------------------------------------------------------------
+//	PROLOG FAILURE ERROR HANDLERS
+// ------------------------------------------------------------------
+		
+	Plan handleTimeout
+ 		println("timeout!! GOODBYE")
+ 	
+ 	Plan loadMapFailure           
+		println("Load Map FAILURE" ) 
+		 
+ 	Plan navigationFailure            
+		println("Navigation FAILURE" )
+		
+	Plan consultPrologFailure            
+		println("The consult is gone wrong, maybe there are errors in the prolog file" ) 
+ 		
+ 	Plan generalPrologFailure            
+		println("Prolog goal FAILURE" ) 	
+	
+}
+
+
+QActor robot context ctxRobot{
+ 	Plan init normal		
+		println( "just a placeholder" ) 	
+ }

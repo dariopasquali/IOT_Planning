@@ -9,13 +9,10 @@ import java.util.Set;
 import it.unibo.contactEvent.interfaces.IEventItem;
 import it.unibo.domain.model.implementation.*;
 import it.unibo.model.map.Map;
-import it.unibo.planning.astar.domain.Move;
 import it.unibo.planning.enums.Direction;
 import it.unibo.planning.enums.ForwardMoveType;
 import it.unibo.planning.enums.MoveType;
 import it.unibo.planning.enums.SpinDirection;
-import it.unibo.qactors.action.AsynchActionResult;
-import it.unibo.qactors.action.IActorAction.ActionExecMode;
 import it.unibo.robot.Robot;
 
 public class Engine {
@@ -215,7 +212,7 @@ public class Engine {
 		//System.out.println(currentMap.toString());
 	}
 	
-	private void moveBackward() {
+	public void moveBackward() {
 		
 		Direction cd = state.getDirection();
 		

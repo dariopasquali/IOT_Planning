@@ -168,9 +168,8 @@ public class Robot extends AbstractRobot {
 	 * It uses the default speed and duration, defined in the initial config method.</br>
 	 * 
 	 * <b>WARNING</b>: the default rotation angle is 45°;</br>
-	 * <b>WARNING</b>: The diagonal moments require more time then the tiled moments.
+	 * <b>WARNING</b>: The diagonal movements require more time then the tiled movements.
 	 * 
-	 * @param planName	The name of the executable plan and the relative file
 	 * @param plan		prolog list [m1, m2, ...] of movements
 	 */
 	public void setNavigationPlan(String plan)	{
@@ -191,6 +190,11 @@ public class Robot extends AbstractRobot {
 		
 		controller = new NavigationController(plan.split(","), engine);			
 	}	
+	
+	
+	public void navigate(){		
+		controller.navigate();		
+	}
 	
 
 	/**
