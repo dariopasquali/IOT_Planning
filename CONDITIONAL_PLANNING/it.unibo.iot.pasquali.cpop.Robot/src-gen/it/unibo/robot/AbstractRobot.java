@@ -230,7 +230,7 @@ protected IActorAction  action;
     		parg = "loadNavigationData(PLAN_MOVES,POS,FILENAME)";
     		parg = QActorUtils.substituteVars(guardVars,parg);
     		//REGENERATE AKKA
-    		aar = solveGoalReactive(parg,100000,"","");
+    		aar = solveGoalReactive(parg,100000000,"","");
     		//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
     		if( aar.getInterrupted() ){
     			curPlanInExec   = "navigationFile";

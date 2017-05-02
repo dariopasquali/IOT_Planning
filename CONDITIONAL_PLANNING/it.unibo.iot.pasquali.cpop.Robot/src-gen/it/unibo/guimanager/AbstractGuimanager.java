@@ -131,7 +131,7 @@ public abstract class AbstractGuimanager extends QActor {
 	    		 		parg =  updateVars( Term.createTerm("enableGUI(START,FILENAME)"), Term.createTerm("enableGUI(START,FILENAME)"), 
 	    		 			    		  					Term.createTerm(currentEvent.getMsg()), parg);
 	    		 			if( parg != null ) {
-	    		 			    aar = QActorUtils.solveGoal(this,myCtx,pengine,parg,"",outEnvView,0);
+	    		 			    aar = QActorUtils.solveGoal(this,myCtx,pengine,parg,"",outEnvView,1000000000);
 	    		 				//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
 	    		 				if( aar.getInterrupted() ){
 	    		 					curPlanInExec   = "waitMap";

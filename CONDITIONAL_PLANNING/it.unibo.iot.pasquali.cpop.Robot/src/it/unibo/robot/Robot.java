@@ -284,14 +284,14 @@ public class Robot extends AbstractRobot {
 	}		
 	
 	
-	@Override
-	public AsynchActionResult solveGoalReactive(String goal, int time, String evList, String planList){
-		
-		System.out.println("solve ---> "+goal);
-		
-		super.solveGoal(goal);
-		return new AsynchActionResult(null, time+1, true, true, "", null);		
-	}
+//	@Override
+//	public AsynchActionResult solveGoalReactive(String goal, int time, String evList, String planList){
+//		
+//		System.out.println("solve ---> "+goal);
+//		
+//		super.solveGoal(goal);
+//		return new AsynchActionResult(null, time+1, true, true, "", null);		
+//	}
 	
 //}}	
 	
@@ -480,6 +480,11 @@ public class Robot extends AbstractRobot {
 				System.out.println(s.toString());
 			}
 		}
+		
+		 @Override
+		public void println(String msg){
+			 System.out.println(msg);
+		 }
 	//}}
 	
 	
@@ -492,7 +497,9 @@ public class Robot extends AbstractRobot {
 	{
 		try
 		{
-			super.execute("forward", defaultSpeed, 0, defaultTime, "", "");
+			println("move Forward");
+			super.execRobotMove(curPlanInExec, "forward", defaultSpeed, 0, defaultTime, "", "");
+			//super.execute("forward", defaultSpeed, 0, defaultTime, "", "");
 		}
 		catch (Exception e) 
 		{
@@ -508,7 +515,9 @@ public class Robot extends AbstractRobot {
 	{
 		try
 		{
-			super.execute("backward", defaultSpeed, 0, defaultTime, "", "");
+			println("move Backward");
+			super.execRobotMove(curPlanInExec, "backward", defaultSpeed, 0, defaultTime, "", "");
+			//super.execute("backward", defaultSpeed, 0, defaultTime, "", "");
 		}
 		catch (Exception e) 
 		{
@@ -524,7 +533,9 @@ public class Robot extends AbstractRobot {
 	{
 		try
 		{
-			super.execute("left", defaultTurnSpeed, 0, defaultTurnTime, "", "");
+			println("turn Left");
+			super.execRobotMove(curPlanInExec, "left", defaultSpeed, 0, defaultTime, "", "");
+//			super.execute("left", defaultTurnSpeed, 0, defaultTurnTime, "", "");
 		}
 		catch (Exception e) 
 		{
@@ -540,7 +551,9 @@ public class Robot extends AbstractRobot {
 	{
 		try
 		{
-			super.execute("right", defaultTurnSpeed, 0, defaultTurnTime, "", "");
+			println("turn Right");
+			super.execRobotMove(curPlanInExec, "rigth", defaultSpeed, 0, defaultTime, "", "");
+			//super.execute("right", defaultTurnSpeed, 0, defaultTurnTime, "", "");
 		}
 		catch (Exception e) 
 		{

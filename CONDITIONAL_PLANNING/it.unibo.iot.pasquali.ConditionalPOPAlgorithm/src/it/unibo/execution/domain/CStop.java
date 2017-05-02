@@ -8,6 +8,7 @@ public class CStop extends CMove{
 	{
 		super(ID, ConditionalMoveType.STOP);
 		this.prologRep = "h";
+		this.guiRep = "h";
 	}
 
 }

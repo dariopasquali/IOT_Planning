@@ -23,7 +23,7 @@ public class NavigationController {
 		this.engine = engine;
 		
 		for(String s : plan)
-			this.plan.add(CMove.fromStringToCMove(s));
+			this.plan.add(CMove.fromPrologToCMove(s));
 	}
 	
 	public boolean navigate()
@@ -69,7 +69,7 @@ public class NavigationController {
 				alternatives.put(choose.getId(), choose);
 				reverse = new ArrayDeque<CMove>();
 				
-				if(engine.checkObjFront()) //next position is CLEAR
+				if(!engine.checkObjFront()) //next position is CLEAR
 				{
 					choose = new Choose(parentID, i, ((CSense)move).getBranchIDNotClear());
 					parentID = i;
@@ -136,7 +136,7 @@ public class NavigationController {
 			
 			
 			try {
-				Thread.sleep(1000);
+				Thread.sleep(500);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}

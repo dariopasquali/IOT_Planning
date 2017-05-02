@@ -86,7 +86,7 @@ QActor console context ctxConsole{
 		
 	Plan savePlan resumeLastPlan
 		[?? msg(local_gui_command, "event", SENDER, none, local_gui_command (saveplan(PLAN)), MSGNUM)]
-			 solve loadPap(PATH) time(210000000) onFailSwitchTo loadMapFailure;
+			 solve savePlan(PATH) time(210000000) onFailSwitchTo loadMapFailure;
 				
 		println("++++++++++++++++++ MAP LOADED ++++++++++++++++++")
 	

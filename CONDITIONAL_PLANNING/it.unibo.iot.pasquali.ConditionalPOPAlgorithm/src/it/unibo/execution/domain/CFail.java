@@ -8,5 +8,6 @@ public class CFail extends CMove{
 	{
 		super(ID, ConditionalMoveType.FAIL);
 		this.prologRep = "f";
+		this.guiRep = "f";
 	}	
 }

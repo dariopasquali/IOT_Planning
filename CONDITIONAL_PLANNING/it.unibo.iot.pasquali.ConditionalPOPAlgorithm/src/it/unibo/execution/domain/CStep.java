@@ -8,12 +8,14 @@ public class CStep extends CMove{
 	{
 		super(ID, ConditionalMoveType.STEP);
 		this.prologRep = "t";
+		this.guiRep = "t";
 	}
 	
 	public CStep(int ID, String prologRep)
 	{
 		super(ID, ConditionalMoveType.STEP);
 		this.prologRep = prologRep;
+		this.guiRep = prologRep;
 	}
 		
 	public CMove getReverse()

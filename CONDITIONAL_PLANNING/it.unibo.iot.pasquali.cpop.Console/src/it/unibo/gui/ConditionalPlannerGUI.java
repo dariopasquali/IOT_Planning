@@ -489,8 +489,7 @@ public class ConditionalPlannerGUI extends Frame implements IOutputEnvView, IBas
 
 	@Override
 	public void addOutput(String msg) {
-		// TODO Auto-generated method stub
-		
+		println(msg);		
 	}
 
 	@Override
@@ -603,13 +602,14 @@ public class ConditionalPlannerGUI extends Frame implements IOutputEnvView, IBas
 
 	@Override
 	public void setEnvVisible(boolean b) {
-		// TODO Auto-generated method stub
+
+		this.frame.setVisible(true);
+		this.outputFrame.setVisible(true);
 		
 	}
 
 	@Override
 	public IBasicEnvAwt getEnv() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 }

@@ -85,7 +85,7 @@ QActor guimanager context ctxRobot{
 		println("++++++++++++++++++++++++++ ROBOT GUI WAIT MAP ++++++++++++++++++");		
 		sense time(1000000000) enableGUI -> continue;
 		printCurrentEvent;
-		onEvent enableGUI : enableGUI(START, FILENAME) -> solve showMap(START, FILENAME) time(0);
+		onEvent enableGUI : enableGUI(START, FILENAME) -> solve showMap(START, FILENAME) time(1000000000);
 		
 		switchToPlan waitUpdates	
 		
@@ -157,7 +157,7 @@ Robot mockScout QActor robot context ctxRobot{
  								emit enableGUI : enableGUI(POS, FILENAME);
  		
  		[?? msg(_, _, SENDER, X, navigatefile( PLAN_MOVES , POS , FILENAME), MSGNUM)] 
- 			solve loadNavigationData(PLAN_MOVES, POS, FILENAME) time (100000) onFailSwitchTo loadMapFailure;
+ 			solve loadNavigationData(PLAN_MOVES, POS, FILENAME) time (100000000) onFailSwitchTo loadMapFailure;
  		
  		switchToPlan startNavigation 	
  		

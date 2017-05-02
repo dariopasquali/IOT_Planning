@@ -19,6 +19,8 @@ import it.unibo.domain.graph.Graph;
 import it.unibo.domain.graph.State;
 import it.unibo.domain.model.conditional.Check;
 import it.unibo.domain.model.conditional.Move;
+import it.unibo.execution.domain.CMove;
+import it.unibo.execution.enums.SpinAngle;
 import it.unibo.gui.ConditionalPlannerGUI;
 import it.unibo.is.interfaces.IActivity;
 import it.unibo.is.interfaces.IIntent;
@@ -39,7 +41,7 @@ import it.unibo.model.interfaces.IGUI;
  */
 public class Console extends AbstractConsole implements IActivity{ 
 	
-	public static final int MODE_WITH_OBJECTS = 0, MODE_ONLY_BORDERS = 1;
+	public static final String MODE_WITH_OBJECTS = "objects", MODE_ONLY_BORDERS = "clear";
 	
 	private IMap map;
 	private static ConditionalPlannerGUI env = new ConditionalPlannerGUI();
@@ -49,12 +51,15 @@ public class Console extends AbstractConsole implements IActivity{
 	
 	private Plan plan;
 	private List<ConditionalPlanNode> conditionalPlan;
+	private List<CMove> expandedConditionalPlan;
+	
+	private long planningTime = 0L;
 	
 	public Console(String actorId, QActorContext myCtx, IOutputEnvView outEnvView )  throws Exception
 	{
 		super(actorId, myCtx, env);
 		((IGUI) env).setController(this);
-		((ConditionalPlannerGUI) env).setVisible(true);
+		env.setEnvVisible(true);
 	}
 	
 //{{ NAVIGATION METHODS -------------------------------------------------
@@ -67,8 +72,10 @@ public class Console extends AbstractConsole implements IActivity{
 	 * @param gx  x coordinate of GOAL state
 	 * @param gy  y coordinate of GOAL state
 	 */
-	public void createPlan(int sx, int sy, int gx, int gy, int mode)
+	public void createPlan(int sx, int sy, int gx, int gy, String mode)
 	{		
+		println("start plan creation");
+		
 		this.sx = sx;
 		this.sy = sy;
 		this.gx = gx;
@@ -78,7 +85,7 @@ public class Console extends AbstractConsole implements IActivity{
 		
 		IMap forHeuristic = null;
 		
-		if(mode == MODE_WITH_OBJECTS)
+		if(mode.equals(MODE_WITH_OBJECTS))
 		{
 			graph = getPOPGraph(map.getIntMap(), map.getXmax(), map.getYmax());
 		}
@@ -93,8 +100,13 @@ public class Console extends AbstractConsole implements IActivity{
 		
 		try
 		{
-			plan = planner.findPlan();
+			long start = System.currentTimeMillis();			
+			plan = planner.findPlan();			
+			planningTime = System.currentTimeMillis() - start;
+			
 			conditionalPlan = plan.numbering();
+			expandedConditionalPlan = Plan.expandPlan(conditionalPlan, SpinAngle.d90);
+			
 		}
 		catch (Exception e) 
 		{
@@ -250,10 +262,10 @@ public class Console extends AbstractConsole implements IActivity{
 	private String getPrologPlan()
 	{
 		String moves = "plan([";
-		for(int i=0; i<conditionalPlan.size(); i++)
+		for(int i=0; i<expandedConditionalPlan.size(); i++)
 		{
-			moves += conditionalPlan.get(i).toString();
-			if(i!=conditionalPlan.size()-1)
+			moves += expandedConditionalPlan.get(i).getPrologRep();
+			if(i!=expandedConditionalPlan.size()-1)
 				moves+=",";
 		}
 		moves+="])";
@@ -373,7 +385,7 @@ public class Console extends AbstractConsole implements IActivity{
 			
 	}
 	
-	public void storePlan(String path)
+	public void savePlan(String path)
 	{
 		String head = "/*"
 				+ "\n*"
@@ -405,7 +417,31 @@ public class Console extends AbstractConsole implements IActivity{
 			e.printStackTrace();
  		}
 	}
-	
+
+	public void showPlan() {
+
+		if(plan == null)
+		{
+			println("ERROR! plan is NULL");
+			return;
+		}
+		
+		println("\n---------------------------\n");
+		println("CONDITIONAL PLAN");
+		
+		for(ConditionalPlanNode n : conditionalPlan)
+			println(n.toString());		
+		
+		println("\n\n---------------------------\n");
+		println("EXPANDED PLAN");
+		
+		for(CMove n : expandedConditionalPlan)
+			println(n.toString());	
+		
+		println("\n\n---------------------------\n");
+		println("PLANNING TIME ---> "+planningTime);
+		
+	}
 	
 //}}
 	

@@ -210,7 +210,7 @@ public abstract class AbstractConsole extends QActor {
 	    	curPlanInExec =  "savePlan";	//within while since it can be lost by switchlan
 	    	nPlanIter++;
 	    		if( (guardVars = QActorUtils.evalTheGuard(this, " ??msg(local_gui_command,\"event\",SENDER,none,local_gui_command(saveplan(PLAN)),MSGNUM)" )) != null ){
-	    		parg = "loadPap(PATH)";
+	    		parg = "savePlan(PATH)";
 	    		parg = QActorUtils.substituteVars(guardVars,parg);
 	    		//REGENERATE AKKA
 	    		aar = solveGoalReactive(parg,210000000,"","");

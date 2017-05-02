@@ -11,6 +11,7 @@ public class CSpin extends CMove{
 	{
 		super(ID, ConditionalMoveType.SPIN);
 		this.prologRep = dir.toString();
+		this.guiRep = dir.toString();
 		this.dir = dir;
 	}	
 	
