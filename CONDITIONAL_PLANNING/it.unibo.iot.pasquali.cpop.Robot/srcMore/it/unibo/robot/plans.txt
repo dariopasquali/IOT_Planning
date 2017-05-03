@@ -20,7 +20,7 @@ plan(2,navigationFile, sentence(true,move(solve,initialConfigNavRobot,0,""),'','
 plan(3,navigationFile, sentence( msg( _,_,SENDER,X,navigatefile( PLAN_MOVES,POS,FILENAME),MSGNUM),raise( enableGUI , enableGUI( POS,FILENAME) )'),'','' ))
 plan(4,navigationFile, sentence(-  msg( _,_,SENDER,X,navigatefile( PLAN_MOVES,POS,FILENAME),MSGNUM) ,move(solve,loadNavigationData( PLAN_MOVES,POS,FILENAME),100000000,"loadMapFailure"),'','' ))
 plan(5,navigationFile, sentence(true,move( switchplan(startNavigation) ),'','' ))
-plan(1,startNavigation, sentence(true,move(solve,navigate,0,""),'','' ))
+plan(1,startNavigation, sentence(true,move(solve,navigate,1000000000,""),'','' ))
 plan(1,notifyEndOfNavigation, sentence(true,move(print,"notify End"),'','' ))
 plan(2,notifyEndOfNavigation, sentence(true,raise( end , end )'),'','' ))
 plan(3,notifyEndOfNavigation, sentence(true,move( switchplan(waitConsoleCommand) ),'','' ))

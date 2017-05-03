@@ -328,7 +328,7 @@ executeCmd( Actor,  move(playsound(FNAME,DURATION)), Events, Plans, RES ):-
 	!,
 	Actor <- playSound( FNAME, DURATION, Events, Plans ) returns AAR,
 	AAR <- getResult returns RES.
-executeCmd( Actor,  move(playsound(NAME,DURATION,ENDEVENT)), Events, Plans, RES ):-
+executeCmd( Actor,  move(playsound(FNAME,DURATION,ENDEVENT)), Events, Plans, RES ):-
 	%% output(  executeCmd2(Actor, move(playsound,FNAME,DURATION,ENDEVENT), Events, Plans) ),
 	!,
 	Actor <- playSound( FNAME, ENDEVENT, DURATION  ) returns AAR,
@@ -371,7 +371,7 @@ executeCmd( Actor,  move(actorOp,OPERATION,T,_), Events, Plans, done(actorOp) ):
 	actorPrintln( actorOp(OPERATION )),
 	Actor <- OPERATION. 		
 %%% ---------  Println	---------------	
-executeCmd( Actor,  move(print,ARG), Events, Plans, done(print) ):-
+executeCmd( Actor,  move(print(ARG)), Events, Plans, done(print) ):-
 	text_term(ARGS,ARG),
 	actorPrintln( runplanmsg( ARGS ) ).
 %%% ---------  addRule	---------------	

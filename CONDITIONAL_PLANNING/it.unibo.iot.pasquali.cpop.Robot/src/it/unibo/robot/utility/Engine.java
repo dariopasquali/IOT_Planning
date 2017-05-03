@@ -205,7 +205,7 @@ public class Engine {
 		
 		notifyMyPosition();
 		
-		if(!(this instanceof FileEngine))
+//		if(!(this instanceof FileEngine))
 			actor.moveForward();
 		
 		
@@ -246,7 +246,7 @@ public class Engine {
 		
 		notifyMyPosition();
 		
-		if(!(this instanceof FileEngine))
+//		if(!(this instanceof FileEngine))
 			actor.moveBackward();		
 	}
 	
@@ -269,7 +269,7 @@ public class Engine {
 		
 		notifyMyPosition();
 		
-		if(!(this instanceof FileEngine))
+//		if(!(this instanceof FileEngine))
 			actor.turnLeft();
 	}
 	
@@ -280,7 +280,7 @@ public class Engine {
 		
 		notifyMyPosition();
 		
-		if(!(this instanceof FileEngine))
+//		if(!(this instanceof FileEngine))
 			actor.turnRight();
 	}
 	

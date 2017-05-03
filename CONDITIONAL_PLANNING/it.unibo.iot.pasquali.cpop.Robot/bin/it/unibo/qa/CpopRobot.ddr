@@ -162,7 +162,7 @@ Robot mockScout QActor robot context ctxRobot{
  		switchToPlan startNavigation 	
  		
  	Plan startNavigation 	
- 		solve navigate time(0)
+ 		solve navigate time(1000000000)
 
  	
  	Plan notifyEndOfNavigation	

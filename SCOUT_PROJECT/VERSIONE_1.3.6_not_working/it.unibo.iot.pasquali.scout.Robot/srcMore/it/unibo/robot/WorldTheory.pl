@@ -201,9 +201,6 @@ PLANS
 %%% ---------  runPlan	---------------	
 runPlan(P):-
 	actorobj(Actor),
- 	initPlan(Actor,P).
-initPlan(Actor,P) :-
-	assign( iternum, iternum(P,1) ),
 	execPlan(Actor,P,1).
 execPlan(Actor,P,PC) :-
 	plan(PC, P, S) ,
@@ -261,13 +258,13 @@ runTheSentence(Actor, sentence( not GUARD, MOVE, EVENTS, PLANS ) ):-
 runTheSentence(Actor, sentence( not GUARD, MOVE, EVENTS, PLANS ) ):-
 	!, runTheSentence(Actor, sentence( true, MOVE, EVENTS, PLANS ) ).
 runTheSentence(Actor, sentence( GUARD, MOVE, EVENTS, PLANS ) ):-
- 	 %% output(  runTheSentence111( GUARD, MOVE, EVENTS, PLANS ) ),
+ 	 %% actorPrintln(  runTheSentence111( GUARD, MOVE, EVENTS, PLANS ) ),
   	( GUARD = - G , !, retract(G),  ! ; GUARD, ! ),
- 	 %% output(  preexecuteCmd( GUARD, MOVE, EVENTS, PLANS ) ),
+ 	 %% actorPrintln(  sentence4( GUARD, MOVE, EVENTS, PLANS ) ),
   	( executeCmd(Actor, MOVE, EVENTS, PLANS, RESULT), !,
-  	  %% output(  preexecuteCmdResult(RESULT) ),	
+  	  %% actorPrintln(  sentence4(RESULT) ),	
   	  setAnswer( RESULT  );	  
-  	  %% output(  sentence4( failure ) ),
+  	  %% actorPrintln(  sentence4( failure ) ),
   	  setAnswer( done(MOVE,failure)  )
   	). 
 runTheSentence(Actor, sentence( GUARD, MOVE, EVENTS, PLANS ) ):-   
@@ -319,17 +316,17 @@ executeCmd( Actor, move(robotmove,CMD,SPEED,DURATION,ANGLE), Events, Plans, RES 
  	!,
  	mapCmdToMove(CMD,MOVE), 
 	%% actorPrintln(  executeCmd(Actor,MOVE, SPEED, ANGLE, DURATION, Events, Plans) ),
-	Actor <- myExecute(MOVE, SPEED, ANGLE, DURATION, Events, Plans) returns RES.
-	%%AAR <- getResult returns RES.
+	Actor <- myExecute(MOVE, SPEED, ANGLE, DURATION, Events, Plans) returns AAR,
+	AAR <- getResult returns RES.
 
 %%% ---------  Play sound	---------------
-executeCmd( Actor,  move(playsound(FNAME,DURATION)), Events, Plans, RES ):-
-	%% output(  executeCmd1(Actor, playsound1( FNAME,DURATION ), Events, Plans) ),
+executeCmd( Actor,  move(playsound,FNAME,DURATION), Events, Plans, RES ):-
+	%% actorPrintln(  executeCmd(Actor, playsound1( FNAME,DURATION ), Events, Plans) ),
 	!,
 	Actor <- playSound( FNAME, DURATION, Events, Plans ) returns AAR,
 	AAR <- getResult returns RES.
-executeCmd( Actor,  move(playsound(NAME,DURATION,ENDEVENT)), Events, Plans, RES ):-
-	%% output(  executeCmd2(Actor, move(playsound,FNAME,DURATION,ENDEVENT), Events, Plans) ),
+executeCmd( Actor,  move(playsound,FNAME,DURATION,ENDEVENT), Events, Plans, RES ):-
+	%% actorPrintln(  executeCmd(Actor, move(playsound,FNAME,DURATION,ENDEVENT), Events, Plans) ),
 	!,
 	Actor <- playSound( FNAME, ENDEVENT, DURATION  ) returns AAR,
 	AAR <- getResult returns RES.
@@ -350,38 +347,21 @@ Thus we ignore DURATION and Events, Plans
 */
 executeCmd( Actor,   move(solve,GOAL,DURATION, ANSWEREVENT), Events, Plans, RES ):-
 	%% actorPrintln(  executeCmd(Actor, move(solve,GOAL,DURATION, ANSWEREVENT) ) ),
-	( GOAL, !, RES=GOAL ; RES = failure(GOAL) ),	
- 	%%MARCH2017 Actor <- solveSentence(sentence(true, GOAL, 0, ANSWEREVENT, Events, Plans)) returns AAR,
- 	%%MARCH2017 AAR   <- getResult returns RES,
- 	setPrologResult(RES).
-
-/*	%%MARCH2017 
+ 	Actor <- solveSentence(sentence(true, GOAL, 0, ANSWEREVENT, '', '')) returns AAR,
+ 	AAR   <- getResult returns RES.
+	
 executeCmd( Actor, move(solve,GOAL,DURATION), Events, Plans, RES ):-
 	%% actorPrintln(  executeCmd(Actor, move(solve,GOAL,DURATION) ) ),
 	Actor <- solveSentence(sentence(true, GOAL, 0, '', '', '')) returns AAR,
-	AAR <- getResult returns RES,
-	setPrologResult(RES).
-*/	
+	AAR <- getResult returns RES.
 	%% actorPrintln( result(GOAL,RES) ).
 	%% The following  DOES NOT WORK since pengine is engaged
 	%% Actor <- solveSentence(sentence(true, GOAL, DURATION, '', Events, Plans)) returns AAR.	
  	
-%%% ---------  ActorOp	---------------	
-executeCmd( Actor,  move(actorOp,OPERATION,T,_), Events, Plans, done(actorOp) ):-
-	actorPrintln( actorOp(OPERATION )),
-	Actor <- OPERATION. 		
 %%% ---------  Println	---------------	
 executeCmd( Actor,  move(print,ARG), Events, Plans, done(print) ):-
 	text_term(ARGS,ARG),
-	actorPrintln( runplanmsg( ARGS ) ).
-%%% ---------  addRule	---------------	
-executeCmd( Actor,  addRule(ARG), Events, Plans, done(adRule) ):-
-	%% actorPrintln(  move(addRule,ARG) ),
-	addRule( ARG ).
-%%% ---------  removeRule	---------------	
-executeCmd( Actor,  removeRule(ARG), Events, Plans, done(adRule) ):-
-	%% actorPrintln(  move(removeRule,ARG) ),
-	removeRule( ARG ).
+	actorPrintln(  ARGS ).
 %%% ---------  Emit	---------------	
 executeCmd( Actor,  move(emit,EVID,CONTENT), Events, Plans, done(emit,EVID) ):-
 	actorPrintln(  move(emit,EVID,CONTENT) ),
@@ -393,31 +373,12 @@ executeCmd( Actor,  move(forward, DEST, MSGID, MSGCNT), Events, Plans, done(forw
 	text_concat("''",A1,A2),
 	text_concat(A2,"''",DESTSTR),
  	Actor <- forwardFromProlog( MSGID , DESTSTR , MSGCNT ). 
-%%% ---------  sense	---------------	
-executeCmd( Actor, move(senseEvent,Tout, Events, Plans), E,P, done(senseEvent) ):-
-	output( senseEvent(Events, Plans) ),
-	Actor <- senseEvents(Tout, Events, Plans ).	%%blocks
-
-
+ 
 %%% ---------  plan	---------------	
 executeCmd( Actor, move(runplan,P), Events, Plans,done(runplan(P)) ):-
  	%% actorPrintln( runplan(P) ),
-	execPlan(Actor,P,1).
+	execPlan(Actor,P,0).
 executeCmd( Actor, move(resumePlan), Events, Plans,done(resume(P)) ).
-executeCmd( Actor, move(switchplan,PLAN), Events, Plans,done(switchplan(PLAN)) ):-
-	output( switchplan(Actor, PLAN) ),
-	Actor <- switchPlan(PLAN).
-executeCmd( Actor, repeatplan(0), Events, Plans,done(repeatplan(0)) ):-
-	value(iternum, iternum(P,_)),
-	execPlan(Actor, P, 1).
-executeCmd( Actor, repeatplan(N), Events, Plans,done(repeatplan(0)) ):-
-	value(iternum, iternum(P,PN)),
-	PN1 is PN + 1,
-	( PN1 < N, !, execPlan(Actor, PLAN, 1); true ).
-%%% ---------  collector (default)  --------------	
-executeCmd( Actor, MOVE, Events, Plans,done(MOVE) ):-
-	output( collector(MOVE) ),
-	Actor <- MOVE.
 
 
 /*

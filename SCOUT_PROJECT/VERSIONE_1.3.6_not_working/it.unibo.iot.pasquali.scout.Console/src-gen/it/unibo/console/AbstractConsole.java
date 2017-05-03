@@ -217,15 +217,11 @@ public abstract class AbstractConsole extends QActor {
 	    	curPlanInExec =  "loadMap";	//within while since it can be lost by switchlan
 	    	nPlanIter++;
 	    		if( (guardVars = QActorUtils.evalTheGuard(this, " ??msg(local_gui_command,\"event\",SENDER,none,local_gui_command(loadmap(PATH)),MSGNUM)" )) != null ){
-	    		parg = "loadMap(PATH)";
+	    		parg = "actorOp(loadMapButton(PATH))";
 	    		parg = QActorUtils.substituteVars(guardVars,parg);
-	    		//REGENERATE AKKA
-	    		aar = solveGoalReactive(parg,210000000,"","");
-	    		//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
-	    		if( aar.getInterrupted() ){
-	    			curPlanInExec   = "loadMap";
-	    			if( ! aar.getGoon() ) break;
-	    		} 			
+	    		//aar = solveGoalReactive(parg,3600000,"","");
+	    		//genCheckAar(m.name)Â»
+	    		QActorUtils.solveGoal(parg,pengine );
 	    		}
 	    		temporaryStr = "\"++++++++++++++++++ MAP LOADED ++++++++++++++++++\"";
 	    		println( temporaryStr );  
@@ -279,16 +275,12 @@ public abstract class AbstractConsole extends QActor {
 	    	nPlanIter++;
 	    		temporaryStr = "\"++++++++++++++++++ EXPLORATION DEBUG ++++++++++++++++++\"";
 	    		println( temporaryStr );  
-	    		if( (guardVars = QActorUtils.evalTheGuard(this, " !?msg(local_gui_command,\"event\",SENDER,none,local_gui_command(explore(FILENAME,START,BOUNDS,MODE)),MSGNUM)" )) != null ){
-	    		parg = "showClearMap(BOUNDS)";
+	    		if( (guardVars = QActorUtils.evalTheGuard(this, " !?msg(local_gui_command,\"event\",SENDER,none,local_gui_command(explore(FILENAME,START,map(W,H),MODE)),MSGNUM)" )) != null ){
+	    		parg = "actorOp(showClearMap(W,H))";
 	    		parg = QActorUtils.substituteVars(guardVars,parg);
-	    		//REGENERATE AKKA
-	    		aar = solveGoalReactive(parg,60000,"","");
-	    		//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
-	    		if( aar.getInterrupted() ){
-	    			curPlanInExec   = "explorationDebug";
-	    			if( ! aar.getGoon() ) break;
-	    		} 			
+	    		//aar = solveGoalReactive(parg,3600000,"","");
+	    		//genCheckAar(m.name)Â»
+	    		QActorUtils.solveGoal(parg,pengine );
 	    		}
 	    		temporaryStr = "\"mappa pulita\"";
 	    		println( temporaryStr );  
@@ -328,21 +320,18 @@ public abstract class AbstractConsole extends QActor {
 	    		printCurrentEvent(false);
 	    		//onEvent
 	    		if( currentEvent.getEventId().equals("expdata") ){
-	    		 		String parg="updateMap(POS,STATE)";
-	    		 		/* PHead */
-	    		 		parg =  updateVars( Term.createTerm("expdata(POS,STATE)"), Term.createTerm("expdata(POS,STATE)"), 
+	    		 		String parg = "actorOp(updateMap(X,Y,STATE))";
+	    		 		/* ActorOp */
+	    		 		parg =  updateVars( Term.createTerm("expdata(POS,STATE)"), Term.createTerm("expdata(position(X,Y),STATE)"), 
 	    		 			    		  					Term.createTerm(currentEvent.getMsg()), parg);
-	    		 			if( parg != null ) {
-	    		 			    aar = QActorUtils.solveGoal(this,myCtx,pengine,parg,"",outEnvView,210000000);
-	    		 				//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
-	    		 				if( aar.getInterrupted() ){
-	    		 					curPlanInExec   = "waitEndOfExploration";
-	    		 					if( ! aar.getGoon() ) break;
-	    		 				} 			
-	    		 				if( aar.getResult().equals("failure")){
-	    		 					if( ! planUtils.switchToPlan("explorationFailure").getGoon() ) break;
-	    		 				}else if( ! aar.getGoon() ) break;
-	    		 			}
+	    		 		if( parg != null ){
+	    		 			aar = solveGoalReactive(parg,3600000,"","");
+	    		 			//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
+	    		 			if( aar.getInterrupted() ){
+	    		 				curPlanInExec   = "waitEndOfExploration";
+	    		 				if( ! aar.getGoon() ) break;
+	    		 			} 			
+	    		 		}
 	    		 }
 	    		//onEvent
 	    		if( currentEvent.getEventId().equals("local_gui_command") ){
@@ -438,14 +427,10 @@ public abstract class AbstractConsole extends QActor {
 	    	nPlanIter++;
 	    		temporaryStr = "\"++++++++++++++++++ NAVIGATION ++++++++++++++++++\"";
 	    		println( temporaryStr );  
-	    		parg = "startNavigation";
-	    		//REGENERATE AKKA
-	    		aar = solveGoalReactive(parg,60000,"","");
-	    		//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
-	    		if( aar.getInterrupted() ){
-	    			curPlanInExec   = "navigation";
-	    			if( ! aar.getGoon() ) break;
-	    		} 			
+	    		parg = "actorOp(sendNavigationData(\"robot\"))";
+	    		//aar = solveGoalReactive(parg,3600000,"","");
+	    		//genCheckAar(m.name)Â»
+	    		QActorUtils.solveGoal(parg,pengine );
 	    		if( ! planUtils.switchToPlan("waitEndOfNavigation").getGoon() ) break;
 	    break;
 	    }//while
@@ -466,14 +451,10 @@ public abstract class AbstractConsole extends QActor {
 	    	nPlanIter++;
 	    		temporaryStr = "\"++++++++++++++++++ NAVIGATION FILE ++++++++++++++++++\"";
 	    		println( temporaryStr );  
-	    		parg = "startNavigationFile";
-	    		//REGENERATE AKKA
-	    		aar = solveGoalReactive(parg,60000,"","");
-	    		//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
-	    		if( aar.getInterrupted() ){
-	    			curPlanInExec   = "navigationFile";
-	    			if( ! aar.getGoon() ) break;
-	    		} 			
+	    		parg = "actorOp(sendNavigationData(\"simulated\"))";
+	    		//aar = solveGoalReactive(parg,3600000,"","");
+	    		//genCheckAar(m.name)Â»
+	    		QActorUtils.solveGoal(parg,pengine );
 	    		if( ! planUtils.switchToPlan("waitEndOfNavigation").getGoon() ) break;
 	    break;
 	    }//while
@@ -599,14 +580,10 @@ public abstract class AbstractConsole extends QActor {
 	    while(true){
 	    	curPlanInExec =  "clearGUI";	//within while since it can be lost by switchlan
 	    	nPlanIter++;
-	    		parg = "clearGUI";
-	    		//REGENERATE AKKA
-	    		aar = solveGoalReactive(parg,10000,"","");
-	    		//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
-	    		if( aar.getInterrupted() ){
-	    			curPlanInExec   = "clearGUI";
-	    			if( ! aar.getGoon() ) break;
-	    		} 			
+	    		parg = "actorOp(myClearGUI)";
+	    		//aar = solveGoalReactive(parg,3600000,"","");
+	    		//genCheckAar(m.name)Â»
+	    		QActorUtils.solveGoal(parg,pengine );
 	    		temporaryStr = "\"map cleared\"";
 	    		println( temporaryStr );  
 	    		returnValue = continueWork;  

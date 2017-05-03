@@ -16,26 +16,17 @@ navConsoleTheory.pl
 	
 searchBestPath(position(Sx,Sy) , position(Gx,Gy)) :-
 	actorPrintln(position(Sx,Sy)),
-	actorPrintln(position(Gx,Gy)),	
-	havemap,
+	actorPrintln(position(Gx,Gy)),
 	actorobj(Actor),
 	Actor <- searchBestPath(Sx,Sy,Gx,Gy),
 	Actor <- showPathOnGui,
 	assert(haveplan).
 
 startNavigation :-
-	havemap,
-	actorPrintln(havemap),
-	haveplan,
-	actorPrintln(haveplan),
 	actorobj(Actor),
 	Actor <-  sendNavigationData(robot).
 
 startNavigationFile :-
-	havemap,
-	actorPrintln(havemap),
-	haveplan,
-	actorPrintln(haveplan),
 	actorobj(Actor),
 	Actor <-  sendNavigationData(simulated).
 

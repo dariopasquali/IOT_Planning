@@ -35,6 +35,8 @@ public class Engine {
 	protected HashMap<Direction, Direction> leftMap,rightMap;
 	private HashMap<String, Move> moveMapping;
 	
+	private boolean makeRealMove = false;
+	
 	public Engine(int startX, int startY, int mapW, int mapH, Robot actor, boolean checkModifyState) {
 		
 		state = new State(startY, startX, Direction.NORTH);
@@ -124,6 +126,11 @@ public class Engine {
 	public Map getMap() {
 		return map;
 	}
+	
+	public void setMakeRealMove(boolean state)
+	{
+		this.makeRealMove = state;
+	}
 		
 	// MOVES -----------------------------------
 		
@@ -211,7 +218,7 @@ public class Engine {
 		
 		notifyMyPosition();
 		
-		if(!(this instanceof FileEngine))
+		if(makeRealMove)
 			actor.moveForward();
 		
 		
@@ -244,7 +251,7 @@ public class Engine {
 		
 		notifyMyPosition();
 		
-		if(!(this instanceof FileEngine))
+		if(makeRealMove)
 			actor.turnLeft();
 	}
 	
@@ -255,7 +262,7 @@ public class Engine {
 		
 		notifyMyPosition();
 		
-		if(!(this instanceof FileEngine))
+		if(makeRealMove)
 			actor.turnRight();
 	}
 	

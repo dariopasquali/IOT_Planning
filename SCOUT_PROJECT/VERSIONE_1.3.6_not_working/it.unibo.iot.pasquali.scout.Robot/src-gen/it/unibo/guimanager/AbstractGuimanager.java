@@ -59,7 +59,7 @@ public abstract class AbstractGuimanager extends QActor {
 	    try{
 	    	int nPlanIter = 0;
 	    	//curPlanInExec =  "init";
-	    	boolean returnValue = suspendWork;		//MARCHH2017
+	    	boolean returnValue = continueWork;
 	    while(true){
 	    	curPlanInExec =  "init";	//within while since it can be lost by switchlan
 	    	nPlanIter++;
@@ -87,7 +87,7 @@ public abstract class AbstractGuimanager extends QActor {
 	    try{
 	    	int nPlanIter = 0;
 	    	//curPlanInExec =  "enableOrDie";
-	    	boolean returnValue = suspendWork;		//MARCHH2017
+	    	boolean returnValue = continueWork;
 	    while(true){
 	    	curPlanInExec =  "enableOrDie";	//within while since it can be lost by switchlan
 	    	nPlanIter++;
@@ -110,14 +110,15 @@ public abstract class AbstractGuimanager extends QActor {
 	    try{
 	    	int nPlanIter = 0;
 	    	//curPlanInExec =  "waitMap";
-	    	boolean returnValue = suspendWork;		//MARCHH2017
+	    	boolean returnValue = continueWork;
 	    while(true){
 	    	curPlanInExec =  "waitMap";	//within while since it can be lost by switchlan
 	    	nPlanIter++;
 	    		temporaryStr = "\"++++++++++++++++++++++++++ ROBOT GUI WAIT MAP ++++++++++++++++++\"";
 	    		println( temporaryStr );  
 	    		//senseEvent
-	    		aar = planUtils.senseEvents( 1000000000,"enableGUI","continue",
+	    		timeoutval = 1000000000;
+	    		aar = planUtils.senseEvents( timeoutval,"enableGUI","continue",
 	    		"" , "",ActionExecMode.synch );
 	    		if( ! aar.getGoon() || aar.getTimeRemained() <= 0 ){
 	    			//println("			WARNING: sense timeout");
@@ -156,12 +157,13 @@ public abstract class AbstractGuimanager extends QActor {
 	    try{
 	    	int nPlanIter = 0;
 	    	//curPlanInExec =  "waitUpdates";
-	    	boolean returnValue = suspendWork;		//MARCHH2017
+	    	boolean returnValue = continueWork;
 	    while(true){
 	    	curPlanInExec =  "waitUpdates";	//within while since it can be lost by switchlan
 	    	nPlanIter++;
 	    		//senseEvent
-	    		aar = planUtils.senseEvents( 1000000000,"show,end,abort","continue,continue,continue",
+	    		timeoutval = 1000000000;
+	    		aar = planUtils.senseEvents( timeoutval,"show,end,abort","continue,continue,continue",
 	    		"" , "",ActionExecMode.synch );
 	    		if( ! aar.getGoon() || aar.getTimeRemained() <= 0 ){
 	    			//println("			WARNING: sense timeout");
@@ -219,7 +221,7 @@ public abstract class AbstractGuimanager extends QActor {
 	    try{
 	    	int nPlanIter = 0;
 	    	//curPlanInExec =  "consultPrologFailure";
-	    	boolean returnValue = suspendWork;		//MARCHH2017
+	    	boolean returnValue = continueWork;
 	    while(true){
 	    	curPlanInExec =  "consultPrologFailure";	//within while since it can be lost by switchlan
 	    	nPlanIter++;

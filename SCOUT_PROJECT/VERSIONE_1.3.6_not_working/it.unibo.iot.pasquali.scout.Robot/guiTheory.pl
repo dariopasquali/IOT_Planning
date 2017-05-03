@@ -1,7 +1,7 @@
 %% robotMode(MODE).
 %% MODE = gui -> the guimanager is enable and show the gui (for simulation use)
 %% MODE = robot -> the guimanager is disabled (for physical robot use)
-robotMode(robot).
+robotMode(gui).
 
 
 showMap( position( SX , SY ), FILENAME ):-
