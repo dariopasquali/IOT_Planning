@@ -7,8 +7,6 @@ public class State implements Serializable, Comparable<State>{
 	private int x,y;	
 	private double heuristic;
 	
-	
-	
 	public State(int x, int y)
 	{
 		this.x = x;
@@ -64,5 +62,9 @@ public class State implements Serializable, Comparable<State>{
 			return 0;
 		
 		return -1;
+	}
+	
+	public State getDefaultValue(){
+		return new State(-1,-1);
 	}
 }

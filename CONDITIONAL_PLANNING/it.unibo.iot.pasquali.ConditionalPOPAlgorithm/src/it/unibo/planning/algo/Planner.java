@@ -56,7 +56,7 @@ public class Planner {
 		
 		this.heuristicMap = new HashMap<String, Double>();
 		
-		this.lastStep = new Move(new State(-1,-1), new State(-1,-1));		
+		this.lastStep = new Move(start.getDefaultValue(), start.getDefaultValue());		
 		
 		visited = new TreeSet<State>();
 		
@@ -167,7 +167,7 @@ public class Planner {
 			globalContext = goal.getGlobalContext();			
 			plan.addStep(goal.getAction());
 			
-			lastStep = new Move(new State(-1,-1), new State(-1,-1));
+			lastStep = new Move(start.getDefaultValue(), start.getDefaultValue());
 			
 			visited = new TreeSet<>();
 			

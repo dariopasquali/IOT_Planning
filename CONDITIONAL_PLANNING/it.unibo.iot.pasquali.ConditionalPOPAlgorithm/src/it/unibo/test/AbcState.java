@@ -42,5 +42,9 @@ public class AbcState extends it.unibo.domain.graph.State{
 		return -1;
 	}
 	
-
+	@Override
+	public State getDefaultValue()
+	{
+		return new AbcState("");
+	}
 }
