@@ -73,6 +73,8 @@ Event show : show(POS, DIR)
 
 Event updateSimulation : updateSimulation(POSITION)
 
+Event subscribeACK : subscribeACK
+
 // ------------------------------------------------------------------
 //			CONTEXTS
 // ------------------------------------------------------------------
@@ -103,8 +105,12 @@ QActor guimanager context ctxRobot{
 		switchToPlan enableOrDie
 		
 	Plan enableOrDie
-	
-		[!? robotMode(gui)] switchToPlan waitMap else endQActor "TERMINATE because robot mode = robot"	
+		
+		[!? robotMode(gui)] actorOp initRobotGui;
+		[!? robotMode(gui)] switchToPlan waitMap else endQActor "TERMINATE because robot mode = robot";	
+		
+		[!? robotMode(unity)] actorOp initUnity;
+		[!? robotMode(unity)] switchToPlan waitMap else endQActor "TERMINATE because robot mode = robot"	
 		
 	
 	Plan waitMap
@@ -113,6 +119,8 @@ QActor guimanager context ctxRobot{
 		sense time(1000000000) enableGUI -> continue;
 		printCurrentEvent;
 		onEvent enableGUI : enableGUI(START, FILENAME) -> solve showMap(START, FILENAME) time(0);
+		[!? robotMode(unity)] sense time(2000) subscribeACK -> continue else endQActor "TERMINATE because robot mode = robot";
+		[!? robotMode(unity)] actorOp createActor;
 		
 		switchToPlan waitUpdates	
 		
@@ -182,6 +190,8 @@ Robot mockScout QActor robot context ctxRobot{
  		
  		[!? msg(_, _, SENDER, X, explorefile(START, FILENAME), _)]
  								emit enableGUI : enableGUI(START, FILENAME);
+ 								
+ 		delay time(2000);
  			
  		[?? msg(_, _, SENDER, X, explorefile(START, FILENAME), _)]
  								 solve initExploreFile(START, FILENAME) time(0)

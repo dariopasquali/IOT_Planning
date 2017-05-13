@@ -29,5 +29,6 @@
 	<classpathentry kind="lib" path="/it.unibo.iss.libs/libs/unibo/uniboQactorRobot.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/it.unibo.iot.pasquali.Common"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/it.unibo.iot.pasquali.SearchAlgorithm"/>
+	<classpathentry kind="lib" path="C:/Users/Dario/Desktop/unityRugge/unityactorconnector.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -1,0 +1,197 @@
+RobotSystem scout
+
+// ------------------------------------------------------------------
+//		NAVIGATION - INTERACTION
+// ------------------------------------------------------------------
+
+// From Console to Robot to start the Navigation
+Dispatch navigate : navigate ( PLAN_MOVES , POS )
+Dispatch navigatefile : navigatefile( PLAN_MOVES , POS , FILENAME)
+//PLAN_MOVES = plan ( [ t || d || l || r ] )
+//POS = position ( Xs , Ys )
+// 
+//t = forward tiled
+//l = left (90 degrees)
+//r = right
+//h = stop
+//f = fail
+
+// ------------------------------------------------------------------
+//		COMMON - INTERACTION
+// ------------------------------------------------------------------
+
+// Raised by Robot when it ends the current command
+Event end : end
+
+
+// ------------------------------------------------------------------
+//		LOCAL - INTERACTION
+// ------------------------------------------------------------------
+
+// Raised by Sonar when an obstacle is detected
+
+//Sonar
+Event obstaclefront : obstaclefront
+
+// ------------------------------------------------------------------
+//		ROBOT GUI - INTERACTION
+// ------------------------------------------------------------------
+
+Event enableGUI : enableGUI(START, FILENAME)
+// STATE = on || off
+
+Event show : show(POS, DIR)
+// POS = position(X,Y)
+// DIR = n || e || w || s 
+
+Event updateSimulation : updateSimulation(POSITION)
+
+// ------------------------------------------------------------------
+//			CONTEXTS
+// ------------------------------------------------------------------
+
+Context ctxRobot ip [ host="localhost" port=8020]
+
+EventHandler evh for updateSimulation -print{ 
+	memo currentEvent for robot;
+	solve updateSimulationWorld for robot
+};
+
+Context ctxConsole ip [ host="localhost" port=8010]
+
+QActor console context ctxConsole{
+ 	Plan init normal
+		println( "NEVER HERE. I'm just a placeholder" ) 
+ }
+
+// ------------------------------------------------------------------
+//			GUI MANAGER
+// ------------------------------------------------------------------
+
+QActor guimanager context ctxRobot{
+	
+	Plan init normal
+		println("++++++++++++++++++++++++++ guiManager(starts) ++++++++++++++++++");
+		solve consult("guiTheory.pl") time(210000000) onFailSwitchTo  consultPrologFailure ;
+		switchToPlan enableOrDie
+		
+	Plan enableOrDie
+	
+		[!? robotMode(gui)] switchToPlan waitMap else endQActor "TERMINATE because robot mode = robot"	
+		
+	
+	Plan waitMap
+	
+		println("++++++++++++++++++++++++++ ROBOT GUI WAIT MAP ++++++++++++++++++");		
+		sense time(1000000000) enableGUI -> continue;
+		printCurrentEvent;
+		onEvent enableGUI : enableGUI(START, FILENAME) -> solve showMap(START, FILENAME) time(1000000000);
+		
+		switchToPlan waitUpdates	
+		
+	Plan waitUpdates
+		sense time(1000000000) show, end ->  continue, continue;
+			
+		onEvent show : show(POS,DIR) -> solve updateState(POS,DIR) time(0);
+		onEvent end : end -> switchToPlan waitMap;
+		
+		repeatPlan 0 
+		
+		
+		
+	Plan consultPrologFailure            
+		println("GUI ----------------------------- consult gone wrong" )
+}
+
+Robot robotScout QActor robot context ctxRobot{
+
+// ------------------------------------------------------------------
+//			NORMAL PLANS
+// ------------------------------------------------------------------
+
+	
+	Plan init normal
+		
+		println("load theories");
+		
+		solve consult("robotTheory.pl") time(210000000) onFailSwitchTo  consultPrologFailure ;
+		solve consult("navRobotTheory.pl") time(210000000) onFailSwitchTo  consultPrologFailure ;
+		solve consult("talkTheory.pl") time(210000000) onFailSwitchTo  consultPrologFailure ;
+		
+ 		println("++++++++++++++++++ robot(starts) ++++++++++++++++++");
+ 		
+ 		switchToPlan waitConsoleCommand
+ 		
+ 	Plan waitConsoleCommand
+ 		
+		println("++++++++++++++++++ WAIT CONSOLE COMMAND ++++++++++++++++++");
+ 		
+ 		receiveMsg time(600000000);
+ 		printCurrentMessage;
+ 		memoCurrentMessage;
+
+ 		onMsg navigate : navigate(PLAN_MOVES, POS) -> switchToPlan navigation;
+ 		onMsg navigatefile : navigatefile( PLAN_MOVES , POS , FILENAME) -> switchToPlan navigationFile;
+ 		
+ 		repeatPlan 0		
+ 
+ 
+ // NAVIGATION PLANS ----------------------------------------------------
+ 		
+ 	Plan navigation
+ 		println("I Received some conditional navigation data");
+ 		
+ 		solve initialConfigNavRobot time(0);
+ 		
+ 		[?? msg(_, _, SENDER, X, navigate(PLAN_MOVES, POS), MSGNUM)] 
+ 			solve loadNavigationData(PLAN_MOVES, POS) time (100000) onFailSwitchTo loadMapFailure;
+ 		
+ 		switchToPlan startNavigation 	
+ 	
+ 	Plan navigationFile
+ 		println("I Received some navigation data and a filename");
+ 		
+ 		solve initialConfigNavRobot time(0);
+ 		
+ 		[!? msg(_, _, SENDER, X, navigatefile( PLAN_MOVES , POS , FILENAME), MSGNUM)]
+ 								emit enableGUI : enableGUI(POS, FILENAME);
+ 		
+ 		[?? msg(_, _, SENDER, X, navigatefile( PLAN_MOVES , POS , FILENAME), MSGNUM)] 
+ 			solve loadNavigationData(PLAN_MOVES, POS, FILENAME) time (100000000) onFailSwitchTo loadMapFailure;
+ 		
+ 		switchToPlan startNavigation 	
+ 		
+ 	Plan startNavigation 	
+ 		solve navigate time(1000000000)
+
+ 	
+ 	Plan notifyEndOfNavigation	
+ 	
+ 		println("notify End"); 	 			
+ 		emit end : end; 		
+ 		switchToPlan waitConsoleCommand	
+ 		
+ 	Plan simulatedWorldChanged resumeLastPlan
+ 		println("******************** Simulated World Changed ****************************")
+
+	
+// ------------------------------------------------------------------
+//	PROLOG FAILURE ERROR HANDLERS
+// ------------------------------------------------------------------
+		
+	Plan handleTimeout
+ 		println("timeout!! GOODBYE")
+ 	
+ 	Plan loadMapFailure           
+		println("Load Map FAILURE" ) 
+		 
+ 	Plan navigationFailure            
+		println("Navigation FAILURE" )
+		
+ 		
+ 	Plan consultPrologFailure            
+		println("The consult is gone wrong, maybe there are errors in the prolog file" ) 
+ 		
+ 	Plan generalPrologFailure            
+		println("Prolog goal FAILURE" ) 
+}

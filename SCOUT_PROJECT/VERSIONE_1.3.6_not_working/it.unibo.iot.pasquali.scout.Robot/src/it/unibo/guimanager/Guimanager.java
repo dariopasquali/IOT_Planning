@@ -12,6 +12,9 @@ import java.util.Iterator;
 import java.util.List;
 
 import it.unibo.gui.RobotGUI;
+import it.unibo.guimanager.businesslogic.BLFactory;
+import it.unibo.guimanager.businesslogic.BLFactory.BLType;
+import it.unibo.guimanager.interfaces.IGuiManagerBL;
 import it.unibo.is.interfaces.IActivity;
 import it.unibo.is.interfaces.IIntent;
 import it.unibo.is.interfaces.IOutputEnvView;
@@ -20,71 +23,51 @@ import it.unibo.qactors.QActorContext;
 
 public class Guimanager extends AbstractGuimanager implements IActivity
 {
-	private Map map;
 	
-	private static RobotGUI gui = new RobotGUI();
+	private IGuiManagerBL controller;
+	
 	
 	public Guimanager(String actorId, QActorContext myCtx, IOutputEnvView outEnvView )
 			throws Exception
 	{
-		super(actorId, myCtx, gui);
-		((RobotGUI) env).setController(this);
+		super(actorId, myCtx, outEnvView);
 	}
 	
+	// INIT ---------------------------------------------------------
+	
+	public void initRobotGui(){
+		controller = BLFactory.getBusinessLogic(this, BLType.GUI);
+	}
+	
+	public void initUnity(){
+		controller = BLFactory.getBusinessLogic(this, BLType.UNITY);
+	}	
+	
+	// BUSINESS LOGIC -----------------------------------------------
 	
 	public void showMap(int startX, int startY, String filename)
 	{
-		((RobotGUI) env).setVisible(true);
-		
-		Map m = null;
-		
-		List<String> data = new ArrayList<String>();						
-		try
-		{
-			InputStream fs = new FileInputStream(filename);
-			InputStreamReader inpsr = new InputStreamReader(fs);
-			BufferedReader br       = new BufferedReader(inpsr);
-			Iterator<String> lsit   = br.lines().iterator();
-
-			while(lsit.hasNext())
-			{
-				data.add(lsit.next());
-			}
-			br.close();
-			
-		} catch (Exception e)
-		{
-			System.out.println("QActor  ERROR " + e.getMessage());
-		}
-			
-		for(int i=0; i<data.size(); i++)
-		{
-			if(i == 0)
-			{
-				m = Map.createMapFromPrologRep(data.get(i));
-			}
-			else
-			{
-				String s[] = data.get(i).split(" ");
-				m.addElementFromString(s[1]);
-			}
-		}
-		this.map = m;
-		
-		println(map.toString());
-		
-		((RobotGUI)env).setMap(m);
-		((RobotGUI)env).setCurrentPosition(startY, startX, "N");
+		controller.showMap(startX, startY, filename);
+	}
+	
+	public void createActor(){
+		controller.createActor();
 	}
 	
 	public void updateState(int x, int y, String direction)
 	{
-		((RobotGUI) env).setCurrentPosition(y, x, direction.toUpperCase());
+		controller.updateState(x, y, direction);
 	}
 	
+	// ---------------------------------------------------------------
+
+
 	
-
-
+	public void setEnv(IOutputEnvView env)
+	{
+		this.env = env.getEnv();
+	}
+	
 	@Override
 	public void execAction(String cmd) {
 		
