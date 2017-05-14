@@ -115,7 +115,7 @@ QActor console context ctxConsole{
 		
 	Plan loadMap resumeLastPlan
 		[?? msg(local_gui_command, "event", SENDER, none, local_gui_command (loadmap(PATH)), MSGNUM)]
-			 solve loadMap(PATH) time(210000000) onFailSwitchTo loadMapFailure;
+			 actorOp loadMapButton(PATH);
 				
 		println("++++++++++++++++++ MAP LOADED ++++++++++++++++++")
 	
@@ -132,8 +132,8 @@ QActor console context ctxConsole{
 	Plan explorationDebug
 		println("++++++++++++++++++ EXPLORATION DEBUG ++++++++++++++++++");
 					
-		[!? msg(local_gui_command, "event", SENDER, none, local_gui_command (explore(FILENAME,START,BOUNDS,MODE)), MSGNUM)]
-			solve showClearMap(BOUNDS) time(60000) onFailSwitchTo  explorationFailure;	
+		[!? msg(local_gui_command, "event", SENDER, none, local_gui_command (explore(FILENAME,START,map(W,H),MODE)), MSGNUM)]
+			actorOp showClearMap(W,H);	
 		
 		println("mappa pulita");
 			
@@ -152,8 +152,7 @@ QActor console context ctxConsole{
 		
 		printCurrentEvent;
 		
-		onEvent expdata : expdata(POS , STATE) ->
-			solve updateMap(POS , STATE) time(210000000) onFailSwitchTo explorationFailure;
+		onEvent expdata : expdata(position( X , Y ) , STATE) ->	actorOp updateMap( X , Y , STATE);
 			
 		onEvent local_gui_command : local_gui_command(abort) ->	switchToPlan abortCommand;
 		
@@ -182,16 +181,14 @@ QActor console context ctxConsole{
 	Plan navigation
 		println("++++++++++++++++++ NAVIGATION ++++++++++++++++++");
 		
-		solve startNavigation time(60000) onFailSwitchTo  navigationFailure;
-		
+		actorOp sendNavigationData("robot");		
 		switchToPlan waitEndOfNavigation
 		
 		
 	Plan navigationFile
 		println("++++++++++++++++++ NAVIGATION FILE ++++++++++++++++++");
 		
-		solve startNavigationFile time(60000) onFailSwitchTo  navigationFailure;
-		
+		actorOp sendNavigationData("simulated");		
 		switchToPlan waitEndOfNavigation	
 		
 		
@@ -224,7 +221,7 @@ QActor console context ctxConsole{
 		switchToPlan waitGUICommand	
 		
 	Plan clearGUI resumeLastPlan
-		solve clearGUI time(10000);
+		actorOp myClearGUI;
 		println("map cleared")
 	
 	Plan clearPath resumeLastPlan

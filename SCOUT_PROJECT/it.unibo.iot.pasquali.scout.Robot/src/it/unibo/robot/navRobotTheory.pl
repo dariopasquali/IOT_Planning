@@ -110,6 +110,23 @@ executeCmd(Actor,  move(switchplan,PNAME), Events, Plans, done(switchplan) ):-
 executeCmd(Actor, move(senseEvent,TIMEOUT,EVENTSLIST, PLANSLIST), Events, Plans, RES ):-
 	actorPrintln(sense(EVENTLIST)),
 	Actor <- senseEvent(TIMEOUT, EVENTSLIST, PLANSLIST).
+	
+executeCmd( Actor,  move(print,MSG), Events, Plans, done(print) ):-
+	actorPrintln(MSG).
+	
+executeCmd( Actor, move(robotmove,CMD,SPEED,DURATION,ANGLE), ENDEV, RES ):-
+ 	!,
+ 	mapCmdToMove(CMD,MOVE), 
+	%% actorPrintln(  executeCmd(Actor,MOVE, SPEED, ANGLE, DURATION, ENDEV ) ),
+	Actor <- mtExecute(MOVE, SPEED, ANGLE, DURATION, ENDEV, '', '') returns AAR,
+	AAR <- getResult returns RES.
+	
+executeCmd( Actor, move(robotmove,CMD,SPEED,DURATION,ANGLE), Events, Plans, RES ):-
+ 	!,
+ 	mapCmdToMove(CMD,MOVE), 
+	%% actorPrintln(  executeCmd(Actor,MOVE, SPEED, ANGLE, DURATION, Events, Plans) ),
+	Actor <- myExecute(MOVE, SPEED, ANGLE, DURATION, Events, Plans) returns AAR,
+	AAR <- getResult returns RES.
 
 %% WORLD INTERACTION ------------------------------------------------------
 

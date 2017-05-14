@@ -130,15 +130,15 @@ public class MapViewer {
     	
     	this.ymax = ymax;
     	this.xmax = xmax;
-    	matrix = new JButton[ymax+1][xmax+1];
+    	matrix = new JButton[ymax][xmax];
     	map = new Map(ymax, xmax);
     	map.clearAll();
     	
-        p = new JPanel(new GridLayout(ymax+1, xmax+1));
+        p = new JPanel(new GridLayout(ymax, xmax));
         
-        for(int y = 0; y <=ymax; y ++)
+        for(int y = 0; y <ymax; y ++)
         {
-        	for(int x = 0; x <=xmax; x++)
+        	for(int x = 0; x <xmax; x++)
         	{
         		JButton gb = createCell(y, x);
         		gb.setBackground(CellState.CLEAR.getColor());
@@ -215,8 +215,8 @@ public class MapViewer {
     
     public void clearAll() {
 		
-		for(int y = 0; y<=ymax; y++)
-			for(int x = 0; x<=xmax; x++)
+		for(int y = 0; y<ymax; y++)
+			for(int x = 0; x<xmax; x++)
 				matrix[y][x].setBackground(Color.GRAY);
 		
 		map.clearAll();		
@@ -242,9 +242,9 @@ public class MapViewer {
     
 	public void noneAll()
 	{
-		for(int y=0; y<=ymax; y++)
+		for(int y=0; y<ymax; y++)
 		{
-			for(int x=0; x<=xmax; x++)
+			for(int x=0; x<xmax; x++)
 			{
 				getGridButton(y, x).setBackground(CellState.NONE.getColor());
 			}
@@ -255,9 +255,9 @@ public class MapViewer {
 	
 	public void clearPath()
 	{
-		for(int y=0; y<=ymax; y++)
+		for(int y=0; y<ymax; y++)
 		{
-			for(int x=0; x<=xmax; x++)
+			for(int x=0; x<xmax; x++)
 			{
 				if(!matrix[y][x].getBackground().equals(CellState.OBJECT.getColor()))
 					setCellClear(y, x);

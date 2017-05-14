@@ -44,7 +44,9 @@ public class Robot extends AbstractRobot {
 	private ArrayList<State> path;
 	
 	private Engine engine = null;
-	private String currentFilename;	
+	private String currentFilename;
+	
+	
 	
 	//private HashMap<Integer, Direction> spinMap;
 	
@@ -136,6 +138,7 @@ public class Robot extends AbstractRobot {
 			engine.setNorthDirection();
 		}
 		
+		engine.setMakeRealMove(false);
 		println(engine.getState().toString());
 	}
 	
@@ -163,6 +166,7 @@ public class Robot extends AbstractRobot {
 			engine.setNorthDirection();
 		}
 		
+		engine.setMakeRealMove(false);
 		println(engine.getState().toString());
 	}
 //}}	
@@ -183,7 +187,10 @@ public class Robot extends AbstractRobot {
 	 * @param mapHeight		map height (Y)
 	 */
 	public void initExploreMap(int startX, int startY, int mapWidth, int mapHeight){
+		
 		engine = new Engine(startX, startY, mapWidth, mapHeight, this, true);
+		
+		engine.setMakeRealMove(true);
 		
 		engine.noneAll();
 		
@@ -215,6 +222,7 @@ public class Robot extends AbstractRobot {
 				
 		engine = new FileEngine(startX, startY, loadMap(filename), this, true);		
 		engine.noneAll();
+		engine.setMakeRealMove(true);
 		
 		((QActorPlanUtilsDebug)planUtils).setEngine((FileEngine) engine);		
 		enableDebugSensing();
@@ -272,13 +280,13 @@ public class Robot extends AbstractRobot {
 			switch(m)
 			{
 			case "t":
-				pathPlan.addSenseEvent(1000, "obstaclefront", "waitAndEvaluate");
-				pathPlan.addForwardMove(speed, time);
+				//pathPlan.addSenseEvent(1000, "obstaclefront", "waitAndEvaluate");
+				pathPlan.addForwardMove(speed, time, "obstaclefront", "waitAndEvaluate");
 				break;
 				
 			case "d":
-				pathPlan.addSenseEvent(1000, "obstaclefront", "waitAndEvaluate");
-				pathPlan.addForwardMove(speed, diagoTime);
+				//pathPlan.addSenseEvent(1000, "obstaclefront", "waitAndEvaluate");
+				pathPlan.addForwardMove(speed, diagoTime, "obstaclefront", "waitAndEvaluate");
 				break;
 				
 			case "l":
@@ -345,12 +353,14 @@ public class Robot extends AbstractRobot {
 	}
 	
 	
-	@Override
-	public AsynchActionResult execute(String command, int speed, int angle, int moveTime, 
+	
+	public AsynchActionResult myExecute(String command, int speed, int angle, int moveTime, 
 			String  events, String plans) throws Exception
 	{		
+		super.execRobotMove(curPlanInExec, command, speed, angle, moveTime, events, plans);
 		updateMyPosition(command);
-		return super.execute(command, speed, angle, moveTime, events, plans);		
+		println("UPDATEEEEEEEEE");
+		return new AsynchActionResult(null, 0, true, true, "", null);		
 	}
 	
 	
@@ -387,12 +397,7 @@ public class Robot extends AbstractRobot {
 		
 		System.out.println(((FileEngine)engine).getWorldMap().toString());
 	}
-	/*
-	public Direction makeSpin(Direction start, SpinDirection spin) { //TODO use the Engine
-		int newID = (start.getValue() + (8+spinFactor*spin.getRotation()))%8;
-		return spinMap.get(newID);
-	}
-	*/
+
 //}}	
 
 	
@@ -444,20 +449,7 @@ public class Robot extends AbstractRobot {
 		System.out.println("loading...");
 		QActorUtils.consultFromFile(pengine, filename);
 	}		
-	
-	
-	@Override
-	public AsynchActionResult solveGoalReactive(String goal, int time, String evList, String planList){
 		
-		System.out.println("solve ---> "+goal);
-		
-		super.solveGoal(goal);
-		return new AsynchActionResult(null, time+1, true, true, "", null);		
-	}
-	
-//}}	
-	
-	
 //{{ SYSTEM INTERACTION *****************************************************
 
 
@@ -650,65 +642,73 @@ public class Robot extends AbstractRobot {
 	/**
 	 * Move Real robot forward at default speed and for default duration
 	 */
-	public void moveForward()
-	{
-		try
+		public void moveForward()
 		{
-			super.execute("forward", defaultSpeed, 0, defaultTime, "", "");
+			try
+			{
+				println("move Forward");
+				super.execRobotMove(curPlanInExec, "forward", defaultSpeed, 0, defaultTime, "", "");
+				//super.execute("forward", defaultSpeed, 0, defaultTime, "", "");
+			}
+			catch (Exception e) 
+			{
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
-		catch (Exception e) 
+		
+		/**
+		 * Move Real robot backward at default speed and for default duration
+		 */
+		public void moveBackward()
 		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			try
+			{
+				println("move Backward");
+				super.execRobotMove(curPlanInExec, "backward", defaultSpeed, 0, defaultTime, "", "");
+				//super.execute("backward", defaultSpeed, 0, defaultTime, "", "");
+			}
+			catch (Exception e) 
+			{
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
-	}
-	
-	/**
-	 * Move Real robot backward at default speed and for default duration
-	 */
-	public void moveBackward()
-	{
-		try
+		
+		/**
+		 * Turn Real robot left at default speed and for default duration
+		 */
+		public void turnLeft()
 		{
-			super.execute("backward", defaultSpeed, 0, defaultTime, "", "");
+			try
+			{
+				println("turn Left POPPE");
+				super.execRobotMove(curPlanInExec, "left", defaultSpeed, 0, defaultTime, "", "");
+//				super.execute("left", defaultTurnSpeed, 0, defaultTurnTime, "", "");
+			}
+			catch (Exception e) 
+			{
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
-		catch (Exception e) 
+		
+		/**
+		 * Turn Real robot right at default speed and for default duration
+		 */
+		public void turnRight()
 		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			try
+			{
+				println("turn Right");
+				super.execRobotMove(curPlanInExec, "right", defaultSpeed, 0, defaultTime, "", "");
+				//super.execute("right", defaultTurnSpeed, 0, defaultTurnTime, "", "");
+			}
+			catch (Exception e) 
+			{
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
-	}
-	
-	/**
-	 * Turn Real robot left at default speed and for default duration
-	 */
-	public void turnLeft()
-	{
-		try
-		{
-			super.execute("left", defaultTurnSpeed, 0, defaultTurnTime, "", "");
-		}
-		catch (Exception e) 
-		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-	
-	/**
-	 * Turn Real robot right at default speed and for default duration
-	 */
-	public void turnRight()
-	{
-		try
-		{
-			super.execute("right", defaultTurnSpeed, 0, defaultTurnTime, "", "");
-		}
-		catch (Exception e) 
-		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
 //}}
 }

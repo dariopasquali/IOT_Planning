@@ -384,7 +384,7 @@ public class ConsoleGUI extends Frame implements IOutputEnvView, IBasicEnvAwt, I
 				
 				FileDialog loadDialog = new FileDialog(frame, "Choose the Navigation Map", FileDialog.LOAD);
 				loadDialog.setDirectory("C:\\");
-				loadDialog.setFile("*.pl");
+				loadDialog.setFile("");
 				loadDialog.setVisible(true);
 				String filename = loadDialog.getDirectory()+loadDialog.getFile();
 				if(filename.contains("null"))

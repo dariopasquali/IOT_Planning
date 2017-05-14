@@ -15,13 +15,17 @@
 	<classpathentry kind="lib" path="C:/Users/Dario/.gradle/caches/modules-2/files-2.1/org.uncommons.maths/uncommons-maths/1.2.2a/e4e84f879d4160be9508aa3904516ec30c39e815/uncommons-maths-1.2.2a.jar" sourcepath="C:/Users/Dario/.gradle/caches/modules-2/files-2.1/org.uncommons.maths/uncommons-maths/1.2.2a/bb01359792453974c40d34f49c84d703deff266b/uncommons-maths-1.2.2a-sources.jar"/>
 	<classpathentry kind="lib" path="C:/Users/Dario/.gradle/caches/modules-2/files-2.1/org.hamcrest/hamcrest-core/1.3/42a25dc3219429f0e5d060061f71acb49bf010a0/hamcrest-core-1.3.jar" sourcepath="C:/Users/Dario/.gradle/caches/modules-2/files-2.1/org.hamcrest/hamcrest-core/1.3/1dc37250fbc78e23a65a67fbbaf71d2e9cbc3c0b/hamcrest-core-1.3-sources.jar"/>
 	<classpathentry kind="lib" path="C:/Users/Dario/.gradle/caches/modules-2/files-2.1/com.typesafe.akka/akka-actor_2.11/2.4.9-RC2/2983907774623d6e811d37f3e0465a78ebd6060a/akka-actor_2.11-2.4.9-RC2.jar" sourcepath="C:/Users/Dario/.gradle/caches/modules-2/files-2.1/com.typesafe.akka/akka-actor_2.11/2.4.9-RC2/df2f01ac868b05b7c8aaf6be935c82c440b3aa99/akka-actor_2.11-2.4.9-RC2-sources.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Dario/Desktop/UNIBO/ING_SOFT_M/PLANNING/GIT/IOT_Planning/SCOUT_PROJECT_2017/it.unibo.iss.libs/libs/unibo/uniboInterfaces.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Dario/Desktop/UNIBO/ING_SOFT_M/PLANNING/GIT/IOT_Planning/SCOUT_PROJECT_2017/it.unibo.iss.libs/libs/unibo/unibonoawtsupports.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Dario/Desktop/UNIBO/ING_SOFT_M/PLANNING/GIT/IOT_Planning/SCOUT_PROJECT_2017/it.unibo.iss.libs/libs/unibo/uniboEnvBaseAwt.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Dario/Desktop/UNIBO/ING_SOFT_M/PLANNING/GIT/IOT_Planning/SCOUT_PROJECT_2017/it.unibo.iss.libs/libs/unibo/2p301.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Dario/Desktop/UNIBO/ING_SOFT_M/PLANNING/GIT/IOT_Planning/SCOUT_PROJECT_2017/it.unibo.iss.libs/libs/unibo/qa18Akka.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Dario/Desktop/UNIBO/ING_SOFT_M/PLANNING/GIT/IOT_Planning/SCOUT_PROJECT_2017/it.unibo.iss.libs/libs/http/nanoHTTPD.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/it.unibo.iot.pasquali.Common"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/it.unibo.iot.pasquali.SearchAlgorithm"/>
+	<classpathentry kind="lib" path="/it.unibo.iss.libs/libs/unibo/2p301.jar"/>
+	<classpathentry kind="lib" path="/it.unibo.iss.libs/libs/unibo/labbaseRobotSam.jar"/>
+	<classpathentry kind="lib" path="/it.unibo.iss.libs/libs/unibo/qa18Akka.jar"/>
+	<classpathentry kind="lib" path="/it.unibo.iss.libs/libs/unibo/qactors18.jar"/>
+	<classpathentry kind="lib" path="/it.unibo.iss.libs/libs/unibo/robotTalk.jar"/>
+	<classpathentry kind="lib" path="/it.unibo.iss.libs/libs/unibo/tuprolog.jar"/>
+	<classpathentry kind="lib" path="/it.unibo.iss.libs/libs/unibo/uniboEnvBaseAwt.jar"/>
+	<classpathentry kind="lib" path="/it.unibo.iss.libs/libs/unibo/uniboInterfaces.jar"/>
+	<classpathentry kind="lib" path="/it.unibo.iss.libs/libs/unibo/unibonoawtsupports.jar"/>
+	<classpathentry kind="lib" path="/it.unibo.iss.libs/libs/unibo/uniboQactorRobot.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
