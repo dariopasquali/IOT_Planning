@@ -77,7 +77,7 @@ public class UnityBL implements IGuiManagerBL{
 	@Override
 	public void updateState(int x, int y, String direction) {
 		
-		String move = "move(" + actorName + "," + x + "," + y + "," + direction + ")";
+		String move = "move(" + actorName + "," + direction+ "," + x + "," + y +  ")";
 		connector.send(move);		
 	}
 	
