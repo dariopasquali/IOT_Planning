@@ -202,8 +202,8 @@ QActor console context ctxConsole{
  						
 		onEvent update : update (OBJECT, CURRENT) ->
 			 solve updateMapAndReplan(OBJECT , CURRENT) time(0)
-			 onFailSwitchTo  alternativeFindpathFailure;	
-			 	
+			 onFailSwitchTo  alternativeFindpathFailure;
+		
 		onEvent end : end -> switchToPlan endOfNavigation;
 		
 		repeatPlan 0

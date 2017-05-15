@@ -27,6 +27,7 @@ initialConfigNavRobot :-
 	defaultSpeed(S),
 	defaultDuration(T),
 	actorobj(Actor),
+	actorPrintln(initialConfigNavRobot),
 	Actor <- initialConfigRobot(S,T,S,S).
 	
 configEngine(position(SX, SY)) :-

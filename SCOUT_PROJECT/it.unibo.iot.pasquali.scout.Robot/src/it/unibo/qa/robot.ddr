@@ -233,6 +233,7 @@ Robot mockScout QActor robot context ctxRobot{
  		
  		[!? msg(_, _, SENDER, X, navigatefile( PLAN_MOVES , POS , FILENAME), MSGNUM)]
  								emit enableGUI : enableGUI(POS, FILENAME);
+ 								
  		
  		[?? msg(_, _, SENDER, X, navigatefile( PLAN_MOVES , POS , FILENAME), MSGNUM)] 
  			solve loadNavigationData(PLAN_MOVES, POS, FILENAME) time (100000) onFailSwitchTo loadMapFailure;
