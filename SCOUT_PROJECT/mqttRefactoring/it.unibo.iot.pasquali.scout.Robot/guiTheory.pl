@@ -2,7 +2,14 @@
 %% MODE = gui -> the guimanager is enable and show the gui (for simulation use)
 %% MODE = robot -> the guimanager is disabled (for physical robot use)
 %% MODE = unity -> the guimanager enable a simulation on unity
-robotMode(unity).
+robotMode(gui).
+
+mqttServer("tcp://m2m.eclipse.org:1883").
+
+initMqtt :-
+	mqttServer(SERVER),
+	actorobj(Actor),
+	Actor <- initMqtt(SERVER).
 
 
 showMap( position( SX , SY ), FILENAME ):-

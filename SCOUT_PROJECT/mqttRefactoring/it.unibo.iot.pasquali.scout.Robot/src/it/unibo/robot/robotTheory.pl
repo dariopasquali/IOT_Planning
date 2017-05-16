@@ -4,6 +4,14 @@ robotTheory.pl
 ===============================================================
 */
 
+mqttServer("tcp://m2m.eclipse.org:1883").
+
+initMqtt :-
+	mqttServer(SERVER),
+	actorobj(Actor),
+	Actor <- initMqtt(SERVER).
+
+
 %% DEBUG CONTROL -----------------------------------------------
 
 enableDebugSensing :-

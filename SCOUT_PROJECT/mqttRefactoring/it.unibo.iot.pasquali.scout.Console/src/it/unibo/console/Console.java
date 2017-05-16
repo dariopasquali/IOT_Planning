@@ -6,12 +6,15 @@ package it.unibo.console;
 
 import java.awt.Point;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+
+import org.eclipse.paho.client.mqttv3.MqttException;
 
 import it.unibo.gui.ConsoleGUI;
 import it.unibo.gui.enums.CellState;
@@ -21,6 +24,7 @@ import it.unibo.is.interfaces.IOutputEnvView;
 import it.unibo.model.interfaces.IGUI;
 import it.unibo.model.interfaces.IMap;
 import it.unibo.model.map.Map;
+import it.unibo.mqtt.MqttUtils;
 import it.unibo.planning.astar.algo.AStarSearchAgent;
 import it.unibo.planning.astar.engine.AStarEngine;
 import it.unibo.qactors.QActorContext;
@@ -44,12 +48,24 @@ public class Console extends AbstractConsole implements IActivity{
 	private String filename;
 	private String robotMode;
 	
+	private String mqttServer, mqttTopicBase, mqttCurrentTopic;
+	private MqttUtils mqtt;
+	
 	public Console(String actorId, QActorContext myCtx, IOutputEnvView outEnvView )  throws Exception
 	{
 		super(actorId, myCtx, env);
 		((IGUI) env).setController(this);
 		((ConsoleGUI) env).setVisible(true);
 		path = null;
+	}
+	
+	public void initMqtt(String server, String topicBase)
+	{
+		this.mqttServer = server;
+		this.mqttTopicBase = topicBase;
+		
+		println("MQTT SERVER -----> "+mqttServer);
+		
 	}
 	
 	
@@ -214,7 +230,7 @@ public class Console extends AbstractConsole implements IActivity{
 		}
 		else
 		{
-			temporaryStr = QActorUtils.unifyMsgContent(pengine, "navigatefile(PLAN,POS,FILENAME)","navigatefile("+pp+","+po+",\""+filename+"\")", guardVars ).toString();
+			temporaryStr = QActorUtils.unifyMsgContent(pengine, "navigatefile(PLAN,POS,FILENAME)","navigatefile("+pp+","+po+",\""+mqttCurrentTopic+"\")", guardVars ).toString();
 			println("temp string "+temporaryStr);
 			try
 			{
@@ -275,11 +291,37 @@ public class Console extends AbstractConsole implements IActivity{
 		this.map = m;
 			
 		
-		((ConsoleGUI)env).setMap(m);
-		this.filename = path; 
+		((ConsoleGUI)env).setMap(m);		
+		
+		File f = new File(path);
+		this.filename = f.getName().replace(".pl", "");
+		
+		publishOnMqtt(data, filename);
 			
 	}
 	
+	private void publishOnMqtt(List<String> data, String filename){
+		
+		String m = "";
+		for(String s : data)
+			m += s+"\n";
+		
+		mqtt = new MqttUtils();		
+		mqttCurrentTopic = mqttTopicBase+filename;
+		
+		println("MQTT TOPIC -----> "+ mqttCurrentTopic);
+		
+		try
+		{
+			mqtt.connect(this, mqttServer, mqttCurrentTopic);			
+			mqtt.publish(this, mqttCurrentTopic, m, true);
+		}
+		catch (MqttException e)
+		{
+			println(e.getMessage());
+		}
+		
+	}
 	
 	
 	/**

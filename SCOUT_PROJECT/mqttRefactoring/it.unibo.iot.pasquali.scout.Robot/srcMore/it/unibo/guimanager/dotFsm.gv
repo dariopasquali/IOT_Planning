@@ -21,7 +21,7 @@ digraph finite_state_machine {
   	enableOrDie -> waitMap [ label = ""];
   	enableOrDie -> waitMap [ label = ""];
   	
-  	waitMap -> waitUpdates [ label = "enableGUI(START,FILENAME)/"];
+  	waitMap -> waitUpdates [ label = "enableGUI(START,TOPIC)/"];
   	
   	waitUpdates -> waitUpdates [ label = "show(POS,DIR)/"];
   	waitUpdates -> waitMap [ label = "end/abort/"];

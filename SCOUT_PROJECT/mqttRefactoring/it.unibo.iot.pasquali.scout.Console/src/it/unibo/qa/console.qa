@@ -7,10 +7,9 @@ System scout
 // From Console to Robot to start Exploration
 Dispatch explore : explore
 Dispatch exploredebug : exploredebug( START , BOUNDS )
-Dispatch explorefile : explorefile(START , MQTT )
+Dispatch explorefile : explorefile(START , FILENAME )
 //START = position ( X , Y )
 //BOUNDS = map ( W , H )
-//MQTT = mqtt(SERVER , TOPIC)
 
 // From Robot to Console to notify a new cell state
 Event expdata : expdata( POS , STATE )
@@ -23,7 +22,7 @@ Event expdata : expdata( POS , STATE )
 
 // From Console to Robot to start the Navigation
 Dispatch navigate : navigate( PLAN_MOVES , POS )
-Dispatch navigatefile : navigatefile( PLAN_MOVES , POS , MQTT)
+Dispatch navigatefile : navigatefile( PLAN_MOVES , POS , TOPIC)
 //PLAN_MOVES = plan ( [ t || d || l || r ] )
 //POS = position ( Xs , Ys )
 // 
@@ -31,7 +30,6 @@ Dispatch navigatefile : navigatefile( PLAN_MOVES , POS , MQTT)
 //d = forward diagonal
 //l = left (45 or 90 degrees)
 //r = right
-//MQTT = mqtt(SERVER , TOPIC)
 
 
 // Raised by Robot when find an unexpected
@@ -89,6 +87,8 @@ QActor console context ctxConsole{
 		solve consult("navConsoleTheory.pl") time(0) onFailSwitchTo  consultPrologFailure ;		
 		solve consult("consoleTheory.pl") time(0) onFailSwitchTo  consultPrologFailure ;
 		
+		solve initMqtt time(0);
+		
  		println("++++++++++++++++++ console(starts) ++++++++++++++++++");
  		switchToPlan waitGUICommand
  		
@@ -116,6 +116,9 @@ QActor console context ctxConsole{
 		repeatPlan 0
 		
 	Plan loadMap resumeLastPlan
+		[!? msg(local_gui_command, "event", SENDER, none, local_gui_command (loadmap(PATH)), MSGNUM)]
+			 solve initMqtt time(111111110);
+	
 		[?? msg(local_gui_command, "event", SENDER, none, local_gui_command (loadmap(PATH)), MSGNUM)]
 			 actorOp loadMapButton(PATH);
 				

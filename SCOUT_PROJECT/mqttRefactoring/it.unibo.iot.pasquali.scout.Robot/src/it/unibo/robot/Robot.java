@@ -11,6 +11,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
+import org.eclipse.paho.client.mqttv3.MqttCallback;
+import org.eclipse.paho.client.mqttv3.MqttException;
+import org.eclipse.paho.client.mqttv3.MqttMessage;
+
 import alice.tuprolog.Term;
 import it.unibo.contactEvent.interfaces.IEventItem;
 import it.unibo.domain.model.implementation.State;
@@ -21,6 +26,7 @@ import it.unibo.iot.sensors.ISensor;
 import it.unibo.iot.sensors.distanceSensor.DistanceSensor;
 import it.unibo.is.interfaces.IOutputEnvView;
 import it.unibo.model.map.Map;
+import it.unibo.mqtt.MqttUtils;
 import it.unibo.planning.enums.Direction;
 import it.unibo.qactors.action.AsynchActionResult;
 import it.unibo.qactors.action.IActorAction.ActionExecMode;
@@ -36,7 +42,7 @@ import it.unibo.qactors.QActorUtils;
  * @author Dario
  *
  */
-public class Robot extends AbstractRobot { 
+public class Robot extends AbstractRobot implements MqttCallback{ 
 	
 	private int defaultSpeed, defaultTime;
 	private int defaultTurnSpeed, defaultTurnTime;
@@ -45,6 +51,13 @@ public class Robot extends AbstractRobot {
 	
 	private Engine engine = null;
 	private String currentFilename;
+	
+	private String mqttServer, mqttTopic;
+	private MqttUtils mqtt;
+	private String mqttClientId;
+	
+	private boolean haveMap = false;
+	private String mqttData = "";
 	
 	
 	
@@ -96,6 +109,11 @@ public class Robot extends AbstractRobot {
 		this.defaultTurnSpeed = defTurnSpeed;
 		this.defaultTurnTime = defTurnTime;
 	}
+	
+	public void initMqtt(String server)
+	{
+		this.mqttServer = server;
+	}
 //}}
 	
 	
@@ -143,20 +161,22 @@ public class Robot extends AbstractRobot {
 	}
 	
 	
-	public void configFileEngine(int sx, int sy, String filename)
+	public void configFileEngine(int sx, int sy, String topic)
 	{
 		System.out.println("Navigation Mode --> SIMULATED");
 		
-		if(currentFilename.equals(filename))
+		if(currentFilename.equals(topic))
 			System.out.println("Engine already has the most recent Map");
 		else
 		{
-			Map m = loadMap(filename);
+			Map m = loadMapfromMqtt(topic);
+			
 			this.engine = new FileEngine(sx, sy, m, this, false);
 			//((FileEngine)engine).setObject(new State(2,2));
 			((QActorPlanUtilsDebug)planUtils).setEngine(((FileEngine)engine));
 		}		
 		
+		System.out.println("WOLRD MAP");
 		System.out.println(((FileEngine)engine).getWorldMap().toString());
 		
 		enableDebugSensing();
@@ -443,6 +463,62 @@ public class Robot extends AbstractRobot {
 		return m;
 	}
 	
+	private Map loadMapfromMqtt(String topic){
+		
+		this.mqttTopic = topic;
+		
+		mqtt = new MqttUtils();
+		
+		try
+		{
+			mqttClientId = mqtt.connect(this, mqttServer, mqttTopic);
+			mqtt.subscribe(this, mqttTopic, this);
+			
+			Thread.sleep(1000);
+			
+			while(!haveMap);			
+			haveMap = false;
+		}
+		catch (MqttException e)
+		{
+			println(e.getMessage());
+		}
+		catch (Exception e)
+		{
+			println(e.getMessage());
+		}
+		
+		Map m = null;
+		
+		String[] d = mqttData.split("\n");
+		mqttData = "";
+		
+		for(int i=0; i<d.length; i++)
+		{
+			if(i == 0)
+			{
+				m = Map.createMapFromPrologRep(d[i]);
+			}
+			else
+			{
+				String s[] = d[i].split(" ");
+				m.addElementFromString(s[1]);
+			}
+		}
+		
+		return m;
+	}
+	
+	@Override
+	public void messageArrived(String topic, MqttMessage message) throws Exception {
+
+		if(mqttData.equals(""))
+			mqttData = message.toString();
+		haveMap = true;		
+	}
+	
+	
+	
 	public void consultFromFile(String filename)
 	{
 		System.out.println("loading...");
@@ -710,4 +786,16 @@ public class Robot extends AbstractRobot {
 			}
 		}
 //}}
+
+		@Override
+		public void connectionLost(Throwable cause) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void deliveryComplete(IMqttDeliveryToken token) {
+			// TODO Auto-generated method stub
+			
+		}
 }

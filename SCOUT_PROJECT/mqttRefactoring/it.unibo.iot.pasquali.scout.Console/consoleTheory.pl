@@ -10,7 +10,16 @@ consoleTheory.pl
 %%gui(image).
 gui(button).
 mqttServer("tcp://m2m.eclipse.org:1883").
-mqttTopic("unibo/mqtt/scout").
+mqttTopic("unibo/mqtt/scout/").
+
+initMqtt :-
+	actorPrintln(tetteculo),
+	mqttServer(SERVER),
+	mqttTopic(TOPIC),
+	actorobj(Actor),
+	Actor <- initMqtt(SERVER , TOPIC).
+
+
 
 %% USED ------------------------------------------------------------------
 

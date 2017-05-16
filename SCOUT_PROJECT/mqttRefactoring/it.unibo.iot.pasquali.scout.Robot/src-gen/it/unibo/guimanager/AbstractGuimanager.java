@@ -145,9 +145,9 @@ public abstract class AbstractGuimanager extends QActor {
 	    		printCurrentEvent(false);
 	    		//onEvent
 	    		if( currentEvent.getEventId().equals("enableGUI") ){
-	    		 		String parg="showMap(START,FILENAME)";
+	    		 		String parg="showMap(START,TOPIC)";
 	    		 		/* PHead */
-	    		 		parg =  updateVars( Term.createTerm("enableGUI(START,FILENAME)"), Term.createTerm("enableGUI(START,FILENAME)"), 
+	    		 		parg =  updateVars( Term.createTerm("enableGUI(START,TOPIC)"), Term.createTerm("enableGUI(START,TOPIC)"), 
 	    		 			    		  					Term.createTerm(currentEvent.getMsg()), parg);
 	    		 			if( parg != null ) {
 	    		 			    aar = QActorUtils.solveGoal(this,myCtx,pengine,parg,"",outEnvView,0);

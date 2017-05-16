@@ -8,7 +8,7 @@ plan(4,enableOrDie, sentence( robotMode( unity),move( switchplan(waitMap) ),'','
 plan(1,waitMap, sentence(true,move(print,"++++++++++++++++++++++++++ ROBOT GUI WAIT MAP ++++++++++++++++++"),'','' ))
 plan(2,waitMap, sentence(true,senseEvent(1000000000,"enableGUI","continue"),'','' ))
 plan(3,waitMap, sentence(true,printCurrentEvent(false),'','' ))
-plan(4,waitMap, sentence(true,eventswitch(enableGUI, Â»enableGUI( START,FILENAME), move(solve,showMap( START,FILENAME),0,"") ),'','' ))
+plan(4,waitMap, sentence(true,eventswitch(enableGUI, Â»enableGUI( START,TOPIC), move(solve,showMap( START,TOPIC),0,"") ),'','' ))
 plan(5,waitMap, sentence( robotMode( unity),senseEvent(2000,"subscribeACK","continue"),'','' ))
 plan(6,waitMap, sentence(true,move(actorOp,createActor,0,""),'','' ))
 plan(7,waitMap, sentence(true,move( switchplan(waitUpdates) ),'','' ))

@@ -313,14 +313,13 @@ executeCmd( Actor, move(robotmove,CMD,SPEED,DURATION,ANGLE), ENDEV, RES ):-
  	!,
  	mapCmdToMove(CMD,MOVE), 
 	%% actorPrintln(  executeCmd(Actor,MOVE, SPEED, ANGLE, DURATION, ENDEV ) ),
-	Actor <- mtExecute(MOVE, SPEED, ANGLE, DURATION, ENDEV, '', '') returns AAR,
+	Actor <- execute(MOVE, SPEED, ANGLE, DURATION, ENDEV, '', '') returns AAR,
 	AAR <- getResult returns RES.
-	
 executeCmd( Actor, move(robotmove,CMD,SPEED,DURATION,ANGLE), Events, Plans, RES ):-
  	!,
  	mapCmdToMove(CMD,MOVE), 
 	%% actorPrintln(  executeCmd(Actor,MOVE, SPEED, ANGLE, DURATION, Events, Plans) ),
-	Actor <- myExecute(MOVE, SPEED, ANGLE, DURATION, Events, Plans) returns AAR,
+	Actor <- execute(MOVE, SPEED, ANGLE, DURATION, Events, Plans) returns AAR,
 	AAR <- getResult returns RES.
 
 %%% ---------  Play sound	---------------
@@ -416,9 +415,9 @@ executeCmd( Actor, repeatplan(N), Events, Plans,done(repeatplan(0)) ):-
 	PN1 is PN + 1,
 	( PN1 < N, !, execPlan(Actor, PLAN, 1); true ).
 %%% ---------  collector (default)  --------------	
-%executeCmd( Actor, MOVE, Events, Plans,done(MOVE) ):-
-%	output( collector(MOVE) ),
-%	Actor <- MOVE.
+executeCmd( Actor, MOVE, Events, Plans,done(MOVE) ):-
+	output( collector(MOVE) ),
+	Actor <- MOVE.
 
 
 /*

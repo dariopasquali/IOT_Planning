@@ -28,17 +28,18 @@ initialConfigNavRobot :-
 	defaultDuration(T),
 	actorobj(Actor),
 	actorPrintln(initialConfigNavRobot),
-	Actor <- initialConfigRobot(S,T,S,S).
+	Actor <- initialConfigRobot(S,T,S,S),
+	initMqtt.
 	
 configEngine(position(SX, SY)) :-
 	actorPrintln("confingEngine!!!!"),
 	actorobj(Actor),
 	Actor <- configEngine(SX, SY).
 	
-configFileEngine(position(SX, SY), FILENAME) :-
+configFileEngine(position(SX, SY), TOPIC) :-
 	actorPrintln("configFileEngine!!!!"),
 	actorobj(Actor),
-	Actor <- configFileEngine(SX, SY, FILENAME).
+	Actor <- configFileEngine(SX, SY, TOPIC).
 
 %% PLAN MANAGEMENT ----------------------------------------
 
@@ -58,12 +59,12 @@ loadNavigationData(PLAN, POS) :-
 	setNavPlan(PLAN).
 	
 	
-loadNavigationData(PLAN, POS, FILENAME) :-
+loadNavigationData(PLAN, POS, TOPIC) :-
 	actorPrintln(PLAN),
 	actorPrintln(POS),
-	actorPrintln(FILENAME),
+	actorPrintln(TOPIC),
 	actorPrintln("caricamento dati in corso...."),
-	configFileEngine(POS, FILENAME),
+	configFileEngine(POS, TOPIC),
 	setNavPlan(PLAN).
 	
 	

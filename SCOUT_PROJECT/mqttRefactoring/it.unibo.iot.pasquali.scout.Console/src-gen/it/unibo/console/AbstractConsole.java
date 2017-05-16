@@ -87,6 +87,14 @@ public abstract class AbstractConsole extends QActor {
 	    			curPlanInExec   = "init";
 	    			if( ! aar.getGoon() ) break;
 	    		} 			
+	    		parg = "initMqtt";
+	    		//REGENERATE AKKA
+	    		aar = solveGoalReactive(parg,0,"","");
+	    		//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
+	    		if( aar.getInterrupted() ){
+	    			curPlanInExec   = "init";
+	    			if( ! aar.getGoon() ) break;
+	    		} 			
 	    		temporaryStr = "\"++++++++++++++++++ console(starts) ++++++++++++++++++\"";
 	    		println( temporaryStr );  
 	    		if( ! planUtils.switchToPlan("waitGUICommand").getGoon() ) break;
@@ -216,6 +224,17 @@ public abstract class AbstractConsole extends QActor {
 	    while(true){
 	    	curPlanInExec =  "loadMap";	//within while since it can be lost by switchlan
 	    	nPlanIter++;
+	    		if( (guardVars = QActorUtils.evalTheGuard(this, " !?msg(local_gui_command,\"event\",SENDER,none,local_gui_command(loadmap(PATH)),MSGNUM)" )) != null ){
+	    		parg = "initMqtt";
+	    		parg = QActorUtils.substituteVars(guardVars,parg);
+	    		//REGENERATE AKKA
+	    		aar = solveGoalReactive(parg,111111110,"","");
+	    		//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
+	    		if( aar.getInterrupted() ){
+	    			curPlanInExec   = "loadMap";
+	    			if( ! aar.getGoon() ) break;
+	    		} 			
+	    		}
 	    		if( (guardVars = QActorUtils.evalTheGuard(this, " ??msg(local_gui_command,\"event\",SENDER,none,local_gui_command(loadmap(PATH)),MSGNUM)" )) != null ){
 	    		parg = "actorOp(loadMapButton(PATH))";
 	    		parg = QActorUtils.substituteVars(guardVars,parg);

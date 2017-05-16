@@ -22,7 +22,7 @@ Event expdata : expdata ( POS , STATE )
 
 // From Console to Robot to start the Navigation
 Dispatch navigate : navigate ( PLAN_MOVES , POS )
-Dispatch navigatefile : navigatefile( PLAN_MOVES , POS , FILENAME)
+Dispatch navigatefile : navigatefile( PLAN_MOVES , POS , TOPIC)
 //PLAN = plan ( [ t || d || l || r ] )
 //POS = position ( Xs , Ys )
 // 
@@ -64,7 +64,7 @@ Event obstacleleft : obstacleleft
 //		ROBOT GUI - INTERACTION
 // ------------------------------------------------------------------
 
-Event enableGUI : enableGUI(START, FILENAME)
+Event enableGUI : enableGUI(START, TOPIC)
 // STATE = on || off
 
 Event show : show(POS, DIR)
@@ -79,6 +79,7 @@ Event subscribeACK : subscribeACK
 //			CONTEXTS
 // ------------------------------------------------------------------
 
+//Context ctxSimulation ip [host="localhost" port=8021]
 Context ctxRobot ip [ host="localhost" port=8020]
 
 EventHandler evh for updateSimulation -print{ 
@@ -92,6 +93,8 @@ QActor console context ctxConsole{
  	Plan init normal
 		println( "NEVER HERE. I'm just a placeholder" ) 
  }
+ 
+
 
 // ------------------------------------------------------------------
 //			GUI MANAGER
@@ -118,7 +121,7 @@ QActor guimanager context ctxRobot{
 		println("++++++++++++++++++++++++++ ROBOT GUI WAIT MAP ++++++++++++++++++");		
 		sense time(1000000000) enableGUI -> continue;
 		printCurrentEvent;
-		onEvent enableGUI : enableGUI(START, FILENAME) -> solve showMap(START, FILENAME) time(0);
+		onEvent enableGUI : enableGUI(START, TOPIC) -> solve showMap(START, TOPIC) time(0);
 		[!? robotMode(unity)] sense time(2000) subscribeACK -> continue;
 		actorOp createActor;
 		
@@ -171,7 +174,7 @@ Robot mockScout QActor robot context ctxRobot{
  		onMsg exploredebug : exploredebug ( START , BOUNDS) -> switchToPlan explorationDebug;
  		onMsg explorefile : explorefile (START, FILENAME) -> switchToPlan explorationFile;
  		onMsg navigate : navigate(PLAN_MOVES, POS) -> switchToPlan navigation;
- 		onMsg navigatefile : navigatefile( PLAN_MOVES , POS , FILENAME) -> switchToPlan navigationFile;
+ 		onMsg navigatefile : navigatefile( PLAN_MOVES , POS , TOPIC) -> switchToPlan navigationFile;
  		
  		repeatPlan 0		
  
@@ -231,13 +234,13 @@ Robot mockScout QActor robot context ctxRobot{
  		
  		solve initialConfigNavRobot time(0);
  		
- 		[!? msg(_, _, SENDER, X, navigatefile( PLAN_MOVES , POS , FILENAME), MSGNUM)]
- 								emit enableGUI : enableGUI(POS, FILENAME);
+ 		[!? msg(_, _, SENDER, X, navigatefile( PLAN_MOVES , POS , TOPIC), MSGNUM)]
+ 								emit enableGUI : enableGUI(POS, TOPIC);
  								
+ 		[?? msg(_, _, SENDER, X, navigatefile( PLAN_MOVES , POS , TOPIC), MSGNUM)] 
+ 			solve loadNavigationData(PLAN_MOVES, POS, TOPIC) time (100000) onFailSwitchTo loadMapFailure;
  		
- 		[?? msg(_, _, SENDER, X, navigatefile( PLAN_MOVES , POS , FILENAME), MSGNUM)] 
- 			solve loadNavigationData(PLAN_MOVES, POS, FILENAME) time (100000) onFailSwitchTo loadMapFailure;
- 		
+ 		//sense time(222222222) abort -> continue
  		switchToPlan startNavigation 	
  		
  	Plan startNavigation

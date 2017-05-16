@@ -64,7 +64,7 @@ public class UnityBL implements IGuiManagerBL{
 
 		try
 		{
-			mqtt.publish(actor, mqttClientID, MQTT_SERVER, topic, file, 0, false);
+			mqtt.publish(actor, topic, file, false);
 			System.out.println("MAP SUBSCRIBED");
 		} 
 		catch (MqttException e)
