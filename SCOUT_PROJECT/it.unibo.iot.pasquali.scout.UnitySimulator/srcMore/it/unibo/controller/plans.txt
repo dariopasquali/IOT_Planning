@@ -1,0 +1,7 @@
+plan(1,init, sentence(true,move(print,"controller init"),'','' ))
+plan(2,init, sentence(true,move(actorOp,initUnityController,0,""),'','' ))
+plan(3,init, sentence(true,move( switchplan(waitUpdates) ),'','' ))
+plan(1,waitUpdates, sentence(true,senseEvent(100000000,"senseObstacle","continue"),'','' ))
+plan(2,waitUpdates, sentence(true,printCurrentEvent(false),'','' ))
+plan(3,waitUpdates, sentence(true,eventswitch(senseObstacle, Â»senseObstacle, move(actorOp,senseWithUnity,0,"") ),'','' ))
+plan(4,waitUpdates, sentence(true,repeatplan() ,'','' ))

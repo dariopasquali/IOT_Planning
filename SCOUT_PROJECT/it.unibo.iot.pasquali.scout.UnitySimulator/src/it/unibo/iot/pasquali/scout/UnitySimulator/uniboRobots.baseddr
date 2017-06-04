@@ -1,0 +1,27 @@
+/* 
+ * ===================================
+ * scout mock
+ * ===================================
+ */ 
+  
+RobotBase mockScout               
+ //BASIC                  
+motorleft  = Motor  [ simulated 0  ]  position: LEFT
+motorright = Motor  [ simulated 0  ]  position: RIGHT
+distFrontMock= Distance [ simulated 0  ] position: FRONT
+distLeftMock= Distance [ simulated 0  ] position: LEFT
+//COMPOSED   
+motors = Actuators [ motorleft , motorright  ] private position: BOTTOM
+Mainrobot scout  [ motors  ]      
+; 
+
+RobotBase robotScout 
+//BASIC                          
+motorleft  = Motor  [ gpiomotor pincw 8 pinccw 9  ]  position: RIGHT
+motorright = Motor  [ gpiomotor pincw 12 pinccw 13  ]  position: LEFT
+distanceFrontRadar = Distance  [ sonarhcsr04 pintrig 0 pinecho 1]  position: FRONT_TOP
+distanceLeftRadar= Distance [ sonarhcsr04 pintrig 0 pinecho 1 ] position: LEFT
+//COMPOSED
+motors = Actuators [ motorleft , motorright  ] private position: BOTTOM
+Mainrobot inspectorrobot  [ motors ]   
+;  

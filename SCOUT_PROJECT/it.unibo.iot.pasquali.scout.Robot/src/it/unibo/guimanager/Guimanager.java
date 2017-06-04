@@ -21,6 +21,8 @@ import it.unibo.is.interfaces.IIntent;
 import it.unibo.is.interfaces.IOutputEnvView;
 import it.unibo.model.map.Map;
 import it.unibo.qactors.QActorContext;
+import it.unibo.qactors.QActorUtils;
+import it.unibo.robot.Robot;
 
 public class Guimanager extends AbstractGuimanager implements IActivity
 {
@@ -37,13 +39,16 @@ public class Guimanager extends AbstractGuimanager implements IActivity
 	// INIT ---------------------------------------------------------
 	
 	public void initRobotGui(){
-		println("init Robot Gui");
+		println("*********************************************init Robot Gui");
 		controller = BLFactory.getBusinessLogic(this, BLType.GUI);
 	}
 	
 	public void initUnity(){
 		println("init UNITY simulation");
 		controller = BLFactory.getBusinessLogic(this, BLType.UNITY);
+		
+		Robot robot = (Robot)QActorUtils.getQActor("robot_ctrl");
+		robot.setUnitySimulation(true);
 	}	
 	
 	// BUSINESS LOGIC -----------------------------------------------
@@ -60,6 +65,17 @@ public class Guimanager extends AbstractGuimanager implements IActivity
 	public void updateState(int x, int y, String direction)
 	{
 		controller.updateState(x, y, direction);
+	}
+	
+	public void placeObstacle(int x, int y){
+		
+		controller.placeObstacle(x,y);
+	}
+	
+	public void simulationSensing()
+	{
+		println("LET'S SENSE");
+		controller.simulationSensing();
 	}
 	
 	// ---------------------------------------------------------------

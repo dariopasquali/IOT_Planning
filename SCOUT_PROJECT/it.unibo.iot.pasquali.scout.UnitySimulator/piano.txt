@@ -1,0 +1,4 @@
+plan(1,piano, sentence(true,delay( 5000) ,'','' ))
+plan(2,piano, sentence(true, move( print,"Inizio Navigazione"),'', '' ))
+plan(3,piano, sentence(true,move(senseEvent,2000,[obstaclefront],[waitAndEvaluate]),'', '' ))
+plan(4,piano, sentence(true, move( print,"FINE Navigazione FUCK"),'', '' ))

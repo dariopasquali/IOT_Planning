@@ -17,6 +17,19 @@ navRobotTheory.pl
 planFilename("scout.txt").
 planName(scout).
 
+/*
+planExecutionMode( MODE ) defines how the robot executes the navigation plan
+
+pInter --> the plan is translated in a prolog-like interpretable format.
+Then is saved in the file scout.txt, loaded with runPlan and executed with Prolog.
+
+executor -> the plan is translated in a list of executable robot action
+then it is executed action by action by the actor
+
+qa --> the plan is translated in a qa file, a compilable software factory (TODO)
+*/
+planExecutionMode(executor).
+
 
 defaultSpeed(60).
 defaultDuration(1000).
@@ -42,12 +55,30 @@ configFileEngine(position(SX, SY), FILENAME) :-
 
 %% PLAN MANAGEMENT ----------------------------------------
 
+robaAcaso :-
+	actorPrintln(robaaaaaaa).
+
+notifyObstacle :-
+	actorobj(Actor),
+	actorPrintln(esegui_cazzo),
+	Actor <- notifyObstacle.
+
+javaPlanExecution :-
+	actorobj(Actor),
+	actorPrintln(esegui_cazzo),
+	Actor <- javaPlanExecution.
+
 setNavPlan(plan(PLAN)) :-
 	actorobj(Actor),
 	planName(NAME),
 	actorPrintln(NAME),
-	actorPrintln("setNavigationPlan!!!!"),
+	actorPrintln("set Prolog-like Navigation Plan"),
 	Actor <- setNavigationPlan(NAME, PLAN).
+	
+setExeNavPlan(plan(PLAN)) :-	
+	actorobj(Actor),
+	actorPrintln("set Executable Navigation Plan"),
+	Actor <- setExecutableNavigationPlan(PLAN).
 	
 	
 loadNavigationData(PLAN, POS) :-
@@ -55,7 +86,8 @@ loadNavigationData(PLAN, POS) :-
 	actorPrintln(POS),
 	actorPrintln("caricamento dati in corso...."),
 	configEngine(POS),
-	setNavPlan(PLAN).
+	planExecutionMode(EXEMODE),
+	switchExecutors(PLAN, EXEMODE).
 	
 	
 loadNavigationData(PLAN, POS, FILENAME) :-
@@ -64,7 +96,18 @@ loadNavigationData(PLAN, POS, FILENAME) :-
 	actorPrintln(FILENAME),
 	actorPrintln("caricamento dati in corso...."),
 	configFileEngine(POS, FILENAME),
+	actorPrintln("done"),	
+	planExecutionMode(EXEMODE),
+	actorPrintln(EXEMODE),
+	switchExecutors(PLAN, EXEMODE).
+	
+switchExecutors(PLAN, pInter) :-
+	actorPrintln(pInter1),
 	setNavPlan(PLAN).
+	
+switchExecutors(PLAN, executor) :-
+	actorPrintln(executor1),
+	setExeNavPlan(PLAN).
 	
 	
 loadThePlan( FName ):-
@@ -130,10 +173,6 @@ executeCmd( Actor, move(robotmove,CMD,SPEED,DURATION,ANGLE), Events, Plans, RES 
 	AAR <- getResult returns RES.
 
 %% WORLD INTERACTION ------------------------------------------------------
-
-notifyUnexpectedObstacle :-
-	actorobj(Actor),
-	Actor <- notifyObstacle.
 
 updateSimulationWorld :-
 	actorobj(Actor),

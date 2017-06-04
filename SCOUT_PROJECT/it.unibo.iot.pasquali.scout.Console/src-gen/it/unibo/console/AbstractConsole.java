@@ -69,6 +69,7 @@ public abstract class AbstractConsole extends QActor {
 	    		//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
 	    		if( aar.getInterrupted() ){
 	    			curPlanInExec   = "init";
+	    			if( aar.getTimeRemained() <= 0 ) addRule("tout(solvegoal,"+getName()+")");
 	    			if( ! aar.getGoon() ) break;
 	    		} 			
 	    		parg = "consult(\"navConsoleTheory.pl\")";
@@ -77,6 +78,7 @@ public abstract class AbstractConsole extends QActor {
 	    		//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
 	    		if( aar.getInterrupted() ){
 	    			curPlanInExec   = "init";
+	    			if( aar.getTimeRemained() <= 0 ) addRule("tout(solvegoal,"+getName()+")");
 	    			if( ! aar.getGoon() ) break;
 	    		} 			
 	    		parg = "consult(\"consoleTheory.pl\")";
@@ -85,6 +87,7 @@ public abstract class AbstractConsole extends QActor {
 	    		//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
 	    		if( aar.getInterrupted() ){
 	    			curPlanInExec   = "init";
+	    			if( aar.getTimeRemained() <= 0 ) addRule("tout(solvegoal,"+getName()+")");
 	    			if( ! aar.getGoon() ) break;
 	    		} 			
 	    		temporaryStr = "\"++++++++++++++++++ console(starts) ++++++++++++++++++\"";
@@ -219,9 +222,14 @@ public abstract class AbstractConsole extends QActor {
 	    		if( (guardVars = QActorUtils.evalTheGuard(this, " ??msg(local_gui_command,\"event\",SENDER,none,local_gui_command(loadmap(PATH)),MSGNUM)" )) != null ){
 	    		parg = "actorOp(loadMapButton(PATH))";
 	    		parg = QActorUtils.substituteVars(guardVars,parg);
-	    		//aar = solveGoalReactive(parg,3600000,"","");
-	    		//genCheckAar(m.name)Â»
-	    		QActorUtils.solveGoal(parg,pengine );
+	    		aar = solveGoalReactive(parg,3600000,"","");
+	    		//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
+	    		if( aar.getInterrupted() ){
+	    			curPlanInExec   = "loadMap";
+	    			if( aar.getTimeRemained() <= 0 ) addRule("tout(actorOp,"+getName()+")");
+	    			if( ! aar.getGoon() ) break;
+	    		} 			
+	    		//QActorUtils.solveGoal(parg,pengine );
 	    		}
 	    		temporaryStr = "\"++++++++++++++++++ MAP LOADED ++++++++++++++++++\"";
 	    		println( temporaryStr );  
@@ -251,6 +259,7 @@ public abstract class AbstractConsole extends QActor {
 	    		//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
 	    		if( aar.getInterrupted() ){
 	    			curPlanInExec   = "exploration";
+	    			if( aar.getTimeRemained() <= 0 ) addRule("tout(solvegoal,"+getName()+")");
 	    			if( ! aar.getGoon() ) break;
 	    		} 			
 	    		temporaryStr = QActorUtils.unifyMsgContent(pengine,"explore","explore", guardVars ).toString();
@@ -278,9 +287,14 @@ public abstract class AbstractConsole extends QActor {
 	    		if( (guardVars = QActorUtils.evalTheGuard(this, " !?msg(local_gui_command,\"event\",SENDER,none,local_gui_command(explore(FILENAME,START,map(W,H),MODE)),MSGNUM)" )) != null ){
 	    		parg = "actorOp(showClearMap(W,H))";
 	    		parg = QActorUtils.substituteVars(guardVars,parg);
-	    		//aar = solveGoalReactive(parg,3600000,"","");
-	    		//genCheckAar(m.name)Â»
-	    		QActorUtils.solveGoal(parg,pengine );
+	    		aar = solveGoalReactive(parg,3600000,"","");
+	    		//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
+	    		if( aar.getInterrupted() ){
+	    			curPlanInExec   = "explorationDebug";
+	    			if( aar.getTimeRemained() <= 0 ) addRule("tout(actorOp,"+getName()+")");
+	    			if( ! aar.getGoon() ) break;
+	    		} 			
+	    		//QActorUtils.solveGoal(parg,pengine );
 	    		}
 	    		temporaryStr = "\"mappa pulita\"";
 	    		println( temporaryStr );  
@@ -329,6 +343,7 @@ public abstract class AbstractConsole extends QActor {
 	    		 			//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
 	    		 			if( aar.getInterrupted() ){
 	    		 				curPlanInExec   = "waitEndOfExploration";
+	    		 				if( aar.getTimeRemained() <= 0 ) addRule("tout(actorOp,"+getName()+")");
 	    		 				if( ! aar.getGoon() ) break;
 	    		 			} 			
 	    		 		}
@@ -402,6 +417,7 @@ public abstract class AbstractConsole extends QActor {
 	    		//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
 	    		if( aar.getInterrupted() ){
 	    			curPlanInExec   = "findPath";
+	    			if( aar.getTimeRemained() <= 0 ) addRule("tout(solvegoal,"+getName()+")");
 	    			if( ! aar.getGoon() ) break;
 	    		} 			
 	    		}
@@ -428,9 +444,14 @@ public abstract class AbstractConsole extends QActor {
 	    		temporaryStr = "\"++++++++++++++++++ NAVIGATION ++++++++++++++++++\"";
 	    		println( temporaryStr );  
 	    		parg = "actorOp(sendNavigationData(\"robot\"))";
-	    		//aar = solveGoalReactive(parg,3600000,"","");
-	    		//genCheckAar(m.name)Â»
-	    		QActorUtils.solveGoal(parg,pengine );
+	    		aar = solveGoalReactive(parg,3600000,"","");
+	    		//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
+	    		if( aar.getInterrupted() ){
+	    			curPlanInExec   = "navigation";
+	    			if( aar.getTimeRemained() <= 0 ) addRule("tout(actorOp,"+getName()+")");
+	    			if( ! aar.getGoon() ) break;
+	    		} 			
+	    		//QActorUtils.solveGoal(parg,pengine );
 	    		if( ! planUtils.switchToPlan("waitEndOfNavigation").getGoon() ) break;
 	    break;
 	    }//while
@@ -452,9 +473,14 @@ public abstract class AbstractConsole extends QActor {
 	    		temporaryStr = "\"++++++++++++++++++ NAVIGATION FILE ++++++++++++++++++\"";
 	    		println( temporaryStr );  
 	    		parg = "actorOp(sendNavigationData(\"simulated\"))";
-	    		//aar = solveGoalReactive(parg,3600000,"","");
-	    		//genCheckAar(m.name)Â»
-	    		QActorUtils.solveGoal(parg,pengine );
+	    		aar = solveGoalReactive(parg,3600000,"","");
+	    		//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
+	    		if( aar.getInterrupted() ){
+	    			curPlanInExec   = "navigationFile";
+	    			if( aar.getTimeRemained() <= 0 ) addRule("tout(actorOp,"+getName()+")");
+	    			if( ! aar.getGoon() ) break;
+	    		} 			
+	    		//QActorUtils.solveGoal(parg,pengine );
 	    		if( ! planUtils.switchToPlan("waitEndOfNavigation").getGoon() ) break;
 	    break;
 	    }//while
@@ -503,6 +529,7 @@ public abstract class AbstractConsole extends QActor {
 	    		 				//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
 	    		 				if( aar.getInterrupted() ){
 	    		 					curPlanInExec   = "waitEndOfNavigation";
+	    		 					if( aar.getTimeRemained() <= 0 ) addRule("tout(demo,"+getName()+")");
 	    		 					if( ! aar.getGoon() ) break;
 	    		 				} 			
 	    		 				if( aar.getResult().equals("failure")){
@@ -581,9 +608,14 @@ public abstract class AbstractConsole extends QActor {
 	    	curPlanInExec =  "clearGUI";	//within while since it can be lost by switchlan
 	    	nPlanIter++;
 	    		parg = "actorOp(myClearGUI)";
-	    		//aar = solveGoalReactive(parg,3600000,"","");
-	    		//genCheckAar(m.name)Â»
-	    		QActorUtils.solveGoal(parg,pengine );
+	    		aar = solveGoalReactive(parg,3600000,"","");
+	    		//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
+	    		if( aar.getInterrupted() ){
+	    			curPlanInExec   = "clearGUI";
+	    			if( aar.getTimeRemained() <= 0 ) addRule("tout(actorOp,"+getName()+")");
+	    			if( ! aar.getGoon() ) break;
+	    		} 			
+	    		//QActorUtils.solveGoal(parg,pengine );
 	    		temporaryStr = "\"map cleared\"";
 	    		println( temporaryStr );  
 	    		returnValue = continueWork;  
@@ -610,6 +642,7 @@ public abstract class AbstractConsole extends QActor {
 	    		//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
 	    		if( aar.getInterrupted() ){
 	    			curPlanInExec   = "clearPath";
+	    			if( aar.getTimeRemained() <= 0 ) addRule("tout(solvegoal,"+getName()+")");
 	    			if( ! aar.getGoon() ) break;
 	    		} 			
 	    		temporaryStr = "\"path cleared\"";

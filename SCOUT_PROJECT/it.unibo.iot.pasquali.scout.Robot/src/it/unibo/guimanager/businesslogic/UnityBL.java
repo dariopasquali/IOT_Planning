@@ -9,14 +9,11 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Iterator;
 
-import org.eclipse.paho.client.mqttv3.MqttException;
-
-import cli.System.IO.Path;
 import it.unibo.connector.IConnector;
 import it.unibo.connector.UnityConnector;
 import it.unibo.guimanager.Guimanager;
 import it.unibo.guimanager.interfaces.IGuiManagerBL;
-import it.unibo.robot.utility.MqttUtils;
+//import it.unibo.robot.utility.MqttUtils;
 
 public class UnityBL implements IGuiManagerBL{
 
@@ -26,10 +23,13 @@ public class UnityBL implements IGuiManagerBL{
 	private String actorName;
 	private int startX, startY;
 	
-	private MqttUtils mqtt;
-	private final String MQTT_SERVER = "tcp://m2m.eclipse.org:1883";
-	private String topic = "unibo/mqtt/tetteculo";
-	private String mqttClientID = "";
+	private String currentDir;
+	private int currentX, currentY;
+	
+//	private MqttUtils mqtt;
+//	private final String MQTT_SERVER = "tcp://m2m.eclipse.org:1883";
+//	private String topic = "unibo/mqtt/tetteculo";
+//	private String mqttClientID = "";
 	
 	public UnityBL(Guimanager actor){
 		
@@ -40,17 +40,17 @@ public class UnityBL implements IGuiManagerBL{
 		connector.connect();
 		connector.setupActorSimulatorName();
 		
-		mqtt = new MqttUtils();
-		try
-		{
-			mqttClientID = mqtt.connect(actor, MQTT_SERVER, topic);
-		} 
-		catch (MqttException e)
-		{
-			e.printStackTrace();
-		}
-		
-		connector.send("subscribe(\""+topic+"\")");		
+//		mqtt = new MqttUtils();
+//		try
+//		{
+//			mqttClientID = mqtt.connect(actor, MQTT_SERVER, topic);
+//		} 
+//		catch (MqttException e)
+//		{
+//			e.printStackTrace();
+//		}
+//		
+//		connector.send("subscribe(\""+topic+"\")");		
 		actor.println("connected");		
 	}
 	
@@ -58,20 +58,23 @@ public class UnityBL implements IGuiManagerBL{
 	@Override
 	public void showMap(int startX, int startY, String filename) {
 
-		String file = readMap(filename);
+		this.startX = startX;
+		this.startY = startY;
 		
-		//readAndSend(filename);			
+//		String file = readMap(filename);
+		
+		readAndSend(filename);			
 
-		try
-		{
-			mqtt.publish(actor, mqttClientID, MQTT_SERVER, topic, file, 0, false);
-			System.out.println("MAP SUBSCRIBED");
-		} 
-		catch (MqttException e)
-		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+//		try
+//		{
+//			mqtt.publish(actor, mqttClientID, MQTT_SERVER, topic, file, 0, false);
+//			System.out.println("MAP SUBSCRIBED");
+//		} 
+//		catch (MqttException e)
+//		{
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
 	}
 
 
@@ -85,8 +88,22 @@ public class UnityBL implements IGuiManagerBL{
 	@Override
 	public void updateState(int x, int y, String direction) {
 		
+		currentDir = direction;
+		currentX = x;
+		currentY = y;
+		
 		String move = "move(\"" + actorName + "\",\"" + direction+ "\"," + x + "," + y +  ")";
-		connector.send(move);		
+		connector.send(move);
+	}
+	
+	@Override
+	public void placeObstacle(int x, int y) {		
+		actor.execAction("WORLDCHANGED "+x+","+y);	
+	}
+	
+	@Override
+	public void simulationSensing() {
+		connector.send("senseObstacle");		
 	}
 	
 	private void sendlambda(String filename)
@@ -150,5 +167,11 @@ public class UnityBL implements IGuiManagerBL{
 		
 		return data;
 	}
+
+
+
+
+
+
 
 }

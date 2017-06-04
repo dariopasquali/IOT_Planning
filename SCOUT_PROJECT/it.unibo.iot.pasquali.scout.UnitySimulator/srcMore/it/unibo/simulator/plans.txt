@@ -1,0 +1,6 @@
+plan(1,init, sentence(true,move(print,"simulator init"),'','' ))
+plan(2,init, sentence(true,move(actorOp,initConnector,0,""),'','' ))
+plan(3,init, sentence(true,move( switchplan(simulate) ),'','' ))
+plan(1,simulate, sentence(true,move(actorOp,receiveEvent,0,""),'','' ))
+plan(2,simulate, sentence(true,move(actorOp,sendAnswer,0,""),'','' ))
+plan(3,simulate, sentence(true,repeatplan() ,'','' ))

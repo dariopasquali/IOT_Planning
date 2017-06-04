@@ -6,10 +6,12 @@ import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.lang.reflect.Type;
 
 import alice.tuprolog.Term;
 import it.unibo.contactEvent.interfaces.IEventItem;
@@ -27,6 +29,9 @@ import it.unibo.qactors.action.IActorAction.ActionExecMode;
 import it.unibo.qactors.akka.QActorPlanUtils;
 import it.unibo.robot.exploration.algo.Explorer;
 import it.unibo.robot.planutils.*;
+import it.unibo.robot.planutils.exe.ExecutablePrint;
+import it.unibo.robot.planutils.exe.ExecutableRobotAction;
+import it.unibo.robot.planutils.exe.PlanExecutor;
 import it.unibo.robot.utility.*;
 import it.unibo.qactors.QActorContext;
 import it.unibo.qactors.QActorUtils;
@@ -45,6 +50,10 @@ public class Robot extends AbstractRobot {
 	
 	private Engine engine = null;
 	private String currentFilename;
+	
+	private boolean unitySimulation = false;
+	
+	private PlanExecutor executor;
 	
 	
 	
@@ -143,6 +152,7 @@ public class Robot extends AbstractRobot {
 	}
 	
 	
+	
 	public void configFileEngine(int sx, int sy, String filename)
 	{
 		System.out.println("Navigation Mode --> SIMULATED");
@@ -169,6 +179,15 @@ public class Robot extends AbstractRobot {
 		engine.setMakeRealMove(false);
 		println(engine.getState().toString());
 	}
+
+	public void setUnitySimulation(boolean state)
+	{
+		unitySimulation = state;
+		((QActorPlanUtilsDebug) planUtils).setUnitySimulation(state);
+		
+		this.println("UNITY SIMULATION!!!!");
+	}
+	
 //}}	
 
 	
@@ -280,31 +299,47 @@ public class Robot extends AbstractRobot {
 			switch(m)
 			{
 			case "t":
-				//pathPlan.addSenseEvent(1000, "obstaclefront", "waitAndEvaluate");
-				pathPlan.addForwardMove(speed, time, "obstaclefront", "waitAndEvaluate");
+//				if(unitySimulation)
+//					pathPlan.addEmitEvent("senseObstacle", "senseObstacle");
+				pathPlan.addSenseEvent(2000, "obstaclefront", "waitAndEvaluate");
+				pathPlan.addForwardMove(speed, time, "", "");
+				if(simulated)
+					pathPlan.addSenseEvent(2000, "moveACK", "continue");
 				break;
 				
 			case "d":
-				//pathPlan.addSenseEvent(1000, "obstaclefront", "waitAndEvaluate");
-				pathPlan.addForwardMove(speed, diagoTime, "obstaclefront", "waitAndEvaluate");
+//				if(unitySimulation) // messa nel QActorPlanUtilsDebug
+//					pathPlan.addEmitEvent("senseObstacle", "senseObstacle");
+				pathPlan.addSenseEvent(2000, "obstaclefront", "waitAndEvaluate");
+				pathPlan.addForwardMove(speed, diagoTime, "", "");
+				if(simulated)
+					pathPlan.addSenseEvent(2000, "moveACK", "continue");
 				break;
 				
 			case "l":
 				pathPlan.addSpinMove(speed, time, PlanSpinDirection.LEFT);
+				if(simulated)
+					pathPlan.addSenseEvent(2000, "moveACK", "continue");
 				break;
 				
 			case "r":
 				pathPlan.addSpinMove(speed, time, PlanSpinDirection.RIGHT);
+				if(simulated)
+					pathPlan.addSenseEvent(2000, "moveACK", "continue");
 				break;
 				
 			case "dl":
 				pathPlan.addSpinMove(speed, time, PlanSpinDirection.LEFT);
 				pathPlan.addSpinMove(speed, time, PlanSpinDirection.LEFT);
+				if(simulated)
+					pathPlan.addSenseEvent(2000, "moveACK", "continue");
 				break;
 				
 			case "dr":
 				pathPlan.addSpinMove(speed, time, PlanSpinDirection.RIGHT);
 				pathPlan.addSpinMove(speed, time, PlanSpinDirection.RIGHT);
+				if(simulated)
+					pathPlan.addSenseEvent(2000, "moveACK", "continue");
 				break;
 			}			
 		}
@@ -321,12 +356,53 @@ public class Robot extends AbstractRobot {
 		println("PLAN SAVED IN "+planSaver.getFileName());		
 	}
 	
+	public void setExecutableNavigationPlan(String plan){
+		
+		int diagoTime = (int) (Math.round(defaultTime*1.414));
+		boolean simulated = (engine instanceof FileEngine);
+		
+		executor = new PlanExecutor(this, defaultSpeed, defaultTime, diagoTime);
+		
+		plan = plan.split("\\[")[1];
+		plan = plan.split("\\]")[0];
+		
+		String[] moves = plan.split(",");
+		
+		executor.addPrint("Inizio Navigazione!!");
+		
+		for(String m : moves)
+		{
+			if(m.equals("t") || m.equals("d"))
+			{
+				executor.addEmit("senseObstacle", "senseObstacle");
+				executor.addSense(2000, "obstaclefront", "waitAndEvaluate");				
+			}
+			else if(m.equals("dr") || m.equals("dl"))
+			{
+				executor.addMove(m);
+			}
+			
+			executor.addMove(m);
+			if(simulated)
+				executor.addSense(2000, "moveACK", "continue");					
+		}
+		
+		executor.addPrint("Fine navigazione!!");		
+		return;	
+	}
 	
-
+	public void javaPlanExecution(){
+		executor.execute();
+	}
 	
+	public void stampaRoba() {
+		System.out.println("ROBAAAAAAAAA ");
+	}
 	
 	public void notifyObstacle()
 	{
+		System.out.println("PORCA PUTTANA");
+		
 		State current = engine.getState();
 		State obj = engine.getForwardState();
 		
@@ -373,7 +449,9 @@ public class Robot extends AbstractRobot {
 		String payload = "position("+s.getX() + "," + s.getY() + ")," +
 						s.getDirection().toString().toLowerCase();
 		
+		println("NOTIFY -> "+payload);
 		emit("show", "show(" + payload + ")");
+	
 	}
 	
 	
@@ -451,6 +529,54 @@ public class Robot extends AbstractRobot {
 		
 //{{ SYSTEM INTERACTION *****************************************************
 
+//	@Override
+//	public AsynchActionResult solveGoalReactive( String goal, int duration, String events, String plans) throws Exception{
+//		
+//		if(goal.contains("actorOp"))
+//		{
+//			String method = goal.replace("actorOp", "");
+//			method = method.substring(1, method.length()-1);
+//
+//			String[] s = method.split("\\(");
+//			String methodName = s[0];
+//			
+//			s[1] = s[1].replace(")", "");
+//			
+//			String[] params = s[1].split(",");
+//			
+//			Method[] ms = Class.forName(this.getClass().getName()).getDeclaredMethods();
+//			for(Method m : ms)
+//			{
+//				if(m.getName().equals(methodName))
+//				{
+//					Object[] parsedParams = new Object[params.length];
+//					Type[] types = m.getParameterTypes();
+//					
+//					for(int i=0; i<types.length; i++){
+//
+//						switch(types[i].getTypeName()){
+//						
+//						case "int":
+//							parsedParams[i] = Integer.parseInt(params[i]);
+//							break;
+//							
+//						default:
+//							parsedParams[i] = params[i];
+//						}
+//						
+//					}
+//					
+//					m.invoke(this, (Object[])parsedParams);
+//					break;
+//				}
+//			}			
+//			
+//			return new AsynchActionResult(null, 1, true, true, "", super.getCurrentEvent());
+//						
+//		}
+//		else return super.solveGoalReactive(goal, duration, events, plans);		
+//	}
+	
 
 	public void enableDebugSensing()
 	{
@@ -619,6 +745,10 @@ public class Robot extends AbstractRobot {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+	
+	public QActorPlanUtilsDebug getPlanUtils(){
+		return (QActorPlanUtilsDebug) this.planUtils;
 	}
 	
 //}}

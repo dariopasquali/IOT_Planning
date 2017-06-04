@@ -17,28 +17,29 @@ setActorName( Name ):-
 	text_concat("qatu",TS,NN),
 	assert( myname(NN) ),
 	assert( actorobj(NN) ).
-createActor(Name, Class, NewActor):-
+createActor(Name, Class ):-
  	actorobj(A),
+ 	%% actorPrintln( createActor(A) ),
 	A <- getName returns CurActorName,
- 	A <- getContext  returns Ctx,
-	A <- getOutputEnvView returns View,
- 	Ctx <- addInstance(Name),  
-  	java_object(Class, [Name,Ctx,View], NewActor),
- 	NewActor <-  getName returns NewActorName,
-	actorPrintln( createActor(NewActorName, NewActor) ).
+	%% actorPrintln( createActor(CurActorName,Ctx,View) ),
+ 	A <- getQActorContext  returns Ctx,
+ 	%% actorPrintln( createActor(CurActorName,Ctx,View) ),
+    A <- getOutputEnvView returns View,
+	%% actorPrintln( createActor(CurActorName,Ctx,View) ),
+ 	Ctx <- addInstance(Ctx, Name,Class,View). 
 /*
 Name generator
 */	
 value(nameCounter,0). 
 newName( Prot, Name,N1 ) :-
 	inc(nameCounter,1,N1),
-	text_term(N1S,N1),
+	text_term(N1S,N1), 
 	text_term(ProtS,Prot),
  	text_concat(ProtS,N1S,Name),
-	assert( instance( Prot, N1, Name ) ),
-	actorPrintln( newname(Name,N1) ) .
+	replaceRule( instance( _, _, _ ), instance( Prot, N1, Name ) ).
 
-	
+%%setPrologResult( timeOut(T) ):- setTimeOut( tout("prolog", tout(T))  ).
+
 setPrologResult( Res ):-
 	( retract( goalResult( _ ) ),!; true ),	%%remove previous goalResult (if any) 
 	assert( goalResult(Res) ).
@@ -58,6 +59,9 @@ removeRule( A  ):-
 	retract( A :- B ),!.
 removeRule( _  ).
 
+replaceRule( Rule, NewRule ):-
+	removeRule( Rule ),addRule( NewRule ).
+	
 setResult( A ):-
  	( retract( result( _ ) ),!; true ), %%remove previous result (if any)	
 	assert( result( A ) ).
@@ -99,6 +103,19 @@ loop(I,N,Op) :-
 		assign(I,V1) ,   
 		loop(I,N,Op).	%%tail recursion
 loop(I,N,Op).
+
+numOfFacts( F, N ) :-
+	bagof( F,F,L ),
+	length(L, N). 
+	
+eval( plus, V1, V2, R ):- R is V1+V2.
+eval( minus, V1, V2, R ):- R is V1-V2.
+eval( times, V1, V2, R ):- R is V1*V2.
+eval( div, V1, V2, R ):- R is V1/V2.
+eval( lt, X,Y ) :- X < Y.
+eval( gt, X,Y ) :- X > Y.
+
+divisible( V1, V2 ) :- 0 is mod(V1,V2). 
 
 getVal( I, V ):-
 	value(I,V).
@@ -313,14 +330,13 @@ executeCmd( Actor, move(robotmove,CMD,SPEED,DURATION,ANGLE), ENDEV, RES ):-
  	!,
  	mapCmdToMove(CMD,MOVE), 
 	%% actorPrintln(  executeCmd(Actor,MOVE, SPEED, ANGLE, DURATION, ENDEV ) ),
-	Actor <- mtExecute(MOVE, SPEED, ANGLE, DURATION, ENDEV, '', '') returns AAR,
+	Actor <- execute(MOVE, SPEED, ANGLE, DURATION, ENDEV, '', '') returns AAR,
 	AAR <- getResult returns RES.
-	
 executeCmd( Actor, move(robotmove,CMD,SPEED,DURATION,ANGLE), Events, Plans, RES ):-
  	!,
  	mapCmdToMove(CMD,MOVE), 
 	%% actorPrintln(  executeCmd(Actor,MOVE, SPEED, ANGLE, DURATION, Events, Plans) ),
-	Actor <- myExecute(MOVE, SPEED, ANGLE, DURATION, Events, Plans) returns AAR,
+	Actor <- execute(MOVE, SPEED, ANGLE, DURATION, Events, Plans) returns AAR,
 	AAR <- getResult returns RES.
 
 %%% ---------  Play sound	---------------
@@ -416,9 +432,9 @@ executeCmd( Actor, repeatplan(N), Events, Plans,done(repeatplan(0)) ):-
 	PN1 is PN + 1,
 	( PN1 < N, !, execPlan(Actor, PLAN, 1); true ).
 %%% ---------  collector (default)  --------------	
-%executeCmd( Actor, MOVE, Events, Plans,done(MOVE) ):-
-%	output( collector(MOVE) ),
-%	Actor <- MOVE.
+%% executeCmd( Actor, MOVE, Events, Plans,done(MOVE) ):-
+%% 	output( collector(MOVE) ),
+%% 	Actor <- MOVE.
 
 
 /*

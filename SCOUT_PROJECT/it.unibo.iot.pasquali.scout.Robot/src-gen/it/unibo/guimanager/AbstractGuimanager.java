@@ -14,10 +14,14 @@ import it.unibo.qactors.action.IActorAction;
 import it.unibo.qactors.action.IActorAction.ActionExecMode;
 import it.unibo.qactors.action.IMsgQueue;
 import it.unibo.qactors.akka.QActor;
+import it.unibo.baseEnv.basicFrame.EnvFrame;
+import alice.tuprolog.SolveInfo;
+import it.unibo.is.interfaces.IActivity;
+import it.unibo.is.interfaces.IIntent;
 
 
 //REGENERATE AKKA: QActor instead QActorPlanned
-public abstract class AbstractGuimanager extends QActor { 
+public abstract class AbstractGuimanager extends QActor implements IActivity{ 
 	protected AsynchActionResult aar = null;
 	protected boolean actionResult = true;
 	protected alice.tuprolog.SolveInfo sol;
@@ -29,7 +33,11 @@ public abstract class AbstractGuimanager extends QActor {
 	protected IActorAction  action;
 	
 			protected static IOutputEnvView setTheEnv(IOutputEnvView outEnvView ){
-				return outEnvView;
+				EnvFrame env = new EnvFrame( "Env_guimanager", java.awt.Color.white  , java.awt.Color.black );
+				env.init();
+				env.setSize(800,400);
+				IOutputEnvView newOutEnvView = ((EnvFrame) env).getOutputEnvView();
+				return newOutEnvView;
 			}
 	
 	
@@ -37,10 +45,20 @@ public abstract class AbstractGuimanager extends QActor {
 			super(actorId, myCtx,  
 			"./srcMore/it/unibo/guimanager/WorldTheory.pl",
 			setTheEnv( outEnvView )  , "init");		
+			addInputPanel(80);
+			addCmdPanels();	
 			this.planFilePath = "./srcMore/it/unibo/guimanager/plans.txt";
 			//Plan interpretation is done in Prolog
 			//if(planFilePath != null) planUtils.buildPlanTable(planFilePath);
 	 	}
+	protected void addInputPanel(int size){
+		((EnvFrame) env).addInputPanel(size);			
+	}
+	protected void addCmdPanels(){
+		((EnvFrame) env).addCmdPanel("input", new String[]{"INPUT"}, this);
+		((EnvFrame) env).addCmdPanel("alarm", new String[]{"FIRE"}, this);
+		((EnvFrame) env).addCmdPanel("help",  new String[]{"HELP"}, this);				
+	}
 		@Override
 		protected void doJob() throws Exception {
 			String name  = getName().replace("_ctrl", "");
@@ -71,6 +89,7 @@ public abstract class AbstractGuimanager extends QActor {
 	    		//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
 	    		if( aar.getInterrupted() ){
 	    			curPlanInExec   = "init";
+	    			if( aar.getTimeRemained() <= 0 ) addRule("tout(solvegoal,"+getName()+")");
 	    			if( ! aar.getGoon() ) break;
 	    		} 			
 	    		if( ! planUtils.switchToPlan("enableOrDie").getGoon() ) break;
@@ -94,9 +113,14 @@ public abstract class AbstractGuimanager extends QActor {
 	    		if( (guardVars = QActorUtils.evalTheGuard(this, " !?robotMode(gui)" )) != null ){
 	    		parg = "actorOp(initRobotGui)";
 	    		parg = QActorUtils.substituteVars(guardVars,parg);
-	    		//aar = solveGoalReactive(parg,3600000,"","");
-	    		//genCheckAar(m.name)Â»
-	    		QActorUtils.solveGoal(parg,pengine );
+	    		aar = solveGoalReactive(parg,3600000,"","");
+	    		//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
+	    		if( aar.getInterrupted() ){
+	    			curPlanInExec   = "enableOrDie";
+	    			if( aar.getTimeRemained() <= 0 ) addRule("tout(actorOp,"+getName()+")");
+	    			if( ! aar.getGoon() ) break;
+	    		} 			
+	    		//QActorUtils.solveGoal(parg,pengine );
 	    		}
 	    		if( (guardVars = QActorUtils.evalTheGuard(this, " !?robotMode(gui)" )) != null ){
 	    		if( ! planUtils.switchToPlan("waitMap").getGoon() ) break;
@@ -106,9 +130,14 @@ public abstract class AbstractGuimanager extends QActor {
 	    		}if( (guardVars = QActorUtils.evalTheGuard(this, " !?robotMode(unity)" )) != null ){
 	    		parg = "actorOp(initUnity)";
 	    		parg = QActorUtils.substituteVars(guardVars,parg);
-	    		//aar = solveGoalReactive(parg,3600000,"","");
-	    		//genCheckAar(m.name)Â»
-	    		QActorUtils.solveGoal(parg,pengine );
+	    		aar = solveGoalReactive(parg,3600000,"","");
+	    		//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
+	    		if( aar.getInterrupted() ){
+	    			curPlanInExec   = "enableOrDie";
+	    			if( aar.getTimeRemained() <= 0 ) addRule("tout(actorOp,"+getName()+")");
+	    			if( ! aar.getGoon() ) break;
+	    		} 			
+	    		//QActorUtils.solveGoal(parg,pengine );
 	    		}
 	    		if( (guardVars = QActorUtils.evalTheGuard(this, " !?robotMode(unity)" )) != null ){
 	    		if( ! planUtils.switchToPlan("waitMap").getGoon() ) break;
@@ -145,35 +174,29 @@ public abstract class AbstractGuimanager extends QActor {
 	    		printCurrentEvent(false);
 	    		//onEvent
 	    		if( currentEvent.getEventId().equals("enableGUI") ){
-	    		 		String parg="showMap(START,FILENAME)";
-	    		 		/* PHead */
-	    		 		parg =  updateVars( Term.createTerm("enableGUI(START,FILENAME)"), Term.createTerm("enableGUI(START,FILENAME)"), 
+	    		 		String parg = "actorOp(showMap(X,Y,FILENAME))";
+	    		 		/* ActorOp */
+	    		 		parg =  updateVars( Term.createTerm("enableGUI(START,FILENAME)"), Term.createTerm("enableGUI(position(X,Y),FILENAME)"), 
 	    		 			    		  					Term.createTerm(currentEvent.getMsg()), parg);
-	    		 			if( parg != null ) {
-	    		 			    aar = QActorUtils.solveGoal(this,myCtx,pengine,parg,"",outEnvView,0);
-	    		 				//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
-	    		 				if( aar.getInterrupted() ){
-	    		 					curPlanInExec   = "waitMap";
-	    		 					if( ! aar.getGoon() ) break;
-	    		 				} 			
-	    		 				if( aar.getResult().equals("failure")){
-	    		 					if( ! aar.getGoon() ) break;
-	    		 				}else if( ! aar.getGoon() ) break;
-	    		 			}
+	    		 		if( parg != null ){
+	    		 			aar = solveGoalReactive(parg,3600000,"","");
+	    		 			//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
+	    		 			if( aar.getInterrupted() ){
+	    		 				curPlanInExec   = "waitMap";
+	    		 				if( aar.getTimeRemained() <= 0 ) addRule("tout(actorOp,"+getName()+")");
+	    		 				if( ! aar.getGoon() ) break;
+	    		 			} 			
+	    		 		}
 	    		 }
-	    		if( (guardVars = QActorUtils.evalTheGuard(this, " !?robotMode(unity)" )) != null ){
-	    		//senseEvent
-	    		aar = planUtils.senseEvents( 2000,"subscribeACK","continue",
-	    		"" , "",ActionExecMode.synch );
-	    		if( ! aar.getGoon() || aar.getTimeRemained() <= 0 ){
-	    			//println("			WARNING: sense timeout");
-	    			addRule("tout(senseevent,"+getName()+")");
-	    		}
-	    		}
 	    		parg = "actorOp(createActor)";
-	    		//aar = solveGoalReactive(parg,3600000,"","");
-	    		//genCheckAar(m.name)Â»
-	    		QActorUtils.solveGoal(parg,pengine );
+	    		aar = solveGoalReactive(parg,3600000,"","");
+	    		//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
+	    		if( aar.getInterrupted() ){
+	    			curPlanInExec   = "waitMap";
+	    			if( aar.getTimeRemained() <= 0 ) addRule("tout(actorOp,"+getName()+")");
+	    			if( ! aar.getGoon() ) break;
+	    		} 			
+	    		//QActorUtils.solveGoal(parg,pengine );
 	    		if( ! planUtils.switchToPlan("waitUpdates").getGoon() ) break;
 	    break;
 	    }//while
@@ -192,13 +215,32 @@ public abstract class AbstractGuimanager extends QActor {
 	    while(true){
 	    	curPlanInExec =  "waitUpdates";	//within while since it can be lost by switchlan
 	    	nPlanIter++;
+	    		temporaryStr = "\"waitMove\"";
+	    		println( temporaryStr );  
 	    		//senseEvent
-	    		aar = planUtils.senseEvents( 1000000000,"show,end,abort","continue,continue,continue",
+	    		aar = planUtils.senseEvents( 1000000000,"end,show,senseObstacle","continue,continue,continue",
 	    		"" , "",ActionExecMode.synch );
 	    		if( ! aar.getGoon() || aar.getTimeRemained() <= 0 ){
 	    			//println("			WARNING: sense timeout");
 	    			addRule("tout(senseevent,"+getName()+")");
 	    		}
+	    		printCurrentEvent(false);
+	    		//onEvent
+	    		if( currentEvent.getEventId().equals("senseObstacle") ){
+	    		 		String parg = "actorOp(simulationSensing)";
+	    		 		/* ActorOp */
+	    		 		parg =  updateVars( Term.createTerm("senseObstacle"), Term.createTerm("senseObstacle"), 
+	    		 			    		  					Term.createTerm(currentEvent.getMsg()), parg);
+	    		 		if( parg != null ){
+	    		 			aar = solveGoalReactive(parg,3600000,"","");
+	    		 			//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
+	    		 			if( aar.getInterrupted() ){
+	    		 				curPlanInExec   = "waitUpdates";
+	    		 				if( aar.getTimeRemained() <= 0 ) addRule("tout(actorOp,"+getName()+")");
+	    		 				if( ! aar.getGoon() ) break;
+	    		 			} 			
+	    		 		}
+	    		 }
 	    		//onEvent
 	    		if( currentEvent.getEventId().equals("show") ){
 	    		 		String parg="updateState(POS,DIR)";
@@ -210,6 +252,7 @@ public abstract class AbstractGuimanager extends QActor {
 	    		 				//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
 	    		 				if( aar.getInterrupted() ){
 	    		 					curPlanInExec   = "waitUpdates";
+	    		 					if( aar.getTimeRemained() <= 0 ) addRule("tout(demo,"+getName()+")");
 	    		 					if( ! aar.getGoon() ) break;
 	    		 				} 			
 	    		 				if( aar.getResult().equals("failure")){
@@ -224,17 +267,7 @@ public abstract class AbstractGuimanager extends QActor {
 	    		 		parg =  updateVars(  Term.createTerm("end"), Term.createTerm("end"), 
 	    		 			    		  					Term.createTerm(currentEvent.getMsg()), parg);
 	    		 			if( parg != null ){
-	    		 				 if( ! planUtils.switchToPlan("waitMap").getGoon() ) break; 
-	    		 			}//else println("guard  fails");  //parg is null when there is no guard (onEvent)
-	    		 }
-	    		//onEvent
-	    		if( currentEvent.getEventId().equals("abort") ){
-	    		 		String parg = "";
-	    		 		/* SwitchPlan */
-	    		 		parg =  updateVars(  Term.createTerm("abort"), Term.createTerm("abort"), 
-	    		 			    		  					Term.createTerm(currentEvent.getMsg()), parg);
-	    		 			if( parg != null ){
-	    		 				 if( ! planUtils.switchToPlan("waitMap").getGoon() ) break; 
+	    		 				 if( ! planUtils.switchToPlan("ppp").getGoon() ) break; 
 	    		 			}//else println("guard  fails");  //parg is null when there is no guard (onEvent)
 	    		 }
 	    		if( planUtils.repeatPlan(nPlanIter,0).getGoon() ) continue;
@@ -243,6 +276,35 @@ public abstract class AbstractGuimanager extends QActor {
 	    return returnValue;
 	    }catch(Exception e){
 	       //println( getName() + " plan=waitUpdates WARNING:" + e.getMessage() );
+	       QActorContext.terminateQActorSystem(this); 
+	       return false;  
+	    }
+	    }
+	    public boolean ppp() throws Exception{	//public to allow reflection
+	    try{
+	    	int nPlanIter = 0;
+	    	//curPlanInExec =  "ppp";
+	    	boolean returnValue = suspendWork;		//MARCHH2017
+	    while(true){
+	    	curPlanInExec =  "ppp";	//within while since it can be lost by switchlan
+	    	nPlanIter++;
+	    		parg = "actorOp(simulationSensing)";
+	    		aar = solveGoalReactive(parg,3600000,"","");
+	    		//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
+	    		if( aar.getInterrupted() ){
+	    			curPlanInExec   = "ppp";
+	    			if( aar.getTimeRemained() <= 0 ) addRule("tout(actorOp,"+getName()+")");
+	    			if( ! aar.getGoon() ) break;
+	    		} 			
+	    		//QActorUtils.solveGoal(parg,pengine );
+	    		temporaryStr = "\"FATTOOOOOO\"";
+	    		println( temporaryStr );  
+	    		if( ! planUtils.switchToPlan("waitMap").getGoon() ) break;
+	    break;
+	    }//while
+	    return returnValue;
+	    }catch(Exception e){
+	       //println( getName() + " plan=ppp WARNING:" + e.getMessage() );
 	       QActorContext.terminateQActorSystem(this); 
 	       return false;  
 	    }
@@ -287,5 +349,58 @@ public abstract class AbstractGuimanager extends QActor {
 	//	    	println( " %%%% getMsgFromInputQueue continues with " + msg );
 		    	this.currentMessage = msg;
 		    }
+		/* 
+		* ------------------------------------------------------------
+		* IACTIVITY (aactor with GUI)
+		* ------------------------------------------------------------
+		*/
+		private String[] actions = new String[]{
+		    	"println( STRING | TERM )", 
+		    	"play('./audio/music_interlude20.wav'),20000,'alarm,obstacle', 'handleAlarm,handleObstacle'",
+		"emit(EVID,EVCONTENT)  ",
+		"move(MOVE,DURATION,ANGLE)  with MOVE=mf|mb|ml|mr|ms",
+		"forward( DEST, MSGID, MSGCONTENTTERM)"
+		    };
+		    protected void doHelp(){
+				println("  GOAL ");
+				println("[ GUARD ], ACTION  ");
+				println("[ GUARD ], ACTION, DURATION ");
+				println("[ GUARD ], ACTION, DURATION, ENDEVENT");
+				println("[ GUARD ], ACTION, DURATION, EVENTS, PLANS");
+				println("Actions:");
+				for( int i=0; i<actions.length; i++){
+					println(" " + actions[i] );
+				}
+		    }
+		@Override
+		public void execAction(String cmd) {
+			if( cmd.equals("HELP") ){
+				doHelp();
+				return;
+			}
+			if( cmd.equals("FIRE") ){
+				emit("alarm", "alarm(fire)");
+				return;
+			}
+			String input = env.readln();
+			//input = "\""+input+"\"";
+			input = it.unibo.qactors.web.GuiUiKb.buildCorrectPrologString(input);
+			//println("input=" + input);
+			try {
+				Term.createTerm(input);
+	 			String eventMsg=it.unibo.qactors.web.QActorHttpServer.inputToEventMsg(input);
+				//println("QActor eventMsg " + eventMsg);
+				emit("local_"+it.unibo.qactors.web.GuiUiKb.inputCmd, eventMsg);
+	  		} catch (Exception e) {
+		 		println("QActor input error " + e.getMessage());
+			}
+		}
+	 	
+		@Override
+		public void execAction() {}
+		@Override
+		public void execAction(IIntent input) {}
+		@Override
+		public String execActionWithAnswer(String cmd) {return null;}
 	  }
 	

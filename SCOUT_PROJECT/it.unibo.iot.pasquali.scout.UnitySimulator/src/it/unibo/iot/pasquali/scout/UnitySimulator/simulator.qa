@@ -1,0 +1,19 @@
+System simulation
+
+Context ctxSimulation ip[host="localhost" port=5000]
+
+QActor simulator context ctxSimulation -g yellow{
+	
+	Plan init normal
+		println("simulator init");
+		actorOp initConnector;
+		switchToPlan simulate
+		
+	Plan simulate
+		actorOp receiveEvent;
+		actorOp sendAnswer;
+		
+		repeatPlan
+		
+	
+}

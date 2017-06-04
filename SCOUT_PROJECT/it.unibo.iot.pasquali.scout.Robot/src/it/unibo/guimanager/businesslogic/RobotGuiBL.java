@@ -52,7 +52,7 @@ public class RobotGuiBL implements IGuiManagerBL{
 			
 		} catch (Exception e)
 		{
-			System.out.println("QActor  ERROR " + e.getMessage());
+			e.printStackTrace();
 		}
 			
 		for(int i=0; i<data.size(); i++)
@@ -85,7 +85,22 @@ public class RobotGuiBL implements IGuiManagerBL{
 	@Override
 	public void updateState(int x, int y, String direction) {
 
-		gui.setCurrentPosition(y, x, direction.toUpperCase());		
+		gui.setCurrentPosition(y, x, direction.toUpperCase());
+		
+		actor.emit("moveACK", "moveACK");
+		actor.println("--- ACK SENT ---");
+	}
+
+	@Override
+	public void placeObstacle(int x, int y) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void simulationSensing() {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

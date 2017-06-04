@@ -1,0 +1,125 @@
+RobotSystem simulation
+
+Event senseObstacle : senseObstacle
+Event obstaclefront : obstaclefront
+
+Context ctxRobot ip[host="localhost" port=4000]
+
+QActor controller context ctxRobot -g gray{
+	
+	Plan init normal
+		println("controller init");
+		actorOp initUnityController;
+		switchToPlan waitUpdates
+		
+	Plan waitUpdates
+		
+		sense time(100000000) senseObstacle -> continue;
+		printCurrentEvent;
+		
+		onEvent senseObstacle : senseObstacle -> actorOp senseWithUnity;
+		
+		repeatPlan
+		
+	
+}
+
+/*
+ * Passando al piano startNavigation
+ * viene caricato un piano in formato plans.txt (eseguito con runPlan)
+ * in questo piano si fa la sense dell'evento obstaclefront
+ * e, nel caso, si esegue il piano waitAndEvaluate
+ * 
+ * ho ridefinito QActorPlanUtils in modo che la sense, nel caso di connessione con unity,
+ * sia composta da:
+ * - emit senseObstacle (percepito dal controller e rimandato al simulator)
+ * - sense obstaclefront (simulator manda al controller che emette l'evento)
+ * 
+ * con questa configurazione SI PRESENTA IL PROBLEMA, cioè la sense fatta
+ * in formato plans.txt (file piano.txt nella main directory) viene eseguita
+ * e si fa la switch to plan a waitAndEvaluate
+ * la sense definita in waitAndEvaluate, con la stessa semantica suddetta,
+ * fallisce miseramente lanciando un NullPointerExeption, docuto a AAR.getEvent() = NULL,
+ * a causa di una InvocationException
+ */
+ 
+ /*
+  * Passando invece al piano eventMainLoop
+  * si innesca lo stesso comportamento ma senza passaggi a runPlan
+  * e NON SI PRESENTA IL PROBLEMA
+  */
+  
+  /*
+   * Da qui suppongo che questo problema
+   * e la fail di tutte le chiamate prolog
+   * quando si passa da piano runPlan a piano qa
+   * siano dovute allo stesso identico BUG
+   */
+
+
+Robot mockScout QActor robot context ctxRobot -g white{
+	
+	Plan init normal
+		solve consult("navRobotTheory.pl") time(210000000);
+		println("robot init");
+		//switchToPlan startNavigation
+		switchToPlan eventMainLoop
+	
+	Plan startNavigation
+ 	
+ 		delay time(5000);
+ 	
+ 		solve loadThePlan("piano.txt") time(100000);
+  		
+ 		println("++++++++++++++++++ Plan Loaded ++++++++++++++++++");	
+ 		println(" ");
+ 		println(" ");
+ 		
+ 		solve showPlan(piano) time(10000);
+ 		
+ 		println(" ");
+ 		println(" ");
+ 		println("++++++++++++++++++ ++++++++++++++++++ ++++++++++++++++++");	
+
+		solve myRunPlan(piano) time(10000)
+	
+	Plan waitAndEvaluate
+		
+		println("ho trovato un ostacolo");
+		println("aspettiamo e vediamo che succede");
+		
+		delay time(5000);
+		
+		sense time(5000) obstaclefront -> endTheSystem
+	
+	
+	
+	Plan eventMainLoop
+	
+		delay time(5000);
+	
+		emit senseObstacle : senseObstacle;
+		println("event sent");
+		sense time(5000) obstaclefront -> stampa;
+		printCurrentEvent;
+		
+		delay time(6000);
+		
+		emit senseObstacle : senseObstacle;
+		println("event sent");
+		sense time(5000) obstaclefront -> stampa;
+		printCurrentEvent;
+		
+		repeatPlan 10
+		
+	Plan stampa resumeLastPlan
+		println("proviamo a stampare");
+		actorOp stampaRoba
+
+	Plan endTheSystem
+		println("L'ostacolo è ancora li, vaffanculo!")
+	
+		
+		
+	
+}

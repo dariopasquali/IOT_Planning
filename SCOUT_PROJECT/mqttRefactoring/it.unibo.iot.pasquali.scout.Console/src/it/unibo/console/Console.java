@@ -318,7 +318,7 @@ public class Console extends AbstractConsole implements IActivity{
 		}
 		catch (MqttException e)
 		{
-			println(e.getMessage());
+			e.printStackTrace();
 		}
 		
 	}

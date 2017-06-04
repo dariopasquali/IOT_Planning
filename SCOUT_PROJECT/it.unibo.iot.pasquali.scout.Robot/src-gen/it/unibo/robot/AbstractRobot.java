@@ -89,6 +89,7 @@ protected IActorAction  action;
     		//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
     		if( aar.getInterrupted() ){
     			curPlanInExec   = "init";
+    			if( aar.getTimeRemained() <= 0 ) addRule("tout(solvegoal,"+getName()+")");
     			if( ! aar.getGoon() ) break;
     		} 			
     		parg = "consult(\"navRobotTheory.pl\")";
@@ -97,6 +98,7 @@ protected IActorAction  action;
     		//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
     		if( aar.getInterrupted() ){
     			curPlanInExec   = "init";
+    			if( aar.getTimeRemained() <= 0 ) addRule("tout(solvegoal,"+getName()+")");
     			if( ! aar.getGoon() ) break;
     		} 			
     		parg = "consult(\"exploreRobotTheory.pl\")";
@@ -105,6 +107,7 @@ protected IActorAction  action;
     		//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
     		if( aar.getInterrupted() ){
     			curPlanInExec   = "init";
+    			if( aar.getTimeRemained() <= 0 ) addRule("tout(solvegoal,"+getName()+")");
     			if( ! aar.getGoon() ) break;
     		} 			
     		parg = "consult(\"talkTheory.pl\")";
@@ -113,6 +116,7 @@ protected IActorAction  action;
     		//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
     		if( aar.getInterrupted() ){
     			curPlanInExec   = "init";
+    			if( aar.getTimeRemained() <= 0 ) addRule("tout(solvegoal,"+getName()+")");
     			if( ! aar.getGoon() ) break;
     		} 			
     		temporaryStr = "\"++++++++++++++++++ robot(starts) ++++++++++++++++++\"";
@@ -235,6 +239,7 @@ protected IActorAction  action;
     		//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
     		if( aar.getInterrupted() ){
     			curPlanInExec   = "explorationFile";
+    			if( aar.getTimeRemained() <= 0 ) addRule("tout(solvegoal,"+getName()+")");
     			if( ! aar.getGoon() ) break;
     		} 			
     		if( (guardVars = QActorUtils.evalTheGuard(this, " !?msg(_,_,SENDER,X,explorefile(START,FILENAME),_)" )) != null ){
@@ -253,6 +258,7 @@ protected IActorAction  action;
     		//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
     		if( aar.getInterrupted() ){
     			curPlanInExec   = "explorationFile";
+    			if( aar.getTimeRemained() <= 0 ) addRule("tout(solvegoal,"+getName()+")");
     			if( ! aar.getGoon() ) break;
     		} 			
     		}
@@ -289,6 +295,7 @@ protected IActorAction  action;
     		//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
     		if( aar.getInterrupted() ){
     			curPlanInExec   = "explorationDebug";
+    			if( aar.getTimeRemained() <= 0 ) addRule("tout(solvegoal,"+getName()+")");
     			if( ! aar.getGoon() ) break;
     		} 			
     		}
@@ -323,6 +330,7 @@ protected IActorAction  action;
     		//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
     		if( aar.getInterrupted() ){
     			curPlanInExec   = "navigation";
+    			if( aar.getTimeRemained() <= 0 ) addRule("tout(solvegoal,"+getName()+")");
     			if( ! aar.getGoon() ) break;
     		} 			
     		if( (guardVars = QActorUtils.evalTheGuard(this, " ??msg(_,_,SENDER,X,navigate(PLAN_MOVES,POS),MSGNUM)" )) != null ){
@@ -333,6 +341,7 @@ protected IActorAction  action;
     		//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
     		if( aar.getInterrupted() ){
     			curPlanInExec   = "navigation";
+    			if( aar.getTimeRemained() <= 0 ) addRule("tout(solvegoal,"+getName()+")");
     			if( ! aar.getGoon() ) break;
     		} 			
     		}
@@ -362,6 +371,7 @@ protected IActorAction  action;
     		//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
     		if( aar.getInterrupted() ){
     			curPlanInExec   = "navigationFile";
+    			if( aar.getTimeRemained() <= 0 ) addRule("tout(solvegoal,"+getName()+")");
     			if( ! aar.getGoon() ) break;
     		} 			
     		if( (guardVars = QActorUtils.evalTheGuard(this, " !?msg(_,_,SENDER,X,navigatefile(PLAN_MOVES,POS,FILENAME),MSGNUM)" )) != null ){
@@ -376,10 +386,16 @@ protected IActorAction  action;
     		//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
     		if( aar.getInterrupted() ){
     			curPlanInExec   = "navigationFile";
+    			if( aar.getTimeRemained() <= 0 ) addRule("tout(solvegoal,"+getName()+")");
     			if( ! aar.getGoon() ) break;
     		} 			
     		}
+    		if( (guardVars = QActorUtils.evalTheGuard(this, " !?planExecutionMode(pInter)" )) != null ){
     		if( ! planUtils.switchToPlan("startNavigation").getGoon() ) break;
+    		}
+    		if( (guardVars = QActorUtils.evalTheGuard(this, " !?planExecutionMode(executor)" )) != null ){
+    		if( ! planUtils.switchToPlan("executeNavigationPlan").getGoon() ) break;
+    		}
     break;
     }//while
     return returnValue;
@@ -400,24 +416,18 @@ protected IActorAction  action;
     		if( (guardVars = QActorUtils.evalTheGuard(this, " !?planName(PLANNAME)" )) != null ){
     		parg = "myClearPlan(PLANNAME)";
     		parg = QActorUtils.substituteVars(guardVars,parg);
-    		//REGENERATE AKKA
-    		aar = solveGoalReactive(parg,0,"","");
-    		//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
-    		if( aar.getInterrupted() ){
-    			curPlanInExec   = "startNavigation";
-    			if( ! aar.getGoon() ) break;
-    		} 			
+    		//tout=1 day (24 h)
+    		//aar = solveGoalReactive(parg,86400000,"","");
+    		//genCheckAar(m.name)Â»		
+    		QActorUtils.solveGoal(parg,pengine );
     		}
     		if( (guardVars = QActorUtils.evalTheGuard(this, " !?planFilename(FILENAME)" )) != null ){
     		parg = "loadThePlan(FILENAME)";
     		parg = QActorUtils.substituteVars(guardVars,parg);
-    		//REGENERATE AKKA
-    		aar = solveGoalReactive(parg,300000000,"","");
-    		//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
-    		if( aar.getInterrupted() ){
-    			curPlanInExec   = "startNavigation";
-    			if( ! aar.getGoon() ) break;
-    		} 			
+    		//tout=1 day (24 h)
+    		//aar = solveGoalReactive(parg,86400000,"","");
+    		//genCheckAar(m.name)Â»		
+    		QActorUtils.solveGoal(parg,pengine );
     		}
     		temporaryStr = "\"++++++++++++++++++ Plan Loaded ++++++++++++++++++\"";
     		println( temporaryStr );  
@@ -428,13 +438,10 @@ protected IActorAction  action;
     		if( (guardVars = QActorUtils.evalTheGuard(this, " !?planName(PLANNAME)" )) != null ){
     		parg = "showPlan(PLANNAME)";
     		parg = QActorUtils.substituteVars(guardVars,parg);
-    		//REGENERATE AKKA
-    		aar = solveGoalReactive(parg,1000,"","");
-    		//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
-    		if( aar.getInterrupted() ){
-    			curPlanInExec   = "startNavigation";
-    			if( ! aar.getGoon() ) break;
-    		} 			
+    		//tout=1 day (24 h)
+    		//aar = solveGoalReactive(parg,86400000,"","");
+    		//genCheckAar(m.name)Â»		
+    		QActorUtils.solveGoal(parg,pengine );
     		}
     		temporaryStr = "\" \"";
     		println( temporaryStr );  
@@ -445,19 +452,45 @@ protected IActorAction  action;
     		if( (guardVars = QActorUtils.evalTheGuard(this, " !?planName(PLANNAME)" )) != null ){
     		parg = "myRunPlan(PLANNAME)";
     		parg = QActorUtils.substituteVars(guardVars,parg);
-    		//REGENERATE AKKA
-    		aar = solveGoalReactive(parg,1000000000,"","");
-    		//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
-    		if( aar.getInterrupted() ){
-    			curPlanInExec   = "startNavigation";
-    			if( ! aar.getGoon() ) break;
-    		} 			
+    		//tout=1 day (24 h)
+    		//aar = solveGoalReactive(parg,86400000,"","");
+    		//genCheckAar(m.name)Â»		
+    		QActorUtils.solveGoal(parg,pengine );
     		}
     break;
     }//while
     return returnValue;
     }catch(Exception e){
        //println( getName() + " plan=startNavigation WARNING:" + e.getMessage() );
+       QActorContext.terminateQActorSystem(this); 
+       return false;  
+    }
+    }
+    public boolean executeNavigationPlan() throws Exception{	//public to allow reflection
+    try{
+    	int nPlanIter = 0;
+    	//curPlanInExec =  "executeNavigationPlan";
+    	boolean returnValue = suspendWork;		//MARCHH2017
+    while(true){
+    	curPlanInExec =  "executeNavigationPlan";	//within while since it can be lost by switchlan
+    	nPlanIter++;
+    		temporaryStr = "\"execute the plan AHAHAHAHA\"";
+    		println( temporaryStr );  
+    		parg = "javaPlanExecution";
+    		//REGENERATE AKKA
+    		aar = solveGoalReactive(parg,1000000000,"","");
+    		//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
+    		if( aar.getInterrupted() ){
+    			curPlanInExec   = "executeNavigationPlan";
+    			if( aar.getTimeRemained() <= 0 ) addRule("tout(solvegoal,"+getName()+")");
+    			if( ! aar.getGoon() ) break;
+    		} 			
+    		if( ! planUtils.switchToPlan("notifyEndOfNavigation").getGoon() ) break;
+    break;
+    }//while
+    return returnValue;
+    }catch(Exception e){
+       //println( getName() + " plan=executeNavigationPlan WARNING:" + e.getMessage() );
        QActorContext.terminateQActorSystem(this); 
        return false;  
     }
@@ -470,6 +503,26 @@ protected IActorAction  action;
     while(true){
     	curPlanInExec =  "waitAndEvaluate";	//within while since it can be lost by switchlan
     	nPlanIter++;
+    		temporaryStr = "\"proviamo a fare roba\"";
+    		println( temporaryStr );  
+    		parg = "robaAcaso";
+    		//REGENERATE AKKA
+    		aar = solveGoalReactive(parg,1000000000,"","");
+    		//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
+    		if( aar.getInterrupted() ){
+    			curPlanInExec   = "waitAndEvaluate";
+    			if( aar.getTimeRemained() <= 0 ) addRule("tout(solvegoal,"+getName()+")");
+    			if( ! aar.getGoon() ) break;
+    		} 			
+    		parg = "actorOp(stampaRoba)";
+    		aar = solveGoalReactive(parg,3600000,"","");
+    		//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
+    		if( aar.getInterrupted() ){
+    			curPlanInExec   = "waitAndEvaluate";
+    			if( aar.getTimeRemained() <= 0 ) addRule("tout(actorOp,"+getName()+")");
+    			if( ! aar.getGoon() ) break;
+    		} 			
+    		//QActorUtils.solveGoal(parg,pengine );
     		temporaryStr = "\"maybe there is an unexpected static obstacle\"";
     		println( temporaryStr );  
     		//delay
@@ -505,12 +558,13 @@ protected IActorAction  action;
     	nPlanIter++;
     		temporaryStr = "\"I found an unexpected static obstacle\"";
     		println( temporaryStr );  
-    		parg = "notifyUnexpectedObstacle";
+    		parg = "robaAcaso";
     		//REGENERATE AKKA
-    		aar = solveGoalReactive(parg,0,"","");
+    		aar = solveGoalReactive(parg,1000000000,"","");
     		//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
     		if( aar.getInterrupted() ){
     			curPlanInExec   = "notifyUnexpectedObstacle";
+    			if( aar.getTimeRemained() <= 0 ) addRule("tout(solvegoal,"+getName()+")");
     			if( ! aar.getGoon() ) break;
     		} 			
     		temporaryStr = "\"Unexpected Obstacle notified, I wait the new plan\"";
@@ -533,8 +587,21 @@ protected IActorAction  action;
     while(true){
     	curPlanInExec =  "notifyEndOfNavigation";	//within while since it can be lost by switchlan
     	nPlanIter++;
+    		parg = "actorOp(stampaRoba)";
+    		aar = solveGoalReactive(parg,3600000,"","");
+    		//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
+    		if( aar.getInterrupted() ){
+    			curPlanInExec   = "notifyEndOfNavigation";
+    			if( aar.getTimeRemained() <= 0 ) addRule("tout(actorOp,"+getName()+")");
+    			if( ! aar.getGoon() ) break;
+    		} 			
+    		//QActorUtils.solveGoal(parg,pengine );
     		temporaryStr = "\"notify End\"";
     		println( temporaryStr );  
+    		//delay
+    		aar = delayReactive(400,"" , "");
+    		if( aar.getInterrupted() ) curPlanInExec   = "notifyEndOfNavigation";
+    		if( ! aar.getGoon() ) break;
     		temporaryStr = QActorUtils.unifyMsgContent(pengine, "end","end", guardVars ).toString();
     		emit( "end", temporaryStr );
     		if( ! planUtils.switchToPlan("waitConsoleCommand").getGoon() ) break;
@@ -543,6 +610,86 @@ protected IActorAction  action;
     return returnValue;
     }catch(Exception e){
        //println( getName() + " plan=notifyEndOfNavigation WARNING:" + e.getMessage() );
+       QActorContext.terminateQActorSystem(this); 
+       return false;  
+    }
+    }
+    public boolean waitReplan() throws Exception{	//public to allow reflection
+    try{
+    	int nPlanIter = 0;
+    	//curPlanInExec =  "waitReplan";
+    	boolean returnValue = suspendWork;		//MARCHH2017
+    while(true){
+    	curPlanInExec =  "waitReplan";	//within while since it can be lost by switchlan
+    	nPlanIter++;
+    		temporaryStr = "\"++++++++++++++++++ WAIT ALTERNATIVE PLAN ++++++++++++++++++\"";
+    		println( temporaryStr );  
+    		//ReceiveMsg
+    		 		aar = planUtils.receiveAMsg(mysupport,600000000, "" , "" ); 	//could block
+    			    if( ! aar.getGoon() || aar.getTimeRemained() <= 0 ){
+    			    	//println("	WARNING: receivemsg timeout " + aar.getTimeRemained());
+    			    	addRule("tout(receivemsg,"+getName()+")");
+    			    }
+    		printCurrentMessage(false);
+    		memoCurrentMessage( false );
+    		//onMsg
+    		if( currentMessage.msgId().equals("navigatefile") ){
+    			String parg = "";
+    			/* SwitchPlan */
+    			parg =  updateVars(  Term.createTerm("navigatefile(PLAN_MOVES,POS,FILENAME)"), Term.createTerm("navigatefile(PLAN_MOVES,POS,FILENAME)"), 
+    				    		  					Term.createTerm(currentMessage.msgContent()), parg);
+    				if( parg != null ){
+    					 if( ! planUtils.switchToPlan("navigationFileReplan").getGoon() ) break; 
+    				}//else println("guard  fails");  //parg is null when there is no guard (onEvent)
+    		}
+    break;
+    }//while
+    return returnValue;
+    }catch(Exception e){
+       //println( getName() + " plan=waitReplan WARNING:" + e.getMessage() );
+       QActorContext.terminateQActorSystem(this); 
+       return false;  
+    }
+    }
+    public boolean navigationFileReplan() throws Exception{	//public to allow reflection
+    try{
+    	int nPlanIter = 0;
+    	//curPlanInExec =  "navigationFileReplan";
+    	boolean returnValue = suspendWork;		//MARCHH2017
+    while(true){
+    	curPlanInExec =  "navigationFileReplan";	//within while since it can be lost by switchlan
+    	nPlanIter++;
+    		temporaryStr = "\"I received the alternative plan\"";
+    		println( temporaryStr );  
+    		parg = "initialConfigNavRobot";
+    		//REGENERATE AKKA
+    		aar = solveGoalReactive(parg,0,"","");
+    		//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
+    		if( aar.getInterrupted() ){
+    			curPlanInExec   = "navigationFileReplan";
+    			if( aar.getTimeRemained() <= 0 ) addRule("tout(solvegoal,"+getName()+")");
+    			if( ! aar.getGoon() ) break;
+    		} 			
+    		temporaryStr = "\"NavigationFileReplan ---> sono arrivato dopo la SOLVE!!!!!!!!!!\"";
+    		println( temporaryStr );  
+    		if( (guardVars = QActorUtils.evalTheGuard(this, " ??msg(_,_,SENDER,X,navigatefile(PLAN_MOVES,POS,FILENAME),MSGNUM)" )) != null ){
+    		parg = "loadNavigationData(PLAN_MOVES,POS,FILENAME)";
+    		parg = QActorUtils.substituteVars(guardVars,parg);
+    		//REGENERATE AKKA
+    		aar = solveGoalReactive(parg,100000,"","");
+    		//println(getName() + " plan " + curPlanInExec  +  " interrupted=" + aar.getInterrupted() + " action goon="+aar.getGoon());
+    		if( aar.getInterrupted() ){
+    			curPlanInExec   = "navigationFileReplan";
+    			if( aar.getTimeRemained() <= 0 ) addRule("tout(solvegoal,"+getName()+")");
+    			if( ! aar.getGoon() ) break;
+    		} 			
+    		}
+    		if( ! planUtils.switchToPlan("startNavigation").getGoon() ) break;
+    break;
+    }//while
+    return returnValue;
+    }catch(Exception e){
+       //println( getName() + " plan=navigationFileReplan WARNING:" + e.getMessage() );
        QActorContext.terminateQActorSystem(this); 
        return false;  
     }

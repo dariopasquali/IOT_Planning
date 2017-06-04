@@ -416,9 +416,9 @@ executeCmd( Actor, repeatplan(N), Events, Plans,done(repeatplan(0)) ):-
 	PN1 is PN + 1,
 	( PN1 < N, !, execPlan(Actor, PLAN, 1); true ).
 %%% ---------  collector (default)  --------------	
-%%executeCmd( Actor, MOVE, Events, Plans,done(MOVE) ):-
-%%	output( collector(MOVE) ),
-%%	Actor <- MOVE.
+%executeCmd( Actor, MOVE, Events, Plans,done(MOVE) ):-
+%	output( collector(MOVE) ),
+%	Actor <- MOVE.
 
 
 /*

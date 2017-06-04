@@ -3,7 +3,7 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8"/>
 	<classpathentry kind="lib" path="/it.unibo.iss.libs/libs/unibo/uniboInterfaces.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Dario/.gradle/caches/modules-2/files-2.1/org.eclipse.paho/org.eclipse.paho.client.mqttv3/1.1.0/89d827ffa47c241f2627421ef1d6c7a8c207a341/org.eclipse.paho.client.mqttv3-1.1.0.jar" sourcepath="C:/Users/Dario/.gradle/caches/modules-2/files-2.1/org.eclipse.paho/org.eclipse.paho.client.mqttv3/1.1.0/c4e2860ca315d2f24287112093c7e58305b30a30/org.eclipse.paho.client.mqttv3-1.1.0-sources.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Dario/Desktop/UNIBO/ING_SOFT_M/PLANNING/GIT/IOT_Planning/SCOUT_PROJECT/mqttRefactoring/it.unibo.iss.libs/libs/unibo/qa18Akka.jar"/>
+	<classpathentry kind="lib" path="D:/Desktop/PLANNING/GIT/IOT_Planning/SCOUT_PROJECT/mqttRefactoring/it.unibo.iss.libs/libs/unibo/qa18Akka.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Portatile/.gradle/caches/modules-2/files-2.1/org.eclipse.paho/org.eclipse.paho.client.mqttv3/1.1.0/89d827ffa47c241f2627421ef1d6c7a8c207a341/org.eclipse.paho.client.mqttv3-1.1.0.jar" sourcepath="C:/Users/Portatile/.gradle/caches/modules-2/files-2.1/org.eclipse.paho/org.eclipse.paho.client.mqttv3/1.1.0/c4e2860ca315d2f24287112093c7e58305b30a30/org.eclipse.paho.client.mqttv3-1.1.0-sources.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -73,6 +73,14 @@ Event show : show(POS, DIR)
 
 Event updateSimulation : updateSimulation(POSITION)
 
+// ------------------------------------------------------------------
+//		UNITY - INTERACTION
+// ------------------------------------------------------------------
+
+Event senseObstacle : senseObstacle
+
+Event moveACK : moveACK
+
 Event subscribeACK : subscribeACK
 
 // ------------------------------------------------------------------
@@ -97,7 +105,7 @@ QActor console context ctxConsole{
 //			GUI MANAGER
 // ------------------------------------------------------------------
 
-QActor guimanager context ctxRobot{
+QActor guimanager context ctxRobot -g white{
 	
 	Plan init normal
 		println("++++++++++++++++++++++++++ guiManager(starts) ++++++++++++++++++");
@@ -118,20 +126,31 @@ QActor guimanager context ctxRobot{
 		println("++++++++++++++++++++++++++ ROBOT GUI WAIT MAP ++++++++++++++++++");		
 		sense time(1000000000) enableGUI -> continue;
 		printCurrentEvent;
-		onEvent enableGUI : enableGUI(START, FILENAME) -> solve showMap(START, FILENAME) time(0);
-		[!? robotMode(unity)] sense time(2000) subscribeACK -> continue;
+		onEvent enableGUI : enableGUI(position(X , Y), FILENAME) -> actorOp showMap(X , Y, FILENAME);
+		
+		//[!? robotMode(unity)] sense time(2000) subscribeACK -> continue;
+		
 		actorOp createActor;
 		
 		switchToPlan waitUpdates	
 		
 	Plan waitUpdates
-		sense time(1000000000) show, end, abort ->  continue, continue, continue;
-			
-		onEvent show : show(POS,DIR) -> solve updateState(POS,DIR) time(0);
-		onEvent end : end -> switchToPlan waitMap;
-		onEvent abort : abort -> switchToPlan waitMap;
+		println("waitMove");
+		sense time(1000000000) end, show, senseObstacle->  continue, continue, continue;
+		//sense time(1000000000) show ->  continue;
+		printCurrentEvent;
 		
-		repeatPlan 0 
+		onEvent senseObstacle : senseObstacle -> actorOp simulationSensing;	
+		onEvent show : show(POS,DIR) -> solve updateState(POS,DIR) time(0);
+		onEvent end : end -> switchToPlan ppp;
+		
+		
+		repeatPlan
+		
+	Plan ppp
+		actorOp simulationSensing;
+		println("FATTOOOOOO");
+		switchToPlan waitMap 
 		
 		
 		
@@ -238,30 +257,42 @@ Robot mockScout QActor robot context ctxRobot{
  		[?? msg(_, _, SENDER, X, navigatefile( PLAN_MOVES , POS , FILENAME), MSGNUM)] 
  			solve loadNavigationData(PLAN_MOVES, POS, FILENAME) time (100000) onFailSwitchTo loadMapFailure;
  		
- 		switchToPlan startNavigation 	
+ 		[!? planExecutionMode(pInter)] switchToPlan startNavigation;
+ 		[!? planExecutionMode(executor)] switchToPlan executeNavigationPlan 	
  		
  	Plan startNavigation
  	
- 		[ !? planName(PLANNAME) ] solve myClearPlan(PLANNAME) time(0);
- 		[ !? planFilename(FILENAME) ]  solve loadThePlan(FILENAME) time(300000000);
+ 		[ !? planName(PLANNAME) ] demo myClearPlan(PLANNAME);
+ 		[ !? planFilename(FILENAME) ]  demo loadThePlan(FILENAME);
   		
  		println("++++++++++++++++++ Plan Loaded ++++++++++++++++++");	
  		println(" ");
  		println(" ");
  		
- 		[ !? planName(PLANNAME) ] solve showPlan(PLANNAME) time(1000);
+ 		[ !? planName(PLANNAME) ] demo showPlan(PLANNAME);
  		
  		println(" ");
  		println(" ");
  		println("++++++++++++++++++ ++++++++++++++++++ ++++++++++++++++++");	
 
-		[ !? planName(PLANNAME) ] solve myRunPlan(PLANNAME) time(1000000000)
+		[ !? planName(PLANNAME) ] demo myRunPlan(PLANNAME)
 
+ 	
+ 	Plan executeNavigationPlan
+ 	
+ 		println("execute the plan AHAHAHAHA");
+ 		solve javaPlanExecution time(1000000000); 		
+ 		switchToPlan notifyEndOfNavigation
  	
  	Plan waitAndEvaluate resumeLastPlan
  		
+ 		println("proviamo a fare roba");
+ 		
+ 		solve robaAcaso time(1000000000);
+ 		actorOp stampaRoba;
+ 		
  		println("maybe there is an unexpected static obstacle");
- 		delay time(6000);
+ 		delay time(6000); 		
  		println("are you there obstacle ??");
  		
  		sense time(5000) obstaclefront -> notifyUnexpectedObstacle	
@@ -269,22 +300,46 @@ Robot mockScout QActor robot context ctxRobot{
  		
  	Plan notifyUnexpectedObstacle
  		
- 		println("I found an unexpected static obstacle");
- 		
- 		solve notifyUnexpectedObstacle time(0);
- 		
+ 		println("I found an unexpected static obstacle"); 		
+  		solve robaAcaso time(1000000000);		
  		println("Unexpected Obstacle notified, I wait the new plan");
  		
  		switchToPlan waitConsoleCommand 		
  		
  	
  	Plan notifyEndOfNavigation	
- 	
- 		println("notify End"); 	
- 			
- 		emit end : end;
+ 		 		
+ 		actorOp stampaRoba;
  		
- 		switchToPlan waitConsoleCommand	
+ 		println("notify End");  		
+ 		delay time(400);	 			
+ 		emit end : end; 		
+ 		switchToPlan waitConsoleCommand
+ 	
+ 	Plan waitReplan
+ 		
+ 		println("++++++++++++++++++ WAIT ALTERNATIVE PLAN ++++++++++++++++++");
+ 		
+ 		receiveMsg time(600000000);
+ 		printCurrentMessage;
+ 		memoCurrentMessage;
+ 		
+ 		//onMsg navigate : navigate(PLAN_MOVES, POS) -> switchToPlan navigationReplan;
+ 		onMsg navigatefile : navigatefile( PLAN_MOVES , POS , FILENAME) -> switchToPlan navigationFileReplan
+ 	
+ 	Plan navigationFileReplan
+ 		
+ 		println("I received the alternative plan");
+ 		
+ 		solve initialConfigNavRobot time(0);
+ 		
+ 		println("NavigationFileReplan ---> sono arrivato dopo la SOLVE!!!!!!!!!!");
+ 		
+ 		[?? msg(_, _, SENDER, X, navigatefile( PLAN_MOVES , POS , FILENAME), MSGNUM)] 
+ 			solve loadNavigationData(PLAN_MOVES, POS, FILENAME) time (100000) onFailSwitchTo loadMapFailure;
+ 		
+ 		switchToPlan startNavigation 
+ 		
  		
  	Plan simulatedWorldChanged resumeLastPlan
  		println("******************** Simulated World Changed ****************************")

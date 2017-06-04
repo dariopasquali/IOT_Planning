@@ -103,7 +103,7 @@ public class Plan {
 		plan += "plan("+moveCounter+","+planName+", sentence(true,move(senseEvent"+e+","+p+"),'', '' ))\n";
 		moveCounter++;
 	}
-	
+		
 	public void addSenseEvent(int timeout, String ee, String pp)
 	{
 		
@@ -116,6 +116,12 @@ public class Plan {
 		
 		plan += "plan("+moveCounter+","+planName+", sentence(true,move(senseEvent,"+timeout+","+e+","+p+"),'', '' ))\n";
 		moveCounter++;
+	}
+	
+	public void addEmitEvent(String evID, String payload){
+		
+		plan += "plan("+moveCounter+","+planName+", sentence(true,move(emit,"+evID+","+payload+"),'', '' ))\n";
+		moveCounter++;		
 	}
 	
 	public void addMsgSwitch(MsgSwitch msg)
